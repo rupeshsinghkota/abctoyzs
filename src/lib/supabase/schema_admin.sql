@@ -31,9 +31,9 @@ alter table admins enable row level security;
 alter table products enable row level security;
 
 -- Admin Policies
-create policy "Admins are viewable by admins only"
+create policy "Admins are viewable by themselves"
   on admins for select
-  using (exists (select 1 from admins where user_id = auth.uid()));
+  using (user_id = auth.uid());
 
 -- Product Policies
 create policy "Products are viewable by everyone"

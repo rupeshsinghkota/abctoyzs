@@ -99,10 +99,10 @@ export const AdminService = {
     async getAllOrders() {
         const supabase = createClient();
 
-        // Get all orders (admin has access via RLS or service role)
+        // Get all orders with address information
         const { data: orders, error } = await supabase
             .from('orders')
-            .select('*')
+            .select('*, shipping_address:addresses(*)')
             .order('created_at', { ascending: false });
 
         if (error) throw error;

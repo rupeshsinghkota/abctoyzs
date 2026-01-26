@@ -83,6 +83,11 @@ export default function CheckoutPage() {
                 alert('Please fill in all required address fields');
                 return;
             }
+            // Email required for guests to create account
+            if (!isLoggedIn && !guestAddress.email) {
+                alert('Please enter your email address');
+                return;
+            }
         }
 
         setPlacing(true);
@@ -101,15 +106,103 @@ export default function CheckoutPage() {
                     }))
                 });
             } else {
-                // Guest or logged-in user with no saved addresses
-                // For now, just log and proceed (could save address first then order)
-                console.log('Order with inline address:', { guestAddress, cart, total, isLoggedIn });
+                // Guest checkout OR logged-in user with no saved addresses
+                // Auto-create account for guests and save order
+                const supabase = createClient();
+
+                let userId: string;
+
+                if (!isLoggedIn && guestAddress.email) {
+                    // Create account for guest with random password
+                    const tempPassword = Math.random().toString(36).slice(-12) + 'Aa1!';
+                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                        email: guestAddress.email,
+                        password: tempPassword,
+                        options: {
+                            data: {
+                                full_name: guestAddress.name,
+                                phone: guestAddress.phone
+                            }
+                        }
+                    });
+
+                    if (signUpError) {
+                        // If email exists, try to proceed anyway
+                        console.error('Signup error:', signUpError);
+                        throw new Error('Could not create account. Email may already exist. Please login or use a different email.');
+                    }
+
+                    userId = signUpData.user?.id || '';
+
+                    // Send password reset email so they can set their own password
+                    if (guestAddress.email) {
+                        await supabase.auth.resetPasswordForEmail(guestAddress.email, {
+                            redirectTo: `${window.location.origin}/reset-password`
+                        });
+                    }
+                } else {
+                    // Logged-in user with no saved addresses
+                    const { data: { user } } = await supabase.auth.getUser();
+                    userId = user?.id || '';
+                }
+
+                if (!userId) {
+                    throw new Error('Could not identify user');
+                }
+
+                // Save address for the user
+                const { data: newAddress, error: addressError } = await supabase
+                    .from('addresses')
+                    .insert({
+                        user_id: userId,
+                        name: guestAddress.name,
+                        phone: guestAddress.phone,
+                        address_line1: guestAddress.address_line1,
+                        address_line2: guestAddress.address_line2 || null,
+                        city: guestAddress.city,
+                        state: guestAddress.state,
+                        pincode: guestAddress.pincode,
+                        is_default: true
+                    })
+                    .select()
+                    .single();
+
+                if (addressError) {
+                    console.error('Address error:', addressError);
+                    // Continue anyway, just save order without address reference
+                }
+
+                // Create order
+                const { data: order, error: orderError } = await supabase
+                    .from('orders')
+                    .insert({
+                        user_id: userId,
+                        total_amount: total,
+                        shipping_address_id: newAddress?.id || null, // Link to the new address
+                        status: 'processing'
+                    })
+                    .select()
+                    .single();
+
+                if (orderError) throw orderError;
+
+                // Create order items
+                const itemsToInsert = cart.map(item => ({
+                    order_id: order.id,
+                    product_id: parseInt(item.id),
+                    product_name: item.name,
+                    product_image: item.image,
+                    quantity: item.quantity,
+                    price: item.price
+                }));
+
+                await supabase.from('order_items').insert(itemsToInsert);
             }
 
             clearCart();
             router.push('/checkout/success');
-        } catch (error) {
-            alert('Failed to place order. Please try again.');
+        } catch (error: any) {
+            alert(error.message || 'Failed to place order. Please try again.');
             setPlacing(false);
         }
     }
@@ -133,14 +226,15 @@ export default function CheckoutPage() {
 
     const selectedAddress = addresses.find(a => a.id === selectedAddressId);
     const guestFormValid = !!(guestAddress.name && guestAddress.phone && guestAddress.address_line1 &&
-        guestAddress.city && guestAddress.state && guestAddress.pincode);
+        guestAddress.city && guestAddress.state && guestAddress.pincode &&
+        (!isLoggedIn ? guestAddress.email : true)); // Email required for guests only
     // For logged-in users: either have a selected address OR fill the inline form if no saved addresses
     const isAddressValid = isLoggedIn
         ? (addresses.length > 0 ? !!selectedAddressId : guestFormValid)
         : guestFormValid;
 
     return (
-        <div className="min-h-screen pb-32 bg-background">
+        <div className="min-h-screen pb-40 lg:pb-12 bg-background">
             {/* Header */}
             <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b px-4 py-4 flex items-center gap-4">
                 <Link href="/cart" className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors">
@@ -154,329 +248,331 @@ export default function CheckoutPage() {
                 )}
             </div>
 
-            <div className="p-4 max-w-2xl mx-auto space-y-6">
-
-                {/* Login Prompt for Guests */}
-                {isLoggedIn === false && (
-                    <div className="bg-gradient-to-r from-primary/10 to-orange-500/10 border border-primary/20 rounded-2xl p-4 flex items-center gap-4">
-                        <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                            <p className="font-semibold">Have an account?</p>
-                            <p className="text-sm text-muted-foreground">Login to save orders & track shipments</p>
-                        </div>
-                        <Link href="/login?next=/checkout" className="px-4 py-2 bg-primary text-white font-bold rounded-lg text-sm">
-                            Login
-                        </Link>
-                    </div>
-                )}
-
-                {/* Step 1: Delivery Address */}
-                <div className="bg-card border rounded-2xl overflow-hidden">
-                    <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
-                                1
-                            </div>
-                            <h2 className="font-bold">Delivery Address</h2>
-                        </div>
-                        {isLoggedIn && (
-                            <Link
-                                href="/profile/addresses/new"
-                                className="text-sm text-primary font-semibold flex items-center gap-1"
-                            >
-                                <Plus className="w-4 h-4" />
-                                Add New
-                            </Link>
-                        )}
-                    </div>
-
-                    <div className="p-4">
-                        {loading ? (
-                            <div className="flex items-center justify-center py-8">
-                                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                            </div>
-                        ) : isLoggedIn ? (
-                            // Logged-in: Show saved addresses
-                            addresses.length === 0 ? (
-                                // No saved addresses - show inline form
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-xl text-sm text-muted-foreground">
-                                        <MapPin className="w-4 h-4" />
-                                        <span>Enter your delivery address below</span>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <input
-                                            name="name"
-                                            placeholder="Full Name *"
-                                            value={guestAddress.name}
-                                            onChange={handleGuestChange}
-                                            className="col-span-2 w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                        />
-                                        <input
-                                            name="phone"
-                                            placeholder="Phone *"
-                                            value={guestAddress.phone}
-                                            onChange={handleGuestChange}
-                                            className="col-span-2 w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                        />
-                                    </div>
-                                    <input
-                                        name="address_line1"
-                                        placeholder="Address Line 1 *"
-                                        value={guestAddress.address_line1}
-                                        onChange={handleGuestChange}
-                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                    <input
-                                        name="address_line2"
-                                        placeholder="Address Line 2 (optional)"
-                                        value={guestAddress.address_line2}
-                                        onChange={handleGuestChange}
-                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                    <div className="grid grid-cols-3 gap-3">
-                                        <input
-                                            name="city"
-                                            placeholder="City *"
-                                            value={guestAddress.city}
-                                            onChange={handleGuestChange}
-                                            className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                        />
-                                        <input
-                                            name="state"
-                                            placeholder="State *"
-                                            value={guestAddress.state}
-                                            onChange={handleGuestChange}
-                                            className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                        />
-                                        <input
-                                            name="pincode"
-                                            placeholder="Pincode *"
-                                            value={guestAddress.pincode}
-                                            onChange={handleGuestChange}
-                                            className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                        />
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {addresses.map((address) => (
-                                        <button
-                                            key={address.id}
-                                            onClick={() => setSelectedAddressId(address.id)}
-                                            className={`w-full text-left p-4 rounded-xl border-2 transition-all ${selectedAddressId === address.id
-                                                ? 'border-primary bg-primary/5'
-                                                : 'border-muted hover:border-primary/50'
-                                                }`}
-                                        >
-                                            <div className="flex items-start justify-between gap-3">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className="font-bold">{address.name}</span>
-                                                        {address.is_default && (
-                                                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold">
-                                                                Default
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {address.address_line1}, {address.address_line2 && `${address.address_line2}, `}
-                                                        {address.city}, {address.state} - {address.pincode}
-                                                    </p>
-                                                    <p className="text-sm text-muted-foreground mt-1">📞 {address.phone}</p>
-                                                </div>
-                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedAddressId === address.id ? 'border-primary bg-primary' : 'border-muted-foreground/30'
-                                                    }`}>
-                                                    {selectedAddressId === address.id && <Check className="w-4 h-4 text-white" />}
-                                                </div>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-                            )
-                        ) : (
-                            // Guest: Show address form
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <input
-                                        name="name"
-                                        placeholder="Full Name *"
-                                        value={guestAddress.name}
-                                        onChange={handleGuestChange}
-                                        className="col-span-2 w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                    <input
-                                        name="phone"
-                                        placeholder="Phone *"
-                                        value={guestAddress.phone}
-                                        onChange={handleGuestChange}
-                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                    <input
-                                        name="email"
-                                        placeholder="Email (optional)"
-                                        value={guestAddress.email}
-                                        onChange={handleGuestChange}
-                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                </div>
-                                <input
-                                    name="address_line1"
-                                    placeholder="Address Line 1 *"
-                                    value={guestAddress.address_line1}
-                                    onChange={handleGuestChange}
-                                    className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                />
-                                <input
-                                    name="address_line2"
-                                    placeholder="Address Line 2 (optional)"
-                                    value={guestAddress.address_line2}
-                                    onChange={handleGuestChange}
-                                    className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                />
-                                <div className="grid grid-cols-3 gap-3">
-                                    <input
-                                        name="city"
-                                        placeholder="City *"
-                                        value={guestAddress.city}
-                                        onChange={handleGuestChange}
-                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                    <input
-                                        name="state"
-                                        placeholder="State *"
-                                        value={guestAddress.state}
-                                        onChange={handleGuestChange}
-                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                    <input
-                                        name="pincode"
-                                        placeholder="Pincode *"
-                                        value={guestAddress.pincode}
-                                        onChange={handleGuestChange}
-                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Step 2: Payment Method */}
-                <div className="bg-card border rounded-2xl overflow-hidden">
-                    <div className="p-4 border-b bg-muted/30 flex items-center gap-3">
-                        <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
-                            2
-                        </div>
-                        <h2 className="font-bold">Payment Method</h2>
-                    </div>
-
-                    <div className="p-4 space-y-3">
-                        <button
-                            onClick={() => setPaymentMethod('cod')}
-                            className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${paymentMethod === 'cod'
-                                ? 'border-primary bg-primary/5'
-                                : 'border-muted hover:border-primary/50'
-                                }`}
-                        >
-                            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-                                <Banknote className="w-6 h-6 text-green-600" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="font-bold">Cash on Delivery</p>
-                                <p className="text-sm text-muted-foreground">Pay when you receive your order</p>
-                            </div>
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
-                                }`}>
-                                {paymentMethod === 'cod' && <Check className="w-4 h-4 text-white" />}
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={() => setPaymentMethod('online')}
-                            disabled
-                            className="w-full text-left p-4 rounded-xl border-2 border-muted opacity-50 flex items-center gap-4 cursor-not-allowed"
-                        >
-                            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                                <CreditCard className="w-6 h-6 text-blue-600" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="font-bold">Online Payment</p>
-                                <p className="text-sm text-muted-foreground">Coming soon - UPI, Card, NetBanking</p>
-                            </div>
-                            <div className="w-6 h-6 rounded-full border-2 border-muted-foreground/30" />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Order Summary */}
-                <div className="bg-card border rounded-2xl overflow-hidden">
-                    <div className="p-4 border-b bg-muted/30 flex items-center gap-3">
-                        <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
-                            3
-                        </div>
-                        <h2 className="font-bold">Order Summary</h2>
-                    </div>
-
-                    <div className="p-4 space-y-4">
-                        {cart.map((item) => (
-                            <div key={item.id} className="flex gap-3">
-                                <div className="w-16 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            <div className="p-4 max-w-6xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Left Column: Forms */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Login Prompt for Guests */}
+                        {isLoggedIn === false && (
+                            <div className="bg-gradient-to-r from-primary/10 to-orange-500/10 border border-primary/20 rounded-2xl p-4 flex items-center gap-4">
+                                <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                                    <User className="w-6 h-6 text-primary" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="font-semibold text-sm line-clamp-1">{item.name}</p>
-                                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                                    <p className="font-bold text-primary">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                    <p className="font-semibold">Have an account?</p>
+                                    <p className="text-sm text-muted-foreground">Login to save orders & track shipments</p>
                                 </div>
+                                <Link href="/login?next=/checkout" className="px-4 py-2 bg-primary text-white font-bold rounded-lg text-sm">
+                                    Login
+                                </Link>
                             </div>
-                        ))}
+                        )}
 
-                        <div className="border-t pt-4 space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-muted-foreground">Subtotal</span>
-                                <span className="font-medium">₹{subtotal.toLocaleString()}</span>
+                        {/* Step 1: Delivery Address */}
+                        <div className="bg-card border rounded-2xl overflow-hidden">
+                            <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
+                                        1
+                                    </div>
+                                    <h2 className="font-bold">Delivery Address</h2>
+                                </div>
+                                {isLoggedIn && (
+                                    <Link
+                                        href="/profile/addresses/new"
+                                        className="text-sm text-primary font-semibold flex items-center gap-1"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        Add New
+                                    </Link>
+                                )}
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-muted-foreground">Shipping</span>
-                                <span className="text-green-600 font-medium">Free</span>
+
+                            <div className="p-4">
+                                {loading ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                                    </div>
+                                ) : isLoggedIn ? (
+                                    // Logged-in: Show saved addresses
+                                    addresses.length === 0 ? (
+                                        // No saved addresses - show inline form
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-xl text-sm text-muted-foreground">
+                                                <MapPin className="w-4 h-4" />
+                                                <span>Enter your delivery address below</span>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <input
+                                                    name="name"
+                                                    placeholder="Full Name *"
+                                                    value={guestAddress.name}
+                                                    onChange={handleGuestChange}
+                                                    className="md:col-span-2 w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                                />
+                                                <input
+                                                    name="phone"
+                                                    placeholder="Phone *"
+                                                    value={guestAddress.phone}
+                                                    onChange={handleGuestChange}
+                                                    className="md:col-span-2 w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                                />
+                                            </div>
+                                            <input
+                                                name="address_line1"
+                                                placeholder="Address Line 1 *"
+                                                value={guestAddress.address_line1}
+                                                onChange={handleGuestChange}
+                                                className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                            />
+                                            <input
+                                                name="address_line2"
+                                                placeholder="Address Line 2 (optional)"
+                                                value={guestAddress.address_line2}
+                                                onChange={handleGuestChange}
+                                                className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                            />
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                <input
+                                                    name="city"
+                                                    placeholder="City *"
+                                                    value={guestAddress.city}
+                                                    onChange={handleGuestChange}
+                                                    className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                                />
+                                                <input
+                                                    name="state"
+                                                    placeholder="State *"
+                                                    value={guestAddress.state}
+                                                    onChange={handleGuestChange}
+                                                    className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                                />
+                                                <input
+                                                    name="pincode"
+                                                    placeholder="Pincode *"
+                                                    value={guestAddress.pincode}
+                                                    onChange={handleGuestChange}
+                                                    className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            {addresses.map((address) => (
+                                                <button
+                                                    key={address.id}
+                                                    onClick={() => setSelectedAddressId(address.id)}
+                                                    className={`w-full text-left p-4 rounded-xl border-2 transition-all ${selectedAddressId === address.id
+                                                        ? 'border-primary bg-primary/5'
+                                                        : 'border-muted hover:border-primary/50'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1 text-sm lg:text-base">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <span className="font-bold">{address.name}</span>
+                                                                {address.is_default && (
+                                                                    <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold">
+                                                                        Default
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                                                {address.address_line1}, {address.address_line2 && `${address.address_line2}, `}
+                                                                {address.city}, {address.state} - {address.pincode}
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground mt-2">📞 {address.phone}</p>
+                                                        </div>
+                                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedAddressId === address.id ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                                                            }`}>
+                                                            {selectedAddressId === address.id && <Check className="w-3 h-3 text-white" />}
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )
+                                ) : (
+                                    // Guest: Show address form
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <input
+                                                name="name"
+                                                placeholder="Full Name *"
+                                                value={guestAddress.name}
+                                                onChange={handleGuestChange}
+                                                className="md:col-span-2 w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                            />
+                                            <input
+                                                name="phone"
+                                                placeholder="Phone *"
+                                                value={guestAddress.phone}
+                                                onChange={handleGuestChange}
+                                                className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                            />
+                                            <input
+                                                name="email"
+                                                placeholder="Email Address *"
+                                                value={guestAddress.email}
+                                                onChange={handleGuestChange}
+                                                className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                            />
+                                        </div>
+                                        <input
+                                            name="address_line1"
+                                            placeholder="Address Line 1 *"
+                                            value={guestAddress.address_line1}
+                                            onChange={handleGuestChange}
+                                            className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                        />
+                                        <input
+                                            name="address_line2"
+                                            placeholder="Address Line 2 (optional)"
+                                            value={guestAddress.address_line2}
+                                            onChange={handleGuestChange}
+                                            className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                        />
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                            <input
+                                                name="city"
+                                                placeholder="City *"
+                                                value={guestAddress.city}
+                                                onChange={handleGuestChange}
+                                                className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                            />
+                                            <input
+                                                name="state"
+                                                placeholder="State *"
+                                                value={guestAddress.state}
+                                                onChange={handleGuestChange}
+                                                className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                            />
+                                            <input
+                                                name="pincode"
+                                                placeholder="Pincode *"
+                                                value={guestAddress.pincode}
+                                                onChange={handleGuestChange}
+                                                className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <div className="flex justify-between text-lg font-bold pt-2 border-t">
-                                <span>Total</span>
-                                <span className="text-primary">₹{total.toLocaleString()}</span>
+                        </div>
+
+                        {/* Step 2: Payment Method */}
+                        <div className="bg-card border rounded-2xl overflow-hidden">
+                            <div className="p-4 border-b bg-muted/30 flex items-center gap-3">
+                                <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
+                                    2
+                                </div>
+                                <h2 className="font-bold">Payment Method</h2>
+                            </div>
+
+                            <div className="p-4 space-y-3">
+                                <button
+                                    onClick={() => setPaymentMethod('cod')}
+                                    className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${paymentMethod === 'cod'
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-muted hover:border-primary/50'
+                                        }`}
+                                >
+                                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                                        <Banknote className="w-6 h-6 text-green-600" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-bold text-sm lg:text-base">Cash on Delivery</p>
+                                        <p className="text-xs lg:text-sm text-muted-foreground">Pay when you receive your order</p>
+                                    </div>
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${paymentMethod === 'cod' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                                        }`}>
+                                        {paymentMethod === 'cod' && <Check className="w-3 h-3 text-white" />}
+                                    </div>
+                                </button>
+
+                                <button
+                                    onClick={() => setPaymentMethod('online')}
+                                    disabled
+                                    className="w-full text-left p-4 rounded-xl border-2 border-muted opacity-50 flex items-center gap-4 cursor-not-allowed"
+                                >
+                                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                                        <CreditCard className="w-6 h-6 text-blue-600" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-bold text-sm lg:text-base">Online Payment</p>
+                                        <p className="text-xs lg:text-sm text-muted-foreground">Coming soon - UPI, Card, NetBanking</p>
+                                    </div>
+                                    <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 flex-shrink-0" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Order Summary (Visible only on Mobile below forms) */}
+                        <div className="lg:hidden">
+                            <OrderSummaryCard cart={cart} subtotal={subtotal} total={total} />
+                        </div>
+
+                        {/* Trust Badges */}
+                        <div className="flex items-center justify-center gap-8 py-4 text-xs lg:text-sm text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck className="w-5 h-5 text-green-500" />
+                                <span>Secure Checkout</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Truck className="w-5 h-5 text-blue-500" />
+                                <span>Free Delivery</span>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Trust Badges */}
-                <div className="flex items-center justify-center gap-6 py-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                        <ShieldCheck className="w-5 h-5 text-green-500" />
-                        <span>Secure Checkout</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Truck className="w-5 h-5 text-blue-500" />
-                        <span>Free Delivery</span>
+                    {/* Right Column: Sticky Sidebar (Desktop Only) */}
+                    <div className="hidden lg:block">
+                        <div className="sticky top-24 space-y-6">
+                            <OrderSummaryCard cart={cart} subtotal={subtotal} total={total} />
+
+                            {/* Info text */}
+                            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                                <div className="flex items-center gap-2 text-primary mb-2">
+                                    <ShieldCheck className="w-4 h-4" />
+                                    <span className="text-sm font-bold">Safe & Secure</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                    Your data is encrypted and secure. By placing the order, you agree to our Terms of Service and Refund Policy.
+                                </p>
+                            </div>
+
+                            {/* Desktop Place Order Button */}
+                            <button
+                                onClick={handlePlaceOrder}
+                                disabled={placing || !isAddressValid}
+                                className="w-full py-4 bg-gradient-to-r from-primary to-orange-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-all shadow-primary/25"
+                            >
+                                {placing ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Placing Order...
+                                    </>
+                                ) : (
+                                    <>
+                                        Place Order • ₹{total.toLocaleString()}
+                                        <ChevronRight className="w-5 h-5" />
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Fixed Bottom Place Order */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-30">
+            {/* Mobile Bottom Bar (Hidden on lg) */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
                 <div className="max-w-2xl mx-auto">
-                    {isLoggedIn && selectedAddress && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                            <MapPin className="w-4 h-4" />
-                            <span className="truncate">Delivering to: {selectedAddress.name}, {selectedAddress.city}</span>
-                        </div>
-                    )}
-                    {!isLoggedIn && guestAddress.name && guestAddress.city && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                            <MapPin className="w-4 h-4" />
-                            <span className="truncate">Delivering to: {guestAddress.name}, {guestAddress.city}</span>
+                    {(isLoggedIn ? (selectedAddress && true) : (guestAddress.name && guestAddress.city)) && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3 px-1">
+                            <MapPin className="w-4 h-4 text-primary" />
+                            <span className="truncate">
+                                Delivering to: {isLoggedIn ? selectedAddress?.name : guestAddress.name}, {isLoggedIn ? selectedAddress?.city : guestAddress.city}
+                            </span>
                         </div>
                     )}
                     <button
@@ -496,6 +592,53 @@ export default function CheckoutPage() {
                             </>
                         )}
                     </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function OrderSummaryCard({ cart, subtotal, total }: { cart: any[], subtotal: number, total: number }) {
+    return (
+        <div className="bg-card border rounded-2xl overflow-hidden shadow-sm">
+            <div className="p-4 border-b bg-muted/30 flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
+                    3
+                </div>
+                <h2 className="font-bold">Order Summary</h2>
+            </div>
+
+            <div className="p-4 space-y-4">
+                <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    {cart.map((item) => (
+                        <div key={item.id} className="flex gap-4 mb-4 last:mb-0">
+                            <div className="w-16 h-16 bg-muted rounded-xl overflow-hidden flex-shrink-0 border">
+                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm line-clamp-2 leading-tight">{item.name}</p>
+                                <div className="flex items-center justify-between mt-1">
+                                    <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                                    <p className="font-bold text-sm text-primary">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="border-t pt-4 space-y-2 text-sm lg:text-base">
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span className="font-medium">₹{subtotal.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Shipping</span>
+                        <span className="text-green-600 font-medium">Free</span>
+                    </div>
+                    <div className="flex justify-between text-xl font-black pt-3 border-t">
+                        <span>Total</span>
+                        <span className="text-primary">₹{total.toLocaleString()}</span>
+                    </div>
                 </div>
             </div>
         </div>

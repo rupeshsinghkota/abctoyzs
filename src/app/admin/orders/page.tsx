@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AdminService } from '@/lib/services/admin';
-import { Loader2, Package, Calendar, User } from 'lucide-react';
+import { Loader2, Package, Calendar, User, MapPin } from 'lucide-react';
 
 type Order = {
     id: string;
@@ -11,6 +11,15 @@ type Order = {
     status: string;
     created_at: string;
     items: any[];
+    shipping_address?: {
+        name: string;
+        phone: string;
+        address_line1: string;
+        address_line2?: string;
+        city: string;
+        state: string;
+        pincode: string;
+    };
 };
 
 export default function OrdersPage() {
@@ -97,7 +106,9 @@ export default function OrdersPage() {
                                             <p className="text-xs text-muted-foreground mb-1">Customer</p>
                                             <div className="flex items-center gap-2">
                                                 <User className="w-4 h-4 text-primary" />
-                                                <p className="text-sm font-semibold font-mono">{order.user_id.substring(0, 8)}</p>
+                                                <p className="text-sm font-semibold">
+                                                    {order.shipping_address?.name || 'Guest User'}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -121,9 +132,9 @@ export default function OrdersPage() {
                                             value={order.status}
                                             onChange={(e) => updateStatus(order.id, e.target.value)}
                                             className={`px-4 py-2 rounded-full font-semibold text-sm border-2 outline-none transition-colors ${order.status === 'delivered' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                    order.status === 'shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                                        order.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' :
-                                                            'bg-orange-50 text-orange-700 border-orange-200'
+                                                order.status === 'shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                    order.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' :
+                                                        'bg-orange-50 text-orange-700 border-orange-200'
                                                 }`}
                                         >
                                             <option value="processing">Processing</option>
@@ -133,6 +144,22 @@ export default function OrdersPage() {
                                         </select>
                                     </div>
                                 </div>
+
+                                {/* Shipping Address */}
+                                {order.shipping_address && (
+                                    <div className="mb-6 p-4 bg-primary/5 border border-primary/10 rounded-xl">
+                                        <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
+                                            <MapPin className="w-3 h-3" />
+                                            Shipping Details
+                                        </h4>
+                                        <p className="text-sm font-semibold">{order.shipping_address.name}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            {order.shipping_address.address_line1}, {order.shipping_address.address_line2 && `${order.shipping_address.address_line2}, `}
+                                            {order.shipping_address.city}, {order.shipping_address.state} - {order.shipping_address.pincode}
+                                        </p>
+                                        <p className="text-sm font-medium mt-1">📞 {order.shipping_address.phone}</p>
+                                    </div>
+                                )}
 
                                 {/* Items */}
                                 <div className="space-y-3">

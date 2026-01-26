@@ -91,6 +91,7 @@ export const OrderService = {
             .insert({
                 user_id: user.id,
                 total_amount: orderData.total_amount,
+                shipping_address_id: orderData.shipping_address_id,
                 status: 'processing'
             })
             .select()
