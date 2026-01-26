@@ -2,6 +2,7 @@ import { ProductGrid } from '@/components/shop/ProductGrid';
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 
 interface CategoryPageProps {
     params: Promise<{
@@ -9,25 +10,30 @@ interface CategoryPageProps {
     }>;
 }
 
-// Ensure params are correctly handled in Next.js 15+ (async params)
 export default async function CategoryPage({ params }: CategoryPageProps) {
-    // Await params if using newer Next.js versions (though standard type shows interface)
-    // In Next 15 params is async.
     const { slug } = await params;
 
     const allProducts = await fetchProducts();
 
-    // Mock filtering based on slug
     let categoryProducts = allProducts;
     if (slug !== 'new' && slug !== 'all') {
         categoryProducts = allProducts.filter(p => p.category === slug);
     }
 
-    // Capitalize title
     const title = slug.charAt(0).toUpperCase() + slug.slice(1);
 
     return (
         <div className="min-h-screen pb-20">
+            {/* Breadcrumb */}
+            <div className="container mx-auto px-4 pt-2">
+                <Breadcrumb
+                    items={[
+                        { label: 'Categories', href: '/categories' },
+                        { label: title }
+                    ]}
+                />
+            </div>
+
             {/* Sticky Header for Category */}
             <div className="sticky top-16 z-30 bg-background/80 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between">
                 <h1 className="text-xl font-bold font-heading">{title} Collection</h1>

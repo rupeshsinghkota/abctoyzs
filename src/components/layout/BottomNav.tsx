@@ -13,7 +13,7 @@ export function BottomNav() {
 
     const links = [
         { href: "/", label: "Home", icon: Home },
-        { href: "/category", label: "Categories", icon: LayoutGrid },
+        { href: "/categories", label: "Categories", icon: LayoutGrid },
         { href: "/cart", label: "Cart", icon: ShoppingBag, badge: cartCount },
         { href: "/profile", label: "Profile", icon: User },
     ];

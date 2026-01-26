@@ -7,6 +7,7 @@ import { ProductGrid } from '@/components/shop/ProductGrid';
 import { ProductSpecsTable } from '@/components/product/ProductSpecsTable';
 import { ProductSchema } from '@/components/product/ProductSchema';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 
 interface PageProps {
     params: Promise<{
@@ -41,13 +42,25 @@ export default async function ProductPage({ params }: PageProps) {
         'User manual & warranty card',
     ];
 
+    const categoryTitle = product.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : 'Products';
+
     return (
         <div className="min-h-screen pb-32 md:pb-20 bg-background">
             {/* SEO Structured Data */}
             <ProductSchema product={product} />
 
+            {/* Breadcrumb */}
+            <div className="container mx-auto px-4 pt-2 md:pt-4">
+                <Breadcrumb
+                    items={[
+                        { label: categoryTitle, href: `/category/${product.category}` },
+                        { label: product.name }
+                    ]}
+                />
+            </div>
+
             {/* Mobile: Full Screen Gallery / Desktop: Grid */}
-            <div className="md:container md:mx-auto md:pt-8 md:grid md:grid-cols-2 md:gap-12">
+            <div className="md:container md:mx-auto md:pt-4 md:grid md:grid-cols-2 md:gap-12">
 
                 {/* Gallery Section */}
                 <div className="md:rounded-2xl md:overflow-hidden md:border relative">
