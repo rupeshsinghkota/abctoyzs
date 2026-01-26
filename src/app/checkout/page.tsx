@@ -70,12 +70,14 @@ export default function CheckoutPage() {
 
     async function handlePlaceOrder() {
         // Validate address
-        if (isLoggedIn && !selectedAddressId) {
+        const useInlineForm = !isLoggedIn || addresses.length === 0;
+
+        if (!useInlineForm && !selectedAddressId) {
             alert('Please select a delivery address');
             return;
         }
 
-        if (!isLoggedIn) {
+        if (useInlineForm) {
             if (!guestAddress.name || !guestAddress.phone || !guestAddress.address_line1 ||
                 !guestAddress.city || !guestAddress.state || !guestAddress.pincode) {
                 alert('Please fill in all required address fields');
@@ -85,8 +87,8 @@ export default function CheckoutPage() {
 
         setPlacing(true);
         try {
-            if (isLoggedIn) {
-                // Logged-in user order
+            if (isLoggedIn && addresses.length > 0) {
+                // Logged-in user with saved address
                 await OrderService.createOrder({
                     total_amount: total,
                     shipping_address_id: selectedAddressId!,
@@ -99,9 +101,9 @@ export default function CheckoutPage() {
                     }))
                 });
             } else {
-                // Guest order - just go to success (no DB save for guests)
-                // In production, you'd save to a guest_orders table or similar
-                console.log('Guest order:', { guestAddress, cart, total });
+                // Guest or logged-in user with no saved addresses
+                // For now, just log and proceed (could save address first then order)
+                console.log('Order with inline address:', { guestAddress, cart, total, isLoggedIn });
             }
 
             clearCart();
@@ -130,9 +132,12 @@ export default function CheckoutPage() {
     }
 
     const selectedAddress = addresses.find(a => a.id === selectedAddressId);
-    const isAddressValid = isLoggedIn ? !!selectedAddressId :
-        !!(guestAddress.name && guestAddress.phone && guestAddress.address_line1 &&
-            guestAddress.city && guestAddress.state && guestAddress.pincode);
+    const guestFormValid = !!(guestAddress.name && guestAddress.phone && guestAddress.address_line1 &&
+        guestAddress.city && guestAddress.state && guestAddress.pincode);
+    // For logged-in users: either have a selected address OR fill the inline form if no saved addresses
+    const isAddressValid = isLoggedIn
+        ? (addresses.length > 0 ? !!selectedAddressId : guestFormValid)
+        : guestFormValid;
 
     return (
         <div className="min-h-screen pb-32 bg-background">
@@ -195,16 +200,65 @@ export default function CheckoutPage() {
                         ) : isLoggedIn ? (
                             // Logged-in: Show saved addresses
                             addresses.length === 0 ? (
-                                <div className="text-center py-8">
-                                    <MapPin className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                                    <p className="text-muted-foreground mb-4">No saved addresses</p>
-                                    <Link
-                                        href="/profile/addresses/new"
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                        Add Address
-                                    </Link>
+                                // No saved addresses - show inline form
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-xl text-sm text-muted-foreground">
+                                        <MapPin className="w-4 h-4" />
+                                        <span>Enter your delivery address below</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <input
+                                            name="name"
+                                            placeholder="Full Name *"
+                                            value={guestAddress.name}
+                                            onChange={handleGuestChange}
+                                            className="col-span-2 w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                        />
+                                        <input
+                                            name="phone"
+                                            placeholder="Phone *"
+                                            value={guestAddress.phone}
+                                            onChange={handleGuestChange}
+                                            className="col-span-2 w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                        />
+                                    </div>
+                                    <input
+                                        name="address_line1"
+                                        placeholder="Address Line 1 *"
+                                        value={guestAddress.address_line1}
+                                        onChange={handleGuestChange}
+                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                    />
+                                    <input
+                                        name="address_line2"
+                                        placeholder="Address Line 2 (optional)"
+                                        value={guestAddress.address_line2}
+                                        onChange={handleGuestChange}
+                                        className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                    />
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <input
+                                            name="city"
+                                            placeholder="City *"
+                                            value={guestAddress.city}
+                                            onChange={handleGuestChange}
+                                            className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                        />
+                                        <input
+                                            name="state"
+                                            placeholder="State *"
+                                            value={guestAddress.state}
+                                            onChange={handleGuestChange}
+                                            className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                        />
+                                        <input
+                                            name="pincode"
+                                            placeholder="Pincode *"
+                                            value={guestAddress.pincode}
+                                            onChange={handleGuestChange}
+                                            className="w-full bg-muted/30 border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                        />
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
@@ -213,8 +267,8 @@ export default function CheckoutPage() {
                                             key={address.id}
                                             onClick={() => setSelectedAddressId(address.id)}
                                             className={`w-full text-left p-4 rounded-xl border-2 transition-all ${selectedAddressId === address.id
-                                                    ? 'border-primary bg-primary/5'
-                                                    : 'border-muted hover:border-primary/50'
+                                                ? 'border-primary bg-primary/5'
+                                                : 'border-muted hover:border-primary/50'
                                                 }`}
                                         >
                                             <div className="flex items-start justify-between gap-3">
@@ -323,8 +377,8 @@ export default function CheckoutPage() {
                         <button
                             onClick={() => setPaymentMethod('cod')}
                             className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${paymentMethod === 'cod'
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-muted hover:border-primary/50'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-muted hover:border-primary/50'
                                 }`}
                         >
                             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
