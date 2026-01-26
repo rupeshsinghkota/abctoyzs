@@ -13,7 +13,7 @@ import {
 export default async function AdminLayout({
     children,
 }: {
-    children: React.Node;
+    children: React.ReactNode;
 }) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
