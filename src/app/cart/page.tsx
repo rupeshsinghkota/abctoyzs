@@ -14,8 +14,7 @@ export default function CartPage() {
     const total = subtotal + shipping;
 
     const handleCheckout = () => {
-        clearCart();
-        router.push('/checkout/success');
+        router.push('/checkout');
     };
 
     if (cart.length === 0) {

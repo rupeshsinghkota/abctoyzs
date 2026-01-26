@@ -69,7 +69,54 @@ export const OrderService = {
         return { ...order, items: items || [] } as Order;
     },
 
-    // Helper to create a mock order (since we don't have checkout)
+    // Create a real order from checkout
+    async createOrder(orderData: {
+        total_amount: number;
+        shipping_address_id: string;
+        items: {
+            product_id: number;
+            product_name: string;
+            product_image: string;
+            quantity: number;
+            price: number;
+        }[];
+    }) {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Not logged in");
+
+        // Create Order
+        const { data: order, error } = await supabase
+            .from('orders')
+            .insert({
+                user_id: user.id,
+                total_amount: orderData.total_amount,
+                status: 'processing'
+            })
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Create Order Items
+        const itemsToInsert = orderData.items.map(item => ({
+            order_id: order.id,
+            product_id: item.product_id,
+            product_name: item.product_name,
+            product_image: item.product_image,
+            quantity: item.quantity,
+            price: item.price
+        }));
+
+        const { error: itemError } = await supabase
+            .from('order_items')
+            .insert(itemsToInsert);
+
+        if (itemError) throw itemError;
+        return order;
+    },
+
+    // Helper to create a mock order (for testing)
     async createMockOrder() {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
