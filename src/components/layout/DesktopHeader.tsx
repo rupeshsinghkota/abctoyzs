@@ -55,6 +55,15 @@ export function DesktopHeader() {
             <div className="bg-background border-b border-border/40">
                 <div className="container max-w-7xl mx-auto px-6 h-12 flex items-center justify-center">
                     <nav className="flex items-center gap-12">
+                        {/* View All Option */}
+                        <Link
+                            href="/category/all"
+                            className="text-xs font-bold uppercase tracking-widest text-foreground/60 hover:text-primary transition-colors py-1 relative group"
+                        >
+                            View All
+                            <span className="absolute -bottom-[17px] left-0 w-full h-[2px] bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-center" />
+                        </Link>
+
                         {/* Vehicle Types */}
                         {VEHICLE_CATEGORIES.slice(0, 5).map((cat) => (
                             <Link

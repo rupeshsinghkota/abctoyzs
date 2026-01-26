@@ -34,8 +34,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 />
             </div>
 
-            {/* Sticky Header for Category */}
-            <div className="sticky top-16 z-30 bg-background/80 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between">
+            {/* Category Header */}
+            <div className="bg-background border-b px-4 py-3 flex items-center justify-between">
                 <h1 className="text-xl font-bold font-heading">{title} Collection</h1>
                 <button className="flex items-center gap-2 px-4 py-1.5 bg-muted rounded-full text-sm font-medium hover:bg-muted/80">
                     <SlidersHorizontal className="w-4 h-4" />

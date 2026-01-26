@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { Search, ShoppingBag, Menu, X, Home, Grid, User } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, Home, Grid, User, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data";
 
@@ -53,6 +53,11 @@ export function MobileHeader() {
                         <Link href="/" className="flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors" onClick={() => setIsMenuOpen(false)}>
                             <Home className="w-5 h-5 text-primary" strokeWidth={1.5} />
                             <span className="font-medium">Home</span>
+                        </Link>
+
+                        <Link href="/category/all" className="flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors" onClick={() => setIsMenuOpen(false)}>
+                            <Package className="w-5 h-5 text-primary" strokeWidth={1.5} />
+                            <span className="font-medium">Shop All</span>
                         </Link>
 
                         <div className="py-2">

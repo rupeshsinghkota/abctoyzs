@@ -53,6 +53,7 @@ export default async function ProductPage({ params }: PageProps) {
             <div className="container mx-auto px-4 pt-2 md:pt-4">
                 <Breadcrumb
                     items={[
+                        { label: 'Categories', href: '/category' },
                         { label: categoryTitle, href: `/category/${product.category}` },
                         { label: product.name }
                     ]}
