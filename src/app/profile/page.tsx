@@ -16,7 +16,6 @@ export default async function ProfilePage() {
     const menuItems = [
         { icon: Package, label: 'My Orders', href: '/orders', badge: '0 Active' },
         { icon: MapPin, label: 'Shipping Addresses', href: '/profile/addresses' },
-        { icon: CreditCard, label: 'Payment Methods', href: '/payments' },
         { icon: Settings, label: 'Settings', href: '/settings' },
         { icon: HelpCircle, label: 'Help & Support', href: '/support' },
     ];
