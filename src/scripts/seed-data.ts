@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { products, start_products } from '../lib/data';
+import { products } from '../lib/data';
 
 // Note: We need service role key to bypass RLS for seeding if RLS is strict, 
 // OR we rely on anon key if we have insert policies. 
