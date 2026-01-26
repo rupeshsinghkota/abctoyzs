@@ -10,16 +10,16 @@ import { Car, Bike, Truck, Zap } from 'lucide-react'; // Fallback icons
 // Quick Category Nav (Story Style)
 const categories = [
     { id: 'new', name: 'New In', image: '/hero/hero_car_1769365166894.png', color: 'from-pink-500 via-red-500 to-yellow-500', link: '/category/new' },
+
+    // Age Categories
     { id: 'toddlers', name: 'Toddlers', image: '/categories/age_toddler.png', color: 'from-pink-400 to-rose-500', link: '/category/age/1-3' },
-    { id: 'cars', name: 'Cars', image: '/categories/cat_supercar_1769364520277.png', color: 'from-blue-400 to-blue-600', link: '/category/cars' },
-    { id: '12v', name: '12V Power', image: '/categories/power_12v.png', color: 'from-yellow-400 to-orange-500', link: '/category/power/12v' },
-    { id: 'jeeps', name: 'Jeeps', image: '/categories/cat_suv_1769364537319.png', color: 'from-orange-400 to-orange-600', link: '/category/jeeps' },
     { id: 'kids', name: 'Kids', image: '/categories/age_kid.png', color: 'from-blue-400 to-cyan-500', link: '/category/age/3-6' },
-    { id: '24v', name: '24V Power', image: '/categories/power_24v.png', color: 'from-green-400 to-emerald-500', link: '/category/power/24v' },
-    { id: 'bikes', name: 'Bikes', image: '/categories/cat_motorcycle_1769364560643.png', color: 'from-purple-400 to-purple-600', link: '/category/bikes' },
     { id: 'teens', name: 'Teens', image: '/categories/age_teen.png', color: 'from-amber-400 to-orange-500', link: '/category/age/6-12' },
+
+    // Power Categories
+    { id: '12v', name: '12V Power', image: '/categories/power_12v.png', color: 'from-yellow-400 to-orange-500', link: '/category/power/12v' },
+    { id: '24v', name: '24V Power', image: '/categories/power_24v.png', color: 'from-green-400 to-emerald-500', link: '/category/power/24v' },
     { id: '36v', name: '36V Power', image: '/categories/power_36v.png', color: 'from-indigo-400 to-purple-600', link: '/category/power/36v' },
-    { id: 'atvs', name: 'ATVs', image: '/categories/cat_atv_1769364577413.png', color: 'from-red-500 to-red-700', link: '/category/atvs' },
 ];
 
 export function Stories() {

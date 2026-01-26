@@ -19,7 +19,7 @@ export function CategoryGrid() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6 auto-rows-[160px] md:auto-rows-[240px]">
+            <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6 auto-rows-[120px] md:auto-rows-[240px]">
                 {VEHICLE_CATEGORIES.map((cat, i) => (
                     <Link
                         key={cat.value}
