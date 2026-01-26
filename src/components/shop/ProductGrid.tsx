@@ -3,10 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Star, ShoppingCart, Heart } from 'lucide-react';
+import { Star, ShoppingCart } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/data';
+import { WishlistButton } from '@/components/wishlist/WishlistButton';
 
 interface ProductGridProps {
     products: Product[];
@@ -20,9 +21,9 @@ export function ProductGrid({ products }: ProductGridProps) {
             {products.map((product) => (
                 <div key={product.id} className="relative group bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
                     {/* Wishlist Button */}
-                    <button className="absolute top-3 right-3 z-10 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full text-gray-500 hover:text-red-500 transition-colors">
-                        <Heart className="w-4 h-4" />
-                    </button>
+                    <div className="absolute top-3 right-3 z-10">
+                        <WishlistButton productId={product.id} size="sm" />
+                    </div>
 
                     <Link href={`/product/${product.id}`} className="block">
                         {/* Image Container */}
