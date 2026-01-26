@@ -1,65 +1,50 @@
-import Image from "next/image";
+import { HeroSlider } from "@/components/home/HeroSlider";
+import { Stories } from "@/components/home/Stories";
+import { ProductStrip } from "@/components/home/ProductStrip";
+import { Benefits } from "@/components/home/Benefits";
+import { CategoryGrid } from "@/components/home/CategoryGrid";
+import { Newsletter } from "@/components/home/Newsletter";
+import { fetchProducts } from "@/lib/data";
 
-export default function Home() {
+export default async function Home() {
+  // Fetch all products
+  const products = await fetchProducts();
+
+  // Filter for sections (using real logic now)
+  const newArrivals = products.filter(p => p.tag === 'New' || p.is_new).slice(0, 4);
+
+  // If no 'Trending' tag exists in data, just take the high rated ones
+  const trending = products.filter(p => p.rating >= 4.8 || p.tag === 'Best Seller').slice(0, 4);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col min-h-screen pb-20">
+      <HeroSlider />
+      <Stories />
+      <Benefits />
+
+      <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
+
+      <CategoryGrid />
+
+      {/* Promo Banner Placeholder */}
+      <div className="px-4 py-6">
+        <div className="w-full h-32 md:h-48 bg-gradient-to-r from-primary to-orange-600 rounded-2xl flex items-center justify-between px-6 md:px-12 text-white relative overflow-hidden shadow-lg shadow-orange-500/20">
+          <div className="relative z-10">
+            <span className="text-xs md:text-sm font-bold opacity-90 uppercase tracking-widest">Limited Offer</span>
+            <h3 className="text-2xl md:text-3xl font-black mt-1">Get 10% OFF</h3>
+            <p className="text-sm md:text-base opacity-90">On your first app order</p>
+            <button className="mt-3 px-4 py-1.5 bg-white text-primary text-xs font-bold rounded-full">Use Code: ABCAPP</button>
+          </div>
+          <div className="relative z-10 opacity-20 transform scale-150 rotate-12">
+            {/* Decorative icon or text */}
+            <h1 className="text-8xl font-black">TOYS</h1>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
+
+      <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
+
+      <Newsletter />
     </div>
   );
 }
