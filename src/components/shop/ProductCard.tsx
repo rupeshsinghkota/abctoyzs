@@ -23,7 +23,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
                 <WishlistButton productId={product.id} size="sm" />
             </div>
 
-            <Link href={`/product/${product.id}`} className="block">
+            <Link href={`/product/${product.slug}`} className="block">
                 {/* Image Container */}
                 <div className="aspect-square relative rounded-t-2xl overflow-hidden bg-gray-100">
                     {product.tag && (

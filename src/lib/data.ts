@@ -1,5 +1,6 @@
 export interface Product {
     id: string;
+    slug: string;
     name: string;
     category: string; // Primary: cars, jeeps, bikes, etc.
     price: number;
@@ -101,7 +102,8 @@ export const products: Product[] = [
         specs: { battery: '12V 7Ah', mobile_app: true, max_load: '30kg', speed: '3-5 km/h' },
         description: "The officially licensed BMW M5 Competition ride-on car delivers the ultimate driving experience for your little one.",
         voltage: '12V',
-        ageGroup: '3-6'
+        ageGroup: '3-6',
+        slug: 'bmw-m5-competition-ride-on'
     },
     {
         id: '2',
@@ -119,7 +121,8 @@ export const products: Product[] = [
         specs: { battery: '12V 10Ah', mobile_app: false, max_load: '35kg', speed: '3-6 km/h' },
         description: "Conquer the backyard with this rugged Jeep style ride-on.",
         voltage: '12V',
-        ageGroup: '3-6'
+        ageGroup: '3-6',
+        slug: 'jeep-wrangler-rubicon-style'
     },
     {
         id: '3',
@@ -136,7 +139,8 @@ export const products: Product[] = [
         specs: { battery: '12V 4.5Ah', mobile_app: false, max_load: '25kg', speed: '3-5 km/h' },
         description: "For the speed enthusiasts! This Ducati replica features hand throttle acceleration.",
         voltage: '12V',
-        ageGroup: '3-6'
+        ageGroup: '3-6',
+        slug: 'ducati-panigale-v4-replica'
     },
     {
         id: '4',
@@ -153,7 +157,8 @@ export const products: Product[] = [
         specs: { battery: '24V 7Ah', mobile_app: true, max_load: '50kg', speed: '5-8 km/h' },
         description: "Luxury meets play. The G63 AMG ride-on is a showstopper with painted finish.",
         voltage: '24V',
-        ageGroup: '6-10'
+        ageGroup: '6-10',
+        slug: 'mercedes-amg-g63-24v'
     },
     {
         id: '5',
@@ -171,7 +176,8 @@ export const products: Product[] = [
         specs: { battery: '24V 14Ah', mobile_app: true, max_load: '60kg', speed: '10-15 km/h' },
         description: "The ultimate off-road machine for kids. 2-seater, 4x4 drive.",
         voltage: '24V',
-        ageGroup: '6-10'
+        ageGroup: '6-10',
+        slug: 'maverick-utv-buggy'
     },
     {
         id: '6',
@@ -188,7 +194,8 @@ export const products: Product[] = [
         specs: { battery: '24V', mobile_app: false, max_load: '45kg', speed: '12 km/h' },
         description: "For the young racer. Special drift wheels for sliding action.",
         voltage: '24V',
-        ageGroup: '6-10'
+        ageGroup: '6-10',
+        slug: 'drift-go-kart-pro'
     }
 ];
 
@@ -206,7 +213,8 @@ export async function fetchProducts(): Promise<Product[]> {
         }
 
         return data.map((item: any) => ({
-            id: item.id || item.slug,
+            id: item.id,
+            slug: item.slug || item.id,
             name: item.name,
             category: item.category_id ? 'unknown' : 'cars',
             price: item.base_price,
@@ -266,7 +274,8 @@ export async function searchProducts(query: string): Promise<Product[]> {
         }
 
         return data.map((item: any) => ({
-            id: item.id || item.slug,
+            id: item.id,
+            slug: item.slug || item.id,
             name: item.name,
             category: 'cars',
             price: item.base_price,

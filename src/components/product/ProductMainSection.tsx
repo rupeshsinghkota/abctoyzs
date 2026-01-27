@@ -178,9 +178,13 @@ export function ProductMainSection({ product }: { product: Product }) {
 
                         <div>
                             <h3 className="font-bold text-lg mb-2">Description</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                {product.description || "Premium ride-on toy with advanced features."}
-                            </p>
+                            <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+                                {product.description ? (
+                                    <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                                ) : (
+                                    <p>Premium ride-on toy with advanced features.</p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

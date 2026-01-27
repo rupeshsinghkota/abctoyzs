@@ -13,14 +13,14 @@ import { Metadata } from 'next';
 
 interface PageProps {
     params: Promise<{
-        id: string;
+        slug: string;
     }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { id } = await params;
+    const { slug } = await params;
     const products = await fetchProducts();
-    const product = products.find((p) => p.id === id);
+    const product = products.find((p) => p.slug === slug);
 
     if (!product) return { title: 'Product Not Found' };
 
@@ -31,10 +31,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProductPage({ params }: PageProps) {
-    const { id } = await params;
+    const { slug } = await params;
 
     const products = await fetchProducts();
-    const product = products.find((p) => p.id === id);
+    const product = products.find((p) => p.slug === slug);
 
     if (!product) {
         notFound();
