@@ -350,10 +350,10 @@ export default function NewProductPage() {
 
         setIsGeneratingPosters(true);
         try {
-            // Define two key marketing angles
+            // Define two key marketing angles with DISTINCT styles
             const angles = [
-                { type: 'Performance & Speed', text: 'Unmatched 4WD Performance and Speed' },
-                { type: 'Luxury & Comfort', text: 'Premium Interior and Realistic Design' }
+                { type: 'Performance & Speed', text: 'Unmatched 4WD Performance and Speed', style: 'SPEED_MOTION' },
+                { type: 'Luxury & Comfort', text: 'Premium Interior and Realistic Design', style: 'LUXURY_MINIMAL' }
             ];
 
             const posterUrls: string[] = [];
@@ -365,6 +365,7 @@ export default function NewProductPage() {
                     body: JSON.stringify({
                         productName: effectiveName,
                         featureText: angle.text,
+                        layoutStyle: angle.style, // Pass specific layout style
                         productNotes: formData.prompt_notes,
                         originalImageUrl: formData.images[0] // Use main image as reference
                     })
@@ -474,7 +475,7 @@ export default function NewProductPage() {
             router.push('/admin/products');
         } catch (error) {
             console.error(error);
-            alert('Failed to create product. Check console for details.');
+            alert('Failed to create product: ' + ((error as any).message || 'Unknown error'));
             setSaving(false);
         }
     }

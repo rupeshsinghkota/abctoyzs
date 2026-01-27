@@ -9,7 +9,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
     try {
-        const { productName, featureText, productNotes, originalImageUrl } = await req.json();
+        const { productName, featureText, productNotes, originalImageUrl, layoutStyle } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
@@ -41,13 +41,35 @@ export async function POST(req: Request) {
 
         // DESCRIPTIVE prompt to prevent MALFORMED_FUNCTION_CALL.
         // Use flat descriptions instead of imperative commands.
-        const prompt = `A premium 16:9 wide marketing banner featuring the product from the first image ("${productName}").
+        // Dynamic Prompt Construction based on Layout Style
+        let layoutInstructions = "";
+        let camAngle = "";
+
+        if (layoutStyle === 'SPEED_MOTION') {
+            layoutInstructions = `
+            STYLE: HIGH-ENERGY COMMERCIAL.
+            COMPOSITION: Dynamic motion shot. The vehicle should look like it's MOVING FAST (slight motion blur on wheels/background).
+            TEXT LAYOUT: Large, BOLD, ITALICIZED typography "RACING STYLE" on the side. 
+            BACKGROUND: A blurred race track, desert flat, or neon city street to imply speed.`;
+            camAngle = "Low-angle action shot, incoming 3/4 view.";
+        } else {
+            // Default to LUXURY_MINIMAL
+            layoutInstructions = `
+            STYLE: ELEGANT & SOPHISTICATED.
+            COMPOSITION: Static, majestic hero shot. 
+            TEXT LAYOUT: Clean, thin, elegant typography "MAGAZINE STYLE" with plenty of negative space.
+            BACKGROUND: A modern architectural driveway, marble floor, or sunset vibe.`;
+            camAngle = "Eye-level side profile or majestic front-3/4 view.";
+        }
+
+        const prompt = `A premium 21:9 ultra-wide marketing banner for the product ("${productName}").
+        ${layoutInstructions}
+        CAMERA ANGLE: ${camAngle}
+        
         The product is branded with the logo from the second image, naturally applied to the license plate or door.
+        TEXT OVERLAY: The image MUST include the Product Name "${productName}" and the Key Feature: "${featureText}".
         The vehicle is strictly clean and factory-fresh. All competitor watermarks, text, and logos (especially on the windshield and glass) are completely absent.
-        The background is a breathtaking commercial setting (e.g., "${featureText}" theme with modern architecture or nature) that matches the product's luxury level.
-        The composition is dynamic and cinematic, not a simple center shot. 
-        The lighting is professional, 8k resolution, with a "High-End Advertising" aesthetic.
-        The image is a single, finished marketing poster.`;
+        The image is a single, finished marketing poster with professional embedded text.`;
 
         const inputs = [prompt, { inlineData: { data: logoBase64, mimeType: "image/png" } }];
         if (productBase64) {

@@ -217,7 +217,7 @@ export async function fetchProducts(): Promise<Product[]> {
             id: item.id,
             slug: item.slug || item.id,
             name: item.name,
-            category: item.category_id ? 'unknown' : 'cars',
+            category: item.category ? item.category.toLowerCase() : 'cars',
             price: item.base_price,
             mrp: item.mrp,
             rating: item.rating || 0,
