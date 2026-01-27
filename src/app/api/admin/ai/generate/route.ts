@@ -11,7 +11,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         let prompt = "";
         const contextString = notes ? `\nADDTIONAL CONTEXT/NOTES FROM USER: "${notes}"\nHighly prioritize these details in your response.` : "";
