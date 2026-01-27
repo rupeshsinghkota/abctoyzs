@@ -36,24 +36,24 @@ export async function POST(req: Request) {
             
             ASSETS PROVIDED:
             1. PRODUCT_IMAGE: The original photo of the vehicle.
-            2. BRAND_LOGO: The official "${BRAND_CONFIG.name}" logo.
+            2. BRAND_LOGO: The official "${BRAND_CONFIG.name}" logo file.
             
             TASK: 
-            Transform the PRODUCT_IMAGE into a "STUNNING HIGHEST-END ADVERTISING PHOTOSHOOT". Use the BRAND_LOGO asset as your reference for branding.
+            Transform the PRODUCT_IMAGE into a "STUNNING HIGHEST-END ADVERTISING PHOTOSHOOT". Use the provided BRAND_LOGO asset as your SOLE source for branding.
             
             ARTISTIC DIRECTION:
             1. ASPECT RATIO: The final image MUST be a PERFECT 1:1 SQUARE.
             2. VISUAL STYLE: Cinematic high-end advertising photography. 
-            3. SCENE: Choose a luxury setting that makes the toy vehicle look like a full-sized premium car (e.g., a modern driveway, a desert road at golden hour, or a professional showroom).
+            3. SCENE: Choose a luxury setting (e.g., modern driveway, desert road, or professional showroom).
             4. LIGHTING: Expert studio lighting with realistic reflections and soft shadows.
-            5. TASTEFUL & NATURAL BRANDING: 
-               - DO NOT place large text or logos on the grill or headlights.
-               - PRIMARY PLACEMENT: Place a clean, perfectly scaled version of the logo on the LICENSE PLATE. Ensure it is centered and has a small margin.
-               - SECONDARY PLACEMENT: A very small, elegant "badge" or "emblem" version of the logo on the HOOD (above the grill) or the REAR of the vehicle.
-               - WHEEL CAPS: Optionally, place a tiny version of the brand icon in the center of the wheel hubs.
-               - DECAL STYLE: If placed on a door, it must look like a professional, thin vinyl decal that follows the body lines and perspective, NOT a 3D protruding block.
-               - INTEGRATION: Match the lighting, texture, and perspective of the vehicle perfectly. It should look like it came from the factory.
-            6. QUALITY: 8k resolution, razor-sharp focus on the product, professional background blur.
+            5. STRICT LOGO-ONLY BRANDING: 
+               - DO NOT generate any text (like "${BRAND_CONFIG.name}") using your own fonts or overlays. 
+               - USE ONLY the visual content of the provided BRAND_LOGO file.
+               - DO NOT place any branding on the grill, headlights, or windows.
+               - PRIMARY PLACEMENT: Place the BRAND_LOGO on the LICENSE PLATE. Scale it to fit perfectly with a small margin.
+               - SECONDARY PLACEMENT: A very small, elegant badge version of the BRAND_LOGO on the HOOD or REAR.
+               - INTEGRATION: The logo must look like a physical part of the car, matching the lighting, texture, and perspective perfectly.
+            6. QUALITY: 8k resolution, razor-sharp focus, professional background blur.
             
             Output ONLY the final high-resolution square masterpiece.
         `;
