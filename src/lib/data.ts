@@ -37,6 +37,10 @@ export interface Product {
     // SEO
     meta_title?: string;
     meta_description?: string;
+
+    // Variations Data
+    attributes?: { name: string; options: string[] }[];
+    variants?: ProductVariant[];
 }
 
 export interface ProductVariant {
