@@ -39,6 +39,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [activeTab, setActiveTab] = useState('basic');
     const [brandingIndex, setBrandingIndex] = useState<number | null>(null);
     const [isBrandingAll, setIsBrandingAll] = useState(false);
+    const [isGeneratingPosters, setIsGeneratingPosters] = useState(false);
 
     // Variations State
     const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -373,7 +374,66 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             setIsBrandingAll(false);
         }
     };
+    const generatePosters = async () => {
+        if (!formData.name) {
+            alert('Please enter a product name first');
+            return;
+        }
 
+        setIsGeneratingPosters(true);
+        try {
+            // Define two key marketing angles
+            const angles = [
+                { type: 'Performance & Speed', text: 'Unmatched 4WD Performance and Speed' },
+                { type: 'Luxury & Comfort', text: 'Premium Interior and Realistic Design' }
+            ];
+
+            const posterUrls: string[] = [];
+
+            for (const angle of angles) {
+                const res = await fetch('/api/admin/ai/image/poster', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productName: formData.name,
+                        featureText: angle.text,
+                        originalImageUrl: formData.images[0] // Use main image as reference
+                    })
+                });
+                const { posterUrl, error } = await res.json();
+                if (error) throw new Error(error);
+                posterUrls.push(posterUrl);
+            }
+
+            // Insert into description
+            let newDesc = formData.description;
+
+            // Insert first poster after hook (p)
+            const firstPIdx = newDesc.indexOf('</p>');
+            if (firstPIdx !== -1) {
+                const imgHtml = `\n<div class="my-6"><img src="${posterUrls[0]}" alt="${angles[0].type}" class="rounded-2xl w-full shadow-lg" /></div>\n`;
+                newDesc = newDesc.slice(0, firstPIdx + 4) + imgHtml + newDesc.slice(firstPIdx + 4);
+            }
+
+            // Insert second poster before Safety (h3)
+            const safetyIdx = newDesc.indexOf('🛡️ Safety');
+            if (safetyIdx !== -1) {
+                const h3Idx = newDesc.lastIndexOf('<h3', safetyIdx);
+                if (h3Idx !== -1) {
+                    const imgHtml = `\n<div class="my-6"><img src="${posterUrls[1]}" alt="${angles[1].type}" class="rounded-2xl w-full shadow-lg" /></div>\n`;
+                    newDesc = newDesc.slice(0, h3Idx) + imgHtml + newDesc.slice(h3Idx);
+                }
+            }
+
+            setFormData(prev => ({ ...prev, description: newDesc }));
+            alert('✨ Marketing Posters generated and inserted into description!');
+        } catch (error: any) {
+            console.error(error);
+            alert('Poster generation failed: ' + error.message);
+        } finally {
+            setIsGeneratingPosters(false);
+        }
+    };
     // --- Logic ---
 
     // 1. Generate Variants from Attributes
@@ -630,15 +690,26 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
                                         <label className="block text-sm font-bold uppercase tracking-wider text-muted-foreground">Description <span className="text-red-500">*</span></label>
-                                        <button
-                                            type="button"
-                                            onClick={generateAIDescription}
-                                            disabled={isGeneratingAI || !formData.name}
-                                            className="text-[10px] sm:text-xs px-3 py-1.5 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-lg transition-all font-bold flex items-center gap-1.5 disabled:opacity-50"
-                                        >
-                                            {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                            {isGeneratingAI ? 'Generating...' : 'Generate with AI'}
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={generatePosters}
+                                                disabled={isGeneratingPosters || !formData.name || !formData.images[0]}
+                                                className="text-[10px] sm:text-xs px-3 py-1.5 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition-all font-bold flex items-center gap-1.5 disabled:opacity-50"
+                                            >
+                                                {isGeneratingPosters ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
+                                                {isGeneratingPosters ? 'Creating Posters...' : '🎬 Create Premium Posters'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={generateAIDescription}
+                                                disabled={isGeneratingAI || !formData.name}
+                                                className="text-[10px] sm:text-xs px-3 py-1.5 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-lg transition-all font-bold flex items-center gap-1.5 disabled:opacity-50"
+                                            >
+                                                {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                {isGeneratingAI ? 'Generating...' : 'Generate with AI'}
+                                            </button>
+                                        </div>
                                     </div>
                                     <textarea
                                         required
