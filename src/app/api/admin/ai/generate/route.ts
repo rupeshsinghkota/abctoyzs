@@ -18,14 +18,15 @@ export async function POST(req: Request) {
 
         if (type === 'description') {
             prompt = `
-                You are a premium ride-on toy marketing expert. 
+                You are a premium ride-on toy marketing expert for the brand "ABC Toyz". 
                 Write a high-converting, professional product description for a "${productName}" in the "${category}" category.
                 ${contextString}
                 Use Markdown formatting. Include:
-                - A catchy opening paragraph.
+                - A catchy opening paragraph that highlights why "ABC Toyz" is the best place for this ride-on.
                 - A "Key Features" bulleted list.
                 - A "Safety First" section because it's for kids.
                 - Keep the tone exciting, playful, yet trustworthy.
+                - Mention that this is an "ABC Toyz" premium selection.
                 Do not include placeholders like [Price] or [Link].
             `;
         } else if (type === 'specs') {
@@ -56,16 +57,16 @@ export async function POST(req: Request) {
             `;
         } else if (type === 'all') {
             prompt = `
-                You are a product data expert. I will provide you with a raw text snippet or notes about a ride-on toy product.
-                Your task is to extract and generate ALL relevant product details into a clean JSON format.
+                You are a product data expert for "ABC Toyz". I will provide you with a raw text snippet or notes about a ride-on toy product.
+                Your task is to extract and generate ALL relevant product details into a clean JSON format, specifically branded for ABC Toyz.
                 
                 RAW PRODUCT DATA/NOTES:
                 "${notes}"
                 
                 Return ONLY a JSON object with this exact structure (if info is missing, suggest realistic values):
                 {
-                    "name": "Professional product name",
-                    "description": "High-converting Markdown description",
+                    "name": "Professional product name (Include 'By ABC Toyz' or similar only if it enhances the brand)",
+                    "description": "High-converting Markdown description emphasizing that this is a quality ABC Toyz product.",
                     "specs": {
                         "battery": "e.g. 12V 7Ah",
                         "motor": "e.g. 2 x 35W",
