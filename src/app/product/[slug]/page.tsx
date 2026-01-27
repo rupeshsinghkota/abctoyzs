@@ -87,21 +87,57 @@ export default async function ProductPage({ params }: PageProps) {
         { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : 'Remote' },
     ];
 
-    const whatsInBox = product.box_content && product.box_content.length > 0
-        ? product.box_content
-        : [
-            'Ride-on vehicle (fully assembled)',
-            '2.4G Parental Remote Control',
-            'Rechargeable Battery & Charger',
-            'User Manual & Warranty Card',
-            'Assembly Tools'
-        ];
+    // ... (previous code)
+
+
+
+    // Helper to interleave banners into the description
+    const processDescriptionWithBanners = (desc: string, banners?: string[]) => {
+        if (!banners || banners.length === 0 || !desc) return desc;
+
+        // Try to split by paragraph closings to insert images between them
+        const parts = desc.split('</p>');
+        if (parts.length <= 1) return desc; // Not enough paragraphs to interleave
+
+        let finalHtml = '';
+        let bannerIdx = 0;
+
+        // Strategy: Insert a banner after the 1st paragraph, then every 2 paragraphs
+        // This avoids clogging the start but breaks up walls of text
+        parts.forEach((part, idx) => {
+            finalHtml += part + (idx < parts.length - 1 ? '</p>' : ''); // Re-add closing tag if not last
+
+            // Logic for insertion points:
+            // Index 0 (after 1st p)
+            // Index 3 (after 4th p)
+            // Index 6 (after 7th p)
+            // scaling based on content length
+            const shouldInsert = (idx === 0) || ((idx > 1) && (idx % 2 === 0));
+
+            if (shouldInsert && bannerIdx < banners.length && idx < parts.length - 1) {
+                const banner = banners[bannerIdx];
+                finalHtml += `
+                    <div class="my-8 rounded-2xl overflow-hidden shadow-lg border border-gray-100">
+                        <img src="${banner}" alt="Feature highlight" class="w-full h-auto object-cover" loading="lazy" />
+                    </div>
+                `;
+                bannerIdx++;
+            }
+        });
+
+        // Append remaining banners at the bottom if any (optional, or just leave them out to avoid clutter)
+        // User said "strategic", so maybe just leave the rest out if text is short.
+
+        return finalHtml;
+    };
+
+    const enhancedDescription = processDescriptionWithBanners(product.description, product.banners);
 
     return (
         <div className="min-h-screen bg-background pb-20 md:pb-0">
+            {/* ... (schema and breadcrumb unchanged) */}
             <ProductSchema product={product} />
 
-            {/* Breadcrumb - Clean & Minimal */}
             <div className="container mx-auto px-4 py-4 md:py-6">
                 <nav className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
                     <Link href="/" className="hover:text-primary transition-colors">
@@ -175,7 +211,7 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
                     </div>
 
-                    {/* 3. Long Description (Editorial Style - Centered for Readability) */}
+                    {/* 3. In-Depth Review mixed with Banners */}
                     <div className="max-w-4xl mx-auto border-t pt-10">
                         <div className="text-center mb-6">
                             <span className="px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-wider">
@@ -184,26 +220,10 @@ export default async function ProductPage({ params }: PageProps) {
                             <h3 className="text-2xl font-black mt-3">About This Ride-On</h3>
                         </div>
 
-                        {/* Marketing Banners */}
-                        {product.banners && product.banners.length > 0 && (
-                            <div className="space-y-6 mb-10">
-                                {product.banners.map((banner, index) => (
-                                    <div key={index} className="relative w-full rounded-2xl overflow-hidden shadow-md">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img
-                                            src={banner}
-                                            alt={`${product.name} Feature ${index + 1}`}
-                                            className="w-full h-auto object-cover"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
+                        {/* Mixed Content */}
                         <div
                             className="prose prose-lg dark:prose-invert mx-auto text-gray-600 dark:text-gray-300 leading-relaxed prose-img:rounded-2xl prose-img:shadow-md prose-headings:font-black prose-headings:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-foreground"
-                            dangerouslySetInnerHTML={{ __html: product.description }}
+                            dangerouslySetInnerHTML={{ __html: enhancedDescription }}
                         />
                     </div>
 
