@@ -55,11 +55,11 @@ export async function POST(req: Request) {
             4. MARKETING TEXT: Incorporate a punchy, high-end marketing slogan. 
                - THEME: "${featureText}"
                - SPECIFICS: Use details from the PRODUCT CONTEXT (like specific battery voltage, motor power, or luxury features) to make it highly relevant.
-            5. DESIGN STYLE: Premium e-commerce marketing style (like Apple, Tesla, or Dyson). Minimalist, clean, with high-quality bold typography.
-            6. BACKGROUND: A lifestyle setting that matches the product's luxury level. The car MUST look naturally integrated into this background with perfect perspective and lighting.
+            5. DIVERSE COMPOSITION: DO NOT use the same generic center-shot for every image. Create variety by using different cinematic photography angles (e.g., dynamic 3/4 hero shots, sleek low-angle side profiles, or high-angle lifestyle perspectives).
+            6. BACKGROUND VARIETY: A lifestyle setting that matches the product's luxury level (e.g., modern architectural driveway, sunset mountain pass, or a high-tech studio). The car MUST look naturally integrated with perfect perspective and lighting.
             7. VISUALS: Sharp focus, 8k resolution, cinematic lighting, and professional color grading.
             
-            Output ONLY the final 16:9 high-resolution marketing poster.
+            Output ONLY the final 16:9 high-resolution marketing poster with a unique and powerful composition.
         `;
 
         const inputs = [prompt, { inlineData: { data: logoBase64, mimeType: "image/png" } }];
