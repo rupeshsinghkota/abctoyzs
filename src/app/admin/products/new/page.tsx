@@ -357,7 +357,7 @@ export default function NewProductPage() {
             const speedText = [specs.speed, specs.motor].filter(Boolean).join(" | ") || "High Speed Performance";
 
             // Angle 2: COMFORT & KIDS -> Lifestyle Visual (Child/Interior)
-            const comfortText = [specs.seats && `${specs.seats} Seater`, specs.seat_material, "Spacious"].filter(Boolean).join(" • ") || "Luxury Interior";
+            const comfortText = [specs.seats && `${specs.seats} Seater`, "Leather Seat", "Spacious"].filter(Boolean).join(" • ") || "Luxury Interior";
 
             // Angle 3: DURABILITY & LOAD -> Rugged Visual
             const strengthText = [specs.max_load && `Max ${specs.max_load}`, specs.tire_type].filter(Boolean).join(" + ") || "Built Tough";
