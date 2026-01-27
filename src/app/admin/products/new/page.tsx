@@ -354,13 +354,14 @@ export default function NewProductPage() {
             const specs = formData.specs;
 
             // Angle 1: SPEED & POWER -> Dynamic Motion Visual
-            const speedText = [specs.speed, specs.motor].filter(Boolean).join(" | ") || "High Speed Performance";
+            // Keep it VERY SHORT (max 3-4 words)
+            const speedText = specs.speed || specs.motor || "High Speed";
 
             // Angle 2: COMFORT & KIDS -> Lifestyle Visual (Child/Interior)
-            const comfortText = [specs.seats && `${specs.seats} Seater`, "Leather Seat", "Spacious"].filter(Boolean).join(" • ") || "Luxury Interior";
+            const comfortText = (specs.seats ? `${specs.seats} Seater` : null) || "Leather Interiors";
 
             // Angle 3: DURABILITY & LOAD -> Rugged Visual
-            const strengthText = [specs.max_load && `Max ${specs.max_load}`, specs.tire_type].filter(Boolean).join(" + ") || "Built Tough";
+            const strengthText = (specs.max_load ? `Max ${specs.max_load}` : null) || specs.tire_type || "Built Tough";
 
             const angles = [
                 { type: 'Action', text: speedText, style: 'SPEED_MOTION' },
