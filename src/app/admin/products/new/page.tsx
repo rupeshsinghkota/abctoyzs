@@ -352,14 +352,20 @@ export default function NewProductPage() {
         try {
             // Define 3 key marketing angles using REAL SPECS if available
             const specs = formData.specs;
-            const techText = [specs.battery, specs.motor].filter(Boolean).join(" • ") || "High Performance Power";
-            const speedText = [specs.speed, specs.max_load && `Max ${specs.max_load}`].filter(Boolean).join(" | ") || "Unleash the Speed";
-            const comfortText = [specs.tire_type, specs.seats && `${specs.seats} Seater`].filter(Boolean).join(" + ") || "Premium Comfort";
+
+            // Angle 1: SPEED & POWER -> Dynamic Motion Visual
+            const speedText = [specs.speed, specs.motor].filter(Boolean).join(" | ") || "High Speed Performance";
+
+            // Angle 2: COMFORT & KIDS -> Lifestyle Visual (Child/Interior)
+            const comfortText = [specs.seats && `${specs.seats} Seater`, specs.seat_material, "Spacious"].filter(Boolean).join(" • ") || "Luxury Interior";
+
+            // Angle 3: DURABILITY & LOAD -> Rugged Visual
+            const strengthText = [specs.max_load && `Max ${specs.max_load}`, specs.tire_type].filter(Boolean).join(" + ") || "Built Tough";
 
             const angles = [
                 { type: 'Action', text: speedText, style: 'SPEED_MOTION' },
-                { type: 'Luxury', text: comfortText, style: 'LUXURY_MINIMAL' },
-                { type: 'Tech', text: techText, style: 'LUXURY_MINIMAL' }
+                { type: 'Comfort', text: comfortText, style: 'COMFORT_LIFESTYLE' },
+                { type: 'Durability', text: strengthText, style: 'DURABILITY_OFFROAD' }
             ];
 
             const newBanners: string[] = [];

@@ -52,6 +52,20 @@ export async function POST(req: Request) {
             TEXT LAYOUT: Large, BOLD, ITALICIZED typography "RACING STYLE" on the side. 
             BACKGROUND: A blurred race track, desert flat, or neon city street to imply speed.`;
             camAngle = "Low-angle action shot, incoming 3/4 view.";
+        } else if (layoutStyle === 'COMFORT_LIFESTYLE') {
+            layoutInstructions = `
+            STYLE: WARM LIFESTYLE PHOTOGRAPHY.
+            COMPOSITION: Medium close-up showing the INTERIOR and SEATING. If possible, imply a happy child driving (or just the empty premium seat inviting a rider).
+            TEXT LAYOUT: Clean, soft, serif typography describing comfort.
+            BACKGROUND: A beautiful suburban driveway, garden, or park on a sunny day.`;
+            camAngle = "Eye-level side view looking into the cockpit/seat area.";
+        } else if (layoutStyle === 'DURABILITY_OFFROAD') {
+            layoutInstructions = `
+            STYLE: RUGGED & TOUGH.
+            COMPOSITION: Powerful, grounded stance. The vehicle looks solid and unbreakable.
+            TEXT LAYOUT: Strong, blocky, industrial typography.
+            BACKGROUND: A slightly rougher terrain like a gravel path, grass, or rocky texture to show off-road capability.`;
+            camAngle = "Low-angle front view, emphasizing the tires and grille.";
         } else {
             // Default to LUXURY_MINIMAL
             layoutInstructions = `
