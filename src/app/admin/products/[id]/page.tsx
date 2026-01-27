@@ -7,7 +7,8 @@ import Link from 'next/link';
 import {
     ArrowLeft, Save, Loader2, ImagePlus, X, Zap,
     Users, Gauge, Battery, Smartphone, Tag, Star,
-    Package, DollarSign, Hash, Layers, Split, Check
+    Package, DollarSign, Hash, Layers, Split, Check,
+    Upload
 } from 'lucide-react';
 import { VEHICLE_CATEGORIES, AGE_CATEGORIES } from '@/lib/data';
 
@@ -33,6 +34,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [activeTab, setActiveTab] = useState('basic');
 
     // Variations State
@@ -140,6 +142,26 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             setLoading(false);
         }
     }
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'images' | 'videos') => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        setIsUploading(true);
+        try {
+            const uploadPromises = Array.from(files).map(file => AdminService.uploadFile(file, type));
+            const newUrls = await Promise.all(uploadPromises);
+
+            // Filter out empty strings from current list and add new URLs
+            const currentList = formData[type].filter(url => url.trim() !== '');
+            setFormData({ ...formData, [type]: [...currentList, ...newUrls] });
+        } catch (error) {
+            console.error(error);
+            alert('Upload failed');
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     // --- Logic ---
 
@@ -423,7 +445,23 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                 )}
                                             </div>
                                         ))}
-                                        <button type="button" onClick={() => addListField('images')} className="text-sm font-bold text-primary hover:underline">+ Add Image URL</button>
+
+                                        <div className="flex items-center gap-4">
+                                            <button type="button" onClick={() => addListField('images')} className="text-sm font-bold text-primary hover:underline">+ Add Image URL</button>
+                                            <div className="h-4 w-px bg-border" />
+                                            <label className="text-sm font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                                                <Upload className="w-3 h-3" />
+                                                <span>{isUploading ? 'Uploading...' : 'Upload Image Files'}</span>
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => handleFileUpload(e, 'images')}
+                                                    disabled={isUploading}
+                                                />
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -449,7 +487,23 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                 )}
                                             </div>
                                         ))}
-                                        <button type="button" onClick={() => addListField('videos')} className="text-sm font-bold text-primary hover:underline">+ Add Video URL</button>
+
+                                        <div className="flex items-center gap-4">
+                                            <button type="button" onClick={() => addListField('videos')} className="text-sm font-bold text-primary hover:underline">+ Add Video URL</button>
+                                            <div className="h-4 w-px bg-border" />
+                                            <label className="text-sm font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                                                <Upload className="w-3 h-3" />
+                                                <span>{isUploading ? 'Uploading...' : 'Upload Video Files'}</span>
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    accept="video/*"
+                                                    className="hidden"
+                                                    onChange={(e) => handleFileUpload(e, 'videos')}
+                                                    disabled={isUploading}
+                                                />
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
