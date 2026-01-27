@@ -42,11 +42,17 @@ export async function POST(req: Request) {
             Transform the PRODUCT_IMAGE into a "STUNNING HIGHEST-END ADVERTISING PHOTOSHOOT". Use the BRAND_LOGO asset as your ONLY reference for branding.
             
             ARTISTIC DIRECTION:
-            1. ASPECT RATIO: The final image MUST be a PERFECT 1:1 SQUARE (SQUARE ASPECT RATIO). This is critical for the store's grid layout.
+            1. ASPECT RATIO: The final image MUST be a PERFECT 1:1 SQUARE.
             2. VISUAL STYLE: Cinematic high-end advertising photography. 
-            3. AUTONOMOUS SCENE SELECTION: Decide the best luxury setting (Villa, Midnight Showroom, or Hamptons Driveway).
+            3. AUTONOMOUS SCENE SELECTION: Decide the best luxury setting.
             4. LIGHTING mastery: Professional studio lighting with realistic reflections on all surfaces.
-            5. BRANDING: SEAMLESSLY and REALISTICALLY overlay the provided BRAND_LOGO onto the vehicle (number plate, side panels, or seat). It must match the perspective, lighting, and texture of the vehicle parts perfectly.
+            5. HYPER-REALISTIC BRANDING (NO "ODD" OVERLAYS): 
+               - Integrate the BRAND_LOGO so it looks like a physical, factory-fitted part of the vehicle. 
+               - It must NOT look like a flat digital sticker. 
+               - If placed on a curved surface (like a hood or side door), the logo MUST follow the CURVATURE and PERSPECTIVE of that surface perfectly.
+               - MATCH THE LIGHTING: If there is a bright reflection on the car where the logo is, that reflection MUST also affect the logo (specular highlights).
+               - MATERIALITY: Treat the logo as if it's either "HIGH-GLOSS PAINTED", "EMBOSSED CHROME", or a "PHYSICAL ACRYLIC BADGE" with subtle thickness and shadows.
+               - BLENDING: The logo's texture must match the grain and finish of the paint it sits upon.
             6. QUALITY: 8k resolution textures, crystal clear focus, and professional bokeh.
             
             Output ONLY the final high-resolution square masterpiece.
