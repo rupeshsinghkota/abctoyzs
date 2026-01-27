@@ -216,14 +216,16 @@ export async function fetchProducts(): Promise<Product[]> {
         return data.map((item: any) => ({
             id: item.id,
             slug: item.slug || item.id,
-            name: item.name,
-            category: item.category ? item.category.toLowerCase() : 'cars',
-            price: item.base_price,
-            mrp: item.mrp,
-            rating: item.rating || 0,
-            reviews: item.review_count || 0,
-            image: item.images?.[0] || '',
-            images: item.images || [],
+            name: item.name || 'Untitled Product',
+            // SAFETY: Check if category is a string before calling toLowerCase
+            category: (typeof item.category === 'string' && item.category.trim()) ? item.category.toLowerCase() : 'cars',
+            price: Number(item.base_price) || 0,
+            mrp: item.mrp ? Number(item.mrp) : undefined,
+            rating: Number(item.rating) || 0,
+            reviews: Number(item.review_count) || 0,
+            // SAFETY: Check if images is actually an array
+            image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
+            images: Array.isArray(item.images) ? item.images : [],
             description: item.description || '',
             tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
             specs: item.specs || {},
@@ -231,14 +233,14 @@ export async function fetchProducts(): Promise<Product[]> {
             ageGroup: item.age_group,
             subCategory: item.subCategory,
             // Premium & Variations
-            videos: item.videos || [],
-            box_content: item.box_content || [],
+            videos: Array.isArray(item.videos) ? item.videos : [],
+            box_content: Array.isArray(item.box_content) ? item.box_content : [],
             product_dimensions: item.product_dimensions,
             box_dimensions: item.box_dimensions,
             net_weight: item.net_weight,
             gross_weight: item.gross_weight,
-            attributes: item.attributes || [],
-            variants: item.variants || [],
+            attributes: Array.isArray(item.attributes) ? item.attributes : [],
+            variants: Array.isArray(item.variants) ? item.variants : [],
             meta_title: item.meta_title,
             meta_description: item.meta_description
         })) as Product[];

@@ -15,6 +15,7 @@ interface Product {
     rating: number;
     reviews: number;
     tag?: string;
+    mrp?: number;
 }
 
 interface ProductStripProps {
@@ -78,8 +79,11 @@ export function ProductStrip({ title, products, viewAllLink = '/shop' }: Product
                                     {product.name}
                                 </h4>
                                 <div className="flex items-center gap-2">
-                                    <span className="font-bold text-base md:text-lg">₹{product.price.toLocaleString()}</span>
-                                    <span className="text-xs text-muted-foreground line-through">₹{(product.price * 1.2).toLocaleString()}</span>
+                                    <span className="font-bold text-base md:text-lg">₹{(product.price || 0).toLocaleString()}</span>
+                                    {/* Use Real MRP if available, else fake it slightly for design */}
+                                    <span className="text-xs text-muted-foreground line-through">
+                                        ₹{(product.mrp && product.mrp > product.price ? product.mrp : product.price * 1.2).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </span>
                                 </div>
                             </div>
                         </Link>
