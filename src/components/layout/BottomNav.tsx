@@ -19,7 +19,7 @@ export function BottomNav() {
         { href: "/profile", label: "Profile", icon: User },
     ];
 
-    if (pathname === '/checkout' || pathname === '/checkout/success' || pathname?.startsWith('/product/')) return null;
+    if (pathname === '/checkout' || pathname === '/checkout/success' || pathname?.startsWith('/product/') || pathname?.startsWith('/admin')) return null;
 
     return (
         <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t z-50 md:hidden pb-[env(safe-area-inset-bottom)]">

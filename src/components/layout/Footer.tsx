@@ -4,9 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { Facebook, Instagram, Twitter, Youtube, Mail, MapPin, Phone, ChevronDown, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+    const pathname = usePathname();
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+    if (pathname?.startsWith('/admin')) return null;
 
     const toggleSection = (section: string) => {
         setOpenSections(prev => ({

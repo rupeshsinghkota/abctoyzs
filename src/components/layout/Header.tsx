@@ -4,10 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { MobileHeader } from "./MobileHeader";
 import { DesktopHeader } from "./DesktopHeader";
+import { usePathname } from "next/navigation";
 
 export function Header() {
+    const pathname = usePathname();
     const [isVisible, setIsVisible] = useState(true);
     const lastScrollY = useRef(0);
+
+    if (pathname?.startsWith('/admin')) return null;
 
     useEffect(() => {
         const handleScroll = () => {
