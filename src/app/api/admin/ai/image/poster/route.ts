@@ -42,13 +42,14 @@ export async function POST(req: Request) {
             
             CONTENT REQUIREMENTS:
             1. AUTHENTIC PRODUCT: Feature the vehicle prominently. Use the provided PRODUCT_IMAGE as the ONLY source for the car. The car's model, color, and features MUST remain 100% authentic and accurate to the photo.
-            2. BRANDING: Use the provided BRAND_LOGO asset. Place it in a corner or center so it looks like an official corporate banner.
-            3. MARKETING TEXT: Incorporate a punchy, high-end marketing slogan. 
+            2. CLEANING: surgically remove any watermarks, generic shop logos, or retailer text from other sellers found in the original PRODUCT_IMAGE. DO NOT remove original car manufacturer logos (Jeep, Ford, etc.).
+            3. BRANDING: Use the provided BRAND_LOGO asset. Place it in a corner or center so it looks like an official corporate banner.
+            4. MARKETING TEXT: Incorporate a punchy, high-end marketing slogan. 
                - THEME: "${featureText}"
                - SPECIFICS: Use details from the PRODUCT CONTEXT (like specific battery voltage, motor power, or luxury features) to make it highly relevant.
-            4. DESIGN STYLE: Premium e-commerce marketing style (like Apple, Tesla, or Dyson). Minimalist, clean, with high-quality bold typography.
-            5. BACKGROUND: A lifestyle setting that matches the product's luxury level. The car MUST look naturally integrated into this background with perfect perspective and lighting.
-            6. VISUALS: Sharp focus, 8k resolution, cinematic lighting, and professional color grading.
+            5. DESIGN STYLE: Premium e-commerce marketing style (like Apple, Tesla, or Dyson). Minimalist, clean, with high-quality bold typography.
+            6. BACKGROUND: A lifestyle setting that matches the product's luxury level. The car MUST look naturally integrated into this background with perfect perspective and lighting.
+            7. VISUALS: Sharp focus, 8k resolution, cinematic lighting, and professional color grading.
             
             Output ONLY the final 16:9 high-resolution marketing poster.
         `;

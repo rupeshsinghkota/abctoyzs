@@ -38,19 +38,17 @@ export async function POST(req: Request) {
             1. PRODUCT_IMAGE: The original photo of the vehicle.
             2. BRAND_LOGO: The official logo asset for "${BRAND_CONFIG.name}".
             
-            GOAL: Enhance the PRODUCT_IMAGE into a "HIGH-IMPACT ADVERTISING MASTERPIECE" suitable for premium product pages and social media ads, WHILE PRESERVING THE ORIGINAL PRODUCT FIDELITY.
+            GOAL: Enhance the PRODUCT_IMAGE into a "PREMIUM PRODUCT PAGE (PDP) MASTERPIECE" suitable for high-end e-commerce, WHILE PRESERVING THE ORIGINAL PRODUCT IDENTITY.
             
-            CRITICAL RULES:
-            1. PIXEL FIDELITY: DO NOT change the environment, background, or the vehicle's actual model/color/trim. It must remain 100% recognizable as the same car in the same location.
-            2. ENHANCEMENT (MAKE IT POP): 
-               - Apply professional "Color Grading" to make the colors vibrant and premium.
-               - Enhance existing "Lighting & Reflections" to look like a high-end commercial shoot.
-               - Optimize contrast and sharpness for "Advertising Quality".
-            3. AUTHENTIC CO-BRANDING:
-               - KEEP ORIGINAL CAR BRANDING: Preserve all manufacturer logos (e.g., Jeep, Ford, etc.).
-               - ABC TOYZ BRANDING: Place the BRAND_LOGO asset onto the LICENSE PLATE and as a subtle, high-gloss "physical badge" on the hood or rear.
-               - INTEGRATION: The logo must match the lighting, perspective, and surface texture of the vehicle so perfectly that it looks factory-fitted.
-            4. QUALITY: Crystal clear 8k resolution textures, zero AI artifacts, and professional optics.
+            CRITICAL WORKFLOW:
+            1. REMOVE COMPETITOR BRANDING: Identify and surgically remove any watermarks, logos, or text from other sellers, retailers, or generic manufacturers (e.g., remove competitor shop names or generic toy brand text).
+            2. PRESERVE CAR IDENTITY: DO NOT remove authentic car manufacturer logos (e.g., Jeep, Ford, Mercedes, BMW badges). The vehicle must remain authentic to its real-world brand.
+            3. ADD ABC TOYZ BRANDING: Place the BRAND_LOGO onto the LICENSE PLATE and as a subtle, high-gloss "physical badge" on the hood or rear. It must follow the car's perspective and lighting perfectly.
+            4. VISUAL ENHANCEMENT: 
+               - Apply professional "Color Grading" to make the colors vibrant and luxe.
+               - Enhance "Specular Highlights" and reflections to give the vehicle a high-end "pop".
+               - Sharpen details and optimize contrast for a clean, premium advertising look.
+            5. FIDELITY: DO NOT change the background, the car's model, or the overall composition. It must be a "retouching" of the original image, not a total transformation.
             
             Output ONLY the final breathtaking retouched masterpiece.
         `;
