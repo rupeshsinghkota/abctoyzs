@@ -591,9 +591,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                         rows={8}
                                         className="w-full px-5 py-4 bg-background border-2 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-mono text-sm leading-relaxed"
-                                        placeholder="# Amazing Features\n\n* Feature 1\n* Feature 2\n\nDescribe the product..."
+                                        placeholder="<h3>Amazing Features</h3>\n\n<ul>\n  <li>Feature 1</li>\n  <li>Feature 2</li>\n</ul>\n\n<p>Describe the product...</p>"
                                     />
-                                    <p className="text-xs text-muted-foreground mt-2 text-right">Markdown supported</p>
+                                    <p className="text-xs text-muted-foreground mt-2 text-right">HTML supported</p>
                                 </div>
                             </div>
                         )}

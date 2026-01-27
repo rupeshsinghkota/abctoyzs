@@ -22,18 +22,20 @@ export async function POST(req: Request) {
                 Write a compelling, sophisticated, and high-converting product description for a "${productName}" in the "${category}" category.
                 ${contextString}
 
-                Tone: Exciting, premium, and trustworthy. Use evocative language (e.g., "exhilarating", "meticulously crafted", "unmatched safety").
+                Tone: Exciting, premium, and trustworthy. Use evocative language.
                 
-                Structure (Markdown):
-                1. ## [Catchy, Punchy Title] - A magnetic heading.
-                2. **The ABC Toyz Experience**: A 2-3 sentence emotional hook about the joy this toy brings and why ABC Toyz is the ultimate choice for quality and service.
-                3. ## ✨ Premium Highlights: 
-                   - Use bold keys (e.g., **Authentic Design:** Real LED lights...)
-                   - Focus on 5-7 stand-out features.
-                4. ## 🛡️ Safety & Reliability:
-                   - Emphasize parent-tested safety features, slow-start technology, and durable build.
-                5. ## 🎁 The Perfect Gift:
-                   - A concluding sentence on why this is the best gift for a child.
+                Format: Output ONLY valid semantic HTML (no markdown).
+                Structure:
+                1. <h3>[Catchy, Punchy Title]</h3>
+                2. <p><strong>The ABC Toyz Experience:</strong> [2-3 sentence emotional hook about the joy this toy brings].</p>
+                3. <h3>✨ Premium Highlights:</h3>
+                   <ul>
+                     <li><strong>[Feature Detail]:</strong> [Description]</li>
+                     <li>... (5-7 items)</li>
+                   </ul>
+                4. <h3>🛡️ Safety & Reliability:</h3>
+                   <p>[Details on safety features and quality build].</p>
+                5. <p>🎁 <strong>The Perfect Gift:</strong> [Concluding sentence].</p>
 
                 Do not use generic placeholders. Mention "ABC Toyz" naturally 2-3 times.
             `;
@@ -72,8 +74,8 @@ export async function POST(req: Request) {
                 
                 Return ONLY a JSON object:
                 {
-                    "name": "Create a premium, descriptive title (e.g. 'Ultimate 4WD Adventure Jeep by ABC Toyz' instead of just 'Jeep')",
-                    "description": "Write a 300-word, high-end Markdown description following the world-class copywriting structure: Title, Emotional Hook, Premium Highlights (bulleted), and Safety section. Emphasize the ABC Toyz quality promise.",
+                    "name": "Create a premium, CONCISE product name (max 6-8 words). Do not include 'ABC Toyz' in the name itself unless it is a custom branded item.",
+                    "description": "Write a high-end HTML description (using <h3>, <p>, <ul>, <li> tags). Follow the world-class structure: Title, Emotional Hook, Premium Highlights list, and Safety section. Use strong adjectives.",
                     "specs": {
                         "battery": "Realistic value based on notes",
                         "motor": "Realistic motors (e.g. 4 x 45W for 4WD)",
