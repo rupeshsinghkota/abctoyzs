@@ -39,13 +39,13 @@ export async function POST(req: Request) {
         const logoBase64 = logoBuffer.toString("base64");
 
         // Step 3: Ultra-Stable Generation
-        // Using a flattened, plain text prompt to prevent MALFORMED_FUNCTION_CALL in Gemini Preview.
-        const prompt = `Generate a UNIQUE, BREATHTAKING commercial variation of the first provided image (the toy vehicle) for "${BRAND_CONFIG.name}". 
-        First, digitally scrub clean every trace of competitor branding, old names, and watermarks (especially from the windshield, glass, and windows) while keeping the original car brand badges like Jeep or Ford. 
-        Second, create a new, high-end commercial environment for the car, such as a modern driveway, desert mountain pass, or tech-studio with cinematic lighting. 
-        Third, place the second provided image (the logo) naturally onto the car's license plate or doors so it looks factory-fitted. 
-        Finally, enhance the lighting and reflections to make the car pop with premium, advertising-grade quality. 
-        Output only the final 1:1 square retouched masterpiece.`;
+        // Using a flattened, DESCRIPTIVE prompt to prevent MALFORMED_FUNCTION_CALL.
+        // Imperative verbs (remove, place, scrub) can confuse the model into trying to call tools.
+        const prompt = `A premium commercial product photography masterpiece of the toy vehicle shown in the first image. 
+        The vehicle is branded with the logo from the second image, naturally applied to the license plate or door.
+        The car is strictly clean, appearing factory-fresh with NO other text, watermarks, or competitor logos on the windshield or body.
+        The background is a breathtaking high-end location (e.g., luxury driveway or desert road) with cinematic lighting and reflections.
+        The style is photorealistic, 8k resolution, advertising quality.`;
 
         const result = await model.generateContent([
             { text: prompt },
