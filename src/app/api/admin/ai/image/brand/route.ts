@@ -2,6 +2,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { BRAND_CONFIG } from "@/config/brand";
 import { createClient } from "@/lib/supabase/server";
+import fs from 'fs';
+import path from 'path';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -18,45 +20,41 @@ export async function POST(req: Request) {
         // Using the verified model for image generation
         const model = genAI.getGenerativeModel({ model: "gemini-3-pro-image-preview" });
 
-        // Step 1: Download original image
+        // Step 1: Download original product image
         const imageRes = await fetch(imageUrl);
         const imageBuffer = await imageRes.arrayBuffer();
         const imageBase64 = Buffer.from(imageBuffer).toString("base64");
 
-        // Step 2: Generate Branded/Enhanced Version
+        // Step 2: Read BRAND LOGO from local filesystem
+        const logoPath = path.join(process.cwd(), 'public', BRAND_CONFIG.logoWide);
+        const logoBuffer = fs.readFileSync(logoPath);
+        const logoBase64 = logoBuffer.toString("base64");
+
+        // Step 3: Generate Branded/Enhanced Version
         const prompt = `
             ROLE: You are a World-Class Commercial Photographer and Art Director for "${BRAND_CONFIG.name}".
             
-            PRODUCT: ${productName || "Premium Ride-on Vehicle"}
+            ASSETS PROVIDED:
+            1. PRODUCT_IMAGE: The original photo of the vehicle.
+            2. BRAND_LOGO: The official "${BRAND_CONFIG.name}" logo.
             
             TASK: 
-            Transform the provided product image into a "STUNNING HIGHEST-END ADVERTISING PHOTOSHOOT". You have full creative autonomy to decide the absolute best setting, lighting, and composition that will make this specific product look "AMAZING" and "LUXURY".
+            Transform the PRODUCT_IMAGE into a "STUNNING HIGHEST-END ADVERTISING PHOTOSHOOT". Use the BRAND_LOGO asset as your ONLY reference for branding.
             
             ARTISTIC DIRECTION:
-            1. VISUAL STYLE: Cinematic high-end advertising photography. Think Rolex, Tesla, or Luxury Automotive brochures.
-            2. AUTONOMOUS SCENE SELECTION: Decide which environment makes this product shine:
-               - A "Golden Hour" sunset shoot at a modern architectural villa.
-               - A high-contrast, moody "Midnight Showroom" with neon accents and marble reflections.
-               - A vibrant, crisp "Hamptons Driveway" with professional landscaping and soft bokeh.
-               - A futuristic "Tech-Lab" with clean lines and glowing floor panels.
-            3. LIGHTING MASTERY: Use professional cinematic lighting strategies. Add dramatic rims lights, soft-box diffusion, and realistic light-wrap. Every surface (glossy plastic, chrome, rubber) must react perfectly to the environment.
-            4. COMPOSITION: Use dynamic angles. Apply depth-of-field to focus on the product's craftsmanship while blurring the luxury background beautifully.
-            5. BRANDING: Integrate the "${BRAND_CONFIG.name}" logo or text onto the vehicle (number plate, side trim, or seat) so perfectly it looks factory-fitted.
-            6. QUALITY: Sharp focus, 8k resolution textures, zero distortion, and a "WOW" factor that makes a customer want to buy instantly.
-            
-            VIBE: ${BRAND_CONFIG.voice}. ${BRAND_CONFIG.tagline}.
+            1. VISUAL STYLE: Cinematic high-end advertising photography. 
+            2. AUTONOMOUS SCENE SELECTION: Decide the best luxury setting (Villa, Midnight Showroom, or Hamptons Driveway).
+            3. LIGHTING mastery: Professional studio lighting with realistic reflections on all surfaces.
+            4. BRANDING: SEAMLESSLY and REALISTICALLY overlay the provided BRAND_LOGO onto the vehicle (number plate, side panels, or seat). It must match the perspective, lighting, and texture of the vehicle parts perfectly.
+            5. QUALITY: 8k resolution textures, crystal clear focus, and professional bokeh.
             
             Output ONLY the final high-resolution masterpiece.
         `;
 
         const result = await model.generateContent([
             prompt,
-            {
-                inlineData: {
-                    data: imageBase64,
-                    mimeType: "image/jpeg"
-                }
-            }
+            { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
+            { inlineData: { data: logoBase64, mimeType: "image/png" } }
         ]);
 
         const response = await result.response;

@@ -7,10 +7,10 @@ export const BRAND_CONFIG = {
     name: "ABC Toyz",
     fullName: "ABC Toyz Premium Ride-Ons",
     tagline: "Premium Rides for Little Legends",
-    voice: "Exciting, premium, and trustworthy luxury toy expert",
-
-    // Key marketing pillars the AI should emphasize
-    pillars: [
+    voice: "Premium, exciting, and trustworthy. We speak to the joy of childhood and the satisfaction of parents. Professional yet playful.",
+    logo: "/logo.png",
+    logoWide: "/logo_wide.png",
+    marketingPillars: [
         "Unmatched safety and parent-tested quality",
         "Most realistic designs and authentic features",
         "Premium customer support and fast shipping",
