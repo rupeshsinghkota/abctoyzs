@@ -259,9 +259,11 @@ export default function NewProductPage() {
             const { newImageUrl, error } = await res.json();
             if (error) throw new Error(error);
 
-            const newImages = [...formData.images];
-            newImages[index] = newImageUrl;
-            setFormData(prev => ({ ...prev, images: newImages }));
+            setFormData(prev => {
+                const freshImages = [...prev.images];
+                freshImages[index] = newImageUrl;
+                return { ...prev, images: freshImages };
+            });
             return newImageUrl;
         } catch (error: any) {
             console.error(error);
