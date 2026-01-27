@@ -24,26 +24,44 @@ export async function POST(req: Request) {
 
         if (type === 'description') {
             prompt = `
-                You are a world-class luxury toy copywriter for "${BRAND_CONFIG.name}". 
-                Write a compelling, sophisticated, and high-converting product description for a "${productName}" in the "${category}" category.
+                You are the Editor-in-Chief of a luxury parenting magazine like "Vogue Bambini" or "Architectural Digest".
+                Write a LONG-FORM, immersive, editorial-style product review for a premium toy: "${productName}" (Category: ${category}).
                 ${contextString}
 
                 ${brandingGuide}
                 
-                Format: Output ONLY valid semantic HTML (no markdown).
-                Structure:
-                1. <h3>[Catchy, Punchy Title]</h3>
-                2. <p><strong>The ${BRAND_CONFIG.name} Experience:</strong> [2-3 sentence emotional hook about the joy this toy brings].</p>
-                3. <h3>✨ Premium Highlights:</h3>
-                   <ul>
-                     <li><strong>[Feature Detail]:</strong> [Description]</li>
-                     <li>... (5-7 items)</li>
-                   </ul>
-                4. <h3>🛡️ Safety & Reliability:</h3>
-                   <p>[Details on safety features and quality build].</p>
-                5. <p>🎁 <strong>The Perfect Gift:</strong> [Concluding sentence].</p>
+                TONE: Sophisticated, emotive, authoritative, and aspirational. Use rich vocabulary (e.g., "impeccable", "unrivaled", "masterpiece").
+                LENGTH: 400-600 words. Do not be brief. This is a feature story.
 
-                Do not use generic placeholders. Mention "${BRAND_CONFIG.name}" naturally ${BRAND_CONFIG.aiInstructions.brandingFrequency}.
+                Format: Output ONLY valid semantic HTML (no markdown, no \`\`\` wrappers).
+                
+                Structure Requirements (Strictly Follow):
+                
+                1. <h3>[Create a Magnetic, 3-Word Headline (e.g., "The Ultimate Drive")]</h3>
+                
+                2. <blockquote>
+                   "A statement piece that redefines playtime luxe. The ${productName} isn't just a toy; it's a rite of passage."
+                   </blockquote>
+                
+                3. <p><strong>The Design Philosophy:</strong> [Write 2 rich paragraphs about the aesthetics, lines, and visual appeal. Compare it to the real vehicle if applicable. Evoke the feeling of seeing it for the first time.]</p>
+                
+                4. <h3>🏁 Performance & Engineering</h3>
+                   <p>[Deep dive into the specs but written as a driving experience. Talk about the "thrill of the ignition", the "smooth interaction of the suspension", and the "commanding power of the battery".]</p>
+                
+                5. <h3>✨ Curated Features</h3>
+                   <ul>
+                     <li><strong>The Cockpit:</strong> [Describe the interior, dashboard, and controls in detail]</li>
+                     <li><strong>Safety First:</strong> [Describe safety features like remote control and belts as "Peace of Mind" systems]</li>
+                     <li><strong>Entertainment:</strong> [Describe the media system/music as an "In-Car Entertainment Suite"]</li>
+                   </ul>
+                
+                6. <p><strong>The Verdict:</strong> [Concluding paragraph summarizing why this is the must-have gift of the season. End with a strong call to action for the parent.]</p>
+
+                CRITICAL rules:
+                - Do NOT use generic phrases like "perfect for your child". Use "designed for the discerning young driver".
+                - Mention "${BRAND_CONFIG.name}" naturally ${BRAND_CONFIG.aiInstructions.brandingFrequency}.
+                - Ensure the HTML is perfectly nested and valid.
+                - NO markdown code blocks. Just the raw HTML string.
             `;
         } else if (type === 'specs') {
             prompt = `

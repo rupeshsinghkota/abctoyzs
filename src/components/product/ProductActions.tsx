@@ -177,5 +177,6 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     </div>
                 )}
             </div>
-            );
+        </div>
+    );
 }

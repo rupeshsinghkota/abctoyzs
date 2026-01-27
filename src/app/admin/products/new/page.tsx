@@ -51,6 +51,7 @@ export default function NewProductPage() {
         category: 'cars',
         subcategory: '',
         images: [''],
+        banners: [] as string[],
         videos: [''],
         box_content: [''],
         voltage: '',
@@ -336,7 +337,7 @@ export default function NewProductPage() {
         return d;
     };
 
-    const generatePosters = async () => {
+    const generateMarketingSuite = async () => {
         // Fallback name logic: If name is empty, try to extract first 5 words from notes
         let effectiveName = formData.name;
         if (!effectiveName && formData.prompt_notes) {
@@ -350,13 +351,14 @@ export default function NewProductPage() {
 
         setIsGeneratingPosters(true);
         try {
-            // Define two key marketing angles with DISTINCT styles
+            // Define 3 key marketing angles
             const angles = [
-                { type: 'Performance & Speed', text: 'Unmatched 4WD Performance and Speed', style: 'SPEED_MOTION' },
-                { type: 'Luxury & Comfort', text: 'Premium Interior and Realistic Design', style: 'LUXURY_MINIMAL' }
+                { type: 'Action', text: 'Unleash the Thrill', style: 'SPEED_MOTION' },
+                { type: 'Luxury', text: 'Premium Elegance', style: 'LUXURY_MINIMAL' },
+                { type: 'Detail', text: 'Exquisite Craftsmanship', style: 'LUXURY_MINIMAL' } // Reusing luxury style but prompt inside API handles it if needed, or we just trust the variety
             ];
 
-            const posterUrls: string[] = [];
+            const newBanners: string[] = [];
 
             for (const angle of angles) {
                 const res = await fetch('/api/admin/ai/image/poster', {
@@ -365,27 +367,26 @@ export default function NewProductPage() {
                     body: JSON.stringify({
                         productName: effectiveName,
                         featureText: angle.text,
-                        layoutStyle: angle.style, // Pass specific layout style
+                        layoutStyle: angle.style,
                         productNotes: formData.prompt_notes,
-                        originalImageUrl: formData.images[0] // Use main image as reference
+                        originalImageUrl: formData.images[0]
                     })
                 });
                 const { posterUrl, error } = await res.json();
                 if (error) throw new Error(error);
-                posterUrls.push(posterUrl);
+                newBanners.push(posterUrl);
             }
 
-            setGeneratedPosters(posterUrls);
-
+            setGeneratedPosters(newBanners);
             setFormData(prev => ({
                 ...prev,
-                description: integratePostersIntoDescription(prev.description, posterUrls)
+                banners: newBanners
             }));
 
-            alert('✨ Marketing Posters generated and integrated into description!');
+            alert('✨ Marketing Suite Generated! Check the Media tab.');
         } catch (error: any) {
             console.error(error);
-            alert('Poster generation failed: ' + error.message);
+            alert('Marketing Suite generation failed: ' + error.message);
         } finally {
             setIsGeneratingPosters(false);
         }
@@ -444,7 +445,9 @@ export default function NewProductPage() {
                 base_price: parseFloat(formData.base_price) || 0,
                 mrp: formData.mrp ? parseFloat(formData.mrp) : undefined,
                 stock: parseInt(formData.stock) || 0,
+
                 images: formData.images.filter(img => img.trim()),
+                banners: formData.banners,
                 videos: formData.videos.filter(v => v.trim()),
                 box_content: formData.box_content.filter(i => i.trim()),
                 specs: {
@@ -671,22 +674,62 @@ export default function NewProductPage() {
                             <div className="bg-card border rounded-3xl p-6 space-y-8">
                                 {/* Images Section */}
                                 <div>
-                                    <div className="flex justify-between items-center mb-4">
-                                        <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                                            <ImagePlus className="w-4 h-4" /> Product Images
-                                        </label>
-                                        {formData.images.some(img => img.trim()) && (
-                                            <button
-                                                type="button"
-                                                onClick={brandAllImages}
-                                                disabled={isBrandingAll || isUploading}
-                                                className="text-[10px] sm:text-xs px-3 py-1.5 bg-purple-600 text-white rounded-lg transition-all font-bold flex items-center gap-1.5 hover:bg-purple-700 shadow-sm disabled:opacity-50"
-                                            >
-                                                {isBrandingAll ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                {isBrandingAll ? 'Branding All...' : '✨ Brand All with AI'}
-                                            </button>
+                                    <div className="flex flex-col gap-4 mb-4">
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                                <ImagePlus className="w-4 h-4" /> Product Images
+                                            </label>
+                                            {formData.images.some(img => img.trim()) && (
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={generateMarketingSuite}
+                                                        disabled={isGeneratingPosters || !formData.name}
+                                                        className="text-[10px] sm:text-xs px-3 py-1.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg transition-all font-bold flex items-center gap-1.5 hover:shadow-lg shadow-pink-500/20 disabled:opacity-50"
+                                                    >
+                                                        {isGeneratingPosters ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                        {isGeneratingPosters ? 'Designing Suite...' : '✨ Generate Marketing Suite'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={brandAllImages}
+                                                        disabled={isBrandingAll || isUploading}
+                                                        className="text-[10px] sm:text-xs px-3 py-1.5 bg-purple-600 text-white rounded-lg transition-all font-bold flex items-center gap-1.5 hover:bg-purple-700 shadow-sm disabled:opacity-50"
+                                                    >
+                                                        {isBrandingAll ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                        {isBrandingAll ? 'Branding All...' : 'Enhance Photos'}
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Marketing Banners Display */}
+                                        {formData.banners && formData.banners.length > 0 && (
+                                            <div className="p-4 bg-gradient-to-r from-rose-50 to-pink-50 border border-pink-100 rounded-2xl">
+                                                <h3 className="text-xs font-bold uppercase tracking-wider text-rose-600 mb-3 flex items-center gap-2">
+                                                    <Sparkles className="w-4 h-4" /> Marketing Banners (Hero Carousel)
+                                                </h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    {formData.banners.map((banner, idx) => (
+                                                        <div key={idx} className="relative group aspect-[21/9] rounded-xl overflow-hidden shadow-sm border-2 border-white">
+                                                            <img src={banner} alt="Banner" className="w-full h-full object-cover" />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const newBanners = formData.banners.filter((_, i) => i !== idx);
+                                                                    setFormData({ ...formData, banners: newBanners });
+                                                                }}
+                                                                className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
+
 
                                     {/* Modern Image Gallery */}
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -809,7 +852,7 @@ export default function NewProductPage() {
                                         <div className="flex gap-2">
                                             <button
                                                 type="button"
-                                                onClick={generatePosters}
+                                                onClick={generateMarketingSuite}
                                                 disabled={isGeneratingPosters || !formData.images[0] || !formData.prompt_notes}
                                                 className="text-[10px] sm:text-xs px-4 py-2 bg-blue-600 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:bg-blue-700 shadow-lg disabled:opacity-50"
                                             >
@@ -1302,10 +1345,10 @@ export default function NewProductPage() {
                         </div>
                     </div>
                 </div>
-            </form>
+            </form >
 
             {/* Mobile Sticky Save Button */}
-            <div className="lg:hidden fixed bottom-[64px] left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-40">
+            < div className="lg:hidden fixed bottom-[64px] left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-40" >
                 <button
                     onClick={() => document.querySelector('form')?.requestSubmit()}
                     disabled={saving}
@@ -1314,7 +1357,7 @@ export default function NewProductPage() {
                     {saving ? <Loader2 className="animate-spin" /> : <Save className="w-5 h-5" />}
                     Create Product
                 </button>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

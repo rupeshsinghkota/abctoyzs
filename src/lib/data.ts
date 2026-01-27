@@ -10,6 +10,7 @@ export interface Product {
     image: string;
     images: string[];
     tag?: string;
+    banners?: string[]; // Marketing/Hero banners
     specs?: {
         battery: string;
         mobile_app: boolean;
@@ -227,6 +228,7 @@ export async function fetchProducts(): Promise<Product[]> {
             image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
             images: Array.isArray(item.images) ? item.images : [],
             description: item.description || '',
+            banners: Array.isArray(item.banners) ? item.banners : [],
             // Correctly map the boolean flags
             is_new: !!item.is_new,
             is_featured: !!item.is_featured,

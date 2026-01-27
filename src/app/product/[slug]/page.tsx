@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { ProductMainSection } from '@/components/product/ProductMainSection';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { Metadata } from 'next';
+import { MarketingHero } from '@/components/product/MarketingHero';
 
 interface PageProps {
     params: Promise<{
