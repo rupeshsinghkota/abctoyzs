@@ -25,25 +25,28 @@ export async function POST(req: Request) {
 
         // Step 2: Generate Branded/Enhanced Version
         const prompt = `
-            ULTRA-PREMIUM IMAGE REGENERATION TASK for the brand "${BRAND_CONFIG.name}".
+            ROLE: You are a World-Class Commercial Photographer and Art Director for "${BRAND_CONFIG.name}".
             
-            PRODUCT: ${productName || "Luxury Ride-on Toy"}
+            PRODUCT: ${productName || "Premium Ride-on Vehicle"}
             
-            OBJECTIVE:
-            Take the uploaded photo of the ride-on toy and transform it into a world-class, high-fidelity marketing asset.
+            TASK: 
+            Transform the provided product image into a "STUNNING HIGHEST-END ADVERTISING PHOTOSHOOT". You have full creative autonomy to decide the absolute best setting, lighting, and composition that will make this specific product look "AMAZING" and "LUXURY".
             
-            CRITICAL REQUIREMENTS:
-            1. TOY PRESERVATION: Maintain the exact model, shape, and structure of the toy vehicle from the original image.
-            2. BRANDING: Seamlessly integrate the text "${BRAND_CONFIG.name}" onto the vehicle's number plate, side panels, or windshield. It must look like a real physical sticker/part of the car, with correct perspective and reflections.
-            3. LUXURY BACKGROUND: Replace any boring or factory background with a high-end setting:
-               - EITHER a modern, minimalist luxury car showroom with marble floors and cinematic spotlights.
-               - OR a beautiful sun-drenched private estate driveway with professional landscaping.
-            4. DETIALING & TEXTURES: Dramatically enhance surface textures (glossy paint, leather seats, rubber tires, LED light clusters).
-            5. LIGHTING: Use professional studio lighting (three-point setup) with soft shadows and realistic reflections.
-            6. RESOLUTION: Output a crystal-clear, sharp, and high-resolution JPEG.
-            7. VIBE: ${BRAND_CONFIG.voice}. ${BRAND_CONFIG.tagline}.
+            ARTISTIC DIRECTION:
+            1. VISUAL STYLE: Cinematic high-end advertising photography. Think Rolex, Tesla, or Luxury Automotive brochures.
+            2. AUTONOMOUS SCENE SELECTION: Decide which environment makes this product shine:
+               - A "Golden Hour" sunset shoot at a modern architectural villa.
+               - A high-contrast, moody "Midnight Showroom" with neon accents and marble reflections.
+               - A vibrant, crisp "Hamptons Driveway" with professional landscaping and soft bokeh.
+               - A futuristic "Tech-Lab" with clean lines and glowing floor panels.
+            3. LIGHTING MASTERY: Use professional cinematic lighting strategies. Add dramatic rims lights, soft-box diffusion, and realistic light-wrap. Every surface (glossy plastic, chrome, rubber) must react perfectly to the environment.
+            4. COMPOSITION: Use dynamic angles. Apply depth-of-field to focus on the product's craftsmanship while blurring the luxury background beautifully.
+            5. BRANDING: Integrate the "${BRAND_CONFIG.name}" logo or text onto the vehicle (number plate, side trim, or seat) so perfectly it looks factory-fitted.
+            6. QUALITY: Sharp focus, 8k resolution textures, zero distortion, and a "WOW" factor that makes a customer want to buy instantly.
             
-            Return ONLY the generated image data.
+            VIBE: ${BRAND_CONFIG.voice}. ${BRAND_CONFIG.tagline}.
+            
+            Output ONLY the final high-resolution masterpiece.
         `;
 
         const result = await model.generateContent([
