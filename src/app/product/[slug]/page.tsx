@@ -1,7 +1,8 @@
+```
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { StickyCartBar } from '@/components/product/StickyCartBar';
-import { Star, Truck, ShieldCheck, RotateCcw, Zap, Gauge, Weight, Gamepad2, Package, CheckCircle2, ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, Home, Share2, Heart, ShoppingBag, Gauge, Package, ArrowRight, Wallet, ShieldCheck, Zap, Medal, Star, Weight, Gamepad2, CheckCircle2, Truck } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { ProductSchema } from '@/components/product/ProductSchema';
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 
     return {
-        title: `${product.name} - ABC Toyz`,
+        title: `${ product.name } - ABC Toyz`,
         description: product.description,
         openGraph: {
             images: product.images || [],
@@ -52,10 +53,10 @@ export default async function ProductPage({ params }: PageProps) {
     // We avoid createServerClient() here as it seemed to cause 404s locally (likely auth/cookie context mismatch).
     const products = await fetchProducts(slug);
 
-    console.log(`[ProductPage] Loading slug: ${slug} | Found: ${products.length}`);
+    console.log(`[ProductPage] Loading slug: ${ slug } | Found: ${ products.length } `);
 
     if (products.length === 0) {
-        console.warn(`[ProductPage] WARN: Product NOT found via fetchProducts(slug). attempting fallback fetch all...`);
+        console.warn(`[ProductPage] WARN: Product NOT found via fetchProducts(slug).attempting fallback fetch all...`);
         // Fallback: Fetch ALL and filter (in case exact database slug match is erratic locally)
         const all = await fetchProducts();
         const found = all.find(p => p.slug === slug);
@@ -70,7 +71,7 @@ export default async function ProductPage({ params }: PageProps) {
     const product = products.length > 0 ? products[0] : null;
 
     if (!product) {
-        console.error(`[ProductPage] Error: Product not found for slug: ${slug}`);
+        console.error(`[ProductPage] Error: Product not found for slug: ${ slug } `);
         notFound();
     }
 
@@ -112,7 +113,7 @@ export default async function ProductPage({ params }: PageProps) {
                         <Home className="w-3.5 h-3.5" />
                     </Link>
                     <ChevronRight className="w-3.5 h-3.5 text-border" />
-                    <Link href={`/category/${product.category}`} className="hover:text-primary transition-colors capitalize font-medium">
+                    <Link href={`/ category / ${ product.category } `} className="hover:text-primary transition-colors capitalize font-medium">
                         {product.category}
                     </Link>
                     <ChevronRight className="w-3.5 h-3.5 text-border" />
@@ -196,19 +197,53 @@ export default async function ProductPage({ params }: PageProps) {
 
                 </div>
 
-                {/* Related Products */}
-                {relatedProducts.length > 0 && (
-                    <div className="mt-16 border-t pt-16 px-4 lg:px-0">
-                        <div className="container mx-auto">
-                            <h2 className="text-2xl lg:text-3xl font-black mb-8">You Might Also Like</h2>
-                            <ProductGrid products={relatedProducts} />
+                {/* 4. Brand Promise / Trust Signals */}
+                <div className="bg-primary/5 border border-primary/10 rounded-3xl p-8 lg:p-12 text-center mt-12">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-6">
+                        <Star className="w-8 h-8 text-primary fill-primary" />
+                    </div>
+                    <h3 className="text-2xl font-black mb-4">Why Choose ABC Toyz?</h3>
+                    <p className="text-muted-foreground max-w-2xl mx-auto text-lg mb-10">
+                        We are India's most trusted destination for premium battery-operated ride-ons.
+                        Experience the difference of verified quality and exceptional service.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-transparent hover:border-primary/20 transition-all">
+                            <ShieldCheck className="w-10 h-10 text-primary mx-auto mb-4" />
+                            <div className="font-bold text-lg mb-2">Verified Safety</div>
+                            <p className="text-sm text-muted-foreground">Every vehicle meets strict safety standards (EN71/BIS certified) for your peace of mind.</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-transparent hover:border-primary/20 transition-all">
+                            <Zap className="w-10 h-10 text-primary mx-auto mb-4" />
+                            <div className="font-bold text-lg mb-2">Premium Performance</div>
+                            <p className="text-sm text-muted-foreground">We stock only high-torque motors and durable heavy-duty batteries.</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-transparent hover:border-primary/20 transition-all">
+                            <Medal className="w-10 h-10 text-primary mx-auto mb-4" />
+                            <div className="font-bold text-lg mb-2">Service Guarantee</div>
+                            <p className="text-sm text-muted-foreground">Expert technical support and spare parts availability for years to come.</p>
                         </div>
                     </div>
-                )}
-            </main>
+                </div>
 
-            {/* Mobile Footer Spacing for Sticky Bar */}
-            <div className="h-20 lg:hidden" />
+        </div>
+
+                {/* Related Products */ }
+    {
+        relatedProducts.length > 0 && (
+            <div className="mt-16 border-t pt-16 px-4 lg:px-0">
+                <div className="container mx-auto">
+                    <h2 className="text-2xl lg:text-3xl font-black mb-8">You Might Also Like</h2>
+                    <ProductGrid products={relatedProducts} />
+                </div>
+            </div>
+        )
+    }
+            </main >
+
+        {/* Mobile Footer Spacing for Sticky Bar */ }
+        < div className = "h-20 lg:hidden" />
 
             <StickyCartBar
                 product={product}
@@ -216,6 +251,6 @@ export default async function ProductPage({ params }: PageProps) {
             // or needs to correspond with ProductMainSection. 
             // For now, passing base product. ProductMainSection handles the selection UI.
             />
-        </div>
+        </div >
     );
 }
