@@ -310,7 +310,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Tabs */}
-                        <div className="flex overflow-x-auto gap-2 p-1.5 bg-muted rounded-2xl sticky top-4 z-10 backdrop-blur-md bg-opacity-90">
+                        <div className="flex overflow-x-auto gap-2 p-1.5 bg-muted rounded-2xl sticky top-[57px] md:top-0 z-10 backdrop-blur-md bg-opacity-90 scrollbar-hide">
                             {tabs.map(tab => {
                                 const Icon = tab.icon;
                                 return (
@@ -834,6 +834,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     </div>
                 </div>
             </form>
+
+            {/* Mobile Sticky Save Button */}
+            <div className="lg:hidden fixed bottom-[64px] left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-40">
+                <button
+                    onClick={() => document.querySelector('form')?.requestSubmit()}
+                    disabled={saving}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-all"
+                >
+                    {saving ? <Loader2 className="animate-spin" /> : <Save className="w-5 h-5" />}
+                    Update Product
+                </button>
+            </div>
         </div>
     );
 }
