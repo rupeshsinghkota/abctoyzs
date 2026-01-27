@@ -63,7 +63,14 @@ export function ProductCard({ product, className }: ProductCardProps) {
             <button
                 onClick={(e) => {
                     e.stopPropagation();
-                    addToCart({ ...product, quantity: 1, image: product.image });
+                    addToCart({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        image: product.image,
+                        quantity: 1,
+                        attributes: {}
+                    });
                 }}
                 className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-50 dark:bg-zinc-800 text-sm font-semibold text-primary rounded-b-2xl border-t hover:bg-primary hover:text-white transition-colors active:scale-95"
             >

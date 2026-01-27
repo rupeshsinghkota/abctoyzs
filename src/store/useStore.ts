@@ -3,10 +3,12 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface CartItem {
     id: string;
+    variantId?: string; // Optional: specific variant ID
     name: string;
     price: number;
     image: string;
     quantity: number;
+    attributes?: Record<string, string>; // e.g. { Color: "Red" }
 }
 
 interface AppState {
@@ -26,11 +28,14 @@ export const useStore = create<AppState>()(
             isCartOpen: false,
             addToCart: (item) =>
                 set((state) => {
-                    const existing = state.cart.find((i) => i.id === item.id);
+                    const existing = state.cart.find((i) =>
+                        i.id === item.id && i.variantId === item.variantId
+                    );
                     if (existing) {
                         return {
                             cart: state.cart.map((i) =>
-                                i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+                                (i.id === item.id && i.variantId === item.variantId)
+                                    ? { ...i, quantity: i.quantity + 1 } : i
                             ),
                         };
                     }

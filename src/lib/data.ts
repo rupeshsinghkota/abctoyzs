@@ -15,15 +15,39 @@ export interface Product {
         speed: string;
         motor?: string;
         seats?: number;
+        tire_type?: string;
+        seat_material?: string;
+        remote_control?: boolean;
+        features?: string[];
     };
     description: string;
-    // New Fields
+    // Premium Features
     videos?: string[];
+    box_content?: string[];
+    product_dimensions?: string;
+    box_dimensions?: string;
+    net_weight?: string;
+    gross_weight?: string;
     voltage?: '12V' | '24V' | '36V' | '48V';
     ageGroup?: '1-3' | '3-6' | '6-10' | '10+';
     subCategory?: string;
     is_new?: boolean;
     is_featured?: boolean;
+
+    // Variations Data
+    attributes?: { name: string; options: string[] }[];
+    variants?: ProductVariant[];
+}
+
+export interface ProductVariant {
+    id: string;
+    product_id: string | number;
+    name: string;
+    attributes: Record<string, string>; // { "Color": "Red" }
+    price: number;
+    stock: number;
+    sku?: string;
+    image?: string;
 }
 
 // Structured Category Constants
@@ -168,7 +192,9 @@ export const products: Product[] = [
 export async function fetchProducts(): Promise<Product[]> {
     try {
         const supabase = createClient();
-        const { data, error } = await supabase.from('products').select('*');
+        const { data, error } = await supabase
+            .from('products')
+            .select('*, variants:product_variants(*)');
 
         if (error || !data || data.length === 0) {
             console.warn("Supabase fetch failed or empty, using static fallback.", error);
@@ -189,7 +215,16 @@ export async function fetchProducts(): Promise<Product[]> {
             specs: item.specs || {},
             voltage: item.voltage,
             ageGroup: item.age_group,
-            subCategory: item.subCategory
+            subCategory: item.subCategory,
+            // Premium & Variations
+            videos: item.videos || [],
+            box_content: item.box_content || [],
+            product_dimensions: item.product_dimensions,
+            box_dimensions: item.box_dimensions,
+            net_weight: item.net_weight,
+            gross_weight: item.gross_weight,
+            attributes: item.attributes || [],
+            variants: item.variants || []
         })) as Product[];
 
     } catch (e) {

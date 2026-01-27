@@ -4,28 +4,65 @@ import React, { useState } from 'react';
 import { ShoppingBag, ShoppingCart, Minus, Plus, Check, Loader2 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { useRouter } from 'next/navigation';
-import { Product } from '@/lib/data';
+import { Product, ProductVariant } from '@/lib/data';
 
 interface StickyCartBarProps {
     product: Product;
+    selectedAttributes?: Record<string, string>;
+    currentVariant?: ProductVariant | null;
+    isReady?: boolean; // True if selection is complete
 }
 
-export function StickyCartBar({ product }: StickyCartBarProps) {
+export function StickyCartBar({ product, selectedAttributes = {}, currentVariant, isReady = true }: StickyCartBarProps) {
     const addToCart = useStore((state) => state.addToCart);
     const router = useRouter();
     const [quantity, setQuantity] = useState(1);
     const [addedToCart, setAddedToCart] = useState(false);
     const [buyingNow, setBuyingNow] = useState(false);
 
+    const activePrice = currentVariant ? currentVariant.price : product.price;
+
     const handleAddToCart = () => {
-        addToCart({ ...product, quantity, image: product.images?.[0] || product.image });
+        if (!isReady) {
+            // If not ready (options missing), maybe scroll to top?
+            // For now, just return or alert. Ideally, we scroll to options.
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
+        const finalName = currentVariant ? `${product.name} - ${currentVariant.name}` : product.name;
+
+        addToCart({
+            id: product.id,
+            variantId: currentVariant?.id,
+            name: finalName,
+            price: activePrice,
+            image: currentVariant?.image || product.images?.[0] || product.image,
+            quantity: quantity,
+            attributes: selectedAttributes
+        });
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
     };
 
     const handleBuyNow = () => {
+        if (!isReady) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
         setBuyingNow(true);
-        addToCart({ ...product, quantity, image: product.images?.[0] || product.image });
+        const finalName = currentVariant ? `${product.name} - ${currentVariant.name}` : product.name;
+
+        addToCart({
+            id: product.id,
+            variantId: currentVariant?.id,
+            name: finalName,
+            price: activePrice,
+            image: currentVariant?.image || product.images?.[0] || product.image,
+            quantity: quantity,
+            attributes: selectedAttributes
+        });
         setTimeout(() => {
             router.push('/cart');
         }, 300);
@@ -41,8 +78,8 @@ export function StickyCartBar({ product }: StickyCartBarProps) {
                 <div className="flex items-center gap-2 p-3">
                     {/* Price */}
                     <div className="flex flex-col min-w-0 flex-shrink-0">
-                        <span className="text-lg font-black leading-tight">₹{product.price.toLocaleString()}</span>
-                        <span className="text-[10px] text-green-600 font-medium">20% OFF</span>
+                        <span className="text-lg font-black leading-tight">₹{activePrice.toLocaleString()}</span>
+                        {/* <span className="text-[10px] text-green-600 font-medium">20% OFF</span> */}
                     </div>
 
                     {/* Quantity Selector - Compact */}

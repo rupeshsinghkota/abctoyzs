@@ -1,6 +1,5 @@
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { ImageGallery } from '@/components/product/ImageGallery';
 import { StickyCartBar } from '@/components/product/StickyCartBar';
 import { Star, Truck, ShieldCheck, RotateCcw, Zap, Gauge, Weight, Gamepad2, Package, CheckCircle2, ChevronRight, Home } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/ProductGrid';
@@ -8,7 +7,7 @@ import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { ProductSchema } from '@/components/product/ProductSchema';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import Link from 'next/link';
-import { DesktopProductActions } from '@/components/product/DesktopProductActions';
+import { ProductMainSection } from '@/components/product/ProductMainSection';
 import { ProductCard } from '@/components/shop/ProductCard';
 
 interface PageProps {
@@ -70,130 +69,7 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
 
             <main className="container mx-auto px-0 md:px-4">
-                <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-start">
-
-                    {/* LEFT COLUMN: Visuals (Gallery) - Spans 7 columns */}
-                    <div className="lg:col-span-7 bg-white dark:bg-card">
-                        <ImageGallery images={productImages} videos={product.videos} />
-                    </div>
-
-                    {/* RIGHT COLUMN: Sticky Info - Spans 5 columns */}
-                    <div className="lg:col-span-5 relative mt-6 lg:mt-0 px-4 lg:px-0">
-                        <div className="lg:sticky lg:top-24 space-y-6">
-
-                            {/* Header Info */}
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    {product.tag && (
-                                        <span className="px-2.5 py-0.5 text-[10px] font-bold text-white bg-primary rounded-full uppercase tracking-wider">
-                                            {product.tag}
-                                        </span>
-                                    )}
-                                    <div className="flex items-center gap-1.5 text-xs font-bold">
-                                        <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400 bg-yellow-400" />
-                                        <span>{product.rating}</span>
-                                        <span className="text-muted-foreground font-normal underline decoration-dotted underline-offset-4">
-                                            ({product.reviews} reviews)
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <h1 className="text-2xl md:text-3xl lg:text-4xl font-black font-heading leading-tight tracking-tight text-foreground">
-                                    {product.name}
-                                </h1>
-
-                                <div className="flex items-end gap-3 pb-2 border-b">
-                                    <div className="flex flex-col">
-                                        <span className="text-xs text-green-600 font-bold mb-0.5">Special Deal</span>
-                                        <span className="text-3xl font-black text-foreground">₹{product.price.toLocaleString()}</span>
-                                    </div>
-                                    <div className="flex flex-col pb-1">
-                                        <span className="text-base text-muted-foreground line-through">₹{Math.round(product.price * 1.2).toLocaleString()}</span>
-                                    </div>
-                                    <span className="ml-auto mb-2 px-2.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold rounded-full">
-                                        SAVE 20%
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Desktop Actions (Hidden on Mobile, passed to StickyBar) */}
-                            <div className="block lg:hidden">
-                                {/* Trust Badges Mobile */}
-                                <div className="grid grid-cols-3 gap-2 mb-6">
-                                    <div className="flex flex-col items-center justify-center p-2 bg-gray-50 rounded-xl text-center">
-                                        <Truck className="w-5 h-5 text-primary mb-1" />
-                                        <span className="text-[10px] font-bold">Free Delivery</span>
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center p-2 bg-gray-50 rounded-xl text-center">
-                                        <ShieldCheck className="w-5 h-5 text-primary mb-1" />
-                                        <span className="text-[10px] font-bold">Warranty</span>
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center p-2 bg-gray-50 rounded-xl text-center">
-                                        <RotateCcw className="w-5 h-5 text-primary mb-1" />
-                                        <span className="text-[10px] font-bold">Easy Returns</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="hidden lg:block bg-muted/20 p-6 rounded-2xl border">
-                                <p className="text-sm font-bold text-green-600 flex items-center gap-2 mb-4">
-                                    <CheckCircle2 className="w-4 h-4" />
-                                    In Stock & Ready to Ship
-                                </p>
-
-                                <div className="space-y-3">
-                                    <DesktopProductActions product={product} />
-
-                                    <div className="flex gap-3 pt-2">
-                                        <WishlistButton productId={product.id} size="lg" className="h-12 flex-1 rounded-xl border-2 border-muted" />
-                                        <button className="flex-1 h-12 flex items-center justify-center gap-2 font-bold border-2 border-muted rounded-xl hover:bg-muted/50 transition-colors">
-                                            Contact Support
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6 flex items-center justify-center gap-6 text-xs text-muted-foreground font-medium">
-                                    <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Free Shipping</span>
-                                    <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> 1 Year Warranty</span>
-                                </div>
-                            </div>
-
-                            {/* Mobile Content Repeater (Highlights & Description) */}
-                            <div className="lg:hidden space-y-8 pb-8">
-                                <div className="space-y-3">
-                                    <h3 className="font-bold text-lg">Key Features</h3>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {highlights.map((item, idx) => (
-                                            <div key={idx} className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl border">
-                                                <item.icon className="w-5 h-5 text-primary shrink-0" />
-                                                <div className="flex flex-col">
-                                                    <span className="text-[10px] text-muted-foreground uppercase">{item.label}</span>
-                                                    <span className="text-sm font-bold">{item.value}</span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <ProductSpecs
-                                    specs={product.specs}
-                                    additionalInfo={{
-                                        "Voltage": product.voltage,
-                                        "Recommended Age": product.ageGroup,
-                                    }}
-                                />
-
-                                <div>
-                                    <h3 className="font-bold text-lg mb-2">Description</h3>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
-                                        {product.description || "Premium ride-on toy with advanced features."}
-                                    </p>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
+                <ProductMainSection product={product} />
 
                 {/* DESKTOP FULL WIDTH DETAILS (Below Fold) */}
                 <div className="hidden lg:block mt-12 max-w-7xl mx-auto space-y-16 px-4 pb-16">

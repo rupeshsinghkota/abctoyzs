@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 
 export type Product = {
-    id: number;
+    id: string;
     slug: string;
     name: string;
     description: string;
@@ -17,6 +17,16 @@ export type Product = {
     review_count: number;
     is_new: boolean;
     is_featured: boolean;
+    // Premium Features
+    videos?: string[];
+    box_content?: string[];
+    product_dimensions?: string;
+    box_dimensions?: string;
+    net_weight?: string;
+    gross_weight?: string;
+    // Variations
+    attributes?: { name: string; options: string[] }[];
+    variants?: any[]; // We'll type this more strictly if needed
     created_at: string;
     updated_at: string;
 };
@@ -48,7 +58,7 @@ export const AdminService = {
         return data as Product[];
     },
 
-    async getProduct(id: number) {
+    async getProduct(id: string) {
         const supabase = createClient();
         const { data, error } = await supabase
             .from('products')
@@ -72,7 +82,7 @@ export const AdminService = {
         return data as Product;
     },
 
-    async updateProduct(id: number, updates: Partial<Product>) {
+    async updateProduct(id: string, updates: Partial<Product>) {
         const supabase = createClient();
         const { data, error } = await supabase
             .from('products')
@@ -85,12 +95,21 @@ export const AdminService = {
         return data as Product;
     },
 
-    async deleteProduct(id: number) {
+    async deleteProduct(id: string) {
         const supabase = createClient();
         const { error } = await supabase
             .from('products')
             .delete()
             .eq('id', id);
+
+        if (error) throw error;
+    },
+
+    async createVariants(variants: any[]) {
+        const supabase = createClient();
+        const { error } = await supabase
+            .from('product_variants')
+            .insert(variants);
 
         if (error) throw error;
     },

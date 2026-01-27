@@ -15,7 +15,7 @@ export default function ProductsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [categoryFilter, setCategoryFilter] = useState('all');
-    const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
     useEffect(() => {
         loadProducts();
@@ -32,7 +32,7 @@ export default function ProductsPage() {
         }
     }
 
-    async function handleDelete(id: number) {
+    async function handleDelete(id: string) {
         try {
             await AdminService.deleteProduct(id);
             setProducts(products.filter(p => p.id !== id));
@@ -237,8 +237,8 @@ export default function ProductsPage() {
                                 {/* Stock Badge */}
                                 <div className="absolute top-3 right-3">
                                     <span className={`px-2 py-1 text-xs font-bold rounded-full backdrop-blur-sm ${product.stock > 10 ? 'bg-green-500/90 text-white' :
-                                            product.stock > 0 ? 'bg-yellow-500/90 text-black' :
-                                                'bg-red-500/90 text-white'
+                                        product.stock > 0 ? 'bg-yellow-500/90 text-black' :
+                                            'bg-red-500/90 text-white'
                                         }`}>
                                         {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                                     </span>
@@ -345,8 +345,8 @@ export default function ProductsPage() {
                                         </td>
                                         <td className="p-4">
                                             <span className={`px-3 py-1.5 text-xs font-bold rounded-full ${product.stock > 10 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                    product.stock > 0 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                product.stock > 0 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                                                 }`}>
                                                 {product.stock} units
                                             </span>
