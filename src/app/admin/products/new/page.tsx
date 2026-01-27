@@ -34,6 +34,7 @@ export default function NewProductPage() {
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const [activeTab, setActiveTab] = useState('basic');
     const [brandingIndex, setBrandingIndex] = useState<number | null>(null);
+    const [isBrandingAll, setIsBrandingAll] = useState(false);
 
     // Variations State
     const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -260,12 +261,35 @@ export default function NewProductPage() {
 
             const newImages = [...formData.images];
             newImages[index] = newImageUrl;
-            setFormData({ ...formData, images: newImages });
+            setFormData(prev => ({ ...prev, images: newImages }));
+            return newImageUrl;
         } catch (error: any) {
             console.error(error);
             alert('Branding failed: ' + error.message);
+            return null;
         } finally {
             setBrandingIndex(null);
+        }
+    };
+
+    const brandAllImages = async () => {
+        const imagesToBrand = formData.images.filter(img => img.trim() !== '');
+        if (imagesToBrand.length === 0) return;
+
+        setIsBrandingAll(true);
+        try {
+            // Process images sequentially to avoid overloading model and for better feedback
+            for (let i = 0; i < formData.images.length; i++) {
+                if (formData.images[i].trim()) {
+                    await brandImage(i);
+                }
+            }
+            alert('✨ All images branded and enhanced successfully!');
+        } catch (error: any) {
+            console.error(error);
+            alert('Bulk branding failed');
+        } finally {
+            setIsBrandingAll(false);
         }
     };
 
@@ -546,9 +570,22 @@ export default function NewProductPage() {
                             <div className="bg-card border rounded-3xl p-6 space-y-8">
                                 {/* Images Section */}
                                 <div>
-                                    <label className="block text-sm font-bold mb-4 uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                                        <ImagePlus className="w-4 h-4" /> Product Images
-                                    </label>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                            <ImagePlus className="w-4 h-4" /> Product Images
+                                        </label>
+                                        {formData.images.some(img => img.trim()) && (
+                                            <button
+                                                type="button"
+                                                onClick={brandAllImages}
+                                                disabled={isBrandingAll || isUploading}
+                                                className="text-[10px] sm:text-xs px-3 py-1.5 bg-purple-600 text-white rounded-lg transition-all font-bold flex items-center gap-1.5 hover:bg-purple-700 shadow-sm disabled:opacity-50"
+                                            >
+                                                {isBrandingAll ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                {isBrandingAll ? 'Branding All...' : '✨ Brand All with AI'}
+                                            </button>
+                                        )}
+                                    </div>
 
                                     {/* Modern Image Gallery */}
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
