@@ -8,7 +8,7 @@ import {
     ArrowLeft, Save, Loader2, ImagePlus, X, Zap,
     Users, Gauge, Battery, Smartphone, Tag, Star,
     Package, DollarSign, Hash, Layers, Split, Check,
-    Upload
+    Upload, Sparkles
 } from 'lucide-react';
 import { VEHICLE_CATEGORIES, AGE_CATEGORIES } from '@/lib/data';
 
@@ -31,6 +31,7 @@ export default function NewProductPage() {
     const router = useRouter();
     const [saving, setSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const [activeTab, setActiveTab] = useState('basic');
 
     // Variations State
@@ -86,6 +87,106 @@ export default function NewProductPage() {
             alert('Upload failed');
         } finally {
             setIsUploading(false);
+        }
+    };
+
+    const generateAIDescription = async () => {
+        if (!formData.name) {
+            alert('Please enter a product name first');
+            return;
+        }
+
+        setIsGeneratingAI(true);
+        try {
+            const res = await fetch('/api/admin/ai/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productName: formData.name,
+                    category: formData.category,
+                    type: 'description'
+                })
+            });
+            const { data, error } = await res.json();
+            if (error) throw new Error(error);
+            setFormData({ ...formData, description: data });
+        } catch (error: any) {
+            console.error(error);
+            alert('AI Generation failed: ' + error.message);
+        } finally {
+            setIsGeneratingAI(false);
+        }
+    };
+
+    const generateAISpecs = async () => {
+        if (!formData.name) {
+            alert('Please enter a product name first');
+            return;
+        }
+
+        setIsGeneratingAI(true);
+        try {
+            const res = await fetch('/api/admin/ai/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productName: formData.name,
+                    category: formData.category,
+                    type: 'specs'
+                })
+            });
+            const { data, error } = await res.json();
+            if (error) throw new Error(error);
+
+            setFormData({
+                ...formData,
+                specs: {
+                    ...formData.specs,
+                    battery: data.Battery || formData.specs.battery,
+                    motor: data.Motors || formData.specs.motor,
+                    speed: data.Speed || formData.specs.speed,
+                    max_load: data.MaxLoad || formData.specs.max_load
+                }
+            });
+        } catch (error: any) {
+            console.error(error);
+            alert('AI Generation failed: ' + error.message);
+        } finally {
+            setIsGeneratingAI(false);
+        }
+    };
+
+    const generateAILogistics = async () => {
+        if (!formData.name) {
+            alert('Please enter a product name first');
+            return;
+        }
+
+        setIsGeneratingAI(true);
+        try {
+            const res = await fetch('/api/admin/ai/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productName: formData.name,
+                    category: formData.category,
+                    type: 'logistics'
+                })
+            });
+            const { data, error } = await res.json();
+            if (error) throw new Error(error);
+
+            setFormData({
+                ...formData,
+                product_dimensions: data.dimensions || formData.product_dimensions,
+                gross_weight: data.weight || formData.gross_weight,
+                box_content: data.whats_in_the_box && data.whats_in_the_box.length > 0 ? data.whats_in_the_box : formData.box_content
+            });
+        } catch (error: any) {
+            console.error(error);
+            alert('AI Generation failed: ' + error.message);
+        } finally {
+            setIsGeneratingAI(false);
         }
     };
 
@@ -311,7 +412,18 @@ export default function NewProductPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Description <span className="text-red-500">*</span></label>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="block text-sm font-bold uppercase tracking-wider text-muted-foreground">Description <span className="text-red-500">*</span></label>
+                                        <button
+                                            type="button"
+                                            onClick={generateAIDescription}
+                                            disabled={isGeneratingAI || !formData.name}
+                                            className="text-[10px] sm:text-xs px-3 py-1.5 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-lg transition-all font-bold flex items-center gap-1.5 disabled:opacity-50"
+                                        >
+                                            {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                            {isGeneratingAI ? 'Generating...' : 'Generate with AI'}
+                                        </button>
+                                    </div>
                                     <textarea
                                         required
                                         value={formData.description}
@@ -619,6 +731,18 @@ export default function NewProductPage() {
                         {/* Tech Specs Tab */}
                         {activeTab === 'specs' && (
                             <div className="bg-card border rounded-3xl p-6 space-y-6">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-bold">Technical Specifications</h3>
+                                    <button
+                                        type="button"
+                                        onClick={generateAISpecs}
+                                        disabled={isGeneratingAI || !formData.name}
+                                        className="text-xs px-4 py-2 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-xl transition-all font-bold flex items-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isGeneratingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                        {isGeneratingAI ? 'Suggesting...' : '⚡ Suggest Specs'}
+                                    </button>
+                                </div>
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Battery</label>
@@ -710,6 +834,18 @@ export default function NewProductPage() {
                         {/* Logistics Tab */}
                         {activeTab === 'logistics' && (
                             <div className="bg-card border rounded-3xl p-6 space-y-8">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-bold">Logistics & Box Content</h3>
+                                    <button
+                                        type="button"
+                                        onClick={generateAILogistics}
+                                        disabled={isGeneratingAI || !formData.name}
+                                        className="text-xs px-4 py-2 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-xl transition-all font-bold flex items-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isGeneratingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                        {isGeneratingAI ? 'Suggesting...' : '✨ Suggest Logistics'}
+                                    </button>
+                                </div>
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Product Dimensions</label>
