@@ -32,26 +32,27 @@ export async function POST(req: Request) {
 
         // Step 3: Generate Branded/Enhanced Version
         const prompt = `
-            ROLE: You are the world's most elite Digital Retoucher and Branding Specialist for "${BRAND_CONFIG.name}".
+            ROLE: You are a World-Class Commercial Retoucher and Master Colorist specializing in high-end automotive advertising for "${BRAND_CONFIG.name}".
             
             ASSETS PROVIDED:
             1. PRODUCT_IMAGE: The original photo of the vehicle.
-            2. BRAND_LOGO: The official "${BRAND_CONFIG.name}" logo file.
+            2. BRAND_LOGO: The official logo asset for "${BRAND_CONFIG.name}".
             
-            TASK: 
-            Add the provided BRAND_LOGO to the PRODUCT_IMAGE. 
+            GOAL: Enhance the PRODUCT_IMAGE into a "HIGH-IMPACT ADVERTISING MASTERPIECE" suitable for premium product pages and social media ads, WHILE PRESERVING THE ORIGINAL PRODUCT FIDELITY.
             
-            CRITICAL INSTRUCTION: DO NOT CHANGE THE PRODUCT IMAGE. 
-            - Keep the original background, environment, lighting, and composition EXACTLY as it is in the PRODUCT_IMAGE. 
-            - DO NOT generate a new scene or transform the setting. 
-            - The car itself (color, model, trim) must remain UNCHANGED.
+            CRITICAL RULES:
+            1. PIXEL FIDELITY: DO NOT change the environment, background, or the vehicle's actual model/color/trim. It must remain 100% recognizable as the same car in the same location.
+            2. ENHANCEMENT (MAKE IT POP): 
+               - Apply professional "Color Grading" to make the colors vibrant and premium.
+               - Enhance existing "Lighting & Reflections" to look like a high-end commercial shoot.
+               - Optimize contrast and sharpness for "Advertising Quality".
+            3. AUTHENTIC CO-BRANDING:
+               - KEEP ORIGINAL CAR BRANDING: Preserve all manufacturer logos (e.g., Jeep, Ford, etc.).
+               - ABC TOYZ BRANDING: Place the BRAND_LOGO asset onto the LICENSE PLATE and as a subtle, high-gloss "physical badge" on the hood or rear.
+               - INTEGRATION: The logo must match the lighting, perspective, and surface texture of the vehicle so perfectly that it looks factory-fitted.
+            4. QUALITY: Crystal clear 8k resolution textures, zero AI artifacts, and professional optics.
             
-            BRANDING PLACEMENT (SUBTLE & NATURAL):
-            1. LICENSE PLATE: Place the BRAND_LOGO on the license plate. Scale it to fit perfectly with a small margin.
-            2. BRAND BADGE: Add a very small, elegant "physical badge" version of the logo on the HOOD or REAR (ensuring it doesn't overlap existing manufacturer logos).
-            3. AUTHENTICITY: The logo must look like it was already there when the photo was taken, matching the perspective, lighting, and grain/texture of the original photo perfectly.
-            
-            Output ONLY the final retouched image which keeps everything from the original except for the added branding.
+            Output ONLY the final breathtaking retouched masterpiece.
         `;
 
         const result = await model.generateContent([
