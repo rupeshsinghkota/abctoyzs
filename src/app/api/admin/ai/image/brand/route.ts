@@ -40,32 +40,25 @@ export async function POST(req: Request) {
 
         // Step 3: Generate Branded/Enhanced Version
         const prompt = `
-            ROLE: You are the world's most elite Commercial Photographer and Digital Artist specializing in high-end automotive advertising for "${BRAND_CONFIG.name}".
+            ROLE: World-Class Commercial Photographer and Digital Artist.
             
-            ASSETS PROVIDED:
-            1. PRODUCT_IMAGE: The original photo of the vehicle.
-            2. BRAND_LOGO: The official logo asset for "${BRAND_CONFIG.name}".
+            INPUTS:
+            1. CAR_IMAGE: The original photo of the vehicle.
+            2. BRAND_LOGO: The high-resolution logo for "${BRAND_CONFIG.name}".
             
-            GOAL: Transform the PRODUCT_IMAGE into an "AMAZING PREMIUM PRODUCT PAGE (PDP) MASTERPIECE". Enhance the entire shot—including high-end background replacement and cinematic lighting—while preserving 100% fidelity to the specific car model provided.
+            GOAL: Transform the CAR_IMAGE into a breathtaking "AMAZING PREMIUM PRODUCT PAGE (PDP)" hero shot.
             
-            CRITICAL WORKFLOW:
-            1. PRODUCT FIDELITY: The vehicle's model, color, and specific features MUST remain 100% authentic to the PRODUCT_IMAGE. Do not transform the car into a different model.
-            2. ENVIRONMENT & SHOT ENHANCEMENT:
-               - Create a "STUNNING, BETTER BACKGROUND" that matches the vehicle's luxe level (e.g., modern architectural driveway, desert landscape at golden hour, or a high-tech studio).
-               - Optimize the "SHOT DIRECTION" and composition to make it look like a professional HERO SHOT. 
-               - Enhance "Specular Highlights", reflections, and professional color grading to make the image "POP".
-            3. DYNAMIC ABC TOYZ BRANDING:
-               - INTELLIGENT PLACEMENT: Identify the visible surfaces of the vehicle and place the BRAND_LOGO asset where it looks most natural:
-                 - If the FRONT is visible: Place on the LICENSE PLATE.
-                 - If the REAR is visible: Place on the LICENSE PLATE or TRUNK.
-                 - If the SIDE is visible: Place as a small, elegant badge on the DOOR or as a center-cap on the WHEELS.
-                 - If the HOOD is visible: Place as a subtle, high-gloss "physical badge".
-               - INTEGRATION: The logo must follow the car's perspective, curvature, and lighting perfectly so that it looks factory-fitted, regardless of the camera angle.
-            4. CLEANING:
-               - REMOVE OTHER SELLER BRANDING: surgically remove any watermarks, generic toy shop logos, or retailer text from the original photo.
-               - PRESERVE CAR IDENTITY: DO NOT remove authentic car manufacturer logos (e.g., Jeep, Ford, Mercedes, BMW badges).
+            INSTRUCTIONS:
+            - PRODUCT: Keep the vehicle model, color, and features 100% identical to the CAR_IMAGE.
+            - ENVIRONMENT: Replace the background with a stunning high-end setting (e.g., modern driveway, desert mountains, or tech-studio) that matches a premium lifestyle.
+            - LIGHTING: Apply cinematic color grading and enhanced specular reflections to make the car "pop".
+            - BRANDING: Place the BRAND_LOGO asset naturally on the vehicle based on its angle:
+                * Front/Rear: Place on LICENSE PLATE.
+                * Side: Place on WHEEL center-caps or DOOR badge.
+                * Top: Add a subtle physical badge.
+            - CLEANING: Remove competitor watermarks/logos but KEEP authentic car brand badges (Jeep, Ford, etc.).
             
-            Output ONLY the final breathtaking 1:1 SQUARE masterpiece that respects the original camera direction while maximizing "Commercial Appeal".
+            Output ONLY the final breathtaking 1:1 SQUARE retouched masterpiece.
         `;
 
         const result = await model.generateContent([
