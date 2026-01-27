@@ -85,7 +85,7 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
 
             <main className="container mx-auto px-0 md:px-4">
-                <ProductMainSection product={product} />
+                <ProductMainSection product={product} boxContent={whatsInBox} />
 
                 {/* DESKTOP FULL WIDTH DETAILS (Below Fold) */}
                 <div className="hidden lg:block mt-12 max-w-7xl mx-auto space-y-16 px-4 pb-16">
