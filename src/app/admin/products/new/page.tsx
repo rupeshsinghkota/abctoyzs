@@ -334,53 +334,94 @@ export default function NewProductPage() {
                                         <ImagePlus className="w-4 h-4" /> Product Images
                                     </label>
 
-                                    {/* Preview Grid */}
-                                    {validImages.length > 0 && (
-                                        <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mb-6">
-                                            {validImages.map((img, index) => (
-                                                <div key={index} className="relative group aspect-square rounded-xl overflow-hidden bg-muted border">
-                                                    <img src={img} alt="" className="w-full h-full object-cover" />
-                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <button type="button" onClick={() => removeListField('images', formData.images.indexOf(img))} className="p-1.5 bg-red-500 text-white rounded-full"><X className="w-4 h-4" /></button>
-                                                    </div>
-                                                    {index === 0 && <span className="absolute top-1 left-1 px-2 py-0.5 bg-primary text-white text-[10px] font-bold rounded-full">Main</span>}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    <div className="space-y-3">
+                                    {/* Modern Image Gallery */}
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                        {/* Existing Previews */}
                                         {formData.images.map((img, index) => (
-                                            <div key={index} className="flex gap-2">
-                                                <input
-                                                    type="url"
-                                                    value={img}
-                                                    onChange={(e) => updateList('images', index, e.target.value)}
-                                                    className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
-                                                    placeholder="https://..."
-                                                />
-                                                {formData.images.length > 1 && (
-                                                    <button type="button" onClick={() => removeListField('images', index)} className="px-4 bg-muted hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 rounded-xl transition-colors"><X className="w-5 h-5" /></button>
-                                                )}
-                                            </div>
+                                            img.trim() ? (
+                                                <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden bg-muted border-2 border-transparent hover:border-primary transition-all shadow-sm">
+                                                    <img src={img} alt="" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                                                        {index !== 0 && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const newImages = [...formData.images];
+                                                                    const [moved] = newImages.splice(index, 1);
+                                                                    newImages.unshift(moved);
+                                                                    setFormData({ ...formData, images: newImages });
+                                                                }}
+                                                                className="px-2 py-1 bg-white text-black text-[10px] font-bold rounded-lg hover:bg-primary hover:text-white transition-colors"
+                                                            >
+                                                                Set as Main
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeListField('images', index)}
+                                                            className="p-2 bg-red-500 text-white rounded-full hover:scale-110 transition-transform"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    {index === 0 && (
+                                                        <div className="absolute top-2 left-2 px-2 py-1 bg-primary text-white text-[10px] font-bold rounded-lg shadow-lg">
+                                                            MAIN
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : null
                                         ))}
 
-                                        <div className="flex items-center gap-4">
-                                            <button type="button" onClick={() => addListField('images')} className="text-sm font-bold text-primary hover:underline">+ Add Image URL</button>
-                                            <div className="h-4 w-px bg-border" />
-                                            <label className="text-sm font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
-                                                <Upload className="w-3 h-3" />
-                                                <span>{isUploading ? 'Uploading...' : 'Upload Image Files'}</span>
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    accept="image/*"
-                                                    className="hidden"
-                                                    onChange={(e) => handleFileUpload(e, 'images')}
-                                                    disabled={isUploading}
-                                                />
-                                            </label>
-                                        </div>
+                                        {/* Upload Button Card */}
+                                        <label className={`aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${isUploading ? 'bg-muted animate-pulse border-muted-foreground' : 'bg-primary/5 border-primary/20 hover:border-primary hover:bg-primary/10'}`}>
+                                            {isUploading ? (
+                                                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                                            ) : (
+                                                <Upload className="w-6 h-6 text-primary" />
+                                            )}
+                                            <span className="text-[10px] font-bold text-primary uppercase tracking-wider text-center px-2">
+                                                {isUploading ? 'Uploading...' : 'Add Photos'}
+                                            </span>
+                                            <input
+                                                type="file"
+                                                multiple
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => handleFileUpload(e, 'images')}
+                                                disabled={isUploading}
+                                            />
+                                        </label>
+                                    </div>
+
+                                    {/* Manual URL Input (Secondary) */}
+                                    <div className="mt-6 pt-6 border-t border-dashed">
+                                        <button
+                                            type="button"
+                                            onClick={() => addListField('images')}
+                                            className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                                        >
+                                            + Or paste image URLs manually
+                                        </button>
+
+                                        {formData.images.some(img => !img.trim()) && (
+                                            <div className="mt-3 space-y-2">
+                                                {formData.images.map((img, index) => (
+                                                    !img.trim() && (
+                                                        <div key={index} className="flex gap-2">
+                                                            <input
+                                                                type="url"
+                                                                value={img}
+                                                                onChange={(e) => updateList('images', index, e.target.value)}
+                                                                className="flex-1 px-4 py-2 bg-muted/30 border-2 rounded-xl text-sm focus:border-primary outline-none"
+                                                                placeholder="https://example.com/image.jpg"
+                                                            />
+                                                            <button type="button" onClick={() => removeListField('images', index)} className="p-2 text-muted-foreground hover:text-red-500"><X className="w-4 h-4" /></button>
+                                                        </div>
+                                                    )
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
