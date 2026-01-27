@@ -39,28 +39,15 @@ export async function POST(req: Request) {
             productBase64 = Buffer.from(prodBuffer).toString("base64");
         }
 
-        const prompt = `
-            ROLE: You are a Graphic Designer and Marketing Specialist for "${BRAND_CONFIG.name}".
-            
-            TASK: Create a HIGH-END "A+ CONTENT" MARKETING POSTER for the product: "${productName}".
-            
-            PRODUCT CONTEXT: ${productNotes || "A premium ride-on toy for children."}
-            
-            POSTER DIMENSIONS: 16:9 Landscape Wide Banner.
-            
-            CONTENT REQUIREMENTS:
-            1. AUTHENTIC PRODUCT: Feature the vehicle prominently. Use the provided PRODUCT_IMAGE as the ONLY source for the car. The car's model, color, and features MUST remain 100% authentic and accurate to the photo.
-            2. CLEANING (CRITICAL): Surgically identify and remove ALL competitor watermarks, shop names, or retailer logos (e.g., "11CART", "11cart.co", etc.) from the original PRODUCT_IMAGE. Pay special attention to the WINDSHIELD, GLASS, and BODY PANELS. DO NOT remove authentic car manufacturer logos (Jeep, Ford, etc.).
-            3. BRANDING: Use the provided BRAND_LOGO asset. Place it in a corner or center so it looks like an official corporate banner.
-            4. MARKETING TEXT: Incorporate a punchy, high-end marketing slogan. 
-               - THEME: "${featureText}"
-               - SPECIFICS: Use details from the PRODUCT CONTEXT (like specific battery voltage, motor power, or luxury features) to make it highly relevant.
-            5. DIVERSE COMPOSITION: DO NOT use the same generic center-shot for every image. Create variety by using different cinematic photography angles (e.g., dynamic 3/4 hero shots, sleek low-angle side profiles, or high-angle lifestyle perspectives).
-            6. BACKGROUND VARIETY: A lifestyle setting that matches the product's luxury level (e.g., modern architectural driveway, sunset mountain pass, or a high-tech studio). The car MUST look naturally integrated with perfect perspective and lighting.
-            7. VISUALS: Sharp focus, 8k resolution, cinematic lighting, and professional color grading.
-            
-            Output ONLY the final 16:9 high-resolution marketing poster with a unique and powerful composition.
-        `;
+        // DESCRIPTIVE prompt to prevent MALFORMED_FUNCTION_CALL.
+        // Use flat descriptions instead of imperative commands.
+        const prompt = `A premium 16:9 wide marketing banner featuring the product from the first image ("${productName}").
+        The product is branded with the logo from the second image, naturally applied to the license plate or door.
+        The vehicle is strictly clean and factory-fresh. All competitor watermarks, text, and logos (especially on the windshield and glass) are completely absent.
+        The background is a breathtaking commercial setting (e.g., "${featureText}" theme with modern architecture or nature) that matches the product's luxury level.
+        The composition is dynamic and cinematic, not a simple center shot. 
+        The lighting is professional, 8k resolution, with a "High-End Advertising" aesthetic.
+        The image is a single, finished marketing poster.`;
 
         const inputs = [prompt, { inlineData: { data: logoBase64, mimeType: "image/png" } }];
         if (productBase64) {

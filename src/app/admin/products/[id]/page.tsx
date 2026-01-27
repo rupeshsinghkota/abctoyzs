@@ -352,10 +352,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             const { newImageUrl, error } = await res.json();
             if (error) throw new Error(error);
 
-            setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, newImageUrl]
-            }));
+            setFormData(prev => {
+                const freshImages = [...prev.images];
+                freshImages[index] = newImageUrl;
+                return { ...prev, images: freshImages };
+            });
             return newImageUrl;
         } catch (error: any) {
             console.error(error);
@@ -381,7 +382,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             });
 
             await Promise.all(brandingPromises);
-            alert('✨ Branded variations added to the gallery!');
+            alert('✨ All images branded and enhanced successfully!');
         } catch (error: any) {
             console.error(error);
             alert('Bulk branding failed');

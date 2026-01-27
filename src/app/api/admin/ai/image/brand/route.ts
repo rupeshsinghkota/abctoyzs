@@ -41,10 +41,11 @@ export async function POST(req: Request) {
         // Step 3: Ultra-Stable Generation
         // Using a flattened, DESCRIPTIVE prompt to prevent MALFORMED_FUNCTION_CALL.
         // Imperative verbs (remove, place, scrub) can confuse the model into trying to call tools.
-        const prompt = `A premium commercial product photography masterpiece of the toy vehicle shown in the first image. 
+        const prompt = `A premium commercial product photography masterpiece of the toy vehicle shown in the first image, cropped to a strict 1:1 SQUARE aspect ratio. 
         The vehicle is branded with the logo from the second image, naturally applied to the license plate or door.
         The car is strictly clean, appearing factory-fresh with NO other text, watermarks, or competitor logos on the windshield or body.
-        The background is a breathtaking high-end location (e.g., luxury driveway or desert road) with cinematic lighting and reflections.
+        The background is completely replaced with a breathtaking high-end commercial location (e.g., luxury driveway or desert road) with cinematic lighting and reflections.
+        The image format is a perfect square.
         The style is photorealistic, 8k resolution, advertising quality.`;
 
         const result = await model.generateContent([
