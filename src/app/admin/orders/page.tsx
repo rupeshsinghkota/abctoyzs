@@ -83,8 +83,8 @@ export default function OrdersPage() {
                         <div key={order.id} className="bg-card border rounded-2xl overflow-hidden">
                             {/* Order Header */}
                             <div className="p-6 border-b bg-muted/20">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-6">
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div className="grid grid-cols-2 sm:flex sm:items-center gap-4 sm:gap-6 w-full">
                                         <div>
                                             <p className="text-xs text-muted-foreground mb-1">Order ID</p>
                                             <p className="font-mono text-sm font-semibold">{order.id.substring(0, 8)}</p>
@@ -102,7 +102,7 @@ export default function OrdersPage() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div>
+                                        <div className="col-span-2 sm:col-auto border-t sm:border-0 pt-3 sm:pt-0">
                                             <p className="text-xs text-muted-foreground mb-1">Customer</p>
                                             <div className="flex items-center gap-2">
                                                 <User className="w-4 h-4 text-primary" />
@@ -112,7 +112,7 @@ export default function OrdersPage() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="text-right w-full sm:w-auto border-t sm:border-0 pt-3 sm:pt-0">
                                         <p className="text-xs text-muted-foreground mb-1">Total</p>
                                         <p className="text-2xl font-bold">${order.total_amount}</p>
                                     </div>
