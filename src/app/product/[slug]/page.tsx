@@ -183,9 +183,10 @@ export default async function ProductPage({ params }: PageProps) {
                             </span>
                             <h3 className="text-2xl font-black mt-3">About This Ride-On</h3>
                         </div>
-                        <div className="prose prose-lg dark:prose-invert mx-auto text-gray-600 dark:text-gray-300 leading-relaxed">
-                            <p className="whitespace-pre-line">{product.description}</p>
-                        </div>
+                        <div
+                            className="prose prose-lg dark:prose-invert mx-auto text-gray-600 dark:text-gray-300 leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: product.description }}
+                        />
                     </div>
 
                 </div>
