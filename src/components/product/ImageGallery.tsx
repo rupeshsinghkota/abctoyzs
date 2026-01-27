@@ -58,12 +58,28 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                                         poster={images[0]} // Use first image as poster fallback
                                     />
                                 ) : (
-                                    <img
-                                        src={item.url}
-                                        alt={`Product view ${index + 1}`}
-                                        className="w-full h-full object-contain drop-shadow-sm p-8"
-                                        draggable={false}
-                                    />
+                                    <div className="relative w-full h-full">
+                                        <img
+                                            src={item.url}
+                                            alt={`Product view ${index + 1}`}
+                                            className="w-full h-full object-contain drop-shadow-sm p-8"
+                                            draggable={false}
+                                        />
+                                        {/* Play Button on First Image */}
+                                        {index === 0 && videos.length > 0 && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    scrollTo(images.length);
+                                                }}
+                                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-black/30 backdrop-blur-sm rounded-full flex items-center justify-center group hover:bg-black/50 transition-all z-10"
+                                            >
+                                                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center pl-1 shadow-lg">
+                                                    <Play className="w-6 h-6 text-primary fill-primary" />
+                                                </div>
+                                            </button>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         ))}
@@ -151,11 +167,27 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                         </div>
                     ) : (
                         <>
-                            <img
-                                src={mediaItems[desktopIndex].url}
-                                alt="Product Main View"
-                                className="w-full h-full object-contain p-10 transition-transform duration-500 ease-out group-hover:scale-110 cursor-zoom-in"
-                            />
+                            <div className="relative w-full h-full">
+                                <img
+                                    src={mediaItems[desktopIndex].url}
+                                    alt="Product Main View"
+                                    className="w-full h-full object-contain p-10 transition-transform duration-500 ease-out group-hover:scale-110 cursor-zoom-in"
+                                />
+                                {/* Play Button on First Image */}
+                                {desktopIndex === 0 && videos.length > 0 && (
+                                    <button
+                                        onClick={() => setDesktopIndex(images.length)}
+                                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-black/10 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-black/20 transition-all z-20"
+                                    >
+                                        <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center pl-1 shadow-xl transform group-hover:scale-110 transition-transform">
+                                            <Play className="w-7 h-7 text-primary fill-primary" />
+                                        </div>
+                                        <span className="absolute bottom-[-30px] text-sm font-bold bg-white/90 px-3 py-1 rounded-full shadow-sm text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                            Watch Video
+                                        </span>
+                                    </button>
+                                )}
+                            </div>
                             {/* Zoom Hint */}
                             <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                 <div className="bg-white/90 backdrop-blur rounded-full p-2 shadow-sm">
