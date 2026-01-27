@@ -38,33 +38,19 @@ export async function POST(req: Request) {
         const logoBuffer = fs.readFileSync(logoPath);
         const logoBase64 = logoBuffer.toString("base64");
 
-        // Step 3: Generate Branded/Enhanced Version
-        const prompt = `
-            ROLE: World-Class Commercial Photographer and Digital Artist.
-            
-            INPUTS:
-            1. CAR_IMAGE: The original photo of the vehicle.
-            2. BRAND_LOGO: The high-resolution logo for "${BRAND_CONFIG.name}".
-            
-            GOAL: Transform the CAR_IMAGE into a breathtaking "AMAZING PREMIUM PRODUCT PAGE (PDP)" hero shot.
-            
-            INSTRUCTIONS:
-            - PRODUCT: Keep the vehicle model, color, and features 100% identical to the CAR_IMAGE.
-            - ENVIRONMENT: Replace the background with a stunning high-end setting (e.g., modern driveway, desert mountains, or tech-studio) that matches a premium lifestyle.
-            - LIGHTING: Apply cinematic color grading and enhanced specular reflections to make the car "pop".
-            - BRANDING: Place the BRAND_LOGO asset naturally on the vehicle based on its angle:
-                * Front/Rear: Place on LICENSE PLATE.
-                * Side: Place on WHEEL center-caps or DOOR badge.
-                * Top: Add a subtle physical badge.
-            - CLEANING (CRITICAL): Surgically identify and remove ALL competitor watermarks, shop names, or retailer logos (e.g., "11CART", "11cart.co", etc.). Pay special attention to the WINDSHIELD, GLASS, and BODY PANELS. These areas must be 100% clean and free of old text. KEEP authentic car brand badges (Jeep, Ford, etc.).
-            
-            Output ONLY the final breathtaking 1:1 SQUARE retouched masterpiece.
-        `;
+        // Step 3: Ultra-Stable Generation
+        // Using a flattened, plain text prompt to prevent MALFORMED_FUNCTION_CALL in Gemini Preview.
+        const prompt = `Generate a UNIQUE, BREATHTAKING commercial variation of the first provided image (the toy vehicle) for "${BRAND_CONFIG.name}". 
+        First, digitally scrub clean every trace of competitor branding, old names, and watermarks (especially from the windshield, glass, and windows) while keeping the original car brand badges like Jeep or Ford. 
+        Second, create a new, high-end commercial environment for the car, such as a modern driveway, desert mountain pass, or tech-studio with cinematic lighting. 
+        Third, place the second provided image (the logo) naturally onto the car's license plate or doors so it looks factory-fitted. 
+        Finally, enhance the lighting and reflections to make the car pop with premium, advertising-grade quality. 
+        Output only the final 1:1 square retouched masterpiece.`;
 
         const result = await model.generateContent([
-            prompt,
-            { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
-            { inlineData: { data: logoBase64, mimeType: "image/png" } }
+            { text: prompt },
+            { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }, // First: the car
+            { inlineData: { data: logoBase64, mimeType: "image/png" } }   // Second: the logo
         ]);
 
         const response = await result.response;

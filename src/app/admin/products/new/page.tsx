@@ -274,11 +274,10 @@ export default function NewProductPage() {
             const { newImageUrl, error } = await res.json();
             if (error) throw new Error(error);
 
-            setFormData(prev => {
-                const freshImages = [...prev.images];
-                freshImages[index] = newImageUrl;
-                return { ...prev, images: freshImages };
-            });
+            setFormData(prev => ({
+                ...prev,
+                images: [...prev.images, newImageUrl]
+            }));
             return newImageUrl;
         } catch (error: any) {
             console.error(error);
@@ -302,7 +301,7 @@ export default function NewProductPage() {
                 return Promise.resolve(null);
             });
             await Promise.all(brandingPromises);
-            alert('✨ All images branded and enhanced successfully!');
+            alert('✨ Branded variations added to the gallery!');
         } catch (error: any) {
         } finally {
             setIsBrandingAll(false);
