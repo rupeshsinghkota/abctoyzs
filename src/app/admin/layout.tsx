@@ -9,6 +9,7 @@ import {
     LogOut,
     Home
 } from 'lucide-react';
+import { AdminBottomNav } from '@/components/admin/AdminBottomNav';
 
 export default async function AdminLayout({
     children,
@@ -91,10 +92,19 @@ export default async function AdminLayout({
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto">
-                <div className="p-8">
+                {/* Mobile Top Bar */}
+                <div className="md:hidden flex items-center justify-between p-4 border-b bg-card sticky top-0 z-20">
+                    <Link href="/admin">
+                        <img src="/logo_wide.png" alt="ABC TOYZ" className="h-6" />
+                    </Link>
+                    <div className="text-xs font-bold text-primary uppercase tracking-widest">Admin</div>
+                </div>
+
+                <div className="p-4 md:p-8 pb-24 md:pb-8">
                     {children}
                 </div>
             </main>
+            <AdminBottomNav />
         </div>
     );
 }

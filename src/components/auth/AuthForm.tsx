@@ -47,8 +47,21 @@ export function AuthForm({ view = 'login' }: AuthFormProps) {
                     password,
                 });
                 if (error) throw error;
+
+                // Check if user is admin for auto-redirect
+                const { data: adminCheck } = await supabase
+                    .from('admins')
+                    .select('user_id')
+                    .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+                    .single();
+
                 router.refresh(); // Refresh server components
-                router.push(nextUrl);
+
+                if (adminCheck) {
+                    router.push('/admin');
+                } else {
+                    router.push(nextUrl);
+                }
             }
         } catch (err: any) {
             setError(err.message);
