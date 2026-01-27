@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         const brandingGuide = `
             Brand Name: ${BRAND_CONFIG.name}
             Voice: ${BRAND_CONFIG.voice}
-            Key Values: ${BRAND_CONFIG.pillars.join(", ")}
+            Key Values: ${BRAND_CONFIG.marketingPillars.join(", ")}
         `;
 
         if (type === 'description') {
@@ -84,6 +84,8 @@ export async function POST(req: Request) {
                 {
                     "name": "Create a premium, CONCISE product name (max 6-8 words).",
                     "description": "Write a high-end HTML description (using <h3>, <p>, <ul>, <li> tags). Follow the world-class structure: Title, Emotional Hook, Premium Highlights list, and Safety section. Use strong adjectives. Reinforce the brand identity of ${BRAND_CONFIG.name}.",
+                    "meta_title": "SEO Optimized meta title (max 60 chars)",
+                    "meta_description": "SEO Optimized meta description (max 160 chars)",
                     "specs": {
                         "battery": "Realistic value based on notes",
                         "motor": "Realistic motors (e.g. 4 x 45W for 4WD)",

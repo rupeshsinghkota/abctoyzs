@@ -36,10 +36,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [saving, setSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-    const [activeTab, setActiveTab] = useState('basic');
+    const [activeTab, setActiveTab] = useState('media');
     const [brandingIndex, setBrandingIndex] = useState<number | null>(null);
     const [isBrandingAll, setIsBrandingAll] = useState(false);
     const [isGeneratingPosters, setIsGeneratingPosters] = useState(false);
+    const [generatedPosters, setGeneratedPosters] = useState<string[]>([]);
 
     // Variations State
     const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -60,6 +61,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         stock: '0',
         is_new: false,
         is_featured: false,
+        meta_title: '',
+        meta_description: '',
         prompt_notes: '', // context for AI
         product_dimensions: '',
         box_dimensions: '',
@@ -109,6 +112,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 box_dimensions: data.box_dimensions || '',
                 net_weight: data.net_weight || '',
                 gross_weight: data.gross_weight || '',
+                meta_title: data.meta_title || '',
+                meta_description: data.meta_description || '',
                 specs: {
                     battery: data.specs?.battery || '',
                     motor: data.specs?.motor || '',
@@ -293,24 +298,33 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             if (error) throw new Error(error);
 
             // Populate everything
-            setFormData({
-                ...formData,
-                name: data.name || formData.name,
-                description: data.description || formData.description,
-                product_dimensions: data.logistics?.product_dimensions || formData.product_dimensions,
-                gross_weight: data.logistics?.gross_weight || formData.gross_weight,
-                box_content: data.logistics?.whats_in_the_box || formData.box_content,
-                specs: {
-                    ...formData.specs,
-                    battery: data.specs?.battery || formData.specs.battery,
-                    motor: data.specs?.motor || formData.specs.motor,
-                    speed: data.specs?.speed || formData.specs.speed,
-                    max_load: data.specs?.max_load || formData.specs.max_load,
-                    tire_type: data.specs?.tire_type || formData.specs.tire_type,
-                    seats: data.specs?.seats?.toString() || formData.specs.seats,
-                    mobile_app: data.specs?.mobile_app ?? formData.specs.mobile_app,
-                    remote_control: data.specs?.remote_control ?? formData.specs.remote_control,
+            setFormData(prev => {
+                let finalDesc = data.description || prev.description;
+                if (generatedPosters.length > 0) {
+                    finalDesc = integratePostersIntoDescription(finalDesc, generatedPosters);
                 }
+
+                return {
+                    ...prev,
+                    name: data.name || prev.name,
+                    description: finalDesc,
+                    meta_title: data.meta_title || prev.meta_title,
+                    meta_description: data.meta_description || prev.meta_description,
+                    product_dimensions: data.logistics?.product_dimensions || prev.product_dimensions,
+                    gross_weight: data.logistics?.gross_weight || prev.gross_weight,
+                    box_content: data.logistics?.whats_in_the_box || prev.box_content,
+                    specs: {
+                        ...prev.specs,
+                        battery: data.specs?.battery || prev.specs.battery,
+                        motor: data.specs?.motor || prev.specs.motor,
+                        speed: data.specs?.speed || prev.specs.speed,
+                        max_load: data.specs?.max_load || prev.specs.max_load,
+                        tire_type: data.specs?.tire_type || prev.specs.tire_type,
+                        seats: data.specs?.seats?.toString() || prev.specs.seats,
+                        mobile_app: data.specs?.mobile_app ?? prev.specs.mobile_app,
+                        remote_control: data.specs?.remote_control ?? prev.specs.remote_control,
+                    }
+                };
             });
 
             alert('✨ Product details updated successfully!');
@@ -374,9 +388,42 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             setIsBrandingAll(false);
         }
     };
+    // Helper to insert images into description HTML
+    const integratePostersIntoDescription = (description: string, urls: string[]) => {
+        if (!urls.length) return description;
+        let d = description;
+
+        // Remove any existing poster blocks to avoid duplicates
+        d = d.replace(/<div class="my-10 marketing-poster">[\s\S]*?<\/div>/g, '');
+
+        // Insert first poster after hook (p)
+        const firstPIdx = d.indexOf('</p>');
+        if (firstPIdx !== -1) {
+            const imgHtml = `\n<div class="my-10 marketing-poster"><img src="${urls[0]}" alt="Premium Performance" class="rounded-3xl w-full shadow-2xl border-4 border-white/10" /></div>\n`;
+            d = d.slice(0, firstPIdx + 4) + imgHtml + d.slice(firstPIdx + 4);
+        }
+
+        // Insert second poster before Safety section
+        const safetyIdx = d.indexOf('🛡️ Safety');
+        if (safetyIdx !== -1) {
+            const h3Idx = d.lastIndexOf('<h3', safetyIdx);
+            if (h3Idx !== -1) {
+                const imgHtml = `\n<div class="my-10 marketing-poster"><img src="${urls[1]}" alt="Luxury Experience" class="rounded-3xl w-full shadow-2xl border-4 border-white/10" /></div>\n`;
+                d = d.slice(0, h3Idx) + imgHtml + d.slice(h3Idx);
+            }
+        }
+        return d;
+    };
+
     const generatePosters = async () => {
-        if (!formData.name) {
-            alert('Please enter a product name first');
+        // Fallback name logic: If name is empty, try to extract first 5 words from notes
+        let effectiveName = formData.name;
+        if (!effectiveName && formData.prompt_notes) {
+            effectiveName = formData.prompt_notes.split(/\s+/).slice(0, 6).join(' ') + '...';
+        }
+
+        if (!effectiveName) {
+            alert('Please enter a product name or paste details in the AI center first.');
             return;
         }
 
@@ -395,8 +442,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        productName: formData.name,
+                        productName: effectiveName,
                         featureText: angle.text,
+                        productNotes: formData.prompt_notes,
                         originalImageUrl: formData.images[0] // Use main image as reference
                     })
                 });
@@ -405,28 +453,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 posterUrls.push(posterUrl);
             }
 
-            // Insert into description
-            let newDesc = formData.description;
+            setGeneratedPosters(posterUrls);
 
-            // Insert first poster after hook (p)
-            const firstPIdx = newDesc.indexOf('</p>');
-            if (firstPIdx !== -1) {
-                const imgHtml = `\n<div class="my-6"><img src="${posterUrls[0]}" alt="${angles[0].type}" class="rounded-2xl w-full shadow-lg" /></div>\n`;
-                newDesc = newDesc.slice(0, firstPIdx + 4) + imgHtml + newDesc.slice(firstPIdx + 4);
-            }
+            setFormData(prev => ({
+                ...prev,
+                description: integratePostersIntoDescription(prev.description, posterUrls)
+            }));
 
-            // Insert second poster before Safety (h3)
-            const safetyIdx = newDesc.indexOf('🛡️ Safety');
-            if (safetyIdx !== -1) {
-                const h3Idx = newDesc.lastIndexOf('<h3', safetyIdx);
-                if (h3Idx !== -1) {
-                    const imgHtml = `\n<div class="my-6"><img src="${posterUrls[1]}" alt="${angles[1].type}" class="rounded-2xl w-full shadow-lg" /></div>\n`;
-                    newDesc = newDesc.slice(0, h3Idx) + imgHtml + newDesc.slice(h3Idx);
-                }
-            }
-
-            setFormData(prev => ({ ...prev, description: newDesc }));
-            alert('✨ Marketing Posters generated and inserted into description!');
+            alert('✨ Marketing Posters generated and integrated into description!');
         } catch (error: any) {
             console.error(error);
             alert('Poster generation failed: ' + error.message);
@@ -567,8 +601,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     };
 
     const tabs = [
-        { id: 'basic', label: 'Basic Info', icon: Package },
         { id: 'media', label: 'Media', icon: ImagePlus },
+        { id: 'basic', label: 'Basic Info', icon: Package },
         { id: 'attributes', label: 'Attributes', icon: Layers },
         { id: 'variations', label: 'Variations', icon: Split },
         { id: 'specs', label: 'Tech Specs', icon: Gauge },
@@ -662,44 +696,35 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                     </div>
                                 </div>
 
-                                <div className="p-4 bg-purple-50 dark:bg-purple-900/10 rounded-2xl border-2 border-purple-100 dark:border-purple-500/20 space-y-3">
-                                    <div className="flex justify-between items-center">
-                                        <label className="text-xs font-bold uppercase text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
-                                            <Sparkles className="w-3 h-3" /> AI Source Details (Generate All)
-                                        </label>
-                                        <button
-                                            type="button"
-                                            onClick={generateFullProduct}
-                                            disabled={isGeneratingAI || !formData.prompt_notes}
-                                            className="text-[10px] sm:text-xs px-4 py-1.5 bg-purple-600 text-white rounded-lg transition-all font-bold flex items-center gap-1.5 hover:bg-purple-700 shadow-sm disabled:opacity-50"
-                                        >
-                                            {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                            {isGeneratingAI ? 'Generating All...' : '✨ Magic Generate Everything'}
-                                        </button>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-dashed">
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">SEO Meta Title</label>
+                                        <input
+                                            type="text"
+                                            value={formData.meta_title}
+                                            onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
+                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none text-sm"
+                                            placeholder="Optimized title for Google"
+                                        />
                                     </div>
-                                    <textarea
-                                        value={formData.prompt_notes}
-                                        onChange={(e) => setFormData({ ...formData, prompt_notes: e.target.value })}
-                                        className="w-full px-4 py-3 bg-background border rounded-xl text-sm focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"
-                                        placeholder="Paste supplier details, manufacturer notes, or raw product text here..."
-                                        rows={4}
-                                    />
-                                    <p className="text-[10px] text-purple-400 font-medium">Tip: Paste a whole product page snippet here, and the AI will fill out the name, description, specs, and logistics automatically!</p>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">SEO Meta Description</label>
+                                        <textarea
+                                            value={formData.meta_description}
+                                            onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
+                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none text-sm resize-none"
+                                            placeholder="Brief description for search results"
+                                            rows={2}
+                                        />
+                                    </div>
                                 </div>
+
+
 
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
                                         <label className="block text-sm font-bold uppercase tracking-wider text-muted-foreground">Description <span className="text-red-500">*</span></label>
                                         <div className="flex gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={generatePosters}
-                                                disabled={isGeneratingPosters || !formData.name || !formData.images[0]}
-                                                className="text-[10px] sm:text-xs px-3 py-1.5 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition-all font-bold flex items-center gap-1.5 disabled:opacity-50"
-                                            >
-                                                {isGeneratingPosters ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
-                                                {isGeneratingPosters ? 'Creating Posters...' : '🎬 Create Premium Posters'}
-                                            </button>
                                             <button
                                                 type="button"
                                                 onClick={generateAIDescription}
@@ -857,6 +882,46 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                         )}
                                     </div>
                                 </div>
+
+                                <div className="p-5 bg-purple-50 dark:bg-purple-900/10 rounded-2xl border-2 border-purple-100 dark:border-purple-500/20 space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-xs font-bold uppercase text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                                            <Sparkles className="w-4 h-4" /> AI Automation Center
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={generatePosters}
+                                                disabled={isGeneratingPosters || !formData.images[0] || !formData.prompt_notes}
+                                                className="text-[10px] sm:text-xs px-4 py-2 bg-blue-600 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:bg-blue-700 shadow-lg disabled:opacity-50"
+                                            >
+                                                {isGeneratingPosters ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
+                                                {isGeneratingPosters ? 'Creating Posters...' : '🎬 Create Premium Posters'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={generateFullProduct}
+                                                disabled={isGeneratingAI || !formData.prompt_notes}
+                                                className="text-[10px] sm:text-xs px-4 py-2 bg-purple-600 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:bg-purple-700 shadow-lg disabled:opacity-50"
+                                            >
+                                                {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                {isGeneratingAI ? 'Generating All...' : '✨ Magic Generate All Details'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <textarea
+                                        value={formData.prompt_notes}
+                                        onChange={(e) => setFormData({ ...formData, prompt_notes: e.target.value })}
+                                        className="w-full px-4 py-3 bg-background border rounded-xl text-sm focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"
+                                        placeholder="Paste supplier details, manufacturer notes, or raw product text here for the AI to analyze..."
+                                        rows={4}
+                                    />
+                                    <div className="flex items-center gap-2 text-[10px] text-purple-400 font-medium">
+                                        <Zap className="w-3 h-3" />
+                                        <span>Pro Tip: Add images first, then paste details here and click "Create Posters" followed by "Magic Generate"!</span>
+                                    </div>
+                                </div>
+
 
                                 <div className="h-px bg-border/50" />
 

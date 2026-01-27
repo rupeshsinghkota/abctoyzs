@@ -9,7 +9,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
     try {
-        const { productName, featureText, originalImageUrl } = await req.json();
+        const { productName, featureText, productNotes, originalImageUrl } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
@@ -36,14 +36,18 @@ export async function POST(req: Request) {
             
             TASK: Create a HIGH-END "A+ CONTENT" MARKETING POSTER for the product: "${productName}".
             
+            PRODUCT CONTEXT: ${productNotes || "A premium ride-on toy for children."}
+            
             POSTER DIMENSIONS: 16:9 Landscape Wide Banner.
             
             CONTENT REQUIREMENTS:
-            1. CENTRAL PRODUCT: Feature the product "${productName}" prominently. Use the provided PRODUCT_IMAGE as the source.
+            1. CENTRAL PRODUCT: Feature the product prominently. Use the provided PRODUCT_IMAGE as the source. 
             2. BRANDING: Use the provided BRAND_LOGO asset. Place it in a corner or center so it looks like an official corporate banner.
-            3. MARKETING TEXT: Incorporate the following feature text legibly and beautifully into the design: "${featureText}".
-            4. DESIGN STYLE: Premium e-commerce marketing style (like Apple or Dyson). Minimalist, clean, with high-quality typography.
-            5. BACKGROUND: A lifestyle setting that matches the product (e.g., a child having fun, a luxury driveway, or a professional showroom).
+            3. MARKETING TEXT: Incorporate a punchy, high-end marketing slogan. 
+               - THEME: "${featureText}"
+               - SPECIFICS: Use details from the PRODUCT CONTEXT (like specific battery voltage, motor power, or luxury features) to make it highly relevant.
+            4. DESIGN STYLE: Premium e-commerce marketing style (like Apple, Tesla, or Dyson). Minimalist, clean, with high-quality bold typography.
+            5. BACKGROUND: A lifestyle setting that matches the product's luxury level.
             6. VISUALS: Sharp focus, 8k resolution, cinematic lighting, and professional color grading.
             
             Output ONLY the final 16:9 high-resolution marketing poster.

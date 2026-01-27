@@ -17,6 +17,9 @@ export type Product = {
     review_count: number;
     is_new: boolean;
     is_featured: boolean;
+    // SEO
+    meta_title?: string;
+    meta_description?: string;
     // Premium Features
     videos?: string[];
     box_content?: string[];

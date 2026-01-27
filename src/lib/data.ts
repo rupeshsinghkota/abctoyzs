@@ -34,9 +34,9 @@ export interface Product {
     is_new?: boolean;
     is_featured?: boolean;
 
-    // Variations Data
-    attributes?: { name: string; options: string[] }[];
-    variants?: ProductVariant[];
+    // SEO
+    meta_title?: string;
+    meta_description?: string;
 }
 
 export interface ProductVariant {
@@ -224,7 +224,9 @@ export async function fetchProducts(): Promise<Product[]> {
             net_weight: item.net_weight,
             gross_weight: item.gross_weight,
             attributes: item.attributes || [],
-            variants: item.variants || []
+            variants: item.variants || [],
+            meta_title: item.meta_title,
+            meta_description: item.meta_description
         })) as Product[];
 
     } catch (e) {
@@ -273,7 +275,9 @@ export async function searchProducts(query: string): Promise<Product[]> {
             specs: item.specs || {},
             voltage: item.voltage,
             ageGroup: item.age_group,
-            subCategory: item.subCategory
+            subCategory: item.subCategory,
+            meta_title: item.meta_title,
+            meta_description: item.meta_description
         })) as Product[];
 
     } catch (e) {

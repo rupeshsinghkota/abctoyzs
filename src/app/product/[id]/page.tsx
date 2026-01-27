@@ -9,11 +9,25 @@ import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import Link from 'next/link';
 import { ProductMainSection } from '@/components/product/ProductMainSection';
 import { ProductCard } from '@/components/shop/ProductCard';
+import { Metadata } from 'next';
 
 interface PageProps {
     params: Promise<{
         id: string;
     }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { id } = await params;
+    const products = await fetchProducts();
+    const product = products.find((p) => p.id === id);
+
+    if (!product) return { title: 'Product Not Found' };
+
+    return {
+        title: product.meta_title || product.name,
+        description: product.meta_description || product.description.substring(0, 160),
+    };
 }
 
 export default async function ProductPage({ params }: PageProps) {
@@ -41,13 +55,15 @@ export default async function ProductPage({ params }: PageProps) {
         { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : 'Remote' },
     ];
 
-    const whatsInBox = [
-        'Ride-on vehicle (fully assembled)',
-        '2.4G Parental Remote Control',
-        'Rechargeable Battery & Charger',
-        'User Manual & Warranty Card',
-        'Assembly Tools'
-    ];
+    const whatsInBox = product.box_content && product.box_content.length > 0
+        ? product.box_content
+        : [
+            'Ride-on vehicle (fully assembled)',
+            '2.4G Parental Remote Control',
+            'Rechargeable Battery & Charger',
+            'User Manual & Warranty Card',
+            'Assembly Tools'
+        ];
 
     return (
         <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -136,17 +152,12 @@ export default async function ProductPage({ params }: PageProps) {
                             <h3 className="text-2xl font-black mt-3">The Ultimate Riding Experience</h3>
                         </div>
 
-                        <div className="prose prose-base dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed space-y-4">
-                            {/* Note: This simulates a long description properly handling spacing */}
-                            <p>
-                                {product.description || "The ultimate driving experience for your little one. This premium ride-on car combines authentic styling with advanced safety features. Equipped with a powerful battery, smooth suspension, and parental remote control, it ensures hours of safe and thrilling fun."}
-                            </p>
-                            <p>
-                                Designed with meticulous attention to detail, this ride-on vehicle isn't just a toy—it's a gateway to adventure. From the realistic dashboard lights to the high-traction tires, every element is engineered to provide an immersive and safe driving experience for young enthusiasts.
-                            </p>
-                            <p>
-                                Safety is paramount. The included parental remote control gives you full peace of mind, allowing you to take over the steering and speed at any moment. The soft-start acceleration system prevents sudden jerks, ensuring a smooth and comfortable ride from start to finish.
-                            </p>
+                        <div className="prose prose-base dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed space-y-4 prose-h3:text-xl prose-h3:font-bold prose-ul:list-disc prose-ul:pl-5">
+                            {product.description ? (
+                                <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                            ) : (
+                                <p>The ultimate driving experience for your little one. This premium ride-on car combines authentic styling with advanced safety features. Equipped with a powerful battery, smooth suspension, and parental remote control, it ensures hours of safe and thrilling fun.</p>
+                            )}
                         </div>
                     </div>
                 </div>
