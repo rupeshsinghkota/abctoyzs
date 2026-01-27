@@ -18,16 +18,24 @@ export async function POST(req: Request) {
 
         if (type === 'description') {
             prompt = `
-                You are a premium ride-on toy marketing expert for the brand "ABC Toyz". 
-                Write a high-converting, professional product description for a "${productName}" in the "${category}" category.
+                You are a world-class luxury toy copywriter for "ABC Toyz". 
+                Write a compelling, sophisticated, and high-converting product description for a "${productName}" in the "${category}" category.
                 ${contextString}
-                Use Markdown formatting. Include:
-                - A catchy opening paragraph that highlights why "ABC Toyz" is the best place for this ride-on.
-                - A "Key Features" bulleted list.
-                - A "Safety First" section because it's for kids.
-                - Keep the tone exciting, playful, yet trustworthy.
-                - Mention that this is an "ABC Toyz" premium selection.
-                Do not include placeholders like [Price] or [Link].
+
+                Tone: Exciting, premium, and trustworthy. Use evocative language (e.g., "exhilarating", "meticulously crafted", "unmatched safety").
+                
+                Structure (Markdown):
+                1. ## [Catchy, Punchy Title] - A magnetic heading.
+                2. **The ABC Toyz Experience**: A 2-3 sentence emotional hook about the joy this toy brings and why ABC Toyz is the ultimate choice for quality and service.
+                3. ## ✨ Premium Highlights: 
+                   - Use bold keys (e.g., **Authentic Design:** Real LED lights...)
+                   - Focus on 5-7 stand-out features.
+                4. ## 🛡️ Safety & Reliability:
+                   - Emphasize parent-tested safety features, slow-start technology, and durable build.
+                5. ## 🎁 The Perfect Gift:
+                   - A concluding sentence on why this is the best gift for a child.
+
+                Do not use generic placeholders. Mention "ABC Toyz" naturally 2-3 times.
             `;
         } else if (type === 'specs') {
             prompt = `
@@ -57,29 +65,28 @@ export async function POST(req: Request) {
             `;
         } else if (type === 'all') {
             prompt = `
-                You are a product data expert for "ABC Toyz". I will provide you with a raw text snippet or notes about a ride-on toy product.
-                Your task is to extract and generate ALL relevant product details into a clean JSON format, specifically branded for ABC Toyz.
+                You are a "Master Product Specialist" for ABC Toyz. Extract and enhance product data from raw notes into a premium listing format.
                 
                 RAW PRODUCT DATA/NOTES:
                 "${notes}"
                 
-                Return ONLY a JSON object with this exact structure (if info is missing, suggest realistic values):
+                Return ONLY a JSON object:
                 {
-                    "name": "Professional product name (Include 'By ABC Toyz' or similar only if it enhances the brand)",
-                    "description": "High-converting Markdown description emphasizing that this is a quality ABC Toyz product.",
+                    "name": "Create a premium, descriptive title (e.g. 'Ultimate 4WD Adventure Jeep by ABC Toyz' instead of just 'Jeep')",
+                    "description": "Write a 300-word, high-end Markdown description following the world-class copywriting structure: Title, Emotional Hook, Premium Highlights (bulleted), and Safety section. Emphasize the ABC Toyz quality promise.",
                     "specs": {
-                        "battery": "e.g. 12V 7Ah",
-                        "motor": "e.g. 2 x 35W",
-                        "speed": "e.g. 3-5 km/h",
-                        "max_load": "e.g. 30kg",
-                        "tire_type": "e.g. EVA Rubber",
-                        "seats": "1 or 2",
+                        "battery": "Realistic value based on notes",
+                        "motor": "Realistic motors (e.g. 4 x 45W for 4WD)",
+                        "speed": "Standard range",
+                        "max_load": "Realistic kg",
+                        "tire_type": "EVA Rubber or Plastic",
+                        "seats": "Number of seats",
                         "mobile_app": true/false,
                         "remote_control": true/false
                     },
                     "logistics": {
-                        "whats_in_the_box": ["Charger", "Manual", etc.],
-                        "product_dimensions": "L x W x H in cm",
+                        "whats_in_the_box": ["Charger", "Manual", "Remote", etc.],
+                        "product_dimensions": "Standard dimensions",
                         "gross_weight": "Weight in kg"
                     }
                 }
