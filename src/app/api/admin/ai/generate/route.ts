@@ -35,6 +35,11 @@ export async function POST(req: Request) {
             Brand Name: ${BRAND_CONFIG.name}
             Voice: ${BRAND_CONFIG.voice}
             Key Values: ${BRAND_CONFIG.marketingPillars.join(", ")}
+
+            CRITICAL PROHIBITION:
+            - You must NEVER mention the brand "11cart" or any other retailer names.
+            - ONLY refer to the brand as "${BRAND_CONFIG.name}".
+            - If the input notes mention "11cart" or other brands, IGNORE them and replace with "${BRAND_CONFIG.name}".
         `;
 
         // ... (truncated for brevity, logic follows) ...
