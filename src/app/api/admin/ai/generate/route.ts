@@ -68,17 +68,25 @@ export async function POST(req: Request) {
         } else if (type === 'specs') {
             // ... existing specs prompt
             prompt = `
-                Suggest realistic technical specifications for a "${productName}" in the "${category}" category.
+                Act as a Technical Product Engineer.
+                Extract or ESTIMATE realistic technical specifications for: "${productName}" (${category}).
                 ${contextString}
-                Output ONLY a JSON object with the following potential fields:
+
+                CRITICAL RULES:
+                1. NEVER output "N/A", "Unknown", or "Variable".
+                2. If exact data is missing, YOU MUST ESTIMATE based on similar products in this category (e.g. Most jeeps are 12V, 30kg load).
+                3. Keep values SHORT and CONCISE (Max 3-5 words).
+                
+                Output ONLY a JSON object with these exact keys:
                 {
-                    "Battery": "e.g. 12V 7Ah",
-                    "Motors": "e.g. 2 x 35W",
-                    "Speed": "e.g. 3-5 km/h",
-                    "Charging Time": "e.g. 8-12 hours",
-                    "Play Time": "e.g. 1-2 hours",
-                    "Max Load": "e.g. 30kg",
-                    "Suitable Age": "e.g. 3-8 years"
+                    "Battery": "e.g. 12V 7Ah (Rechargeable)",
+                    "Motors": "e.g. 2 x 35W High Torque",
+                    "Speed": "e.g. 3-7 km/h",
+                    "Charging Time": "e.g. 8-10 Hours",
+                    "Play Time": "e.g. 45-60 Mins",
+                    "Max Load": "e.g. 35-40 kg",
+                    "Suitable Age": "e.g. 2-6 Years",
+                    "Seating Capacity": "e.g. 1 Seater or 2 Seater"
                 }
             `;
         } else if (type === 'logistics') {
@@ -107,9 +115,22 @@ export async function POST(req: Request) {
                     "description": "High-end HTML description. Use <h3> for major headings. Use <ul> for lists. EMBED THE IMAGES naturally within this string using <img src='...' class='w-full rounded-2xl shadow-lg my-8' />. The text should be long, descriptive, and formatted beautifully.",
                     "meta_title": "SEO Title",
                     "meta_description": "SEO Desc",
-                    "specs": { "battery": "", "motor": "", "speed": "", "max_load": "", "tire_type": "", "seats": "", "mobile_app": true, "remote_control": true },
+                    "specs": { 
+                        "battery": "12V 7Ah (Estimate if missing)", 
+                        "motor": "2 x 35W (Estimate if missing)", 
+                        "speed": "3-7 km/h", 
+                        "max_load": "35 kg", 
+                        "tire_type": "EVA Rubber or Plastic", 
+                        "seats": "1 Seater or 2 Seater", 
+                        "mobile_app": true, 
+                        "remote_control": true 
+                    },
                     "logistics": { "whats_in_the_box": [], "product_dimensions": "", "gross_weight": "" }
                 }
+
+                RULES FOR SPECS:
+                - NEVER use "N/A" or "Unknown". Estimate realistic values.
+                - Keep strings SHORT (under 5 words).
             `;
         }
 
