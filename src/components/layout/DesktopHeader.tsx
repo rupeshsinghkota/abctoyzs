@@ -65,7 +65,7 @@ export function DesktopHeader() {
                         </Link>
 
                         {/* Vehicle Types */}
-                        {VEHICLE_CATEGORIES.slice(0, 5).map((cat) => (
+                        {VEHICLE_CATEGORIES.slice(0, 7).map((cat) => (
                             <Link
                                 key={cat.value}
                                 href={`/category/${cat.value}`}

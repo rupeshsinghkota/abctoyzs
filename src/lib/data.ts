@@ -31,6 +31,7 @@ export const VEHICLE_CATEGORIES = [
     { label: 'ATVs', value: 'atvs', image: '/categories/cat_atv_1769364577413.png' },
     { label: 'UTVs & Buggies', value: 'utvs', image: '/categories/cat_utv_1769364600471.png' },
     { label: 'Go-Karts', value: 'gokarts', image: '/categories/cat_gokart_1769364617852.png' },
+    { label: 'Dirt Bikes', value: 'dirtbikes', image: '/categories/cat_dirtbike.png' },
     { label: 'Scooters', value: 'scooters', image: '/categories/cat_scooter_1769364639228.png' },
 ];
 
