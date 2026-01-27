@@ -13,6 +13,8 @@ export interface Product {
         mobile_app: boolean;
         max_load: string;
         speed: string;
+        motor?: string;
+        seats?: number;
     };
     description: string;
     // New Fields
