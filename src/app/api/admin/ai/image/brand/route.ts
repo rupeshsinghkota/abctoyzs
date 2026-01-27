@@ -42,13 +42,14 @@ export async function POST(req: Request) {
             Transform the PRODUCT_IMAGE into a "STUNNING HIGHEST-END ADVERTISING PHOTOSHOOT". Use the BRAND_LOGO asset as your ONLY reference for branding.
             
             ARTISTIC DIRECTION:
-            1. VISUAL STYLE: Cinematic high-end advertising photography. 
-            2. AUTONOMOUS SCENE SELECTION: Decide the best luxury setting (Villa, Midnight Showroom, or Hamptons Driveway).
-            3. LIGHTING mastery: Professional studio lighting with realistic reflections on all surfaces.
-            4. BRANDING: SEAMLESSLY and REALISTICALLY overlay the provided BRAND_LOGO onto the vehicle (number plate, side panels, or seat). It must match the perspective, lighting, and texture of the vehicle parts perfectly.
-            5. QUALITY: 8k resolution textures, crystal clear focus, and professional bokeh.
+            1. ASPECT RATIO: The final image MUST be a PERFECT 1:1 SQUARE (SQUARE ASPECT RATIO). This is critical for the store's grid layout.
+            2. VISUAL STYLE: Cinematic high-end advertising photography. 
+            3. AUTONOMOUS SCENE SELECTION: Decide the best luxury setting (Villa, Midnight Showroom, or Hamptons Driveway).
+            4. LIGHTING mastery: Professional studio lighting with realistic reflections on all surfaces.
+            5. BRANDING: SEAMLESSLY and REALISTICALLY overlay the provided BRAND_LOGO onto the vehicle (number plate, side panels, or seat). It must match the perspective, lighting, and texture of the vehicle parts perfectly.
+            6. QUALITY: 8k resolution textures, crystal clear focus, and professional bokeh.
             
-            Output ONLY the final high-resolution masterpiece.
+            Output ONLY the final high-resolution square masterpiece.
         `;
 
         const result = await model.generateContent([
