@@ -80,8 +80,15 @@ export async function POST(req: Request) {
         ${layoutInstructions}
         CAMERA ANGLE: ${camAngle}
         
-        The product is branded with the logo from the second image, naturally applied to the license plate or door.
-        TEXT OVERLAY: The image MUST include the Product Name "${productName}" and the Key Feature: "${featureText}".
+        CRITICAL VISUAL REQUIREMENTS:
+        1. **PRESERVE PRODUCT LOOK:** The vehicle in the banner MUST LOOK EXACTLY like the reference image provided (3rd input). Do NOT hallucinate a different car model. Keep the same color, shape, and design details.
+        2. **SHOW A CHILD:** You MUST include a happy child (appropriate age for the toy) interacting with the vehicle (driving it, sitting in it, or standing next to it confident). The child should look natural and premium.
+        3. **TEXT OVERLAY:** The image MUST include ONLY the Key Feature Text: "${featureText}". 
+           - Do NOT write the product name.
+           - Do NOT write generic slogans.
+           - ONLY write the specific spec text provided (e.g. "12V 7Ah • 4 Motors").
+        
+        The product is branded with the logo from the second image if visible.
         The vehicle is strictly clean and factory-fresh. All competitor watermarks, text, and logos (especially on the windshield and glass) are completely absent.
         The image is a single, finished marketing poster with professional embedded text.`;
 
