@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { BRAND_CONFIG } from "@/config/brand";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -15,19 +16,24 @@ export async function POST(req: Request) {
 
         let prompt = "";
         const contextString = notes ? `\nADDTIONAL CONTEXT/NOTES FROM USER: "${notes}"\nHighly prioritize these details in your response.` : "";
+        const brandingGuide = `
+            Brand Name: ${BRAND_CONFIG.name}
+            Voice: ${BRAND_CONFIG.voice}
+            Key Values: ${BRAND_CONFIG.pillars.join(", ")}
+        `;
 
         if (type === 'description') {
             prompt = `
-                You are a world-class luxury toy copywriter for "ABC Toyz". 
+                You are a world-class luxury toy copywriter for "${BRAND_CONFIG.name}". 
                 Write a compelling, sophisticated, and high-converting product description for a "${productName}" in the "${category}" category.
                 ${contextString}
 
-                Tone: Exciting, premium, and trustworthy. Use evocative language.
+                ${brandingGuide}
                 
                 Format: Output ONLY valid semantic HTML (no markdown).
                 Structure:
                 1. <h3>[Catchy, Punchy Title]</h3>
-                2. <p><strong>The ABC Toyz Experience:</strong> [2-3 sentence emotional hook about the joy this toy brings].</p>
+                2. <p><strong>The ${BRAND_CONFIG.name} Experience:</strong> [2-3 sentence emotional hook about the joy this toy brings].</p>
                 3. <h3>✨ Premium Highlights:</h3>
                    <ul>
                      <li><strong>[Feature Detail]:</strong> [Description]</li>
@@ -37,7 +43,7 @@ export async function POST(req: Request) {
                    <p>[Details on safety features and quality build].</p>
                 5. <p>🎁 <strong>The Perfect Gift:</strong> [Concluding sentence].</p>
 
-                Do not use generic placeholders. Mention "ABC Toyz" naturally 2-3 times.
+                Do not use generic placeholders. Mention "${BRAND_CONFIG.name}" naturally ${BRAND_CONFIG.aiInstructions.brandingFrequency}.
             `;
         } else if (type === 'specs') {
             prompt = `
@@ -67,15 +73,17 @@ export async function POST(req: Request) {
             `;
         } else if (type === 'all') {
             prompt = `
-                You are a "Master Product Specialist" for ABC Toyz. Extract and enhance product data from raw notes into a premium listing format.
+                You are a "Master Product Specialist" for "${BRAND_CONFIG.name}". Extract and enhance product data from raw notes into a premium listing format.
                 
                 RAW PRODUCT DATA/NOTES:
                 "${notes}"
                 
+                ${brandingGuide}
+                
                 Return ONLY a JSON object:
                 {
-                    "name": "Create a premium, CONCISE product name (max 6-8 words). Do not include 'ABC Toyz' in the name itself unless it is a custom branded item.",
-                    "description": "Write a high-end HTML description (using <h3>, <p>, <ul>, <li> tags). Follow the world-class structure: Title, Emotional Hook, Premium Highlights list, and Safety section. Use strong adjectives.",
+                    "name": "Create a premium, CONCISE product name (max 6-8 words).",
+                    "description": "Write a high-end HTML description (using <h3>, <p>, <ul>, <li> tags). Follow the world-class structure: Title, Emotional Hook, Premium Highlights list, and Safety section. Use strong adjectives. Reinforce the brand identity of ${BRAND_CONFIG.name}.",
                     "specs": {
                         "battery": "Realistic value based on notes",
                         "motor": "Realistic motors (e.g. 4 x 45W for 4WD)",
