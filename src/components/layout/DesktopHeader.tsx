@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Search, ShoppingBag, User, ChevronDown } from "lucide-react";
+import { Search, ShoppingBag, User, ChevronDown, Lock } from "lucide-react";
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data";
+import { useAdmin } from "@/hooks/useAdmin";
 
 export function DesktopHeader() {
+    const { isAdmin } = useAdmin();
     return (
         <div className="w-full shadow-sm">
             {/* Top Bar: Logo, Search, Actions */}
@@ -34,6 +36,13 @@ export function DesktopHeader() {
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-3">
+                        {isAdmin && (
+                            <Link href="/admin" className="flex items-center gap-2 p-2 hover:bg-primary/10 rounded-full transition-colors text-foreground/70 hover:text-primary group" title="Admin Dashboard">
+                                <div className="w-9 h-9 rounded-full bg-secondary/50 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                    <Lock className="w-5 h-5 text-primary" strokeWidth={1.5} />
+                                </div>
+                            </Link>
+                        )}
                         <Link href="/profile" className="flex items-center gap-2 p-2 hover:bg-secondary/50 rounded-full transition-colors text-foreground/70 hover:text-foreground">
                             <div className="w-9 h-9 rounded-full bg-secondary/50 flex items-center justify-center">
                                 <User className="w-5 h-5" strokeWidth={1.5} />

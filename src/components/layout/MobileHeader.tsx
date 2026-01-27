@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { Search, ShoppingBag, Menu, X, Home, Grid, User, Package, ChevronDown, ChevronRight, Zap, Baby } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, Home, Grid, User, Package, ChevronDown, ChevronRight, Zap, Baby, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data";
+import { useAdmin } from "@/hooks/useAdmin";
 
 export function MobileHeader() {
+    const { isAdmin } = useAdmin();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -200,7 +202,17 @@ export function MobileHeader() {
 
                     {/* Footer Actions */}
                     <div className="flex-none p-4 border-t border-border/10 bg-muted/20">
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className={`grid gap-3 ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                            {isAdmin && (
+                                <Link
+                                    href="/admin"
+                                    className="flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border/50 hover:border-primary/50 transition-colors shadow-sm group"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <Lock className="w-5 h-5 mb-1 text-primary animate-pulse transition-colors" strokeWidth={1.5} />
+                                    <span className="text-xs font-bold text-primary">Admin</span>
+                                </Link>
+                            )}
                             <Link
                                 href="/cart"
                                 className="flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border/50 hover:border-primary/50 transition-colors shadow-sm group"
