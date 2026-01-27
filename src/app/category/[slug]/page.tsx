@@ -28,7 +28,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             <div className="container mx-auto px-4 pt-2">
                 <Breadcrumb
                     items={[
-                        { label: 'Categories', href: '/categories' },
+                        { label: 'Categories', href: '/category' },
                         { label: title }
                     ]}
                 />

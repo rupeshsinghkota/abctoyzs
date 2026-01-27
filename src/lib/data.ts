@@ -16,6 +16,7 @@ export interface Product {
     };
     description: string;
     // New Fields
+    videos?: string[];
     voltage?: '12V' | '24V' | '36V' | '48V';
     ageGroup?: '1-3' | '3-6' | '6-10' | '10+';
     subCategory?: string;
@@ -62,6 +63,9 @@ export const products: Product[] = [
         images: [
             'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&auto=format&fit=crop&q=60',
             'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&auto=format&fit=crop&q=60',
+        ],
+        videos: [
+            'https://cdn.coverr.co/videos/coverr-driving-a-go-cart-4560/1080p.mp4'
         ],
         tag: 'New',
         specs: { battery: '12V 7Ah', mobile_app: true, max_load: '30kg', speed: '3-5 km/h' },
