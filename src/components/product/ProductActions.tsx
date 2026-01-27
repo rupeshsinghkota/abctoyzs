@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 
@@ -17,10 +17,15 @@ interface ProductActionsProps {
 export function ProductActions({ product, selectedAttributes, onAttributeSelect, currentVariant }: ProductActionsProps) {
     const { addToCart } = useStore();
     const [quantity, setQuantity] = useState(1);
+    const [added, setAdded] = useState(false);
 
     // Initial Price / Image / Stock comes from Product, but overrides if Variant selected
     const displayPrice = currentVariant ? currentVariant.price : product.price;
+    const displayMRP = currentVariant?.price ? (currentVariant.price * 1.3) : (product.mrp || product.price * 1.3); // Fallback mock MRP if missing
     const displayStock = currentVariant ? currentVariant.stock : 7; // Default mock stock
+
+    // Calculate Discount
+    const discount = Math.round(((displayMRP - displayPrice) / displayMRP) * 100);
 
     // Check if checks pass
     const allAttributesSelected = product.attributes
@@ -51,6 +56,18 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             quantity: quantity,
             attributes: selectedAttributes
         });
+
+        setAdded(true);
+        setTimeout(() => setAdded(false), 2000);
+    };
+
+    const handleBuyNow = () => {
+        if (!allAttributesSelected) {
+            alert('Please select all options');
+            return;
+        }
+        handleAddToCart();
+        window.location.href = '/cart';
     };
 
     // Helper to find image for a specific option (e.g. Red) for the swatch
@@ -61,15 +78,21 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Price Display */}
-            <div className="flex items-end gap-3 pb-4 border-b">
-                <div className="flex flex-col">
-                    <span className="text-3xl font-black text-foreground">₹{displayPrice.toLocaleString()}</span>
+            <div className="p-5 bg-card border rounded-2xl shadow-sm space-y-4">
+                <div className="flex items-end flex-wrap gap-3">
+                    <span className="text-4xl font-black text-foreground">₹{displayPrice.toLocaleString()}</span>
+                    {discount > 0 && (
+                        <div className="flex flex-col mb-1.5">
+                            <span className="text-sm font-bold text-muted-foreground line-through">MRP: ₹{displayMRP.toLocaleString()}</span>
+                            <span className="text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-full w-fit">
+                                {discount}% OFF
+                            </span>
+                        </div>
+                    )}
                 </div>
-                {currentVariant && displayPrice !== product.price && (
-                    <span className="text-sm text-muted-foreground mb-1 line-through">Base: ₹{product.price.toLocaleString()}</span>
-                )}
+                <p className="text-xs text-muted-foreground font-medium">Inclusive of all taxes</p>
             </div>
 
             {/* Attributes Selection */}
@@ -115,10 +138,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                 )
                             }
 
-                            // COLOR SWATCH (Heuristic check for colors if no image)
-                            // If the attribute name contains "Color" and option is a valid CSS color... 
-                            // Simplified for now: just Text Buttons but styled better.
-
+                            // TEXT BUTTON SWATCH
                             return (
                                 <button
                                     key={option}
@@ -138,32 +158,33 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
             ))}
 
+            <div className="h-px bg-border/50 w-full my-6" />
+
             {/* Actions */}
-            <div className="pt-4 flex flex-col gap-4">
-                {/* Quantity Control (Added for consistency) */}
-                <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-800/50 p-3 rounded-2xl border border-gray-100 dark:border-zinc-800">
-                    <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider pl-2">Quantity</span>
+            <div className="flex flex-col gap-4">
+                {/* Quantity Control within Actions Block */}
+                <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Quantity</span>
                     <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
                 </div>
 
-                <div className="flex gap-4">
+                <div className="grid grid-cols-2 gap-3 pt-2">
                     <button
                         onClick={handleAddToCart}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="flex-1 h-14 border-2 border-primary text-primary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                        className={cn(
+                            "h-14 border-2 border-primary/20 bg-primary/5 text-primary font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/10 hover:border-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed group",
+                            added && "bg-green-50 text-green-600 border-green-200"
+                        )}
                     >
-                        <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        Add to Cart
+                        {added ? <Check className="w-5 h-5" /> : <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />}
+                        {added ? "Added" : "Add to Cart"}
                     </button>
 
                     <button
-                        onClick={() => {
-                            handleAddToCart();
-                            // Redirect to checkout - in real app trigger navigation properly
-                            window.location.href = '/cart';
-                        }}
+                        onClick={handleBuyNow}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="flex-1 h-14 bg-gradient-to-r from-primary to-orange-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="h-14 bg-gradient-to-r from-primary to-orange-600 text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ShoppingBag className="w-5 h-5 fill-white/20" />
                         Buy Now
@@ -172,7 +193,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
                 {/* Stock Warning */}
                 {displayStock < 5 && displayStock > 0 && (
-                    <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/10 p-2 rounded-lg justify-center animate-pulse">
+                    <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/10 p-3 rounded-xl justify-center animate-pulse mt-2">
                         <span>🔥 Hurry! Only {displayStock} left at this price!</span>
                     </div>
                 )}

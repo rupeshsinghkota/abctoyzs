@@ -21,11 +21,11 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
     const [buyingNow, setBuyingNow] = useState(false);
 
     const activePrice = currentVariant ? currentVariant.price : product.price;
+    const activeMRP = currentVariant?.price ? (currentVariant.price * 1.3) : (product.mrp || product.price * 1.3);
+    const discount = Math.round(((activeMRP - activePrice) / activeMRP) * 100);
 
     const handleAddToCart = () => {
         if (!isReady) {
-            // If not ready (options missing), maybe scroll to top?
-            // For now, just return or alert. Ideally, we scroll to options.
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
@@ -75,26 +75,31 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
         <>
             {/* Mobile Sticky Bar - positioned at bottom (now that global nav is hidden) */}
             <div className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:hidden w-full max-w-full overflow-hidden pb-[env(safe-area-inset-bottom)]">
-                <div className="flex items-center gap-2 p-3">
+                <div className="flex items-center gap-3 p-3">
                     {/* Price */}
                     <div className="flex flex-col min-w-0 flex-shrink-0">
-                        <span className="text-lg font-black leading-tight">₹{activePrice.toLocaleString()}</span>
-                        {/* <span className="text-[10px] text-green-600 font-medium">20% OFF</span> */}
+                        {discount > 0 && (
+                            <div className="flex items-center gap-1.5 leading-none mb-0.5">
+                                <span className="text-[10px] text-muted-foreground line-through decoration-muted-foreground/80">₹{activeMRP.toLocaleString()}</span>
+                                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1 rounded-sm">{discount}% OFF</span>
+                            </div>
+                        )}
+                        <span className="text-xl font-black leading-none tracking-tight">₹{activePrice.toLocaleString()}</span>
                     </div>
 
                     {/* Quantity Selector - Compact */}
-                    <div className="flex items-center bg-muted/60 rounded-lg flex-shrink-0">
+                    <div className="flex items-center bg-muted/60 rounded-lg flex-shrink-0 h-9">
                         <button
                             onClick={decrementQty}
-                            className="w-7 h-8 flex items-center justify-center text-muted-foreground active:scale-90 disabled:opacity-40"
+                            className="w-7 h-full flex items-center justify-center text-muted-foreground active:scale-90 disabled:opacity-40"
                             disabled={quantity <= 1}
                         >
                             <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="w-6 text-center font-bold text-sm">{quantity}</span>
+                        <span className="w-5 text-center font-bold text-sm bg-transparent">{quantity}</span>
                         <button
                             onClick={incrementQty}
-                            className="w-7 h-8 flex items-center justify-center text-muted-foreground active:scale-90 disabled:opacity-40"
+                            className="w-7 h-full flex items-center justify-center text-muted-foreground active:scale-90 disabled:opacity-40"
                             disabled={quantity >= 10}
                         >
                             <Plus className="w-3.5 h-3.5" />
@@ -104,27 +109,21 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
                     {/* Buttons */}
                     <div className="flex gap-2 flex-1 min-w-0">
                         <button
-                            className={`flex-1 py-2.5 rounded-lg border-2 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all min-w-0 ${addedToCart
+                            className={`flex-1 h-11 rounded-xl border-2 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all min-w-0 ${addedToCart
                                 ? 'border-green-500 text-green-600 bg-green-50'
-                                : 'border-gray-300 text-gray-700 bg-white'
+                                : 'border-gray-200 text-gray-700 bg-white'
                                 }`}
                             onClick={handleAddToCart}
                             disabled={addedToCart}
                         >
                             {addedToCart ? (
-                                <>
-                                    <Check className="w-4 h-4 flex-shrink-0" />
-                                    <span className="truncate">Added</span>
-                                </>
+                                <Check className="w-5 h-5 flex-shrink-0" />
                             ) : (
-                                <>
-                                    <ShoppingCart className="w-4 h-4 flex-shrink-0" />
-                                    <span className="truncate">Cart</span>
-                                </>
+                                <ShoppingCart className="w-5 h-5 flex-shrink-0" />
                             )}
                         </button>
                         <button
-                            className="flex-1 py-2.5 rounded-lg bg-primary text-white font-bold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 min-w-0"
+                            className="flex-[1.5] h-11 rounded-xl bg-primary text-white font-bold text-xs shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-1.5 min-w-0"
                             onClick={handleBuyNow}
                             disabled={buyingNow}
                         >
@@ -132,8 +131,8 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
                                 <>
-                                    <ShoppingBag className="w-4 h-4 flex-shrink-0" />
-                                    <span className="truncate">Buy Now</span>
+                                    <ShoppingBag className="w-4 h-4 flex-shrink-0 fill-white/20" />
+                                    <span>Buy Now</span>
                                 </>
                             )}
                         </button>

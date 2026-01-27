@@ -11,7 +11,43 @@ import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { Package, Zap, Gauge, Weight, Battery, Gamepad2 } from 'lucide-react';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
-    // ... (state logic unchanged)
+    // State for attribute selection
+    const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(() => {
+        // Initialize with first options
+        const initial: Record<string, string> = {};
+        product.attributes?.forEach(attr => {
+            if (attr.options.length > 0) {
+                initial[attr.name] = attr.options[0];
+            }
+        });
+        return initial;
+    });
+
+    // Derived Variants State
+    const currentVariant = useMemo(() => {
+        if (!product.variants) return null;
+        return product.variants.find(v => {
+            return Object.entries(selectedAttributes).every(([key, value]) => v.attributes[key] === value);
+        }) || null;
+    }, [product.variants, selectedAttributes]);
+
+    // Images State - Updates based on variant
+    const displayImages = useMemo(() => {
+        if (currentVariant?.image) {
+            return [currentVariant.image, ...product.images.filter(img => img !== currentVariant.image)];
+        }
+        return product.images && product.images.length > 0 ? product.images : [product.image];
+    }, [currentVariant, product.images, product.image]);
+
+    // Delivery Date State (Client-side only to avoid hydration mismatch)
+    const [deliveryDate, setDeliveryDate] = useState<string>("");
+
+    useEffect(() => {
+        const date = new Date();
+        date.setDate(date.getDate() + 4);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        setDeliveryDate(date.toLocaleDateString('en-US', { weekday: 'long' }));
+    }, []);
 
     // ... (return start)
     // Feature highlights for Mobile
@@ -83,7 +119,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             <div>
                                 <p className="text-sm font-bold text-green-700 dark:text-green-400">In Stock & Ready to Ship</p>
                                 <p className="text-[10px] md:text-xs text-green-600/80 dark:text-green-500/80">
-                                    Get it by {new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'long' })}
+                                    Get it by {deliveryDate || "Saturday"}
                                 </p>
                             </div>
                         </div>
@@ -144,12 +180,14 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 <h3 className="font-bold text-lg flex items-center gap-2">
                                     <Package className="w-5 h-5 text-primary" /> What's In The Box?
                                 </h3>
-                                <div className="bg-gray-50 dark:bg-zinc-900/50 p-4 rounded-xl border">
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-800/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm">
                                     <ul className="space-y-3">
                                         {boxContent.map((item, idx) => (
-                                            <li key={idx} className="flex items-center gap-3 text-sm">
-                                                <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0" />
-                                                <span>{item}</span>
+                                            <li key={idx} className="flex items-center gap-3 text-sm font-medium">
+                                                <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                                                    <CheckCircle2 className="w-3 h-3 text-green-600 dark:text-green-400" />
+                                                </div>
+                                                <span className="text-foreground/90">{item}</span>
                                             </li>
                                         ))}
                                     </ul>

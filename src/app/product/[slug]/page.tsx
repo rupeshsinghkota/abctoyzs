@@ -20,37 +20,68 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const products = await fetchProducts();
-    const product = products.find((p) => p.slug === slug);
+    // We use the same fetcher here. 
+    // Optimization: In Next.js, requests are deduped, so calling this again is fine.
+    const products = await fetchProducts(slug);
+    const product = products.length > 0 ? products[0] : null;
 
-    if (!product) return { title: 'Product Not Found' };
+    if (!product) {
+        return {
+            title: 'Product Not Found',
+        };
+    }
 
     return {
-        title: product.meta_title || product.name,
-        description: product.meta_description || product.description.substring(0, 160),
+        title: `${product.name} - ABC Toyz`,
+        description: product.description,
+        openGraph: {
+            images: product.images || [],
+        },
     };
 }
+
+// Force dynamic rendering to ensure fresh data on every request (fixes localhost 404s due to caching)
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function ProductPage({ params }: PageProps) {
     const { slug } = await params;
 
-    const products = await fetchProducts();
-    const product = products.find((p) => p.slug === slug);
+    // Use fetchProducts(slug) which uses the Client SDK logic (createBrowserClient).
+    // This was verified to work via the /api/debug/products endpoint.
+    // We avoid createServerClient() here as it seemed to cause 404s locally (likely auth/cookie context mismatch).
+    const products = await fetchProducts(slug);
+
+    console.log(`[ProductPage] Loading slug: ${slug} | Found: ${products.length}`);
+
+    if (products.length === 0) {
+        console.warn(`[ProductPage] WARN: Product NOT found via fetchProducts(slug). attempting fallback fetch all...`);
+        // Fallback: Fetch ALL and filter (in case exact database slug match is erratic locally)
+        const all = await fetchProducts();
+        const found = all.find(p => p.slug === slug);
+        if (found) {
+            console.log(`[ProductPage] FOUND via fallback filter!`);
+            products.push(found);
+        } else {
+            console.log(`[ProductPage] NOT FOUND via fallback either.`);
+        }
+    }
+
+    const product = products.length > 0 ? products[0] : null;
 
     if (!product) {
+        console.error(`[ProductPage] Error: Product not found for slug: ${slug}`);
         notFound();
     }
 
-    // Get related products (SAME CATEGORY, excluding current)
-    const relatedProducts = products
+    // Get related products (same category, excluding current)
+    const allProducts = await fetchProducts();
+    const relatedProducts = allProducts
         .filter(p => p.id !== product.id && p.category === product.category)
-        .slice(0, 6); // Show up to 6 items in scroll
-
-    const productImages = product.images && product.images.length > 0 ? product.images : [product.image];
+        .slice(0, 6);
 
     // Feature highlights
     const highlights = [
-        { icon: Zap, label: 'Battery', value: product.specs?.battery || product.voltage || '12V Power' },
         { icon: Gauge, label: 'Speed', value: product.specs?.speed || '5-8 km/h' },
         { icon: Weight, label: 'Load', value: product.specs?.max_load || '30 kg' },
         { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : 'Remote' },
@@ -95,7 +126,7 @@ export default async function ProductPage({ params }: PageProps) {
                     <div className="text-center">
                         <h3 className="text-xl font-black mb-6">Why Kids Love It</h3>
                         <div className="grid grid-cols-4 gap-4">
-                            {highlights.map((item, idx) => (
+                            {highlights.map((item: { icon: any, label: string, value: string }, idx: number) => (
                                 <div key={idx} className="flex flex-col items-center justify-center p-5 rounded-2xl bg-secondary/10 hover:bg-secondary/20 transition-all border border-transparent hover:border-border group">
                                     <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
                                         <item.icon className="w-6 h-6 text-primary" />
@@ -132,7 +163,7 @@ export default async function ProductPage({ params }: PageProps) {
                                 What's In The Box?
                             </h3>
                             <ul className="space-y-3">
-                                {whatsInBox.map((item, idx) => (
+                                {whatsInBox.map((item: string, idx: number) => (
                                     <li key={idx} className="flex items-center gap-3 text-sm font-medium text-gray-700 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
                                         <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                                             <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
@@ -150,45 +181,35 @@ export default async function ProductPage({ params }: PageProps) {
                             <span className="px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-wider">
                                 In-Depth Review
                             </span>
-                            <h3 className="text-2xl font-black mt-3">The Ultimate Riding Experience</h3>
+                            <h3 className="text-2xl font-black mt-3">About This Ride-On</h3>
                         </div>
-
-                        <div className="prose prose-base dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed space-y-4 prose-h3:text-xl prose-h3:font-bold prose-ul:list-disc prose-ul:pl-5">
-                            {product.description ? (
-                                <div dangerouslySetInnerHTML={{ __html: product.description }} />
-                            ) : (
-                                <p>The ultimate driving experience for your little one. This premium ride-on car combines authentic styling with advanced safety features. Equipped with a powerful battery, smooth suspension, and parental remote control, it ensures hours of safe and thrilling fun.</p>
-                            )}
+                        <div className="prose prose-lg dark:prose-invert mx-auto text-gray-600 dark:text-gray-300 leading-relaxed">
+                            <p className="whitespace-pre-line">{product.description}</p>
                         </div>
                     </div>
+
                 </div>
 
-                {/* Related Products Section (Scrollable & Same Category) */}
-                <div className="mt-12 border-t pt-10 max-w-7xl mx-auto px-4 pb-24">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-black">You May Also Like</h3>
-                        <Link
-                            href={`/category/${product.category}`}
-                            className="text-xs font-bold text-primary uppercase tracking-wider hover:underline underline-offset-4 cursor-pointer flex items-center gap-1"
-                        >
-                            More {product.category}
-                            <ChevronRight className="w-3 h-3" />
-                        </Link>
+                {/* Related Products */}
+                {relatedProducts.length > 0 && (
+                    <div className="mt-16 border-t pt-16 px-4 lg:px-0">
+                        <div className="container mx-auto">
+                            <h2 className="text-2xl lg:text-3xl font-black mb-8">You Might Also Like</h2>
+                            <ProductGrid products={relatedProducts} />
+                        </div>
                     </div>
-
-                    <div className="flex overflow-x-auto pb-8 -mx-4 px-4 gap-4 snap-x hide-scrollbar scroll-smooth">
-                        {relatedProducts.map((p) => (
-                            <div key={p.id} className="snap-center shrink-0 w-[200px] md:w-[240px]">
-                                <ProductCard product={p} className="h-full" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                )}
             </main>
 
-            {/* Mobile Footer Bar */}
-            <StickyCartBar product={product} />
+            {/* Mobile Footer Spacing for Sticky Bar */}
+            <div className="h-20 lg:hidden" />
+
+            <StickyCartBar
+                product={product}
+            // Note: We pass props, but StickyCartBar typically manages its own selection state 
+            // or needs to correspond with ProductMainSection. 
+            // For now, passing base product. ProductMainSection handles the selection UI.
+            />
         </div>
     );
 }
-

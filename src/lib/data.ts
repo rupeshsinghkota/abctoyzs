@@ -202,15 +202,26 @@ export const products: Product[] = [
 ];
 
 // Data Fetching Helper
-export async function fetchProducts(): Promise<Product[]> {
+export async function fetchProducts(slug?: string): Promise<Product[]> {
     try {
         const supabase = createClient();
-        const { data, error } = await supabase
+        let query = supabase
             .from('products')
             .select('*, variants:product_variants(*)');
 
-        if (error || !data || data.length === 0) {
-            console.warn("Supabase fetch returned 0 results or failed.", error);
+        if (slug) {
+            query = query.eq('slug', slug);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error("[fetchProducts] Supabase error:", error);
+            return [];
+        }
+
+        if (!data || data.length === 0) {
+            console.warn("[fetchProducts] Warning: Supabase returned no data. count:", data?.length);
             return [];
         }
 
