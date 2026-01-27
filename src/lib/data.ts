@@ -227,6 +227,9 @@ export async function fetchProducts(): Promise<Product[]> {
             image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
             images: Array.isArray(item.images) ? item.images : [],
             description: item.description || '',
+            // Correctly map the boolean flags
+            is_new: !!item.is_new,
+            is_featured: !!item.is_featured,
             tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
             specs: item.specs || {},
             voltage: item.voltage,
@@ -287,6 +290,8 @@ export async function searchProducts(query: string): Promise<Product[]> {
             image: item.images?.[0] || '',
             images: item.images || [],
             description: item.description || '',
+            is_new: !!item.is_new,
+            is_featured: !!item.is_featured,
             tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
             specs: item.specs || {},
             voltage: item.voltage,

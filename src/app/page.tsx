@@ -13,8 +13,8 @@ export default async function Home() {
   // Filter for sections (using real logic now)
   const newArrivals = products.filter(p => p.tag === 'New' || p.is_new).slice(0, 4);
 
-  // If no 'Trending' tag exists in data, just take the high rated ones
-  const trending = products.filter(p => p.rating >= 4.8 || p.tag === 'Best Seller').slice(0, 4);
+  // If no 'Trending' tag exists in data, just take the high rated ones, or explicitly featured
+  const trending = products.filter(p => p.is_featured || p.rating >= 4.8 || p.tag === 'Best Seller').slice(0, 4);
 
   return (
     <div className="flex flex-col min-h-screen pb-20">
