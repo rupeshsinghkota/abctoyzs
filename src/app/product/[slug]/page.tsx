@@ -198,7 +198,7 @@ export default async function ProductPage({ params }: PageProps) {
                 </div>
 
                 {/* 4. Brand Promise / Trust Signals */}
-                <div className="bg-primary/5 border border-primary/10 rounded-3xl p-8 lg:p-12 text-center mt-12">
+                <div className="bg-primary/5 border border-primary/10 rounded-3xl p-8 lg:p-12 text-center mt-12 mb-12">
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-6">
                         <Star className="w-8 h-8 text-primary fill-primary" />
                     </div>
@@ -226,8 +226,6 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
                     </div>
                 </div>
-
-        </div>
 
                 {/* Related Products */ }
     {
