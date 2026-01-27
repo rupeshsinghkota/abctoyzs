@@ -46,9 +46,9 @@ export async function POST(req: Request) {
             2. VISUAL STYLE: Cinematic high-end advertising photography. 
             3. SCENE: Choose a luxury setting (e.g., modern driveway, desert road, or professional showroom).
             4. LIGHTING: Expert studio lighting with realistic reflections and soft shadows.
-            5. STRICT LOGO-ONLY BRANDING: 
-               - DO NOT generate any text (like "${BRAND_CONFIG.name}") using your own fonts or overlays. 
-               - USE ONLY the visual content of the provided BRAND_LOGO file.
+            5. CLEANING & RE-BRANDING (STRICT):
+               - REMOVE ALL EXISTING BRANDING: Identify and digitally remove any existing logos, manufacturer names, text, or badges from the original PRODUCT_IMAGE (e.g., remove "Ford", "Jeep", "Tesla", or generic toy brand names). The vehicle should be "unbranded" before you apply the new branding.
+               - LOGO-ONLY: DO NOT generate any text (like "${BRAND_CONFIG.name}") using your own fonts. USE ONLY the visual content of the provided BRAND_LOGO file.
                - DO NOT place any branding on the grill, headlights, or windows.
                - PRIMARY PLACEMENT: Place the BRAND_LOGO on the LICENSE PLATE. Scale it to fit perfectly with a small margin.
                - SECONDARY PLACEMENT: A very small, elegant badge version of the BRAND_LOGO on the HOOD or REAR.
