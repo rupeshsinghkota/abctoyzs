@@ -70,6 +70,29 @@ export const AdminService = {
         return data as Product;
     },
 
+    async getProductWithVariants(id: string) {
+        const supabase = createClient();
+
+        // 1. Get Product
+        const { data: product, error: prodError } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (prodError) throw prodError;
+
+        // 2. Get Variants
+        const { data: variants, error: varError } = await supabase
+            .from('product_variants')
+            .select('*')
+            .eq('product_id', id);
+
+        if (varError) throw varError;
+
+        return { ...product, variants: variants || [] };
+    },
+
     async createProduct(product: Partial<Product>) {
         const supabase = createClient();
         const { data, error } = await supabase
@@ -114,6 +137,27 @@ export const AdminService = {
         if (error) throw error;
     },
 
+    async replaceVariants(productId: string, variants: any[]) {
+        const supabase = createClient();
+
+        // 1. Delete existing variants
+        const { error: deleteError } = await supabase
+            .from('product_variants')
+            .delete()
+            .eq('product_id', productId);
+
+        if (deleteError) throw deleteError;
+
+        // 2. Insert new ones
+        if (variants.length > 0) {
+            const { error: insertError } = await supabase
+                .from('product_variants')
+                .insert(variants);
+
+            if (insertError) throw insertError;
+        }
+    },
+
     // Orders (Admin View)
     async getAllOrders() {
         const supabase = createClient();
@@ -147,6 +191,39 @@ export const AdminService = {
             .eq('id', orderId);
 
         if (error) throw error;
+    },
+
+    async getCustomers() {
+        // Derived from orders since we don't have a synced public profiles table yet
+        const orders = await this.getAllOrders();
+        const customerMap = new Map();
+
+        for (const order of orders) {
+            // Identifier: User ID or Name+Phone
+            const id = order.user_id || `${order.shipping_address?.name}-${order.shipping_address?.phone}`;
+
+            if (!customerMap.has(id)) {
+                customerMap.set(id, {
+                    id,
+                    name: order.shipping_address?.name || 'Guest',
+                    email: '—', // We don't have email in orders table directly usually
+                    phone: order.shipping_address?.phone || '—',
+                    totalOrders: 0,
+                    totalSpent: 0,
+                    lastOrderDate: order.created_at
+                });
+            }
+
+            const customer = customerMap.get(id);
+            customer.totalOrders++;
+            customer.totalSpent += Number(order.total_amount);
+            if (new Date(order.created_at) > new Date(customer.lastOrderDate)) {
+                customer.lastOrderDate = order.created_at;
+            }
+        }
+
+        return Array.from(customerMap.values())
+            .sort((a, b) => b.totalSpent - a.totalSpent); // Top spenders first
     },
 
     // Stats
