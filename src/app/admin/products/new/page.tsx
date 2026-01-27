@@ -350,11 +350,16 @@ export default function NewProductPage() {
 
         setIsGeneratingPosters(true);
         try {
-            // Define 3 key marketing angles
+            // Define 3 key marketing angles using REAL SPECS if available
+            const specs = formData.specs;
+            const techText = [specs.battery, specs.motor].filter(Boolean).join(" • ") || "High Performance Power";
+            const speedText = [specs.speed, specs.max_load && `Max ${specs.max_load}`].filter(Boolean).join(" | ") || "Unleash the Speed";
+            const comfortText = [specs.tire_type, specs.seats && `${specs.seats} Seater`].filter(Boolean).join(" + ") || "Premium Comfort";
+
             const angles = [
-                { type: 'Action', text: 'Unleash the Thrill', style: 'SPEED_MOTION' },
-                { type: 'Luxury', text: 'Premium Elegance', style: 'LUXURY_MINIMAL' },
-                { type: 'Detail', text: 'Exquisite Craftsmanship', style: 'LUXURY_MINIMAL' } // Reusing luxury style but prompt inside API handles it if needed, or we just trust the variety
+                { type: 'Action', text: speedText, style: 'SPEED_MOTION' },
+                { type: 'Luxury', text: comfortText, style: 'LUXURY_MINIMAL' },
+                { type: 'Tech', text: techText, style: 'LUXURY_MINIMAL' }
             ];
 
             const newBanners: string[] = [];
@@ -365,7 +370,7 @@ export default function NewProductPage() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         productName: effectiveName,
-                        featureText: angle.text,
+                        featureText: angle.text, // This now contains real specs like "12V • 4 Motors"
                         layoutStyle: angle.style,
                         productNotes: formData.prompt_notes,
                         originalImageUrl: formData.images[0]
