@@ -37,6 +37,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [isUploading, setIsUploading] = useState(false);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const [activeTab, setActiveTab] = useState('basic');
+    const [brandingIndex, setBrandingIndex] = useState<number | null>(null);
 
     // Variations State
     const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -316,6 +317,31 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             alert('AI Generation failed: ' + error.message);
         } finally {
             setIsGeneratingAI(false);
+        }
+    };
+
+    const brandImage = async (index: number) => {
+        const imageUrl = formData.images[index];
+        if (!imageUrl) return;
+
+        setBrandingIndex(index);
+        try {
+            const res = await fetch('/api/admin/ai/image/brand', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ imageUrl, productName: formData.name })
+            });
+            const { newImageUrl, error } = await res.json();
+            if (error) throw new Error(error);
+
+            const newImages = [...formData.images];
+            newImages[index] = newImageUrl;
+            setFormData({ ...formData, images: newImages });
+        } catch (error: any) {
+            console.error(error);
+            alert('Branding failed: ' + error.message);
+        } finally {
+            setBrandingIndex(null);
         }
     };
 
@@ -629,16 +655,37 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                                 Set as Main
                                                             </button>
                                                         )}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeListField('images', index)}
-                                                            className="p-2 bg-red-500 text-white rounded-full hover:scale-110 transition-transform"
-                                                        >
-                                                            <X className="w-4 h-4" />
-                                                        </button>
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => brandImage(index)}
+                                                                disabled={brandingIndex === index}
+                                                                className="p-2 bg-purple-600 text-white rounded-full hover:scale-110 transition-transform disabled:opacity-50"
+                                                                title="✨ Brand & Enhance with AI"
+                                                            >
+                                                                {brandingIndex === index ? (
+                                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                                ) : (
+                                                                    <Sparkles className="w-4 h-4" />
+                                                                )}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeListField('images', index)}
+                                                                className="p-2 bg-red-500 text-white rounded-full hover:scale-110 transition-transform"
+                                                            >
+                                                                <X className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
                                                     </div>
+                                                    {brandingIndex === index && (
+                                                        <div className="absolute inset-0 bg-purple-900/40 backdrop-blur-[2px] flex flex-col items-center justify-center text-white p-4">
+                                                            <Loader2 className="w-6 h-6 animate-spin mb-2" />
+                                                            <span className="text-[10px] font-bold text-center uppercase tracking-tighter">Branding & Enhancing...</span>
+                                                        </div>
+                                                    )}
                                                     {index === 0 && (
-                                                        <div className="absolute top-2 left-2 px-2 py-1 bg-primary text-white text-[10px] font-bold rounded-lg shadow-lg">
+                                                        <div className="absolute top-4 left-4 px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-lg shadow-lg">
                                                             MAIN
                                                         </div>
                                                     )}
