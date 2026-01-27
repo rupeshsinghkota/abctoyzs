@@ -50,7 +50,7 @@ export async function POST(req: Request) {
             
             CONTENT REQUIREMENTS:
             1. AUTHENTIC PRODUCT: Feature the vehicle prominently. Use the provided PRODUCT_IMAGE as the ONLY source for the car. The car's model, color, and features MUST remain 100% authentic and accurate to the photo.
-            2. CLEANING: surgically remove any watermarks, generic shop logos, or retailer text from other sellers found in the original PRODUCT_IMAGE. DO NOT remove original car manufacturer logos (Jeep, Ford, etc.).
+            2. CLEANING (CRITICAL): Surgically identify and remove ALL competitor watermarks, shop names, or retailer logos (e.g., "11CART", "11cart.co", etc.) from the original PRODUCT_IMAGE. Pay special attention to the WINDSHIELD, GLASS, and BODY PANELS. DO NOT remove authentic car manufacturer logos (Jeep, Ford, etc.).
             3. BRANDING: Use the provided BRAND_LOGO asset. Place it in a corner or center so it looks like an official corporate banner.
             4. MARKETING TEXT: Incorporate a punchy, high-end marketing slogan. 
                - THEME: "${featureText}"

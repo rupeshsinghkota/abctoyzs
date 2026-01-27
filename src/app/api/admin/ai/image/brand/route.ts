@@ -56,7 +56,7 @@ export async function POST(req: Request) {
                 * Front/Rear: Place on LICENSE PLATE.
                 * Side: Place on WHEEL center-caps or DOOR badge.
                 * Top: Add a subtle physical badge.
-            - CLEANING: Remove competitor watermarks/logos but KEEP authentic car brand badges (Jeep, Ford, etc.).
+            - CLEANING (CRITICAL): Surgically identify and remove ALL competitor watermarks, shop names, or retailer logos (e.g., "11CART", "11cart.co", etc.). Pay special attention to the WINDSHIELD, GLASS, and BODY PANELS. These areas must be 100% clean and free of old text. KEEP authentic car brand badges (Jeep, Ford, etc.).
             
             Output ONLY the final breathtaking 1:1 SQUARE retouched masterpiece.
         `;
