@@ -295,7 +295,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     type: 'all',
-                    notes: formData.prompt_notes
+                    notes: formData.prompt_notes,
+                    banners: formData.banners // Pass banners for AI to embed
                 })
             });
             const { data, error } = await res.json();
@@ -303,10 +304,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
             // Populate everything
             setFormData(prev => {
-                let finalDesc = data.description || prev.description;
-                if (generatedPosters.length > 0) {
-                    finalDesc = integratePostersIntoDescription(finalDesc, generatedPosters);
-                }
+                const finalDesc = data.description || prev.description;
+                // AI now handles image placement, and banners are already generated separately if needed
 
                 return {
                     ...prev,
@@ -434,10 +433,22 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         setIsGeneratingPosters(true);
         try {
             // Define 3 key marketing angles
+            // Define 3 key marketing angles using REAL SPECS if available
+            const specs = formData.specs;
+
+            // Angle 1: SPEED & POWER -> Dynamic Motion Visual
+            const speedText = [specs.speed, specs.motor].filter(Boolean).join(" | ") || "High Speed Performance";
+
+            // Angle 2: COMFORT & KIDS -> Lifestyle Visual (Child/Interior)
+            const comfortText = [specs.seats && `${specs.seats} Seater`, "Leather Seat", "Spacious"].filter(Boolean).join(" • ") || "Luxury Interior";
+
+            // Angle 3: DURABILITY & LOAD -> Rugged Visual
+            const strengthText = [specs.max_load && `Max ${specs.max_load}`, specs.tire_type].filter(Boolean).join(" + ") || "Built Tough";
+
             const angles = [
-                { type: 'Action', text: 'Unleash the Thrill', style: 'SPEED_MOTION' },
-                { type: 'Luxury', text: 'Premium Elegance', style: 'LUXURY_MINIMAL' },
-                { type: 'Detail', text: 'Exquisite Craftsmanship', style: 'LUXURY_MINIMAL' }
+                { type: 'Action', text: speedText, style: 'SPEED_MOTION' },
+                { type: 'Comfort', text: comfortText, style: 'COMFORT_LIFESTYLE' },
+                { type: 'Durability', text: strengthText, style: 'DURABILITY_OFFROAD' }
             ];
 
             const newBanners: string[] = [];
