@@ -175,12 +175,6 @@ export default async function ProductPage({ params }: PageProps) {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <h3 className="font-bold text-lg mb-2">Description</h3>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
-                                        {product.description || "Premium ride-on toy with advanced features."}
-                                    </p>
-                                </div>
                                 <ProductSpecs
                                     specs={product.specs}
                                     additionalInfo={{
@@ -188,6 +182,13 @@ export default async function ProductPage({ params }: PageProps) {
                                         "Recommended Age": product.ageGroup,
                                     }}
                                 />
+
+                                <div>
+                                    <h3 className="font-bold text-lg mb-2">Description</h3>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {product.description || "Premium ride-on toy with advanced features."}
+                                    </p>
+                                </div>
                             </div>
 
                         </div>
