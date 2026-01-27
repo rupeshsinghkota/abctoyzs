@@ -54,6 +54,35 @@ export async function POST(req: Request) {
                     "weight": "e.g. 15kg"
                 }
             `;
+        } else if (type === 'all') {
+            prompt = `
+                You are a product data expert. I will provide you with a raw text snippet or notes about a ride-on toy product.
+                Your task is to extract and generate ALL relevant product details into a clean JSON format.
+                
+                RAW PRODUCT DATA/NOTES:
+                "${notes}"
+                
+                Return ONLY a JSON object with this exact structure (if info is missing, suggest realistic values):
+                {
+                    "name": "Professional product name",
+                    "description": "High-converting Markdown description",
+                    "specs": {
+                        "battery": "e.g. 12V 7Ah",
+                        "motor": "e.g. 2 x 35W",
+                        "speed": "e.g. 3-5 km/h",
+                        "max_load": "e.g. 30kg",
+                        "tire_type": "e.g. EVA Rubber",
+                        "seats": "1 or 2",
+                        "mobile_app": true/false,
+                        "remote_control": true/false
+                    },
+                    "logistics": {
+                        "whats_in_the_box": ["Charger", "Manual", etc.],
+                        "product_dimensions": "L x W x H in cm",
+                        "gross_weight": "Weight in kg"
+                    }
+                }
+            `;
         }
 
         const result = await model.generateContent(prompt);

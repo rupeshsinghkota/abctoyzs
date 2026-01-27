@@ -194,6 +194,55 @@ export default function NewProductPage() {
         }
     };
 
+    const generateFullProduct = async () => {
+        if (!formData.prompt_notes) {
+            alert('Please enter some product details or notes first');
+            return;
+        }
+
+        setIsGeneratingAI(true);
+        try {
+            const res = await fetch('/api/admin/ai/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'all',
+                    notes: formData.prompt_notes
+                })
+            });
+            const { data, error } = await res.json();
+            if (error) throw new Error(error);
+
+            // Populate everything
+            setFormData({
+                ...formData,
+                name: data.name || formData.name,
+                description: data.description || formData.description,
+                product_dimensions: data.logistics?.product_dimensions || formData.product_dimensions,
+                gross_weight: data.logistics?.gross_weight || formData.gross_weight,
+                box_content: data.logistics?.whats_in_the_box || formData.box_content,
+                specs: {
+                    ...formData.specs,
+                    battery: data.specs?.battery || formData.specs.battery,
+                    motor: data.specs?.motor || formData.specs.motor,
+                    speed: data.specs?.speed || formData.specs.speed,
+                    max_load: data.specs?.max_load || formData.specs.max_load,
+                    tire_type: data.specs?.tire_type || formData.specs.tire_type,
+                    seats: data.specs?.seats?.toString() || formData.specs.seats,
+                    mobile_app: data.specs?.mobile_app ?? formData.specs.mobile_app,
+                    remote_control: data.specs?.remote_control ?? formData.specs.remote_control,
+                }
+            });
+
+            alert('✨ Product details generated successfully!');
+        } catch (error: any) {
+            console.error(error);
+            alert('AI Generation failed: ' + error.message);
+        } finally {
+            setIsGeneratingAI(false);
+        }
+    };
+
     // --- Logic ---
 
     // 1. Generate Variants from Attributes
@@ -416,17 +465,28 @@ export default function NewProductPage() {
                                 </div>
 
                                 <div className="p-4 bg-purple-50 dark:bg-purple-900/10 rounded-2xl border-2 border-purple-100 dark:border-purple-500/20 space-y-3">
-                                    <label className="text-xs font-bold uppercase text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
-                                        <Sparkles className="w-3 h-3" /> Manual Notes for AI (Context)
-                                    </label>
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-xs font-bold uppercase text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                                            <Sparkles className="w-3 h-3" /> AI Source Details (Generate All)
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={generateFullProduct}
+                                            disabled={isGeneratingAI || !formData.prompt_notes}
+                                            className="text-[10px] sm:text-xs px-4 py-1.5 bg-purple-600 text-white rounded-lg transition-all font-bold flex items-center gap-1.5 hover:bg-purple-700 shadow-sm disabled:opacity-50"
+                                        >
+                                            {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                            {isGeneratingAI ? 'Generating All...' : '✨ Magic Generate Everything'}
+                                        </button>
+                                    </div>
                                     <textarea
                                         value={formData.prompt_notes}
                                         onChange={(e) => setFormData({ ...formData, prompt_notes: e.target.value })}
                                         className="w-full px-4 py-3 bg-background border rounded-xl text-sm focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"
-                                        placeholder="e.g. Blue color, 4WD, music system, with remote, 2-seater jeep..."
-                                        rows={3}
+                                        placeholder="Paste supplier details, manufacturer notes, or raw product text here..."
+                                        rows={4}
                                     />
-                                    <p className="text-[10px] text-purple-400 font-medium">Add specific features or specs here. The AI will use these notes to generate everything!</p>
+                                    <p className="text-[10px] text-purple-400 font-medium">Tip: Paste a whole product page snippet here, and the AI will fill out the name, description, specs, and logistics automatically!</p>
                                 </div>
 
                                 <div>
