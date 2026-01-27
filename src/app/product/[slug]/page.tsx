@@ -183,8 +183,26 @@ export default async function ProductPage({ params }: PageProps) {
                             </span>
                             <h3 className="text-2xl font-black mt-3">About This Ride-On</h3>
                         </div>
+
+                        {/* Marketing Banners */}
+                        {product.banners && product.banners.length > 0 && (
+                            <div className="space-y-6 mb-10">
+                                {product.banners.map((banner, index) => (
+                                    <div key={index} className="relative w-full rounded-2xl overflow-hidden shadow-md">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={banner}
+                                            alt={`${product.name} Feature ${index + 1}`}
+                                            className="w-full h-auto object-cover"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <div
-                            className="prose prose-lg dark:prose-invert mx-auto text-gray-600 dark:text-gray-300 leading-relaxed"
+                            className="prose prose-lg dark:prose-invert mx-auto text-gray-600 dark:text-gray-300 leading-relaxed prose-img:rounded-2xl prose-img:shadow-md prose-headings:font-black prose-headings:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-foreground"
                             dangerouslySetInnerHTML={{ __html: product.description }}
                         />
                     </div>
