@@ -32,30 +32,29 @@ export async function POST(req: Request) {
 
         // Step 3: Generate Branded/Enhanced Version
         const prompt = `
-            ROLE: You are a World-Class Commercial Photographer and Art Director for "${BRAND_CONFIG.name}".
+            ROLE: You are the world's most elite Commercial Photographer and Art Director, specialized in high-stakes automotive advertising for "${BRAND_CONFIG.name}".
             
             ASSETS PROVIDED:
             1. PRODUCT_IMAGE: The original photo of the vehicle.
             2. BRAND_LOGO: The official "${BRAND_CONFIG.name}" logo file.
             
             TASK: 
-            Transform the PRODUCT_IMAGE into a "STUNNING HIGHEST-END ADVERTISING PHOTOSHOOT". Use the provided BRAND_LOGO asset as your SOLE source for branding.
+            Transform the PRODUCT_IMAGE into an "AMAZING COMMERCIAL PHOTOGRAPHY MASTERPIECE" that would be the centerpiece of a global advertising campaign. It must look absolutely stunning on a premium product page and high-impact television or digital ads.
             
             ARTISTIC DIRECTION:
             1. ASPECT RATIO: The final image MUST be a PERFECT 1:1 SQUARE.
-            2. VISUAL STYLE: Cinematic high-end advertising photography. 
-            3. SCENE: Choose a luxury setting (e.g., modern driveway, desert road, or professional showroom).
-            4. LIGHTING: Expert studio lighting with realistic reflections and soft shadows.
-            5. CLEANING & RE-BRANDING (STRICT):
-               - REMOVE ALL EXISTING BRANDING: Identify and digitally remove any existing logos, manufacturer names, text, or badges from the original PRODUCT_IMAGE (e.g., remove "Ford", "Jeep", "Tesla", or generic toy brand names). The vehicle should be "unbranded" before you apply the new branding.
-               - LOGO-ONLY: DO NOT generate any text (like "${BRAND_CONFIG.name}") using your own fonts. USE ONLY the visual content of the provided BRAND_LOGO file.
-               - DO NOT place any branding on the grill, headlights, or windows.
-               - PRIMARY PLACEMENT: Place the BRAND_LOGO on the LICENSE PLATE. Scale it to fit perfectly with a small margin.
-               - SECONDARY PLACEMENT: A very small, elegant badge version of the BRAND_LOGO on the HOOD or REAR.
-               - INTEGRATION: The logo must look like a physical part of the car, matching the lighting, texture, and perspective perfectly.
-            6. QUALITY: 8k resolution, razor-sharp focus, professional background blur.
+            2. VISUAL STYLE: Ultra-luxurious, cinematic, and hyper-realistic. The toy vehicle should be indistinguishable from a full-sized exotic supercar or premium SUV.
+            3. SCENE & COMPOSITION: Create a breathtaking, high-end environment (e.g., a modern architectural masterpiece, a sunset mountain road, or a futuristic neon-lit showroom). Ensure the vehicle's stance is powerful and heroic.
+            4. LIGHTING & ATMOSPHERE: Use complex "Golden Hour" lighting or high-end studio light-painting. Include incredibly realistic specular highlights, volumetric lighting, and deep, rich shadows.
+            5. CLEANING & RE-BRANDING (ELITE INTEGRATION):
+               - REMOVE ALL PRIOR BRANDING: Digitally scrub all original manufacturer logos, text, or generic badges.
+               - LOGO-ONLY: Use the provided BRAND_LOGO asset as the SOLE source of branding. No generic fonts.
+               - PLACEMENT: Integrate the logo onto the LICENSE PLATE and as a subtle, high-gloss "physical badge" on the hood or trunk. It must follow the car's curvature and lighting perfectly.
+            6. TECHNICAL EXCELLENCE: 
+               - MATERIALITY: Render hyper-realistic paint finishes (metallic flakes, deep gloss, or satin matte) and authentic tire and carbon-fiber textures.
+               - OPTICS: Use professional "depth of field" (bokeh) to make the vehicle pop. 8k resolution textures with zero artifacts.
             
-            Output ONLY the final high-resolution square masterpiece.
+            Output ONLY the final breathtaking high-resolution square masterpiece.
         `;
 
         const result = await model.generateContent([
