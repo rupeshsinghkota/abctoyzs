@@ -4,6 +4,7 @@ export interface Product {
     name: string;
     category: string; // Primary: cars, jeeps, bikes, etc.
     price: number;
+    mrp?: number;
     rating: number;
     reviews: number;
     image: string;
@@ -208,8 +209,8 @@ export async function fetchProducts(): Promise<Product[]> {
             .select('*, variants:product_variants(*)');
 
         if (error || !data || data.length === 0) {
-            console.warn("Supabase fetch failed or empty, using static fallback.", error);
-            return products;
+            console.warn("Supabase fetch returned 0 results or failed.", error);
+            return [];
         }
 
         return data.map((item: any) => ({
@@ -218,6 +219,7 @@ export async function fetchProducts(): Promise<Product[]> {
             name: item.name,
             category: item.category_id ? 'unknown' : 'cars',
             price: item.base_price,
+            mrp: item.mrp,
             rating: item.rating || 0,
             reviews: item.review_count || 0,
             image: item.images?.[0] || '',
@@ -242,7 +244,8 @@ export async function fetchProducts(): Promise<Product[]> {
         })) as Product[];
 
     } catch (e) {
-        return products;
+        console.error("fetchProducts error:", e);
+        return [];
     }
 }
 
@@ -258,9 +261,8 @@ export async function searchProducts(query: string): Promise<Product[]> {
             .ilike('name', `%${query}%`);
 
         if (error || !data) {
-            console.warn("Supabase search failed, falling back to static filter.", error);
-            // Make sure we have a fallback if the DB is empty but we want to show *something* for demo purposes
-            return products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+            console.warn("Supabase search failed.", error);
+            return [];
         }
 
         // If DB returns empty array (valid search but no results), rely on that unless we want to force static data?
@@ -268,9 +270,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
         // For now, let's respect the DB result. If it's empty, it's empty. Use fallback only on error or null.
 
         if (data.length === 0) {
-            // Optional: If DB is empty, fallback to static so the user sees results. WDYT?
-            // Let's fallback if DB is empty to satisfy the "demo" feeling if they haven't seeded.
-            return products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+            return [];
         }
 
         return data.map((item: any) => ({
@@ -279,6 +279,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
             name: item.name,
             category: 'cars',
             price: item.base_price,
+            mrp: item.mrp,
             rating: item.rating || 0,
             reviews: item.review_count || 0,
             image: item.images?.[0] || '',
@@ -295,6 +296,6 @@ export async function searchProducts(query: string): Promise<Product[]> {
 
     } catch (e) {
         console.error("Search error:", e);
-        return products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+        return [];
     }
 }

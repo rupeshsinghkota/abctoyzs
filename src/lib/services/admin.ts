@@ -6,6 +6,7 @@ export type Product = {
     name: string;
     description: string;
     base_price: number;
+    mrp?: number;
     category: string;
     subcategory?: string;
     images: string[];

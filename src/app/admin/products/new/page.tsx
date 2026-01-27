@@ -47,6 +47,7 @@ export default function NewProductPage() {
         name: '',
         description: '',
         base_price: '',
+        mrp: '',
         category: 'cars',
         subcategory: '',
         images: [''],
@@ -440,6 +441,7 @@ export default function NewProductPage() {
                 ...formData,
                 slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
                 base_price: parseFloat(formData.base_price) || 0,
+                mrp: formData.mrp ? parseFloat(formData.mrp) : undefined,
                 stock: parseInt(formData.stock) || 0,
                 images: formData.images.filter(img => img.trim()),
                 videos: formData.videos.filter(v => v.trim()),
@@ -1219,8 +1221,8 @@ export default function NewProductPage() {
                         {activeTab === 'pricing' && (
                             <div className="bg-card border rounded-3xl p-6 space-y-6">
                                 <div className="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Price ($)</label>
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Selling Price (₹)</label>
                                         <input
                                             type="number"
                                             step="0.01"
@@ -1228,6 +1230,17 @@ export default function NewProductPage() {
                                             value={formData.base_price}
                                             onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
                                             className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none text-2xl font-bold"
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">MRP (₹)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={formData.mrp}
+                                            onChange={(e) => setFormData({ ...formData, mrp: e.target.value })}
+                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none text-2xl font-bold text-muted-foreground"
                                             placeholder="0.00"
                                         />
                                     </div>
@@ -1271,7 +1284,10 @@ export default function NewProductPage() {
                             <div className="p-5">
                                 <h3 className="font-bold text-lg mb-1">{formData.name || 'Product Name'}</h3>
                                 <div className="flex justify-between items-center">
-                                    <p className="text-2xl font-black text-primary">${formData.base_price || '0.00'}</p>
+                                    <p className="text-2xl font-black text-primary">₹{formData.base_price || '0.00'}</p>
+                                    {formData.mrp && Number(formData.mrp) > Number(formData.base_price) && (
+                                        <span className="text-sm text-muted-foreground line-through">₹{formData.mrp}</span>
+                                    )}
                                     {variants.length > 0 && <span className="text-xs bg-muted px-2 py-1 rounded font-bold">{variants.length} Variations</span>}
                                 </div>
                             </div>

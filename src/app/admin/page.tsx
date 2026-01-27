@@ -41,7 +41,7 @@ export default function AdminDashboard() {
         {
             icon: DollarSign,
             label: 'Total Revenue',
-            value: `$${stats.totalRevenue.toFixed(2)}`,
+            value: `₹${stats.totalRevenue.toLocaleString()}`,
             color: 'text-green-600',
             bgColor: 'bg-green-50 dark:bg-green-950'
         },
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
         {
             icon: TrendingUp,
             label: 'Avg Order Value',
-            value: stats.totalOrders > 0 ? `$${(stats.totalRevenue / stats.totalOrders).toFixed(2)}` : '$0',
+            value: stats.totalOrders > 0 ? `₹${(stats.totalRevenue / stats.totalOrders).toLocaleString()}` : '₹0',
             color: 'text-orange-600',
             bgColor: 'bg-orange-50 dark:bg-orange-950'
         },

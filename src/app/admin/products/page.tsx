@@ -104,7 +104,7 @@ export default function ProductsPage() {
                         </div>
                         <span className="text-sm font-semibold text-muted-foreground">Inventory Value</span>
                     </div>
-                    <p className="text-3xl font-black">${totalValue.toLocaleString()}</p>
+                    <p className="text-3xl font-black">₹{totalValue.toLocaleString()}</p>
                 </div>
                 <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20 rounded-2xl p-5">
                     <div className="flex items-center gap-3 mb-3">
@@ -289,8 +289,13 @@ export default function ProductsPage() {
                                 </p>
                                 <div className="flex items-center justify-between">
                                     <p className="text-2xl font-black text-primary">
-                                        ${product.base_price.toLocaleString()}
+                                        ₹{product.base_price.toLocaleString()}
                                     </p>
+                                    {product.mrp && product.mrp > product.base_price && (
+                                        <p className="text-xs text-muted-foreground line-through ml-2">
+                                            ₹{product.mrp.toLocaleString()}
+                                        </p>
+                                    )}
                                     <div className="flex items-center gap-1 text-yellow-500">
                                         <Star className="w-4 h-4 fill-current" />
                                         <span className="font-bold text-sm">{product.rating || '0.0'}</span>
@@ -341,7 +346,7 @@ export default function ProductsPage() {
                                             </span>
                                         </td>
                                         <td className="p-4">
-                                            <span className="text-lg font-bold">${product.base_price.toLocaleString()}</span>
+                                            <span className="text-lg font-bold">₹{product.base_price.toLocaleString()}</span>
                                         </td>
                                         <td className="p-4">
                                             <span className={`px-3 py-1.5 text-xs font-bold rounded-full ${product.stock > 10 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :

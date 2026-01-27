@@ -52,7 +52,9 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
                     <div className="flex items-center justify-between pt-1">
                         <div className="flex flex-col">
-                            <span className="text-xs text-gray-400 line-through">₹{Math.round(product.price * 1.2).toLocaleString()}</span>
+                            {product.mrp && product.mrp > product.price && (
+                                <span className="text-xs text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>
+                            )}
                             <span className="text-base font-bold text-gray-900 dark:text-gray-100">₹{product.price.toLocaleString()}</span>
                         </div>
                     </div>

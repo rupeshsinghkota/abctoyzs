@@ -1,5 +1,5 @@
 import { ProductGrid } from '@/components/shop/ProductGrid';
-import { products, AGE_CATEGORIES } from '@/lib/data';
+import { fetchProducts, AGE_CATEGORIES } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
 
@@ -16,7 +16,8 @@ export default async function AgeCategoryPage({ params }: AgeCategoryPageProps) 
     const categoryInfo = AGE_CATEGORIES.find(c => c.value === slug);
     if (!categoryInfo) notFound();
 
-    // Filter products
+    // Fetch and filter products
+    const products = await fetchProducts();
     const filteredProducts = products.filter(p => p.ageGroup === slug);
 
     return (

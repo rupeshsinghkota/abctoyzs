@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { WishlistService } from '@/lib/services/wishlist';
-import { products, Product } from '@/lib/data';
+import { fetchProducts, Product } from '@/lib/data';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { Heart, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -29,8 +29,8 @@ export default function WishlistPage() {
 
         try {
             const wishlistIds = await WishlistService.getWishlist();
-            // For now, filter static products. Later, fetch from DB.
-            const filteredProducts = products.filter(p => wishlistIds.includes(p.id));
+            const allProducts = await fetchProducts();
+            const filteredProducts = allProducts.filter(p => wishlistIds.includes(p.id));
             setWishlistProducts(filteredProducts);
         } catch (error) {
             console.error(error);
