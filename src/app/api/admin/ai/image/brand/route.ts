@@ -46,10 +46,10 @@ export async function POST(req: Request) {
             2. VISUAL STYLE: Ultra-luxurious, cinematic, and hyper-realistic. The toy vehicle should be indistinguishable from a full-sized exotic supercar or premium SUV.
             3. SCENE & COMPOSITION: Create a breathtaking, high-end environment (e.g., a modern architectural masterpiece, a sunset mountain road, or a futuristic neon-lit showroom). Ensure the vehicle's stance is powerful and heroic.
             4. LIGHTING & ATMOSPHERE: Use complex "Golden Hour" lighting or high-end studio light-painting. Include incredibly realistic specular highlights, volumetric lighting, and deep, rich shadows.
-            5. CLEANING & RE-BRANDING (ELITE INTEGRATION):
-               - REMOVE ALL PRIOR BRANDING: Digitally scrub all original manufacturer logos, text, or generic badges.
-               - LOGO-ONLY: Use the provided BRAND_LOGO asset as the SOLE source of branding. No generic fonts.
-               - PLACEMENT: Integrate the logo onto the LICENSE PLATE and as a subtle, high-gloss "physical badge" on the hood or trunk. It must follow the car's curvature and lighting perfectly.
+            5. AUTHENTIC CO-BRANDING (ELITE INTEGRATION):
+               - KEEP ORIGINAL CAR BRANDING: Do NOT remove any existing manufacturer logos, names, or badges (e.g., keep "Jeep", "Ford", "Mercedes" logos). The vehicle should retain its authentic brand identity.
+               - ADD BRAND LOGO: Use the provided BRAND_LOGO asset as the SOLE source for the new branding. No generic fonts.
+               - PLACEMENT: Integrate the BRAND_LOGO onto the LICENSE PLATE and as a subtle, high-gloss "physical badge" on the hood or rear (ensuring it doesn't overlap or obscure the original manufacturer branding). It must follow the car's curvature and lighting perfectly.
             6. TECHNICAL EXCELLENCE: 
                - MATERIALITY: Render hyper-realistic paint finishes (metallic flakes, deep gloss, or satin matte) and authentic tire and carbon-fiber textures.
                - OPTICS: Use professional "depth of field" (bokeh) to make the vehicle pop. 8k resolution textures with zero artifacts.
