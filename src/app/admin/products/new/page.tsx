@@ -215,7 +215,8 @@ export default function NewProductPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     type: 'all',
-                    notes: formData.prompt_notes
+                    notes: formData.prompt_notes,
+                    banners: formData.banners // Pass banners for AI to embed
                 })
             });
             const { data, error } = await res.json();
@@ -223,11 +224,9 @@ export default function NewProductPage() {
 
             // Populate everything
             setFormData(prev => {
-                let finalDesc = data.description || prev.description;
-                // If we already have posters, weave them back into the new AI description
-                if (generatedPosters.length > 0) {
-                    finalDesc = integratePostersIntoDescription(finalDesc, generatedPosters);
-                }
+                const finalDesc = data.description || prev.description;
+                // AI now handles image placement, so no manual injection needed
+
 
                 return {
                     ...prev,
