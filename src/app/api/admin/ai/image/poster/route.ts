@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { BRAND_CONFIG } from "@/config/brand";
 import { createClient } from "@/lib/supabase/server";
@@ -16,7 +16,15 @@ export async function POST(req: Request) {
         }
 
         const supabase = await createClient();
-        const model = genAI.getGenerativeModel({ model: "gemini-3-pro-image-preview" });
+        const model = genAI.getGenerativeModel({
+            model: "gemini-3-pro-image-preview",
+            safetySettings: [
+                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+            ]
+        });
 
         // Fetch Logo
         const logoPath = path.join(process.cwd(), 'public', BRAND_CONFIG.logoWide);
@@ -62,7 +70,33 @@ export async function POST(req: Request) {
         const result = await model.generateContent(inputs);
         const response = await result.response;
 
-        const newImageBase64 = response.candidates![0].content.parts[0].inlineData!.data;
+        // Robust check for response candidates
+        if (!response.candidates || response.candidates.length === 0) {
+            // Check if it was blocked by safety filters
+            const blockReason = response.promptFeedback?.blockReason;
+            if (blockReason) {
+                console.error("Poster Generation Blocked:", blockReason, response.promptFeedback);
+                throw new Error(`Poster generation was blocked by safety filters: ${blockReason}. Please try different product notes.`);
+            }
+
+            console.error("Gemini Poster Error (No Candidates):", JSON.stringify(response, null, 2));
+            throw new Error("The AI failed to generate the poster. Please try again or simplify the product context.");
+        }
+
+        const candidate = response.candidates[0];
+
+        // Check for finish reason
+        if (candidate.finishReason !== "STOP" && candidate.finishReason !== "MAX_TOKENS" && !candidate.content?.parts?.[0]?.inlineData) {
+            console.error("Poster Generation Stopped Prematurely:", candidate.finishReason, candidate.safetyRatings);
+            throw new Error(`Poster generation stopped unexpectedly (${candidate.finishReason}). This is usually due to safety filters.`);
+        }
+
+        if (!candidate.content?.parts?.[0]?.inlineData) {
+            console.error("Incomplete Poster Response:", JSON.stringify(candidate, null, 2));
+            throw new Error("The AI returned a partial response without poster data. Please try again.");
+        }
+
+        const newImageBase64 = candidate.content.parts[0].inlineData.data;
         const newImageBuffer = Buffer.from(newImageBase64, 'base64');
 
         const filename = `poster_${Date.now()}.jpg`;

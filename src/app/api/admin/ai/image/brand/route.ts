@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { BRAND_CONFIG } from "@/config/brand";
 import { createClient } from "@/lib/supabase/server";
@@ -17,8 +17,16 @@ export async function POST(req: Request) {
 
         const supabase = await createClient();
 
-        // Using the verified model for image generation
-        const model = genAI.getGenerativeModel({ model: "gemini-3-pro-image-preview" });
+        // Using the verified model for image generation with relaxed safety for commercial use
+        const model = genAI.getGenerativeModel({
+            model: "gemini-3-pro-image-preview",
+            safetySettings: [
+                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+            ]
+        });
 
         // Step 1: Download original product image
         const imageRes = await fetch(imageUrl);
@@ -60,13 +68,34 @@ export async function POST(req: Request) {
         ]);
 
         const response = await result.response;
-        const candidates = response.candidates;
 
-        if (!candidates || candidates.length === 0 || !candidates[0].content.parts[0].inlineData) {
-            throw new Error("AI failed to generate an image response.");
+        // Robust check for response candidates
+        if (!response.candidates || response.candidates.length === 0) {
+            // Check if it was blocked by safety filters
+            const blockReason = response.promptFeedback?.blockReason;
+            if (blockReason) {
+                console.error("AI Generation Blocked:", blockReason, response.promptFeedback);
+                throw new Error(`AI generation was blocked by safety filters: ${blockReason}. Please try a different product image.`);
+            }
+
+            console.error("Gemini Response Error (No Candidates):", JSON.stringify(response, null, 2));
+            throw new Error("The AI failed to generate an image. This can happen due to specialized lighting or complex backgrounds. Please try again or use a different photo.");
         }
 
-        const newImageBase64 = candidates[0].content.parts[0].inlineData.data;
+        const candidate = response.candidates[0];
+
+        // Check for finish reason (e.g., SAFETY, RECITATION)
+        if (candidate.finishReason !== "STOP" && candidate.finishReason !== "MAX_TOKENS" && !candidate.content?.parts?.[0]?.inlineData) {
+            console.error("Generation Stopped Prematurely:", candidate.finishReason, candidate.safetyRatings);
+            throw new Error(`AI generation stopped unexpectedly (${candidate.finishReason}). This is usually due to safety filters or image complexity.`);
+        }
+
+        if (!candidate.content?.parts?.[0]?.inlineData) {
+            console.error("Incomplete Response Part:", JSON.stringify(candidate, null, 2));
+            throw new Error("The AI returned an partial response without image data. Please try again.");
+        }
+
+        const newImageBase64 = candidate.content.parts[0].inlineData.data;
         const newImageBuffer = Buffer.from(newImageBase64, 'base64');
 
         // Step 3: Upload back to Supabase
