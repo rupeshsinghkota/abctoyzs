@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
     try {
-        const { productName, category, type } = await req.json();
+        const { productName, category, type, notes } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
@@ -14,11 +14,13 @@ export async function POST(req: Request) {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         let prompt = "";
+        const contextString = notes ? `\nADDTIONAL CONTEXT/NOTES FROM USER: "${notes}"\nHighly prioritize these details in your response.` : "";
 
         if (type === 'description') {
             prompt = `
                 You are a premium ride-on toy marketing expert. 
                 Write a high-converting, professional product description for a "${productName}" in the "${category}" category.
+                ${contextString}
                 Use Markdown formatting. Include:
                 - A catchy opening paragraph.
                 - A "Key Features" bulleted list.
@@ -29,6 +31,7 @@ export async function POST(req: Request) {
         } else if (type === 'specs') {
             prompt = `
                 Suggest realistic technical specifications for a "${productName}" in the "${category}" category.
+                ${contextString}
                 Output ONLY a JSON object with the following potential fields:
                 {
                     "Battery": "e.g. 12V 7Ah",
@@ -43,6 +46,7 @@ export async function POST(req: Request) {
         } else if (type === 'logistics') {
             prompt = `
                 Suggest logistics and "What's in the box" details for a "${productName}" in the "${category}" category.
+                ${contextString}
                 Output ONLY a JSON object with the following fields:
                 {
                     "whats_in_the_box": ["Item 1", "Item 2", ...],

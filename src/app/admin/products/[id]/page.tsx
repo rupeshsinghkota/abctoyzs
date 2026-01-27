@@ -57,6 +57,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         stock: '0',
         is_new: false,
         is_featured: false,
+        prompt_notes: '', // context for AI
         product_dimensions: '',
         box_dimensions: '',
         net_weight: '',
@@ -99,6 +100,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 stock: data.stock?.toString() || '0',
                 is_new: data.is_new || false,
                 is_featured: data.is_featured || false,
+                prompt_notes: '', // Notes are ephemeral and not saved in DB usually, or you can save them if you want. 
+                // For now, let's keep it empty for fresh prompt on edit.
                 product_dimensions: data.product_dimensions || '',
                 box_dimensions: data.box_dimensions || '',
                 net_weight: data.net_weight || '',
@@ -178,7 +181,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 body: JSON.stringify({
                     productName: formData.name,
                     category: formData.category,
-                    type: 'description'
+                    type: 'description',
+                    notes: formData.prompt_notes
                 })
             });
             const { data, error } = await res.json();
@@ -206,7 +210,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 body: JSON.stringify({
                     productName: formData.name,
                     category: formData.category,
-                    type: 'specs'
+                    type: 'specs',
+                    notes: formData.prompt_notes
                 })
             });
             const { data, error } = await res.json();
@@ -244,7 +249,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 body: JSON.stringify({
                     productName: formData.name,
                     category: formData.category,
-                    type: 'logistics'
+                    type: 'logistics',
+                    notes: formData.prompt_notes
                 })
             });
             const { data, error } = await res.json();
@@ -490,6 +496,20 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             placeholder="e.g. Sports, Luxury"
                                         />
                                     </div>
+                                </div>
+
+                                <div className="p-4 bg-purple-50 dark:bg-purple-900/10 rounded-2xl border-2 border-purple-100 dark:border-purple-500/20 space-y-3">
+                                    <label className="text-xs font-bold uppercase text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                                        <Sparkles className="w-3 h-3" /> Manual Notes for AI (Context)
+                                    </label>
+                                    <textarea
+                                        value={formData.prompt_notes}
+                                        onChange={(e) => setFormData({ ...formData, prompt_notes: e.target.value })}
+                                        className="w-full px-4 py-3 bg-background border rounded-xl text-sm focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"
+                                        placeholder="e.g. Blue color, 4WD, music system, with remote, 2-seater jeep..."
+                                        rows={3}
+                                    />
+                                    <p className="text-[10px] text-purple-400 font-medium">Add specific features or specs here. The AI will use these notes to generate everything!</p>
                                 </div>
 
                                 <div>
