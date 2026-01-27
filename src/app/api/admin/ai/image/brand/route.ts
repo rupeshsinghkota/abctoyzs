@@ -48,11 +48,13 @@ export async function POST(req: Request) {
             4. LIGHTING mastery: Professional studio lighting with realistic reflections on all surfaces.
             5. HYPER-REALISTIC BRANDING (NO "ODD" OVERLAYS): 
                - Integrate the BRAND_LOGO so it looks like a physical, factory-fitted part of the vehicle. 
+               - PROPORTION & SCALE: The logo MUST be sized appropriately and tastefully. Do NOT make it excessively large. It should follow the scale of real-world automotive badging. For example:
+                 - On the LICENSE PLATE: It must fit perfectly within the plate's borders with a small margin.
+                 - On the BODY: It should be sized like an elegant decorative decal or factory badge, not a giant billboard.
                - It must NOT look like a flat digital sticker. 
-               - If placed on a curved surface (like a hood or side door), the logo MUST follow the CURVATURE and PERSPECTIVE of that surface perfectly.
-               - MATCH THE LIGHTING: If there is a bright reflection on the car where the logo is, that reflection MUST also affect the logo (specular highlights).
-               - MATERIALITY: Treat the logo as if it's either "HIGH-GLOSS PAINTED", "EMBOSSED CHROME", or a "PHYSICAL ACRYLIC BADGE" with subtle thickness and shadows.
-               - BLENDING: The logo's texture must match the grain and finish of the paint it sits upon.
+               - If placed on a curved surface, the logo MUST follow the CURVATURE and PERSPECTIVE perfectly.
+               - MATCH THE LIGHTING: Specify specular highlights and shadows that match the car's environment.
+               - MATERIALITY: Treat as a "HIGH-GLOSS PAINTED", "EMBOSSED CHROME", or "PHYSICAL BADGE".
             6. QUALITY: 8k resolution textures, crystal clear focus, and professional bokeh.
             
             Output ONLY the final high-resolution square masterpiece.
