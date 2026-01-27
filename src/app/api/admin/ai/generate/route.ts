@@ -90,12 +90,14 @@ export async function POST(req: Request) {
         const response = await result.response;
         let text = response.text();
 
-        // If it's specs or logistics, try to parse JSON from the markdown block
-        if (type === 'specs' || type === 'logistics') {
+        // If it's specs, logistics, or all, try to parse JSON from the markdown block
+        if (type === 'specs' || type === 'logistics' || type === 'all') {
             try {
-                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                // Remove markdown backticks if present
+                const cleanText = text.replace(/```json|```/g, '').trim();
+                const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
                 if (jsonMatch) {
-                    text = JSON.parse(jsonMatch[0]);
+                    return NextResponse.json({ data: JSON.parse(jsonMatch[0]) });
                 }
             } catch (e) {
                 console.error("Failed to parse AI JSON:", e);
