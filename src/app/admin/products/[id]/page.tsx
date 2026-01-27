@@ -354,12 +354,15 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
         setIsBrandingAll(true);
         try {
-            // Process images sequentially
-            for (let i = 0; i < formData.images.length; i++) {
-                if (formData.images[i].trim()) {
-                    await brandImage(i);
+            // Process ALL in parallel for a true "at once" experience
+            const brandingPromises = formData.images.map((img, i) => {
+                if (img.trim()) {
+                    return brandImage(i);
                 }
-            }
+                return Promise.resolve(null);
+            });
+
+            await Promise.all(brandingPromises);
             alert('✨ All images branded and enhanced successfully!');
         } catch (error: any) {
             console.error(error);

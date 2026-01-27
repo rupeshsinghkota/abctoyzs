@@ -278,12 +278,15 @@ export default function NewProductPage() {
 
         setIsBrandingAll(true);
         try {
-            // Process images sequentially to avoid overloading model and for better feedback
-            for (let i = 0; i < formData.images.length; i++) {
-                if (formData.images[i].trim()) {
-                    await brandImage(i);
+            // Process ALL images in parallel for a true "at once" experience
+            const brandingPromises = formData.images.map((img, i) => {
+                if (img.trim()) {
+                    return brandImage(i);
                 }
-            }
+                return Promise.resolve(null);
+            });
+
+            await Promise.all(brandingPromises);
             alert('✨ All images branded and enhanced successfully!');
         } catch (error: any) {
             console.error(error);
