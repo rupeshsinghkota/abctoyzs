@@ -5,6 +5,7 @@ import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
 import { ShoppingBag, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { QuantitySelector } from '@/components/ui/QuantitySelector';
 
 interface ProductActionsProps {
     product: Product;
@@ -138,36 +139,43 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             ))}
 
             {/* Actions */}
-            <div className="pt-4 flex gap-4">
-                <button
-                    onClick={handleAddToCart}
-                    disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                    className="flex-1 h-14 border-2 border-primary text-primary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
-                >
-                    <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    Add to Cart
-                </button>
-
-                <button
-                    onClick={() => {
-                        handleAddToCart();
-                        // Redirect to checkout - in real app trigger navigation properly
-                        window.location.href = '/cart';
-                    }}
-                    disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                    className="flex-1 h-14 bg-gradient-to-r from-primary to-orange-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <ShoppingBag className="w-5 h-5 fill-white/20" />
-                    Buy Now
-                </button>
-            </div>
-
-            {/* Stock Warning */}
-            {displayStock < 5 && displayStock > 0 && (
-                <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/10 p-2 rounded-lg justify-center animate-pulse">
-                    <span>🔥 Hurry! Only {displayStock} left at this price!</span>
+            <div className="pt-4 flex flex-col gap-4">
+                {/* Quantity Control (Added for consistency) */}
+                <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-800/50 p-3 rounded-2xl border border-gray-100 dark:border-zinc-800">
+                    <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider pl-2">Quantity</span>
+                    <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
                 </div>
-            )}
-        </div>
-    );
+
+                <div className="flex gap-4">
+                    <button
+                        onClick={handleAddToCart}
+                        disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
+                        className="flex-1 h-14 border-2 border-primary text-primary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                    >
+                        <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        Add to Cart
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            handleAddToCart();
+                            // Redirect to checkout - in real app trigger navigation properly
+                            window.location.href = '/cart';
+                        }}
+                        disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
+                        className="flex-1 h-14 bg-gradient-to-r from-primary to-orange-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <ShoppingBag className="w-5 h-5 fill-white/20" />
+                        Buy Now
+                    </button>
+                </div>
+
+                {/* Stock Warning */}
+                {displayStock < 5 && displayStock > 0 && (
+                    <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/10 p-2 rounded-lg justify-center animate-pulse">
+                        <span>🔥 Hurry! Only {displayStock} left at this price!</span>
+                    </div>
+                )}
+            </div>
+            );
 }
