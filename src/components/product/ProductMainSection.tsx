@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { ImageGallery } from '@/components/product/ImageGallery';
 import { ProductActions } from '@/components/product/ProductActions';
@@ -10,6 +10,7 @@ import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { StickyCartBar } from '@/components/product/StickyCartBar';
 import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
     // State for attribute selection
@@ -25,6 +26,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
     // Mobile Detail Tabs State
     const [activeTab, setActiveTab] = useState<'specs' | 'box'>('specs');
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const descriptionRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
 
     // Derived Variants State
     const currentVariant = useMemo(() => {
@@ -224,19 +228,45 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 )}
                             </div>
 
-                            <div className="pb-24">
+                            <div className="pb-24 scroll-mt-24" ref={descriptionRef}>
                                 <div className="text-center mb-6">
                                     <span className="px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-wider">
                                         In-Depth Review
                                     </span>
                                     <h3 className="text-xl font-black mt-2">About This Ride-On</h3>
                                 </div>
-                                <div className="prose premium-prose max-w-none px-1">
+                                <div className={cn(
+                                    "prose premium-prose max-w-none px-1 relative overflow-hidden transition-all duration-500 ease-in-out",
+                                    isDescriptionExpanded ? "max-h-none" : "max-h-[160px]"
+                                )}>
                                     {product.description ? (
                                         <div dangerouslySetInnerHTML={{ __html: product.description }} />
                                     ) : (
                                         <p>Premium ride-on toy with advanced features.</p>
                                     )}
+
+                                    {/* Gradient Mask for collapsed state */}
+                                    {!isDescriptionExpanded && (
+                                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
+                                    )}
+                                </div>
+
+                                {/* Toggle Button */}
+                                <div className="mt-4 flex justify-center">
+                                    <button
+                                        onClick={() => {
+                                            if (isDescriptionExpanded) {
+                                                setIsDescriptionExpanded(false);
+                                                // Smooth scroll back to title
+                                                descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            } else {
+                                                setIsDescriptionExpanded(true);
+                                            }
+                                        }}
+                                        className="text-xs font-black text-primary border border-primary/20 bg-primary/5 px-6 py-2.5 rounded-full hover:bg-primary/10 transition-colors uppercase tracking-wider"
+                                    >
+                                        {isDescriptionExpanded ? "Show Less" : "Read Full Description"}
+                                    </button>
                                 </div>
                             </div>
                         </div>
