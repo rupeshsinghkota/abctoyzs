@@ -25,27 +25,31 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
     ].filter(item => item.value);
 
     return (
-        <div className="bg-gray-50 dark:bg-muted/10 rounded-2xl p-6 border border-border/50">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <Package className="w-5 h-5 text-primary" />
-                Technical Specifications
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+    return (
+        <div className="h-full flex flex-col justify-between">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
                 {items.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-800 last:border-0">
-                        <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                            {item.icon && <item.icon className="w-4 h-4" />}
-                            <span>{item.label}</span>
+                    <div key={idx} className="flex items-start gap-4 group">
+                        <div className="p-3 rounded-2xl bg-gray-50 text-gray-400 group-hover:bg-primary/5 group-hover:text-primary transition-colors duration-300">
+                            {item.icon && <item.icon className="w-5 h-5" strokeWidth={1.5} />}
                         </div>
-                        <span className="font-bold text-sm text-foreground">{item.value}</span>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400 group-hover:text-primary/70 transition-colors mb-0.5">{item.label}</span>
+                            <span className="text-base font-bold text-gray-900 leading-tight">{item.value}</span>
+                        </div>
                     </div>
                 ))}
             </div>
 
-            <div className="mt-6 flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/10 rounded-xl text-xs text-blue-700 dark:text-blue-300">
-                <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
-                <p>All specifications are tested under standard conditions. Actual performance may vary based on load, terrain, and usage.</p>
+            <div className="mt-8 pt-6 border-t border-gray-100">
+                <div className="flex items-start gap-3">
+                    <ShieldCheck className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                    <p className="text-xs text-gray-400 leading-relaxed max-w-sm">
+                        Figures derived under standard testing conditions. Actual performance may vary based on load & terrain.
+                    </p>
+                </div>
             </div>
         </div>
+    );
     );
 }
