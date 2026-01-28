@@ -21,7 +21,9 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     // Initial Price / Image / Stock comes from Product, but overrides if Variant selected
     const displayPrice = currentVariant ? currentVariant.price : product.price;
-    const displayMRP = currentVariant?.price ? (currentVariant.price * 1.3) : (product.mrp || product.price * 1.3); // Fallback mock MRP if missing
+    // Fallback mock MRP if missing: 30% higher than price, rounded to nearest 99 or 49 for realism
+    const rawMRP = currentVariant?.price ? (currentVariant.price * 1.3) : (product.mrp || product.price * 1.3);
+    const displayMRP = Math.round(rawMRP / 10) * 10 - 1; // Rounds to end in ...9
     const displayStock = currentVariant ? currentVariant.stock : 7; // Default mock stock
 
     // Calculate Discount

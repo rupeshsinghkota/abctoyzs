@@ -19,6 +19,7 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [desktopIndex, setDesktopIndex] = useState(0);
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
     // Combine images and videos into a single list
     const mediaItems = useMemo<MediaItem[]>(() => {
@@ -49,6 +50,7 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                             <div
                                 key={index}
                                 className="relative flex-[0_0_100%] min-w-0 h-full flex items-center justify-center p-0"
+                                onClick={() => item.type === 'image' && setIsFullScreen(true)}
                             >
                                 {item.type === 'video' ? (
                                     <video
@@ -65,6 +67,10 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                                             className="w-full h-full object-contain drop-shadow-sm p-0"
                                             draggable={false}
                                         />
+                                        {/* Maximize Hint */}
+                                        <div className="absolute top-4 right-4 bg-white/50 backdrop-blur-sm p-2 rounded-full active:scale-95 transition-all">
+                                            <Maximize2 className="w-4 h-4 text-gray-700" />
+                                        </div>
                                         {/* Play Button on First Image */}
                                         {index === 0 && videos.length > 0 && (
                                             <button
@@ -119,6 +125,44 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                     </>
                 )}
             </div>
+
+            {/* Mobile Fullscreen Overlay */}
+            {isFullScreen && (
+                <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center">
+                    <button
+                        onClick={() => setIsFullScreen(false)}
+                        className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white z-[110]"
+                    >
+                        <ChevronLeft className="w-6 h-6 rotate-45" />
+                    </button>
+
+                    <div className="w-full h-full flex items-center justify-center px-4" onClick={() => setIsFullScreen(false)}>
+                        <img
+                            src={mediaItems[selectedIndex].url}
+                            alt="Full screen view"
+                            className="max-w-full max-h-[80vh] object-contain shadow-2xl"
+                        />
+                    </div>
+
+                    <div className="absolute bottom-10 left-0 right-0 px-6 flex items-center justify-between">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); scrollPrev(); }}
+                            className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur rounded-2xl text-white font-bold text-xs uppercase tracking-widest active:scale-95 transition-transform"
+                        >
+                            <ChevronLeft className="w-4 h-4" /> Prev
+                        </button>
+                        <span className="text-white/60 text-xs font-black tracking-widest">
+                            {selectedIndex + 1} / {mediaItems.length}
+                        </span>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); scrollNext(); }}
+                            className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur rounded-2xl text-white font-bold text-xs uppercase tracking-widest active:scale-95 transition-transform"
+                        >
+                            Next <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Desktop Standard Layout (>= 768px) */}
             <div className="hidden md:flex gap-6 h-[calc(100vh-180px)] min-h-[600px] max-h-[850px] w-full">
