@@ -57,7 +57,7 @@ ${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}
                  - "<h3>🛡️ Safety & Quality</h3>" engineering deep-dive.
                  - "<h3>Conclusion</h3>" high-conversion closer.
                - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
-               - **FORMATTING:** Use **bold** liberally for impact. Use valid HTML.
+               - **FORMATTING:** Use **ONLY** valid HTML. Use <strong> tags for bold text. **DO NOT** use Markdown syntax like "**" for bold.
 
             3. **BRAND INTEGRITY & SCRUBBING (MANDATORY):**
                - **ONLY AUTHORIZED BRAND:** The only brand name allowed to appear is "${BRAND_CONFIG.name}". 
