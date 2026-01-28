@@ -8,6 +8,7 @@ import { Star, Truck, ShieldCheck, CheckCircle2, RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
+import { StickyCartBar } from '@/components/product/StickyCartBar';
 import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-react';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
@@ -229,6 +230,13 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                     </div>
                 </div>
             </div>
+            {/* Sticky Cart Bar (Synced with selection) */}
+            <StickyCartBar
+                product={product}
+                selectedAttributes={selectedAttributes}
+                currentVariant={currentVariant}
+                isReady={true}
+            />
         </div>
     );
 }

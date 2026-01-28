@@ -1,6 +1,5 @@
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { StickyCartBar } from '@/components/product/StickyCartBar';
 import { ChevronRight, Home, Share2, Heart, ShoppingBag, Gauge, Package, ArrowRight, Wallet, ShieldCheck, Zap, Medal, Star, Weight, Gamepad2, CheckCircle2, Truck, Baby } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
@@ -259,10 +258,6 @@ export default async function ProductPage({ params }: PageProps) {
 
             {/* Mobile Footer Spacing for Sticky Bar */}
             <div className="h-20 lg:hidden" />
-
-            <StickyCartBar
-                product={product}
-            />
         </div>
     );
 }
