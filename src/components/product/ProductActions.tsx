@@ -80,24 +80,24 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
     return (
         <div className="space-y-8">
             {/* Price Display (Clean, No Box) */}
-            {/* Price Display (Premium) */}
-            <div className="space-y-1">
-                <div className="flex items-baseline gap-4">
-                    <span className="text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-none">
+            {/* Price Display (Compact) */}
+            <div className="space-y-0.5">
+                <div className="flex items-baseline gap-3">
+                    <span className="text-3xl md:text-4xl font-black text-foreground tracking-tight leading-none">
                         ₹{displayPrice.toLocaleString()}
                     </span>
                     {discount > 0 && (
-                        <div className="flex flex-col items-start leading-none">
-                            <span className="text-lg font-bold text-muted-foreground line-through decoration-2 decoration-red-500/50">
+                        <div className="flex items-baseline gap-2 leading-none">
+                            <span className="text-sm font-bold text-muted-foreground line-through decoration-2 decoration-red-500/50">
                                 ₹{displayMRP.toLocaleString()}
                             </span>
-                            <span className="text-sm font-black text-red-600 uppercase tracking-wide">
+                            <span className="text-xs font-black text-red-600 uppercase tracking-wide">
                                 {discount}% OFF
                             </span>
                         </div>
                     )}
                 </div>
-                <p className="text-xs font-bold text-green-600 pl-1 flex items-center gap-1">
+                <p className="text-[10px] font-bold text-green-600 flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" /> Inclusive of all taxes
                 </p>
             </div>
@@ -106,19 +106,19 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
             {/* Attributes Selection */}
             {product.attributes?.map((attr) => (
-                <div key={attr.name} className="space-y-3">
+                <div key={attr.name} className="space-y-2">
                     <div className="flex justify-between">
-                        <span className="text-sm font-bold uppercase tracking-wider text-foreground">{attr.name}</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-foreground">{attr.name}</span>
                         <div className="flex items-center gap-2">
                             {selectedAttributes[attr.name] && (
-                                <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                                <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                                     {selectedAttributes[attr.name]}
                                 </span>
                             )}
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-2">
                         {attr.options.map((option) => {
                             const isSelected = selectedAttributes[attr.name] === option;
                             const optionImage = getOptionImage(attr.name, option);
@@ -130,9 +130,9 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                         key={option}
                                         onClick={() => handleAttributeSelect(attr.name, option)}
                                         className={cn(
-                                            "group relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all shadow-sm hover:scale-105",
+                                            "group relative w-12 h-12 rounded-xl overflow-hidden border-2 transition-all shadow-sm hover:scale-105",
                                             isSelected
-                                                ? "border-primary ring-2 ring-primary/20 ring-offset-2 scale-105"
+                                                ? "border-primary ring-2 ring-primary/20 ring-offset-1 scale-105"
                                                 : "border-transparent hover:border-border"
                                         )}
                                         title={option}
@@ -140,7 +140,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                         <img src={optionImage} alt={option} className="w-full h-full object-cover" />
                                         {isSelected && (
                                             <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                                <div className="bg-white rounded-full p-1 shadow-sm"><Check className="w-3 h-3 text-primary" /></div>
+                                                <div className="bg-white rounded-full p-0.5 shadow-sm"><Check className="w-3 h-3 text-primary" /></div>
                                             </div>
                                         )}
                                     </button>
@@ -153,9 +153,9 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                     key={option}
                                     onClick={() => handleAttributeSelect(attr.name, option)}
                                     className={cn(
-                                        "px-6 py-3 text-sm font-bold rounded-xl border-2 transition-all min-w-[3rem]",
+                                        "px-4 py-2 text-xs font-bold rounded-lg border-2 transition-all min-w-[3rem]",
                                         isSelected
-                                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/25 scale-105"
+                                            ? "border-primary bg-primary text-white shadow-md shadow-primary/20 scale-105"
                                             : "border-muted hover:border-foreground/20 text-muted-foreground hover:text-foreground bg-white dark:bg-zinc-900"
                                     )}
                                 >

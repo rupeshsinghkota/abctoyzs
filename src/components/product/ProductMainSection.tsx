@@ -72,28 +72,29 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                     <div className="lg:sticky lg:top-28 space-y-8">
 
                         {/* Header */}
-                        <div className="space-y-6">
-                            <div className="space-y-2">
+                        {/* Header */}
+                        <div className="space-y-4">
+                            <div className="space-y-1.5">
                                 {product.tag && (
                                     <div className="flex items-center gap-2">
-                                        <span className="px-2.5 py-0.5 text-[10px] font-bold text-white bg-black dark:bg-white dark:text-black rounded-full uppercase tracking-widest">
+                                        <span className="px-2 py-0.5 text-[9px] font-bold text-white bg-black dark:bg-white dark:text-black rounded-full uppercase tracking-widest">
                                             {product.tag}
                                         </span>
                                     </div>
                                 )}
 
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-heading leading-[0.9] tracking-tighter text-foreground">
+                                <h1 className="text-2xl md:text-3xl lg:text-4xl font-black font-heading leading-tight tracking-tight text-foreground">
                                     {product.name}
                                 </h1>
                             </div>
 
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-0.5">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <Star
                                             key={star}
                                             className={cn(
-                                                "w-5 h-5",
+                                                "w-3.5 h-3.5",
                                                 star <= Math.round(product.rating)
                                                     ? "fill-black text-black dark:fill-white dark:text-white"
                                                     : "fill-gray-100 text-gray-100"
@@ -101,7 +102,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                         />
                                     ))}
                                 </div>
-                                <span className="text-sm font-medium text-muted-foreground underline decoration-muted-foreground/30 underline-offset-4">
+                                <span className="text-xs font-medium text-muted-foreground underline decoration-muted-foreground/30 underline-offset-4">
                                     {product.reviews} Verified Reviews
                                 </span>
                             </div>
@@ -114,29 +115,29 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             />
                         </div>
 
-                        {/* Trust Signals - Clean Row (No Boxes) */}
-                        <div className="border-t border-gray-100 dark:border-gray-800 pt-6">
-                            <div className="grid grid-cols-3 gap-4">
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-                                        <Truck className="w-4 h-4" />
-                                        <span>Free Shipping</span>
+                        {/* Trust Signals - Clean Row (Compact) */}
+                        <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
+                            <div className="grid grid-cols-3 gap-2">
+                                <div className="flex flex-col gap-0.5">
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                                        <Truck className="w-3.5 h-3.5" />
+                                        <span>Free delivery</span>
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground pl-6">On all orders</p>
+                                    <p className="text-[9px] text-muted-foreground pl-5">On all orders</p>
                                 </div>
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-                                        <ShieldCheck className="w-4 h-4" />
+                                <div className="flex flex-col gap-0.5">
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                                        <ShieldCheck className="w-3.5 h-3.5" />
                                         <span>Warranty</span>
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground pl-6">1 Year Official</p>
+                                    <p className="text-[9px] text-muted-foreground pl-5">1 Year Official</p>
                                 </div>
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-                                        <RotateCcw className="w-4 h-4" />
+                                <div className="flex flex-col gap-0.5">
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                                        <RotateCcw className="w-3.5 h-3.5" />
                                         <span>Returns</span>
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground pl-6">7 Days Easy</p>
+                                    <p className="text-[9px] text-muted-foreground pl-5">7 Days Easy</p>
                                 </div>
                             </div>
                         </div>
