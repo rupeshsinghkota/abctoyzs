@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { BRAND_CONFIG } from "@/config/brand";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -18,23 +19,42 @@ export async function POST(req: Request) {
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         const prompt = `
-            You are a STRICT DATA PARSER.
-            Your task is to extract structured product data from the provided RAW TEXT.
+            You are an expert E-commerce Product Data Specialist for "${BRAND_CONFIG.name}".
+            Your task is to analyze the provided RAW TEXT and output a JSON object.
 
             RAW TEXT:
             """${text}"""
 
-            CRITICAL RULES:
-            1. EXTRACT ONLY what is explicitly present in the text.
-            2. If a field is NOT found, return an EMPTY STRING "". Do NOT guess. Do NOT use "Unknown".
-            3. Standardize units (e.g. convert "12 volts" to "12V", "3 to 5 km/h" to "3-5 km/h").
-            4. For "category", try to map to one of: "cars", "bikes", "jeeps", "suv", "atv", "go-kart". If unsure, use "cars".
+            CRITICAL INSTRUCTIONS:
+
+            1. **TECHNICAL SPECS (STRICT Extraction):** 
+               - Extract ONLY what is explicitly present in the text for the 'specs' and 'logistics' fields.
+               - If a spec is OFFICIALLY missing, return an EMPTY STRING "". Do NOT guess.
+               - Standardize units (e.g., "12 volts" -> "12V").
+
+            2. **PRODUCT DESCRIPTION (CREATIVE Generation):**
+               - GENERATE a high-converting, LONG-FORM HTML marketing description.
+               - If the raw text is short/messy, EXPAND it into a premium sales pitch.
+               - **BRANDING:** strictly use "${BRAND_CONFIG.name}" as the seller/brand name. REMOVE any competitor names or original supplier branding.
+               - **FORMATTING:** Use valid HTML tags:
+                 - <h2> for main section headers (e.g., "Why Kids Love This", "Safety First")
+                 - <p> for detailed paragraphs (write at least 2-3 rich paragraphs)
+                 - <ul> and <li> for feature lists
+                 - <strong> for emphasis
+               - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
+               - **BANNERS:** The description should be structured to support image insertions between paragraphs (the frontend will handle the actual insertion, but write enough text to space them out).
+
+            3. **SEO DATA (CREATIVE Generation):**
+               - **meta_title:** Generate a click-worthy title (max 60 chars) including "${BRAND_CONFIG.name}".
+               - **meta_description:** Generate a compelling summary (max 160 chars) mentioning "${BRAND_CONFIG.name}".
 
             Output ONLY a JSON object with this exact schema:
             {
-                "name": "Product Name found in text",
+                "name": "Clean Product Name (Title Case)",
                 "price": "Price found (number only) or 0",
-                "description": "A clean HTML description summarizing the text. Use <h3> for headers, <ul> for features.",
+                "description": "<div class='prose'>...Long HTML content...</div>",
+                "meta_title": "SEO Title | ${BRAND_CONFIG.name}",
+                "meta_description": "SEO Description...",
                 "category": "cars|bikes|jeeps|suv|atv|go-kart",
                 "specs": {
                     "battery": "e.g. 12V 7Ah",
