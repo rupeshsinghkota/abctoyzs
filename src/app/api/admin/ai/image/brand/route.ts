@@ -65,19 +65,19 @@ export async function POST(req: Request) {
             const currentImage = imagesToProcess[i];
 
             try {
-                const prompt = `Professional e-commerce product photo of children's ride-on toy:
+                const prompt = `Edit this children's ride-on toy photo:
 
-PRODUCT: Keep exact same toy - same design, colors, wheels, headlights, body shape.
-ANGLE: Keep the SAME viewing angle as the input photo (front, side, 3/4, rear - whatever is in the original).
+KEEP SAME: Exact toy design, colors, wheels, headlights, body. Same viewing angle.
 
-BRANDING:
-- Remove ALL existing branding (windshield text, stickers, logos, badges)
-- Apply "ABC TOYZ" on license plate (use provided logo)
-- Clean, premium brand look
+REMOVE: ALL text and stickers from windshield. ALL seller logos (11CART, etc). ALL existing license plate text.
 
-BACKGROUND: Scenic outdoor setting with golden hour sunset lighting (desert road for Jeep/SUV, luxury driveway for sports cars).
+ADD TEXT "ABC TOYZ" ON LICENSE PLATE ONLY (not on grille, not on body, not on bumper - ONLY on the license plate area).
 
-OUTPUT: Square 1:1 ratio, 8K ultra-sharp, professional brand photoshoot quality.`;
+DO NOT add any car/vehicle icon logos anywhere on the car body.
+
+BACKGROUND: Desert road with golden sunset.
+
+OUTPUT: 1:1 square, 8K quality, sharp focus.`;
 
                 // Build content parts: prompt + current image (to edit) + all reference images + logo
                 const contentParts: any[] = [
