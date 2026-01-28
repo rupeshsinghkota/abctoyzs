@@ -42,6 +42,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [isGeneratingPosters, setIsGeneratingPosters] = useState(false);
     const [generatedPosters, setGeneratedPosters] = useState<string[]>([]);
 
+    // Magic Paste State
+    const [rawText, setRawText] = useState('');
+    const [isExtracting, setIsExtracting] = useState(false);
+
     // Variations State
     const [attributes, setAttributes] = useState<Attribute[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
@@ -179,165 +183,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         }
     };
 
-    const generateAIDescription = async () => {
-        if (!formData.name) {
-            alert('Please enter a product name first');
-            return;
-        }
 
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/admin/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productName: formData.name,
-                    category: formData.category,
-                    type: 'description',
-                    notes: formData.prompt_notes
-                })
-            });
-            const { data, error } = await res.json();
-            if (error) throw new Error(error);
-            setFormData({ ...formData, description: data });
-        } catch (error: any) {
-            console.error(error);
-            alert('AI Generation failed: ' + error.message);
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
-
-    const generateAISpecs = async () => {
-        if (!formData.name) {
-            alert('Please enter a product name first');
-            return;
-        }
-
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/admin/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productName: formData.name,
-                    category: formData.category,
-                    type: 'specs',
-                    notes: formData.prompt_notes
-                })
-            });
-            const { data, error } = await res.json();
-            if (error) throw new Error(error);
-
-            setFormData({
-                ...formData,
-                specs: {
-                    ...formData.specs,
-                    battery: data.Battery || formData.specs.battery,
-                    motor: data.Motors || formData.specs.motor,
-                    speed: data.Speed || formData.specs.speed,
-                    max_load: data.MaxLoad || formData.specs.max_load
-                }
-            });
-        } catch (error: any) {
-            console.error(error);
-            alert('AI Generation failed: ' + error.message);
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
-
-    const generateAILogistics = async () => {
-        if (!formData.name) {
-            alert('Please enter a product name first');
-            return;
-        }
-
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/admin/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productName: formData.name,
-                    category: formData.category,
-                    type: 'logistics',
-                    notes: formData.prompt_notes
-                })
-            });
-            const { data, error } = await res.json();
-            if (error) throw new Error(error);
-
-            setFormData({
-                ...formData,
-                product_dimensions: data.dimensions || formData.product_dimensions,
-                gross_weight: data.weight || formData.gross_weight,
-                box_content: data.whats_in_the_box && data.whats_in_the_box.length > 0 ? data.whats_in_the_box : formData.box_content
-            });
-        } catch (error: any) {
-            console.error(error);
-            alert('AI Generation failed: ' + error.message);
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
-
-    const generateFullProduct = async () => {
-        if (!formData.prompt_notes) {
-            alert('Please enter some product details or notes first');
-            return;
-        }
-
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/admin/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'all',
-                    notes: formData.prompt_notes,
-                    banners: formData.banners // Pass banners for AI to embed
-                })
-            });
-            const { data, error } = await res.json();
-            if (error) throw new Error(error);
-
-            // Populate everything
-            setFormData(prev => {
-                const finalDesc = data.description || prev.description;
-                // AI now handles image placement, and banners are already generated separately if needed
-
-                return {
-                    ...prev,
-                    name: data.name || prev.name,
-                    description: finalDesc,
-                    meta_title: data.meta_title || prev.meta_title,
-                    meta_description: data.meta_description || prev.meta_description,
-                    product_dimensions: data.logistics?.product_dimensions || prev.product_dimensions,
-                    gross_weight: data.logistics?.gross_weight || prev.gross_weight,
-                    box_content: data.logistics?.whats_in_the_box || prev.box_content,
-                    specs: {
-                        ...prev.specs,
-                        battery: data.specs?.battery || prev.specs.battery,
-                        motor: data.specs?.motor || prev.specs.motor,
-                        speed: data.specs?.speed || prev.specs.speed,
-                        max_load: data.specs?.max_load || prev.specs.max_load,
-                        tire_type: data.specs?.tire_type || prev.specs.tire_type,
-                        seats: data.specs?.seats?.toString() || prev.specs.seats,
-                        mobile_app: data.specs?.mobile_app ?? prev.specs.mobile_app,
-                        remote_control: data.specs?.remote_control ?? prev.specs.remote_control,
-                    }
-                };
-            });
-
-            alert('✨ Product details updated successfully!');
-        } catch (error: any) {
-            console.error(error);
-            alert('AI Generation failed: ' + error.message);
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
 
     const brandImage = async (index: number) => {
         const imageUrl = formData.images[index];
@@ -483,6 +329,88 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             alert('Marketing Suite generation failed: ' + error.message);
         } finally {
             setIsGeneratingPosters(false);
+        }
+    };
+
+    // --- Intelligent Mapping Helpers ---
+    const parseAgeGroup = (text?: string) => {
+        if (!text) return '';
+        const t = text.toLowerCase();
+        if (t.includes('1-3') || t.includes('toddler')) return '1-3';
+        if (t.includes('3-6') || t.includes('preschool')) return '3-6';
+        if (t.includes('6-10') || t.includes('6-12') || t.includes('big kid')) return '6-10';
+        if (t.includes('10+') || t.includes('teen') || t.includes('adult')) return '10+';
+        if (t.includes('1') || t.includes('2')) return '1-3';
+        if (t.includes('3') || t.includes('4') || t.includes('5')) return '3-6';
+        if (t.includes('7') || t.includes('8') || t.includes('9')) return '6-10';
+        return '';
+    };
+
+    const parseVoltage = (text?: string) => {
+        if (!text) return '';
+        const match = text.match(/(\d+)V/i);
+        if (match) {
+            const v = match[1] + 'V';
+            if (['12V', '24V', '36V', '48V'].includes(v)) return v;
+        }
+        return '';
+    };
+
+    // --- Magic Paste Handler ---
+    const handleExtractData = async () => {
+        if (!rawText.trim()) {
+            alert('Please paste some text first!');
+            return;
+        }
+
+        setIsExtracting(true);
+        try {
+            const res = await fetch('/api/admin/ai/extract', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: rawText })
+            });
+            const { data, error } = await res.json();
+            if (error) throw new Error(error);
+
+            // Populate Form
+            setFormData(prev => ({
+                ...prev,
+                name: data.name || prev.name,
+                description: data.description || prev.description,
+                category: data.category || 'cars',
+                base_price: data.price ? String(data.price) : prev.base_price,
+                meta_title: data.name || prev.meta_title,
+                product_dimensions: data.logistics?.dimensions || prev.product_dimensions,
+                gross_weight: data.logistics?.weight || prev.gross_weight,
+                box_content: data.logistics?.box_content?.length ? data.logistics.box_content : prev.box_content,
+                specs: {
+                    ...prev.specs,
+                    battery: data.specs?.battery || '',
+                    motor: data.specs?.motor || '',
+                    speed: data.specs?.speed || '',
+                    max_load: data.specs?.max_load || '',
+                    tire_type: data.specs?.tire_type || '',
+                    seat_material: data.specs?.seat_material || '',
+                    seats: data.specs?.seats ? String(data.specs.seats) : '1',
+                    mobile_app: data.specs?.mobile_app === true,
+                    remote_control: data.specs?.remote_control === true,
+                    suitable_age: data.specs?.suitable_age || '',
+                    charging_time: data.specs?.charging_time || '',
+                    run_time: data.specs?.run_time || ''
+                },
+                voltage: parseVoltage(data.specs?.battery) || prev.voltage,
+                age_group: parseAgeGroup(data.specs?.suitable_age) || prev.age_group
+            }));
+
+            alert('✨ Data Extracted & Form Filled!');
+            setRawText('');
+
+        } catch (error: any) {
+            console.error(error);
+            alert('Extraction failed: ' + error.message);
+        } finally {
+            setIsExtracting(false);
         }
     };
     // --- Logic ---
@@ -744,15 +672,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                     <div className="flex justify-between items-center mb-2">
                                         <label className="block text-sm font-bold uppercase tracking-wider text-muted-foreground">Description <span className="text-red-500">*</span></label>
                                         <div className="flex gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={generateAIDescription}
-                                                disabled={isGeneratingAI || !formData.name}
-                                                className="text-[10px] sm:text-xs px-3 py-1.5 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-lg transition-all font-bold flex items-center gap-1.5 disabled:opacity-50"
-                                            >
-                                                {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                {isGeneratingAI ? 'Generating...' : 'Generate with AI'}
-                                            </button>
+                                            <div className="flex gap-2">
+                                                {/* AI Button Removed */}
+                                            </div>
                                         </div>
                                     </div>
                                     <textarea
@@ -949,34 +871,40 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                         <div className="flex gap-2">
                                             <button
                                                 type="button"
-                                                onClick={generateMarketingSuite}
-                                                disabled={isGeneratingPosters || !formData.name}
-                                                className="text-[10px] sm:text-xs px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:shadow-lg shadow-pink-500/20 disabled:opacity-50"
-                                            >
-                                                {isGeneratingPosters ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                {isGeneratingPosters ? 'Designing Suite...' : '✨ Generate Marketing Suite'}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={generateFullProduct}
-                                                disabled={isGeneratingAI || !formData.prompt_notes}
+                                                onClick={handleExtractData}
+                                                disabled={isExtracting || !rawText}
                                                 className="text-[10px] sm:text-xs px-4 py-2 bg-purple-600 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:bg-purple-700 shadow-lg disabled:opacity-50"
                                             >
-                                                {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                {isGeneratingAI ? 'Generating All...' : '✨ Magic Generate All Details'}
+                                                {isExtracting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                {isExtracting ? 'Analyzing...' : 'Extract & Fill Form'}
                                             </button>
                                         </div>
                                     </div>
-                                    <textarea
-                                        value={formData.prompt_notes}
-                                        onChange={(e) => setFormData({ ...formData, prompt_notes: e.target.value })}
-                                        className="w-full px-4 py-3 bg-background border rounded-xl text-sm focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"
-                                        placeholder="Paste supplier details, manufacturer notes, or raw product text here for the AI to analyze..."
-                                        rows={4}
-                                    />
-                                    <div className="flex items-center gap-2 text-[10px] text-purple-400 font-medium">
-                                        <Zap className="w-3 h-3" />
-                                        <span>Pro Tip: Add images first, then paste details here and click "Create Posters" followed by "Magic Generate"!</span>
+
+                                    <div className="relative">
+                                        <textarea
+                                            value={rawText}
+                                            onChange={(e) => setRawText(e.target.value)}
+                                            className="w-full px-4 py-3 bg-background border rounded-xl text-sm focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"
+                                            placeholder="Paste supplier details, manufacturer notes, or raw product text here for the AI to analyze..."
+                                            rows={4}
+                                        />
+                                        <div className="flex items-center gap-2 text-[10px] text-purple-400 font-medium mt-2">
+                                            <Zap className="w-3 h-3" />
+                                            <span>Pro Tip: Add images first, then use "Magic Paste" at the top for full details!</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end pt-2 border-t border-purple-200/50">
+                                        <button
+                                            type="button"
+                                            onClick={generateMarketingSuite}
+                                            disabled={isGeneratingPosters || !formData.name}
+                                            className="text-[10px] sm:text-xs px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:shadow-lg shadow-pink-500/20 disabled:opacity-50"
+                                        >
+                                            {isGeneratingPosters ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
+                                            {isGeneratingPosters ? 'Designing Suite...' : 'Generate Marketing Suite'}
+                                        </button>
                                     </div>
                                 </div>
 
@@ -1176,15 +1104,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                             <div className="bg-card border rounded-3xl p-6 space-y-6">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-lg font-bold">Technical Specifications</h3>
-                                    <button
-                                        type="button"
-                                        onClick={generateAISpecs}
-                                        disabled={isGeneratingAI || !formData.name}
-                                        className="text-xs px-4 py-2 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-xl transition-all font-bold flex items-center gap-2 disabled:opacity-50"
-                                    >
-                                        {isGeneratingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                        {isGeneratingAI ? 'Suggesting...' : '⚡ Suggest Specs'}
-                                    </button>
+
                                 </div>
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
@@ -1279,15 +1199,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                             <div className="bg-card border rounded-3xl p-6 space-y-8">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-lg font-bold">Logistics & Box Content</h3>
-                                    <button
-                                        type="button"
-                                        onClick={generateAILogistics}
-                                        disabled={isGeneratingAI || !formData.name}
-                                        className="text-xs px-4 py-2 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-xl transition-all font-bold flex items-center gap-2 disabled:opacity-50"
-                                    >
-                                        {isGeneratingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                        {isGeneratingAI ? 'Suggesting...' : '✨ Suggest Logistics'}
-                                    </button>
+
                                 </div>
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
