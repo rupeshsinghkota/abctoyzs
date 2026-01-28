@@ -159,7 +159,7 @@ export const products: Product[] = [
         images: [
             'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop&q=60'
         ],
-        specs: { battery: '24V 7Ah', mobile_app: true, max_load: '50kg', speed: '5-8 km/h', charging_time: '10-14 Hours', run_time: '60-120 Mins' },
+        specs: { battery: '24V 7Ah', mobile_app: true, max_load: '50kg', speed: '6-8 km/h', charging_time: '10-14 Hours', run_time: '60-120 Mins' },
         description: "Luxury meets play. The G63 AMG ride-on is a showstopper with painted finish.",
         voltage: '24V',
         ageGroup: '6-10',

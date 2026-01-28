@@ -79,11 +79,11 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     // Feature highlights derived from product specs
     const highlights = [
-        { icon: Baby, label: 'Age', value: product.ageGroup ? `${product.ageGroup} Yrs` : (product.specs?.suitable_age || '2-5 Yrs') },
-        { icon: Gauge, label: 'Speed', value: product.specs?.speed || '5-8 km/h' },
-        { icon: Weight, label: 'Load', value: product.specs?.max_load || '30 kg' },
-        { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'Mobile App' : 'Remote' },
-    ];
+        { icon: Baby, label: 'Age', value: product.specs?.suitable_age || (product.ageGroup ? `${product.ageGroup} Yrs` : null) },
+        { icon: Gauge, label: 'Speed', value: product.specs?.speed },
+        { icon: Weight, label: 'Load', value: product.specs?.max_load },
+        { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },
+    ].filter(h => h.value);
 
     return (
         <div className="space-y-6">
