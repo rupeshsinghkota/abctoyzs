@@ -42,11 +42,16 @@ export async function POST(req: Request) {
         // Using a flattened, DESCRIPTIVE prompt to prevent MALFORMED_FUNCTION_CALL.
         // Imperative verbs (remove, place, scrub) can confuse the model into trying to call tools.
         const prompt = `A premium commercial product photography masterpiece of the toy vehicle shown in the first image, cropped to a strict 1:1 SQUARE aspect ratio. 
-        The vehicle is branded with the logo from the second image, naturally applied to the license plate or door.
-        The car is strictly clean, appearing factory-fresh with NO other text, watermarks, or competitor logos on the windshield or body.
-        The background is completely replaced with a breathtaking high-end commercial location (e.g., luxury driveway or desert road) with cinematic lighting and reflections.
-        The image format is a perfect square.
-        The style is photorealistic, 8k resolution, advertising quality.`;
+        
+        CRITICAL MODIFICATION INSTRUCTIONS:
+        1. FIRST AND MOST IMPORTANT: ERASE ALL EXISTING LOGOS, TEXT, AND DECALS from the vehicle body, windshield, and license plate. The vehicle must look like a clean, unbranded factory model.
+        2. THEN: Apply the provided BRAND LOGO (from the second image) onto the front license plate or hood. It must look physically integrated (metallic or sticker texture), not just overlaid.
+        3. BACKGROUND: Replace the background with a high-end luxury driveway or scenic road with cinematic lighting.
+        
+        STRICT GUIDELINES:
+        - The windshield and vehicle body MUST be completely free of the original competitor logos or text.
+        - Preserve the vehicle's exact shape and color, only modifying the branding and background.
+        - Photorealistic, 8k resolution, advertising quality.`;
 
         const result = await model.generateContent([
             { text: prompt },

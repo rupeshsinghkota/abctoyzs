@@ -83,7 +83,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             remote_control: false,
             max_load: '',
             speed: '',
-            features: [] as string[]
+            features: [] as string[],
+            charging_time: '',
+            run_time: '',
+            suitable_age: '',
+            seat_material: ''
         }
     });
 
@@ -131,7 +135,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     remote_control: data.specs?.remote_control || false,
                     max_load: data.specs?.max_load || '',
                     speed: data.specs?.speed || '',
-                    features: data.specs?.features || []
+                    features: data.specs?.features || [],
+                    charging_time: data.specs?.charging_time || '',
+                    run_time: data.specs?.run_time || '',
+                    suitable_age: data.specs?.suitable_age || '',
+                    seat_material: data.specs?.seat_material || ''
                 }
             });
 
@@ -1145,6 +1153,46 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, speed: e.target.value } })}
                                             className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none"
                                             placeholder="e.g. 5-8 km/h"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Charging Time</label>
+                                        <input
+                                            type="text"
+                                            value={formData.specs.charging_time}
+                                            onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, charging_time: e.target.value } })}
+                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none"
+                                            placeholder="e.g. 8-10 Hours"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Run Time</label>
+                                        <input
+                                            type="text"
+                                            value={formData.specs.run_time}
+                                            onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, run_time: e.target.value } })}
+                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none"
+                                            placeholder="e.g. 1-2 Hours"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Suitable Age</label>
+                                        <input
+                                            type="text"
+                                            value={formData.specs.suitable_age}
+                                            onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, suitable_age: e.target.value } })}
+                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none"
+                                            placeholder="e.g. 2-5 Years"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Seat Material</label>
+                                        <input
+                                            type="text"
+                                            value={formData.specs.seat_material}
+                                            onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, seat_material: e.target.value } })}
+                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none"
+                                            placeholder="e.g. Leather / Plastic"
                                         />
                                     </div>
                                     <div>
