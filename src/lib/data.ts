@@ -61,6 +61,7 @@ export interface ProductVariant {
     name: string;
     attributes: Record<string, string>; // { "Color": "Red" }
     price: number;
+    mrp?: number;
     stock: number;
     sku?: string;
     image?: string;
@@ -99,6 +100,7 @@ export const products: Product[] = [
         category: 'cars',
         subCategory: 'Sports',
         price: 24999,
+        mrp: 34999,
         rating: 4.8,
         reviews: 124,
         image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&auto=format&fit=crop&q=60',
@@ -122,6 +124,7 @@ export const products: Product[] = [
         category: 'jeeps',
         subCategory: 'Off-road',
         price: 18500,
+        mrp: 25999,
         rating: 4.5,
         reviews: 89,
         image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&auto=format&fit=crop&q=60',
@@ -141,6 +144,7 @@ export const products: Product[] = [
         category: 'bikes',
         subCategory: 'Sport Bike',
         price: 12999,
+        mrp: 17999,
         rating: 4.9,
         reviews: 45,
         image: 'https://images.unsplash.com/photo-1558981408-db0ecd8a1ee4?w=800&auto=format&fit=crop&q=60',
@@ -159,6 +163,7 @@ export const products: Product[] = [
         category: 'cars',
         subCategory: 'Luxury',
         price: 34999,
+        mrp: 48999,
         rating: 4.7,
         reviews: 210,
         image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop&q=60',
@@ -177,6 +182,7 @@ export const products: Product[] = [
         category: 'utvs',
         subCategory: 'Buggy',
         price: 45000,
+        mrp: 62999,
         rating: 4.9,
         reviews: 12,
         image: 'https://images.unsplash.com/photo-1583578768565-385d56b0051e?w=800&auto=format&fit=crop&q=60',
@@ -196,6 +202,7 @@ export const products: Product[] = [
         category: 'gokarts',
         subCategory: 'Drift',
         price: 22000,
+        mrp: 30999,
         rating: 4.6,
         reviews: 56,
         image: 'https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?w=800&auto=format&fit=crop&q=60',
