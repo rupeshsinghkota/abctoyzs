@@ -207,12 +207,19 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         const imageUrl = formData.images[index];
         if (!imageUrl) return;
 
+        // Collect all valid images for product analysis context
+        const allValidImages = formData.images.filter(img => img.trim() !== '');
+
         setBrandingIndex(index);
         try {
             const res = await fetch('/api/admin/ai/image/brand', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ imageUrl, productName: formData.name })
+                body: JSON.stringify({
+                    imageUrl,
+                    imageUrls: allValidImages, // Send all images for comprehensive analysis
+                    productName: formData.name
+                })
             });
             const { newImageUrl, error } = await res.json();
             if (error) throw new Error(error);
