@@ -127,6 +127,22 @@ export default async function ProductPage({ params }: PageProps) {
                 {/* DESKTOP FULL WIDTH DETAILS (Below Fold) */}
                 <div className="hidden lg:block mt-12 max-w-7xl mx-auto space-y-16 px-4 pb-16">
 
+                    {/* 1. Key Highlights (Ultra Compact Chips) */}
+                    <div className="flex justify-center">
+                        <div className="inline-flex flex-wrap justify-center gap-3 p-2 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                            {highlights.map((item: { icon: any, label: string, value: string }, idx: number) => (
+                                <div key={idx} className="flex items-center gap-3 px-4 py-2 rounded-xl bg-gray-50 border border-gray-100 hover:border-primary/20 transition-all duration-300 group">
+                                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-orange-600 shadow-sm">
+                                        <item.icon className="w-4 h-4" strokeWidth={2} />
+                                    </div>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase">{item.label}</span>
+                                        <span className="text-xs font-black text-gray-900 leading-none mt-0.5">{item.value}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
                     {/* 2. Specs & Box Contents (Unified Compact Cards) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start px-4 md:px-0">
