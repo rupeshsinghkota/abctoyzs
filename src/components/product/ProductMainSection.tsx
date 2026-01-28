@@ -237,7 +237,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 </div>
                                 <div className={cn(
                                     "prose premium-prose max-w-none px-1 relative overflow-hidden transition-all duration-500 ease-in-out",
-                                    isDescriptionExpanded ? "max-h-none" : "max-h-[160px]"
+                                    isDescriptionExpanded ? "max-h-none" : "max-h-[400px]"
                                 )}>
                                     {product.description ? (
                                         <div dangerouslySetInnerHTML={{ __html: product.description }} />
