@@ -168,34 +168,34 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             ))}
 
             {/* Actions */}
-            <div className="space-y-4 pt-4">
+            <div className="space-y-3 pt-4">
 
-                {/* Primary: Add to Cart (Compact Gradient) */}
+                {/* Primary: Add to Cart */}
                 <button
                     onClick={handleAddToCart}
                     disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
                     className={cn(
-                        "relative w-full h-14 bg-gradient-to-r from-primary via-purple-600 to-primary background-animate text-white font-bold text-lg rounded-xl flex items-center justify-center gap-3 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden",
+                        "relative w-full h-12 bg-gradient-to-r from-primary via-purple-600 to-primary background-animate text-white font-bold text-base rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden",
                         added && "bg-none bg-green-600 shadow-green-500/30"
                     )}
                 >
                     {/* Shine Effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
 
-                    {added ? <Check className="w-6 h-6" strokeWidth={3} /> : <ShoppingCart className="w-5 h-5 fill-white/20 group-hover:scale-110 transition-transform" strokeWidth={2.5} />}
+                    {added ? <Check className="w-5 h-5" strokeWidth={3} /> : <ShoppingCart className="w-5 h-5 fill-white/20 group-hover:scale-110 transition-transform" strokeWidth={2.5} />}
                     {added ? "ADDED" : "ADD TO CART"}
                 </button>
 
                 {/* Secondary: Buy Now & Quantity */}
                 <div className="flex gap-3 h-12">
-                    <div className="shrink-0 h-full w-20">
-                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200 rounded-lg bg-gray-50/50" />
+                    <div className="shrink-0 h-full w-24">
+                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200 rounded-xl bg-gray-50/50" />
                     </div>
 
                     <button
                         onClick={handleBuyNow}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="flex-1 h-full bg-black text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 hover:bg-gray-900 transition-all shadow-md active:scale-[0.98]"
+                        className="flex-1 h-full bg-black text-white text-base font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-900 transition-all shadow-md active:scale-[0.98]"
                     >
                         <ShoppingBag className="w-4 h-4" strokeWidth={2.5} />
                         BUY NOW
