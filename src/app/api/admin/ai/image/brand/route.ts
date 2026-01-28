@@ -44,13 +44,15 @@ export async function POST(req: Request) {
         const prompt = `A premium commercial product photography masterpiece of the toy vehicle shown in the first image, cropped to a strict 1:1 SQUARE aspect ratio. 
         
         CRITICAL MODIFICATION INSTRUCTIONS:
-        1. FIRST AND MOST IMPORTANT: ERASE ALL EXISTING LOGOS, TEXT, AND DECALS from the vehicle body, windshield, and license plate. The vehicle must look like a clean, unbranded factory model.
-        2. THEN: Apply the provided BRAND LOGO (from the second image) onto the front license plate or hood. It must look physically integrated (metallic or sticker texture), not just overlaid.
-        3. BACKGROUND: Replace the background with a high-end luxury driveway or scenic road with cinematic lighting.
+        1. PRESERVE ALL ORIGINAL CAR MANUFACTURER BRANDING: Keep ALL original car brand logos and badges (like Mercedes, BMW, Lamborghini, Ferrari, Porsche, Jeep, Ford, etc.) exactly as they appear on the vehicle. These are authentic licensed designs and MUST remain visible.
+        2. REMOVE ONLY COMPETITOR WATERMARKS: If there are any store watermarks, seller logos, or e-commerce text overlays (like Amazon, Walmart, AliExpress text), remove those only.
+        3. BRAND PLACEMENT: Apply the provided BRAND LOGO (from the second image) onto the front license plate area ONLY. It must look physically integrated (metallic or sticker texture), not just overlaid.
+        4. BACKGROUND: Replace the background with a high-end luxury driveway or scenic road with cinematic lighting.
         
         STRICT GUIDELINES:
-        - The windshield and vehicle body MUST be completely free of the original competitor logos or text.
-        - Preserve the vehicle's exact shape and color, only modifying the branding and background.
+        - The vehicle's original car brand badges and emblems MUST be preserved exactly as shown.
+        - Only enhance the image quality and background - do NOT modify the vehicle design, logos, or badges.
+        - Preserve the vehicle's exact shape, color, and all original manufacturer branding.
         - Photorealistic, 8k resolution, advertising quality.`;
 
         const result = await model.generateContent([
