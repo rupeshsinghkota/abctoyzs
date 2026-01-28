@@ -156,19 +156,20 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                     </div>
 
                     {/* Mobile Content Repeater (Highlights & Description & Box Content) */}
-                    <div className="lg:hidden space-y-8 pb-8 pt-6 border-t mt-6">
+                    <div className="lg:hidden space-y-6 pb-8 pt-6 border-t mt-6">
                         <div className="space-y-4">
                             <h3 className="font-bold text-lg flex items-center gap-2">
-                                <Zap className="w-5 h-5 text-primary" /> Key Features
+                                <div className="p-1.5 bg-primary/10 rounded-lg">
+                                    <Zap className="w-4 h-4 text-primary" />
+                                </div>
+                                Key Features
                             </h3>
                             <div className="grid grid-cols-2 gap-3">
                                 {highlights.map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl border">
-                                        <item.icon className="w-5 h-5 text-primary shrink-0" />
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] text-muted-foreground uppercase">{item.label}</span>
-                                            <span className="text-sm font-bold">{item.value}</span>
-                                        </div>
+                                    <div key={idx} className="flex flex-col items-center justify-center p-3 py-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                        <item.icon className="w-6 h-6 text-primary mb-2" strokeWidth={1.5} />
+                                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-0.5">{item.label}</span>
+                                        <span className="text-sm font-black text-gray-900">{item.value}</span>
                                     </div>
                                 ))}
                             </div>
@@ -178,16 +179,19 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                         {boxContent && boxContent.length > 0 && (
                             <div className="space-y-4">
                                 <h3 className="font-bold text-lg flex items-center gap-2">
-                                    <Package className="w-5 h-5 text-primary" /> What's In The Box?
+                                    <div className="p-1.5 bg-orange-50 rounded-lg">
+                                        <Package className="w-4 h-4 text-orange-600" />
+                                    </div>
+                                    What's In The Box?
                                 </h3>
-                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-800/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-                                    <ul className="space-y-3">
+                                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                                    <ul className="space-y-2">
                                         {boxContent.map((item, idx) => (
-                                            <li key={idx} className="flex items-center gap-3 text-sm font-medium">
-                                                <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                                                    <CheckCircle2 className="w-3 h-3 text-green-600 dark:text-green-400" />
+                                            <li key={idx} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                                <div className="mt-0.5 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                                                    <CheckCircle2 className="w-3 h-3 text-green-700" />
                                                 </div>
-                                                <span className="text-foreground/90">{item}</span>
+                                                <span className="text-sm font-medium text-gray-700 leading-tight">{item}</span>
                                             </li>
                                         ))}
                                     </ul>
