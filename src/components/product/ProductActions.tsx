@@ -77,9 +77,15 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
         return variant?.image;
     };
 
+    // Feature highlights derived from product specs
+    const highlights = [
+        { icon: Gauge, label: 'Speed', value: product.specs?.speed || '5-8 km/h' },
+        { icon: Weight, label: 'Load', value: product.specs?.max_load || '30 kg' },
+        { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'Mobile App' : 'Remote' },
+    ];
+
     return (
-        <div className="space-y-8">
-            {/* Price Display (Clean, No Box) */}
+        <div className="space-y-6">
             {/* Price Display (Compact) */}
             <div className="space-y-0.5">
                 <div className="flex items-baseline gap-3">
@@ -103,6 +109,19 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             </div>
 
             <div className="h-px bg-border/40 w-full" />
+
+            {/* Key Features (Compact Chips) */}
+            <div className="flex flex-wrap gap-2">
+                {highlights.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 border border-gray-100">
+                        <item.icon className="w-4 h-4 text-orange-500" strokeWidth={2} />
+                        <div className="flex flex-col">
+                            <span className="text-[8px] text-muted-foreground font-bold tracking-wider uppercase leading-none">{item.label}</span>
+                            <span className="text-[10px] font-black text-gray-900 leading-none mt-0.5">{item.value}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
 
             {/* Attributes Selection */}
             {product.attributes?.map((attr) => (
@@ -167,43 +186,40 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
             ))}
 
-            {/* Actions */}
-            <div className="space-y-3 pt-4">
-
-                {/* Primary: Add to Cart */}
-                <button
-                    onClick={handleAddToCart}
-                    disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                    className={cn(
-                        "relative w-full h-12 bg-gradient-to-r from-primary via-purple-600 to-primary background-animate text-white font-bold text-base rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden",
-                        added && "bg-none bg-green-600 shadow-green-500/30"
-                    )}
-                >
-                    {/* Shine Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-
-                    {added ? <Check className="w-5 h-5" strokeWidth={3} /> : <ShoppingCart className="w-5 h-5 fill-white/20 group-hover:scale-110 transition-transform" strokeWidth={2.5} />}
-                    {added ? "ADDED" : "ADD TO CART"}
-                </button>
-
-                {/* Secondary: Buy Now & Quantity */}
-                <div className="flex gap-3 h-12">
+            {/* Actions: Single Row */}
+            <div className="space-y-3 pt-2">
+                <div className="flex gap-3 h-14">
+                    {/* 1. Quantity Selector */}
                     <div className="shrink-0 h-full w-24">
                         <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200 rounded-xl bg-gray-50/50" />
                     </div>
 
+                    {/* 2. Add to Cart (Icon Only) */}
+                    <button
+                        onClick={handleAddToCart}
+                        disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
+                        className={cn(
+                            "aspect-square h-full bg-white border-2 border-primary/10 text-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/5 hover:bg-primary hover:text-white hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed group",
+                            added && "bg-green-600 border-green-600 text-white"
+                        )}
+                        title="Add To Cart"
+                    >
+                        {added ? <Check className="w-6 h-6" strokeWidth={3} /> : <ShoppingCart className="w-6 h-6" strokeWidth={2.5} />}
+                    </button>
+
+                    {/* 3. Buy Now (Full) */}
                     <button
                         onClick={handleBuyNow}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
                         className="flex-1 h-full bg-black text-white text-base font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-900 transition-all shadow-md active:scale-[0.98]"
                     >
-                        <ShoppingBag className="w-4 h-4" strokeWidth={2.5} />
+                        <ShoppingBag className="w-5 h-5" strokeWidth={2.5} />
                         BUY NOW
                     </button>
                 </div>
 
                 {/* Secure Checkout Trust */}
-                <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground pt-2 font-bold uppercase tracking-wider opacity-60">
+                <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground pt-1 font-bold uppercase tracking-wider opacity-60">
                     <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Secure Payment</div>
                     <span>•</span>
                     <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Fast Dispatch</div>
