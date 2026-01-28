@@ -57,48 +57,91 @@ export async function POST(req: Request) {
                 const imageBuffer = await imageRes.arrayBuffer();
                 const imageBase64 = Buffer.from(imageBuffer).toString("base64");
 
-                const prompt = `PHOTO EDITING TASK: Create a stunning e-commerce product image.
+                const prompt = `You are a professional e-commerce product photography and catalog-cleanup AI specialized in children's ride-on toys.
 
-INPUT: A photo of a children's ride-on electric toy car.
+REFERENCE:
+Use the uploaded image as the ONLY product reference.
+The toy's physical structure, proportions, body shape, wheels, seat, lights, dashboard, handles, mirrors, stickers placement, surface detailing, and overall design MUST remain exactly the same.
 
-WHAT TO DO:
+DO NOT:
+• Redesign the toy
+• Alter car detailing
+• Change body lines or shapes
+• Modify colors or textures
+• Add or remove parts
 
-1. KEEP THE PRODUCT DETAILS EXACTLY AS-IS
-   - Same toy car model with same design
-   - Same colors - every color must match perfectly  
-   - Same car brand badges (Mercedes, BMW, Lamborghini, Ferrari, Jeep, Ford, Audi, Porsche, etc.)
-   - Same headlights, wheels, seats, mirrors, steering wheel design
-   - DO NOT redesign, recolor, or modify any product details
+BRANDING RULES (VERY IMPORTANT):
+• Remove or neutralize ALL existing brand names, logos, or trademarks visible on the toy (except car manufacturer badges like Mercedes, BMW, Jeep, Ford, etc.)
+• Cleanly erase supplier branding without leaving marks, blur, or artifacts
+• Preserve surface texture after branding removal so it looks factory-original
 
-2. ANGLE ADJUSTMENT (ALLOWED)
-   - You MAY adjust the viewing angle for better composition
-   - Choose a flattering e-commerce angle (3/4 front view works great)
-   - The product details must stay the same, just the perspective can change
+LOGO APPLICATION:
+• Apply ${brandName} LOGO only (provided as second image)
+• Logo placement must be subtle, realistic, and minimal
+• Place logo only in appropriate real-world locations (e.g. small front badge, rear badge, license plate, or side panel)
+• Logo must look physically printed or embedded — not pasted or floating
+• Do NOT oversize the logo
+• Do NOT repeat the logo multiple times
 
-3. REMOVE COMPETITOR WATERMARKS
-   - Remove: "11cart", "Amazon", "Walmart", "Flipkart", "Hamleys", "AliExpress", "Alibaba" logos
-   - Remove: Seller stickers, price tags, website URLs, promotional overlays
-   - KEEP: Car manufacturer badges (BMW, Mercedes, Jeep, etc.) - these are part of the product!
+PRIMARY OBJECTIVE:
+Regenerate the image into a premium, realistic, parent-trust-focused e-commerce product photo suitable for a professional ride-on toy website.
 
-4. CREATIVE BACKGROUND (AI CHOOSES BEST FIT)
-   Choose a background that MATCHES the product style:
-   - For Jeep/Off-road vehicles: Desert road, mountain trail, adventure setting, sunset landscapes
-   - For Sports cars (Lamborghini, Ferrari): Luxury driveway, city street, racetrack
-   - For Classic cars (Mercedes, BMW): Elegant mansion driveway, upscale garage
-   - For General toys: Clean studio OR beautiful outdoor setting
-   
-   Background should:
-   - Be cinematic and visually stunning
-   - Have beautiful lighting (golden hour, soft shadows)
-   - Make the product look premium and desirable
-   - NOT distract from the product - product is the hero
+BACKGROUND:
+Automatically choose ONE clean environment:
+• Soft white studio background with natural floor shadow (default)
+• Minimal indoor lifestyle setting (neutral walls, clean floor)
+• Outdoor daylight setting (simple driveway or park surface)
 
-5. OUTPUT
-   - Square 1:1 aspect ratio
-   - High quality, sharp, professional photography
-   - Cinematic look that makes parents want to buy this for their kids
+BACKGROUND RULES:
+• No clutter
+• No people
+• No children
+• No pets
+• No extra toys
+• No text or graphics
+• No cartoon or fantasy elements
 
-SUMMARY: Keep product details (colors, design, badges) exactly the same. Choose a stunning background that matches the vehicle type. Make it look like a professional advertisement.`;
+LIGHTING:
+• Soft professional studio lighting
+• Natural daylight feel
+• Even illumination across the toy
+• Gentle realistic shadow beneath wheels
+• No harsh reflections on plastic surfaces
+
+COMPOSITION:
+• Full toy must be clearly visible
+• Natural real-world perspective
+• Center or right-aligned framing
+• Proper scale for children's ride-on toy
+• Wheels must rest naturally on surface
+• Toy must appear stable and safe
+
+REALISM & SAFETY PERCEPTION:
+• Toy should look sturdy, safe, and reliable
+• Avoid racing, motion blur, or aggressive angles
+• Avoid dramatic or cinematic effects
+
+QUALITY & OUTPUT:
+• Ultra-high clarity
+• Sharp focus
+• Clean edges
+• Realistic plastic and metal textures
+• Square 1:1 aspect ratio
+• Commercial-grade realism suitable for zoom
+
+STRICTLY FORBIDDEN:
+• Children or adults
+• Supplier branding (11cart, Amazon, Walmart, Flipkart, Hamleys, AliExpress, Alibaba)
+• Extra decals
+• Fake accessories
+• Text overlays
+• Watermarks
+• Illustration or CGI look
+• Over-sharpening or glow effects
+
+FINAL OUTPUT:
+One highly realistic, premium, professionally photographed ride-on toy image with clean branding and a subtle application of ${brandName} LOGO, ready for top-tier e-commerce use.`;
+
                 const contentParts = [
                     { text: prompt },
                     { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
