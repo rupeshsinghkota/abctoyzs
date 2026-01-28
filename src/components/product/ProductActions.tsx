@@ -98,7 +98,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
     return (
         <div className="space-y-6">
             {/* Top Section Wrapper for Desktop Reordering */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2 md:gap-6">
                 {/* Automotive Performance Badges - Order changes on desktop */}
                 <div className="flex overflow-x-auto pb-2 -mb-2 snap-x snap-mandatory no-scrollbar gap-2 sm:grid sm:grid-cols-4 sm:gap-3 sm:pb-0 sm:mb-0 order-1 md:order-3">
                     {highlights.map((item, idx) => (
