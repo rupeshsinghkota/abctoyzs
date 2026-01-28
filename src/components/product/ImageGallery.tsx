@@ -8,12 +8,6 @@ import { ChevronLeft, ChevronRight, Maximize2, Play, CirclePlay } from 'lucide-r
 interface ImageGalleryProps {
     images: string[];
     videos?: string[];
-    marketingSuite?: {
-        action: string;
-        comfort: string;
-        durability: string;
-    };
-    productName?: string;
 }
 
 type MediaItem = {
@@ -21,7 +15,7 @@ type MediaItem = {
     url: string;
 };
 
-export function ImageGallery({ images, videos = [], marketingSuite, productName }: ImageGalleryProps) {
+export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [desktopIndex, setDesktopIndex] = useState(0);
@@ -44,15 +38,6 @@ export function ImageGallery({ images, videos = [], marketingSuite, productName 
     const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
     const scrollTo = useCallback((index: number) => emblaApi?.scrollTo(index), [emblaApi]);
-
-    // Active Headline Overlay logic
-    const activeHeadline = useMemo(() => {
-        if (!marketingSuite) return null;
-        if (desktopIndex === 0) return marketingSuite.action;
-        if (desktopIndex === 1) return marketingSuite.comfort;
-        if (desktopIndex === 2) return marketingSuite.durability;
-        return null;
-    }, [desktopIndex, marketingSuite]);
 
     return (
         <div className="w-full">
@@ -194,19 +179,6 @@ export function ImageGallery({ images, videos = [], marketingSuite, productName 
                                     className="w-full h-full object-contain p-8 transition-all duration-1000 ease-out group-hover:scale-105 relative z-10"
                                 />
 
-                                {/* THE "SHOWROOM" HEADLINE OVERLAY */}
-                                {activeHeadline && (
-                                    <div className="absolute top-12 left-12 z-20 pointer-events-none animate-in fade-in slide-in-from-left-8 duration-700">
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
-                                                {productName || "ABC Toyz"}
-                                            </span>
-                                            <h2 className="text-4xl lg:text-5xl font-black font-heading leading-tight tracking-tighter drop-shadow-sm max-w-[400px]">
-                                                {activeHeadline}
-                                            </h2>
-                                        </div>
-                                    </div>
-                                )}
 
                                 {/* Fullscreen / Zoom Hint */}
                                 <div className="absolute bottom-8 left-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">

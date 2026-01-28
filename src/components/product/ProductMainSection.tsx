@@ -68,8 +68,6 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                     key={displayImages[0]}
                     images={displayImages}
                     videos={product.videos}
-                    marketingSuite={product.marketing_suite}
-                    productName={product.name}
                 />
             </div>
 
@@ -78,38 +76,44 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                 <div className="bg-white rounded-t-[32px] lg:rounded-none px-6 pt-8 pb-4 lg:p-0 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] lg:shadow-none min-h-[50vh]">
                     <div className="lg:sticky lg:top-28 space-y-8">
 
-                        {/* Header */}
-                        {/* Header */}
                         <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                {product.tag && (
-                                    <div className="flex items-center gap-2">
-                                        <span className="px-2 py-0.5 text-[9px] font-bold text-white bg-black dark:bg-white dark:text-black rounded-full uppercase tracking-widest">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-3">
+                                    {product.tag && (
+                                        <span className="px-2 py-0.5 text-[10px] font-black text-white bg-black rounded-md uppercase tracking-[0.2em]">
                                             {product.tag}
                                         </span>
-                                    </div>
-                                )}
+                                    )}
+                                    {product.rating >= 4.5 && (
+                                        <span className="px-2 py-0.5 text-[10px] font-black text-primary bg-primary/10 rounded-md uppercase tracking-[0.2em] border border-primary/20">
+                                            Top Rated
+                                        </span>
+                                    )}
+                                </div>
 
-                                <h1 className="text-2xl md:text-3xl lg:text-4xl font-black font-heading leading-tight tracking-tight text-foreground">
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black font-heading leading-[1.1] tracking-tighter text-foreground">
                                     {product.name}
                                 </h1>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-0.5">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <Star
-                                            key={star}
-                                            className={cn(
-                                                "w-3.5 h-3.5",
-                                                star <= Math.round(product.rating)
-                                                    ? "fill-black text-black dark:fill-white dark:text-white"
-                                                    : "fill-gray-100 text-gray-100"
-                                            )}
-                                        />
-                                    ))}
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+                                    <div className="flex items-center gap-0.5">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <Star
+                                                key={star}
+                                                className={cn(
+                                                    "w-3 h-3",
+                                                    star <= Math.round(product.rating)
+                                                        ? "fill-primary text-primary"
+                                                        : "fill-gray-200 text-gray-200"
+                                                )}
+                                            />
+                                        ))}
+                                    </div>
+                                    <span className="text-[11px] font-black text-foreground ml-1">{product.rating || '5.0'}</span>
                                 </div>
-                                <span className="text-xs font-medium text-muted-foreground underline decoration-muted-foreground/30 underline-offset-4">
+                                <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">
                                     {product.reviews} Verified Reviews
                                 </span>
                             </div>

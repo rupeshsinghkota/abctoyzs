@@ -87,39 +87,43 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     return (
         <div className="space-y-6">
-            {/* Price Display (Compact) */}
-            <div className="space-y-0.5">
-                <div className="flex items-baseline gap-3">
-                    <span className="text-3xl md:text-4xl font-black text-foreground tracking-tight leading-none">
-                        ₹{displayPrice.toLocaleString()}
-                    </span>
-                    {discount > 0 && (
-                        <div className="flex items-baseline gap-2 leading-none">
-                            <span className="text-sm font-bold text-muted-foreground line-through decoration-2 decoration-red-500/50">
-                                ₹{displayMRP.toLocaleString()}
+            {/* Price Display (Premium Deal Style) */}
+            <div className="space-y-2">
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                        <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">
+                            ₹{displayPrice.toLocaleString()}
+                        </span>
+                        {discount > 0 && (
+                            <span className="bg-red-50 text-red-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider border border-red-100 animate-pulse">
+                                Save {discount}% Now
                             </span>
-                            <span className="text-xs font-black text-red-600 uppercase tracking-wide">
-                                {discount}% OFF
+                        )}
+                    </div>
+                    {discount > 0 && (
+                        <div className="flex items-center gap-2 mt-1">
+                            <span className="text-sm font-medium text-muted-foreground/60 line-through">
+                                MRP ₹{displayMRP.toLocaleString()}
+                            </span>
+                            <span className="text-[10px] font-bold text-green-600 flex items-center gap-0.5">
+                                <CheckCircle2 className="w-3 h-3" /> All Inclusive
                             </span>
                         </div>
                     )}
                 </div>
-                <p className="text-[10px] font-bold text-green-600 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Inclusive of all taxes
-                </p>
             </div>
 
-            <div className="h-px bg-border/40 w-full" />
+            <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full" />
 
-            {/* Key Features (Compact Chips) */}
-            <div className="flex flex-wrap gap-2">
+            {/* Automotive Performance Badges */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {highlights.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 border border-gray-100">
-                        <item.icon className="w-4 h-4 text-orange-500" strokeWidth={2} />
-                        <div className="flex flex-col">
-                            <span className="text-[8px] text-muted-foreground font-bold tracking-wider uppercase leading-none">{item.label}</span>
-                            <span className="text-[10px] font-black text-gray-900 leading-none mt-0.5">{item.value}</span>
+                    <div key={idx} className="group flex flex-col items-center justify-center p-3 rounded-2xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300">
+                        <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <item.icon className="w-4 h-4 text-primary" strokeWidth={2.5} />
                         </div>
+                        <span className="text-[9px] text-muted-foreground font-black tracking-[0.1em] uppercase mb-0.5">{item.label}</span>
+                        <span className="text-[11px] font-black text-gray-900">{item.value}</span>
                     </div>
                 ))}
             </div>
