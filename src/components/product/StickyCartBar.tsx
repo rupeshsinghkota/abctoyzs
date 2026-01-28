@@ -5,6 +5,7 @@ import { ShoppingBag, ShoppingCart, Minus, Plus, Check, Loader2 } from 'lucide-r
 import { useStore } from '@/store/useStore';
 import { useRouter } from 'next/navigation';
 import { Product, ProductVariant } from '@/lib/data';
+import { cn } from '@/lib/utils';
 
 interface StickyCartBarProps {
     product: Product;
