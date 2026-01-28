@@ -115,15 +115,17 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
             <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full" />
 
-            {/* Automotive Performance Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {/* Automotive Performance Badges - Horizontal & Compact on Mobile */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {highlights.map((item, idx) => (
-                    <div key={idx} className="group flex flex-col items-center justify-center p-3 rounded-2xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300">
-                        <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                            <item.icon className="w-4 h-4 text-primary" strokeWidth={2.5} />
+                    <div key={idx} className="group flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300">
+                        <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <item.icon className="w-4 h-4 text-primary" strokeWidth={2} />
                         </div>
-                        <span className="text-[9px] text-muted-foreground font-black tracking-[0.1em] uppercase mb-0.5">{item.label}</span>
-                        <span className="text-[11px] font-black text-gray-900">{item.value}</span>
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase truncate">{item.label}</span>
+                            <span className="text-[10px] font-black text-gray-900 truncate">{item.value}</span>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -191,34 +193,34 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
             ))}
 
-            {/* Actions: Single Row */}
-            <div className="space-y-3 pt-2">
-                <div className="flex gap-3 h-14">
-                    {/* 1. Quantity Selector */}
-                    <div className="shrink-0 h-full w-24">
-                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200 rounded-xl bg-gray-50/50" />
+            {/* Actions: Single Row (High Density) */}
+            <div className="space-y-3 pt-1">
+                <div className="flex gap-2 h-12">
+                    {/* 1. Quantity Selector (Slimmer) */}
+                    <div className="shrink-0 h-full w-20">
+                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200/60 rounded-xl bg-gray-50/30" />
                     </div>
-
+                    1,
                     {/* 2. Add to Cart (Icon Only) */}
                     <button
                         onClick={handleAddToCart}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
                         className={cn(
-                            "aspect-square h-full bg-white border-2 border-primary/10 text-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/5 hover:bg-primary hover:text-white hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed group",
+                            "aspect-square h-full bg-white border border-primary/10 text-primary rounded-xl flex items-center justify-center shadow-sm hover:bg-primary hover:text-white transition-all disabled:opacity-50 group",
                             added && "bg-green-600 border-green-600 text-white"
                         )}
                         title="Add To Cart"
                     >
-                        {added ? <Check className="w-6 h-6" strokeWidth={3} /> : <ShoppingCart className="w-6 h-6" strokeWidth={2.5} />}
+                        {added ? <Check className="w-5 h-5" strokeWidth={3} /> : <ShoppingCart className="w-5 h-5" strokeWidth={2.5} />}
                     </button>
 
                     {/* 3. Buy Now (Full) */}
                     <button
                         onClick={handleBuyNow}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="flex-1 h-full bg-black text-white text-base font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-900 transition-all shadow-md active:scale-[0.98]"
+                        className="flex-1 h-full bg-black text-white text-sm font-black rounded-xl flex items-center justify-center gap-2 hover:bg-gray-900 transition-all shadow-md active:scale-[0.98] tracking-wider"
                     >
-                        <ShoppingBag className="w-5 h-5" strokeWidth={2.5} />
+                        <ShoppingBag className="w-4 h-4" strokeWidth={2.5} />
                         BUY NOW
                     </button>
                 </div>

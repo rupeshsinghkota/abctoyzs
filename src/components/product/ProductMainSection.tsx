@@ -163,7 +163,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                         </div>
 
                         {/* Mobile Content Repeater (Highlights & Description & Box Content) */}
-                        <div className="lg:hidden space-y-10 pb-8 pt-6 border-t mt-6">
+                        <div className="lg:hidden space-y-8 pb-8 pt-6 border-t mt-4">
                             {/* Mobile Technical Specs */}
                             <div className="space-y-6">
                                 <div className="flex items-center gap-3">
