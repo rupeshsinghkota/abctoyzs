@@ -66,6 +66,8 @@ export async function POST(req: Request) {
             "front direct view"
         ];
 
+        let lastError: any = null;
+
         for (let i = 0; i < (generateAll ? angles.length : 1); i++) {
             const currentAngle = angles[i];
 
@@ -148,12 +150,14 @@ STYLE: Premium e-commerce product photography, like official brand catalog.`;
                 }
             } catch (err) {
                 console.error(`Error processing image ${i + 1}:`, err);
+                lastError = err;
                 continue;
             }
         }
 
         if (generatedUrls.length === 0) {
-            throw new Error("Failed to enhance any images. Please try again.");
+            const errorMsg = lastError?.message || lastError?.toString() || "Unknown error";
+            throw new Error(`Failed to enhance images. Reason: ${errorMsg}`);
         }
 
         return NextResponse.json({
