@@ -107,7 +107,7 @@ export default async function ProductPage({ params }: PageProps) {
             {/* ... (schema and breadcrumb unchanged) */}
             <ProductSchema product={product} />
 
-            <div className="container mx-auto px-4 py-4 md:py-6">
+            <div className="container mx-auto px-4 py-2 md:py-6">
                 <nav className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
                     <Link href="/" className="hover:text-primary transition-colors">
                         <Home className="w-3.5 h-3.5" />

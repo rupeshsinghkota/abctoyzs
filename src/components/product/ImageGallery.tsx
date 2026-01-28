@@ -41,8 +41,8 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
 
     return (
         <div className="w-full">
-            {/* Mobile Carousel (< 768px) - Immersive 4:5 Aspect Ratio */}
-            <div className="md:hidden relative bg-white aspect-[4/5] w-full">
+            {/* Mobile Carousel (< 768px) - Optimized Compact 4:3 Aspect Ratio */}
+            <div className="md:hidden relative bg-white aspect-[4/3] w-full">
                 <div className="overflow-hidden h-full" ref={emblaRef}>
                     <div className="flex h-full touch-pan-y">
                         {mediaItems.map((item, index) => (
@@ -62,7 +62,7 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                                         <img
                                             src={item.url}
                                             alt={`Product view ${index + 1}`}
-                                            className="w-full h-full object-contain drop-shadow-sm p-8"
+                                            className="w-full h-full object-contain drop-shadow-sm p-4"
                                             draggable={false}
                                         />
                                         {/* Play Button on First Image */}
