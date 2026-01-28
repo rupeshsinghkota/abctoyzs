@@ -64,6 +64,10 @@ export async function POST(req: Request) {
                 5. <h3>✨ Features</h3> <ul>...</ul>
 
                 MANDATORY INCLUSION:
+                - You MUST explicitly mention the "Suitable Age Range" and "Max Weight Capacity" in the body text IF AND ONLY IF it is present in the data.
+                - If Age/Weight is missing in the notes, DO NOT INVENT IT. Leave it out.
+
+                MANDATORY INCLUSION:
                 - You MUST explicitly mention the "Suitable Age Range" and "Max Weight Capacity" in the body text (e.g. in the Features or Design section).
                 
                 Output ONLY the HTML string.
@@ -71,29 +75,28 @@ export async function POST(req: Request) {
         } else if (type === 'specs') {
             // ... existing specs prompt
             prompt = `
-                Act as a Technical Product Engineer.
-                Extract or ESTIMATE realistic technical specifications for: "${productName}" (${category}).
-                ${contextString}
-
                 CRITICAL RULES:
-                1. If exact data is missing, **INFER** based on standard industry norms for this category.
-                   - Example: "12V" usually implies 3-5 km/h, 30kg load, 1-4 years age.
-                   - Example: "24V" usually implies 5-8 km/h, 50kg load, 3-8 years age.
-                2. Only use "Unknown" if you truly have NO CLUE (e.g. no voltage, no motor info provided).
-                3. Keep values SHORT and CONCISE (Max 3-5 words).
+                1. You are a STRICT DATA EXTRACTOR.
+                2. Extract specifications ONLY from the provided notes and product title.
+                3. Do NOT guess, infer, or estimate.
+                4. If a value is NOT found, return an EMPTY STRING "".
+                   - Correct: "Speed": ""
+                   - Incorrect: "Speed": "Unknown"
+                   - Incorrect: "Speed": "3-5 km/h" (if not in notes)
+                5. Keep values SHORT and CONCISE.
                 
                 Output ONLY a JSON object with these exact keys:
                 {
-                    "Battery": "e.g. 12V 7Ah or Unknown",
-                    "Motors": "e.g. 2 x 35W or Unknown",
-                    "Speed": "e.g. 3-7 km/h",
-                    "Charging Time": "e.g. 8-10 Hours or Unknown",
-                    "Run Time": "e.g. 45-60 Mins or Unknown",
+                    "Battery": "e.g. 12V 7Ah or \"\"",
+                    "Motors": "e.g. 2 x 35W or \"\"",
+                    "Speed": "e.g. 3-7 km/h or \"\"",
+                    "Charging Time": "e.g. 8-10 Hours or \"\"",
+                    "Run Time": "e.g. 45-60 Mins or \"\"",
                     "Max Load": "e.g. 35 kg",
                     "Suitable Age": "e.g. 2-6 Years",
                     "Seating Capacity": "e.g. 1 Seater",
-                    "Tire Type": "e.g. EVA Rubber or Plastic",
-                    "Seat Material": "e.g. Leather or Plastic",
+                    "Tire Type": "e.g. EVA Rubber",
+                    "Seat Material": "e.g. Leather",
                     "Remote Control": "e.g. 2.4G Bluetooth",
                     "Mobile App Control": "e.g. Yes/No"
                 }
@@ -141,12 +144,12 @@ export async function POST(req: Request) {
                 }
 
                 RULES FOR SPECS:
-                - If data is missing, INFER based on voltage/category norms (e.g. 12V = 3-5km/h).
-                - Do NOT leave fields empty if a reasonable guess can be made.
-                - Keep strings SHORT.
-
+                - STRICT EXTRACTION ONLY.
+                - If data is missing in the notes, return EMPTY STRING "".
+                - Do NOT use "Unknown". Do NOT estimate.
+                
                 MANDATORY INCLUSION:
-                - You MUST explicitly mention the "Suitable Age Range" and "Max Weight Capacity" in the HTML description text.
+                - Include Age/Weight in description ONLY if provided in notes.
             `;
         }
 
