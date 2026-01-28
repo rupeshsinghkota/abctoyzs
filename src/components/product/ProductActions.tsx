@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check, ShoppingCart } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 
@@ -79,27 +79,33 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     return (
         <div className="space-y-8">
-            {/* Price Display */}
-            <div className="p-5 bg-card border rounded-2xl shadow-sm space-y-4">
-                <div className="flex items-end flex-wrap gap-3">
-                    <span className="text-4xl font-black text-foreground">₹{displayPrice.toLocaleString()}</span>
+            {/* Price Display (Clean, No Box) */}
+            <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                    <span className="text-4xl lg:text-5xl font-black text-foreground tracking-tight">₹{displayPrice.toLocaleString()}</span>
                     {discount > 0 && (
-                        <div className="flex flex-col mb-1.5">
-                            <span className="text-sm font-bold text-muted-foreground line-through">MRP: ₹{displayMRP.toLocaleString()}</span>
-                            <span className="text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-full w-fit">
-                                {discount}% OFF
-                            </span>
-                        </div>
+                        <span className="text-lg font-bold text-muted-foreground line-through decoration-2 decoration-red-500/30">
+                            ₹{displayMRP.toLocaleString()}
+                        </span>
                     )}
                 </div>
-                <p className="text-xs text-muted-foreground font-medium">Inclusive of all taxes</p>
+                {discount > 0 && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-green-700 bg-green-100 px-3 py-1 rounded-full uppercase tracking-wider">
+                            {discount}% OFF
+                        </span>
+                        <span className="text-xs font-medium text-muted-foreground">Inclusive of all taxes</span>
+                    </div>
+                )}
             </div>
+
+            <div className="h-px bg-border/40 w-full" />
 
             {/* Attributes Selection */}
             {product.attributes?.map((attr) => (
                 <div key={attr.name} className="space-y-3">
                     <div className="flex justify-between">
-                        <span className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{attr.name}</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-foreground">{attr.name}</span>
                         <div className="flex items-center gap-2">
                             {selectedAttributes[attr.name] && (
                                 <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
@@ -121,7 +127,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                         key={option}
                                         onClick={() => handleAttributeSelect(attr.name, option)}
                                         className={cn(
-                                            "group relative w-16 h-16 rounded-full overflow-hidden border-2 transition-all shadow-sm hover:scale-105",
+                                            "group relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all shadow-sm hover:scale-105",
                                             isSelected
                                                 ? "border-primary ring-2 ring-primary/20 ring-offset-2 scale-105"
                                                 : "border-transparent hover:border-border"
@@ -144,9 +150,9 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                     key={option}
                                     onClick={() => handleAttributeSelect(attr.name, option)}
                                     className={cn(
-                                        "px-5 py-2.5 text-sm font-bold rounded-xl border-2 transition-all min-w-[3rem]",
+                                        "px-6 py-3 text-sm font-bold rounded-xl border-2 transition-all min-w-[3rem]",
                                         isSelected
-                                            ? "border-primary bg-primary text-white shadow-md shadow-primary/25"
+                                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/25 scale-105"
                                             : "border-muted hover:border-foreground/20 text-muted-foreground hover:text-foreground bg-white dark:bg-zinc-900"
                                     )}
                                 >
@@ -158,42 +164,47 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
             ))}
 
-            <div className="h-px bg-border/50 w-full my-6" />
-
             {/* Actions */}
-            <div className="flex flex-col gap-4">
-                {/* Quantity Control within Actions Block */}
-                <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Quantity</span>
-                    <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
-                </div>
+            <div className="space-y-4 pt-4">
 
-                <div className="grid grid-cols-2 gap-3 pt-2">
+                {/* Row 1: Quantity + Add to Cart */}
+                <div className="flex gap-4 h-14">
+                    <div className="shrink-0 h-full">
+                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border-2 border-muted rounded-2xl bg-white" />
+                    </div>
+
                     <button
                         onClick={handleAddToCart}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
                         className={cn(
-                            "h-14 border-2 border-primary/20 bg-primary/5 text-primary font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/10 hover:border-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed group",
+                            "flex-1 h-full border-2 border-primary/10 bg-primary/5 text-primary font-black text-lg rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/10 hover:border-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group",
                             added && "bg-green-50 text-green-600 border-green-200"
                         )}
                     >
-                        {added ? <Check className="w-5 h-5" /> : <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />}
+                        {added ? <Check className="w-6 h-6" /> : <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform" />}
                         {added ? "Added" : "Add to Cart"}
                     </button>
+                </div>
 
-                    <button
-                        onClick={handleBuyNow}
-                        disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="h-14 bg-gradient-to-r from-primary to-orange-600 text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <ShoppingBag className="w-5 h-5 fill-white/20" />
-                        Buy Now
-                    </button>
+                {/* Row 2: Buy Now (Full Width) */}
+                <button
+                    onClick={handleBuyNow}
+                    disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
+                    className="w-full h-16 bg-gradient-to-r from-primary to-orange-600 text-white font-black text-xl rounded-2xl flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <ShoppingBag className="w-6 h-6 fill-white/20" />
+                    Buy Now
+                </button>
+
+                {/* Secure Checkout Trust */}
+                <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground pt-2">
+                    <CheckCircle2 className="w-3 h-3 text-green-500" />
+                    Secure Checkout by Razorpay
                 </div>
 
                 {/* Stock Warning */}
                 {displayStock < 5 && displayStock > 0 && (
-                    <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/10 p-3 rounded-xl justify-center animate-pulse mt-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/10 p-3 rounded-xl justify-center animate-pulse">
                         <span>🔥 Hurry! Only {displayStock} left at this price!</span>
                     </div>
                 )}
