@@ -31,12 +31,17 @@ export default function NewProductPage() {
     const router = useRouter();
     const [saving, setSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+
     const [activeTab, setActiveTab] = useState('media');
     const [brandingIndex, setBrandingIndex] = useState<number | null>(null);
     const [isBrandingAll, setIsBrandingAll] = useState(false);
     const [isGeneratingPosters, setIsGeneratingPosters] = useState(false);
+    const [isGeneratingPosters, setIsGeneratingPosters] = useState(false);
     const [generatedPosters, setGeneratedPosters] = useState<string[]>([]);
+
+    // Magic Paste State
+    const [rawText, setRawText] = useState('');
+    const [isExtracting, setIsExtracting] = useState(false);
 
     // Variations State
     const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -443,6 +448,42 @@ export default function NewProductPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
+
+                        {/* 🪄 Magic Paste Section */}
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-100 p-6 rounded-3xl shadow-sm">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-black text-xl flex items-center gap-2 text-indigo-900">
+                                    <Sparkles className="w-5 h-5 text-indigo-600" />
+                                    Magic Paste
+                                </h3>
+                                <span className="text-xs font-bold bg-white px-3 py-1 rounded-full text-indigo-600 border border-indigo-100">AI Data Extractor</span>
+                            </div>
+
+                            <textarea
+                                value={rawText}
+                                onChange={(e) => setRawText(e.target.value)}
+                                placeholder="📋 PASTE MESSY TEXT HERE:
+- Supplier WhatsApp messages
+- PDF copy-pastes
+- Competitor listings
+
+I will extract specs, description, and features automatically."
+                                className="w-full px-5 py-4 bg-white/80 border-2 border-indigo-100 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all placeholder:text-indigo-300 min-h-[120px] mb-4 text-sm"
+                            />
+
+                            <div className="flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={handleExtractData}
+                                    disabled={isExtracting || !rawText.trim()}
+                                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:shadow-none"
+                                >
+                                    {isExtracting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 text-yellow-300 fill-yellow-300" />}
+                                    {isExtracting ? 'Extracting Data...' : '🚀 Extract & Fill Form'}
+                                </button>
+                            </div>
+                        </div>
+
                         {/* Tabs */}
                         <div className="flex overflow-x-auto gap-2 p-1.5 bg-muted rounded-2xl sticky top-[57px] md:top-0 z-10 backdrop-blur-md bg-opacity-90 scrollbar-hide">
                             {tabs.map(tab => {
