@@ -25,17 +25,16 @@ export async function POST(req: Request) {
         const supabase = await createClient();
         const brandName = BRAND_CONFIG.name;
 
+        // Imagen 3 (Nano Banana) gave 404 Not Found.
+        // Reverting to Gemini 2.0 Flash which supports multimodal input/output.
         const model = genAI.getGenerativeModel({
-            model: "imagen-3.0-capability-001",
+            model: "gemini-2.0-flash-exp",
             safetySettings: [
                 { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
                 { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
                 { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
                 { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
             ],
-            generationConfig: {
-                responseModalities: ["image", "text"],
-            } as any
         });
 
         // Read brand logo
