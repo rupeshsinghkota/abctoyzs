@@ -499,44 +499,7 @@ export default function NewProductPage() {
 
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
-
-                        {/* 🪄 Magic Paste Section */}
-                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-100 p-6 rounded-3xl shadow-sm">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-black text-xl flex items-center gap-2 text-indigo-900">
-                                    <Sparkles className="w-5 h-5 text-indigo-600" />
-                                    Magic Paste
-                                </h3>
-                                <span className="text-xs font-bold bg-white px-3 py-1 rounded-full text-indigo-600 border border-indigo-100">AI Data Extractor</span>
-                            </div>
-
-                            <textarea
-                                value={rawText}
-                                onChange={(e) => setRawText(e.target.value)}
-                                placeholder="📋 PASTE MESSY TEXT HERE:
-- Supplier WhatsApp messages
-- PDF copy-pastes
-- Competitor listings
-
-I will extract specs, description, and features automatically."
-                                className="w-full px-5 py-4 bg-white/80 border-2 border-indigo-100 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all placeholder:text-indigo-300 min-h-[120px] mb-4 text-sm"
-                            />
-
-                            <div className="flex justify-end">
-                                <button
-                                    type="button"
-                                    onClick={handleExtractData}
-                                    disabled={isExtracting || !rawText.trim()}
-                                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:shadow-none"
-                                >
-                                    {isExtracting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 text-yellow-300 fill-yellow-300" />}
-                                    {isExtracting ? 'Extracting Data...' : '🚀 Extract & Fill Form'}
-                                </button>
-                            </div>
-                        </div>
-
                         {/* Tabs */}
                         <div className="flex overflow-x-auto gap-2 p-1.5 bg-muted rounded-2xl sticky top-[57px] md:top-0 z-10 backdrop-blur-md bg-opacity-90 scrollbar-hide">
                             {tabs.map(tab => {
@@ -822,69 +785,83 @@ I will extract specs, description, and features automatically."
                                         <div className="flex gap-2">
                                             <button
                                                 type="button"
-                                                onClick={generateMarketingSuite}
-                                                disabled={isGeneratingPosters || !formData.images[0] || !formData.prompt_notes}
-                                                className="text-[10px] sm:text-xs px-4 py-2 bg-blue-600 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:bg-blue-700 shadow-lg disabled:opacity-50"
+                                                onClick={handleExtractData}
+                                                disabled={isExtracting || !rawText}
+                                                className="text-[10px] sm:text-xs px-4 py-2 bg-purple-600 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:bg-purple-700 shadow-lg disabled:opacity-50"
                                             >
-                                                {isGeneratingPosters ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
-                                                {isGeneratingPosters ? 'Creating Posters...' : '🎬 Create Premium Posters'}
+                                                {isExtracting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                {isExtracting ? 'Analyzing...' : 'Extract & Fill Form'}
                                             </button>
-                                            <textarea
-                                                value={formData.prompt_notes}
-                                                onChange={(e) => setFormData({ ...formData, prompt_notes: e.target.value })}
-                                                className="w-full px-4 py-3 bg-background border rounded-xl text-sm focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"
-                                                placeholder="Paste supplier details, manufacturer notes, or raw product text here for the AI to analyze..."
-                                                rows={4}
-                                            />
-                                            <div className="flex items-center gap-2 text-[10px] text-purple-400 font-medium">
-                                                <Zap className="w-3 h-3" />
-                                                <span>Pro Tip: Add images first, then use "Magic Paste" at the top for full details!</span>
-                                            </div>
                                         </div>
                                     </div>
 
-
-                                    <div className="h-px bg-border/50" />
-
-                                    {/* Videos Section */}
-                                    <div>
-                                        <label className="block text-sm font-bold mb-4 uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                                            <Zap className="w-4 h-4" /> Product Videos
-                                        </label>
-                                        <div className="space-y-3">
-                                            {formData.videos.map((vid, index) => (
-                                                <div key={index} className="flex gap-2">
-                                                    <input
-                                                        type="url"
-                                                        value={vid}
-                                                        onChange={(e) => updateList('videos', index, e.target.value)}
-                                                        className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
-                                                        placeholder="https://youtube.com/watch?v=... or .mp4 link"
-                                                    />
-                                                    {formData.videos.length > 1 && (
-                                                        <button type="button" onClick={() => removeListField('videos', index)} className="px-4 bg-muted hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 rounded-xl transition-colors"><X className="w-5 h-5" /></button>
-                                                    )}
-                                                </div>
-                                            ))}
-
-                                            <div className="flex items-center gap-4">
-                                                <button type="button" onClick={() => addListField('videos')} className="text-sm font-bold text-primary hover:underline">+ Add Video URL</button>
-                                                <div className="h-4 w-px bg-border" />
-                                                <label className="text-sm font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
-                                                    <Upload className="w-3 h-3" />
-                                                    <span>{isUploading ? 'Uploading...' : 'Upload Video Files'}</span>
-                                                    <input
-                                                        type="file"
-                                                        multiple
-                                                        accept="video/*"
-                                                        className="hidden"
-                                                        onChange={(e) => handleFileUpload(e, 'videos')}
-                                                        disabled={isUploading}
-                                                    />
-                                                </label>
-                                            </div>
+                                    <div className="relative">
+                                        <textarea
+                                            value={rawText}
+                                            onChange={(e) => setRawText(e.target.value)}
+                                            className="w-full px-4 py-3 bg-background border rounded-xl text-sm focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"
+                                            placeholder="Paste supplier details, manufacturer notes, or raw product text here for the AI to analyze..."
+                                            rows={4}
+                                        />
+                                        <div className="flex items-center gap-2 text-[10px] text-purple-400 font-medium mt-2">
+                                            <Zap className="w-3 h-3" />
+                                            <span>Pro Tip: Paste messy text and AI will extract all the data!</span>
                                         </div>
-                                        <p className="text-xs text-muted-foreground mt-2">Supports YouTube links or direct MP4 URLs/uploads. First video will be featured.</p>
+                                    </div>
+
+                                    <div className="flex justify-end pt-2 border-t border-purple-200/50">
+                                        <button
+                                            type="button"
+                                            onClick={generateMarketingSuite}
+                                            disabled={isGeneratingPosters || !formData.name}
+                                            className="text-[10px] sm:text-xs px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl transition-all font-bold flex items-center gap-1.5 hover:shadow-lg shadow-pink-500/20 disabled:opacity-50"
+                                        >
+                                            {isGeneratingPosters ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
+                                            {isGeneratingPosters ? 'Designing Suite...' : 'Generate Marketing Suite'}
+                                        </button>
+                                    </div>
+                                </div>
+
+
+                                <div className="h-px bg-border/50" />
+
+                                {/* Videos Section */}
+                                <div>
+                                    <label className="block text-sm font-bold mb-4 uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                        <Zap className="w-4 h-4" /> Product Videos
+                                    </label>
+                                    <div className="space-y-3">
+                                        {formData.videos.map((vid, index) => (
+                                            <div key={index} className="flex gap-2">
+                                                <input
+                                                    type="url"
+                                                    value={vid}
+                                                    onChange={(e) => updateList('videos', index, e.target.value)}
+                                                    className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
+                                                    placeholder="https://youtube.com/watch?v=... or .mp4 link"
+                                                />
+                                                {formData.videos.length > 1 && (
+                                                    <button type="button" onClick={() => removeListField('videos', index)} className="px-4 bg-muted hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 rounded-xl transition-colors"><X className="w-5 h-5" /></button>
+                                                )}
+                                            </div>
+                                        ))}
+
+                                        <div className="flex items-center gap-4">
+                                            <button type="button" onClick={() => addListField('videos')} className="text-sm font-bold text-primary hover:underline">+ Add Video URL</button>
+                                            <div className="h-4 w-px bg-border" />
+                                            <label className="text-sm font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                                                <Upload className="w-3 h-3" />
+                                                <span>{isUploading ? 'Uploading...' : 'Upload Video Files'}</span>
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    accept="video/*"
+                                                    className="hidden"
+                                                    onChange={(e) => handleFileUpload(e, 'videos')}
+                                                    disabled={isUploading}
+                                                />
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
