@@ -38,22 +38,21 @@ export async function POST(req: Request) {
         const logoBuffer = fs.readFileSync(logoPath);
         const logoBase64 = logoBuffer.toString("base64");
 
-        // Step 3: Ultra-Stable Generation
-        // Using a flattened, DESCRIPTIVE prompt to prevent MALFORMED_FUNCTION_CALL.
-        // Imperative verbs (remove, place, scrub) can confuse the model into trying to call tools.
-        const prompt = `A premium commercial product photography masterpiece of the toy vehicle shown in the first image, cropped to a strict 1:1 SQUARE aspect ratio. 
+        // Step 3: Ultra-Stable Generation - PRODUCT PRESERVATION MODE
+        const prompt = `Create a premium commercial product photograph of the EXACT toy vehicle shown in the first image.
         
-        CRITICAL MODIFICATION INSTRUCTIONS:
-        1. PRESERVE ALL ORIGINAL CAR MANUFACTURER BRANDING: Keep ALL original car brand logos and badges (like Mercedes, BMW, Lamborghini, Ferrari, Porsche, Jeep, Ford, etc.) exactly as they appear on the vehicle. These are authentic licensed designs and MUST remain visible.
-        2. REMOVE ONLY COMPETITOR WATERMARKS: If there are any store watermarks, seller logos, or e-commerce text overlays (like Amazon, Walmart, AliExpress text), remove those only.
-        3. BRAND PLACEMENT: Apply the provided BRAND LOGO (from the second image) onto the front license plate area ONLY. It must look physically integrated (metallic or sticker texture), not just overlaid.
-        4. BACKGROUND: Replace the background with a high-end luxury driveway or scenic road with cinematic lighting.
+        ABSOLUTE REQUIREMENTS - DO NOT VIOLATE:
+        1. THE PRODUCT MUST REMAIN 100% UNCHANGED: Do NOT modify, alter, or change ANYTHING about the toy vehicle itself. Keep every single detail exactly as shown - all logos, badges, text, stickers, decals, colors, shapes, and features must remain EXACTLY as they appear in the original image.
+        2. BACKGROUND ONLY: Replace ONLY the background with a premium setting (luxury driveway, scenic road, or studio backdrop with cinematic lighting).
+        3. OPTIONAL LICENSE PLATE: If visible, you may add the brand logo (second image) to the license plate area ONLY. Do NOT place the logo anywhere else on the vehicle.
         
-        STRICT GUIDELINES:
-        - The vehicle's original car brand badges and emblems MUST be preserved exactly as shown.
-        - Only enhance the image quality and background - do NOT modify the vehicle design, logos, or badges.
-        - Preserve the vehicle's exact shape, color, and all original manufacturer branding.
-        - Photorealistic, 8k resolution, advertising quality.`;
+        STRICTLY FORBIDDEN:
+        - DO NOT remove any logos or badges from the vehicle
+        - DO NOT change the vehicle's color, design, or any details
+        - DO NOT add or remove any features from the vehicle
+        - DO NOT modify the vehicle's appearance in ANY way
+        
+        OUTPUT: 1:1 SQUARE crop, photorealistic, 8K quality, advertising-grade image. The vehicle must look IDENTICAL to the input image with only a better background.`;
 
         const result = await model.generateContent([
             { text: prompt },
