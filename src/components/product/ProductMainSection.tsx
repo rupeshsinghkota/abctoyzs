@@ -14,7 +14,6 @@ import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-rea
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
     // State for attribute selection
     const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(() => {
-        // Initialize with first options
         const initial: Record<string, string> = {};
         product.attributes?.forEach(attr => {
             if (attr.options.length > 0) {
@@ -23,6 +22,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
         });
         return initial;
     });
+
+    // Mobile Detail Tabs State
+    const [activeTab, setActiveTab] = useState<'specs' | 'box'>('specs');
 
     // Derived Variants State
     const currentVariant = useMemo(() => {
@@ -163,40 +165,51 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             </button>
                         </div>
 
-                        {/* Mobile Content Repeater (Highlights & Description & Box Content) */}
-                        <div className="lg:hidden space-y-8 pb-8 pt-6 border-t mt-4">
-                            {/* Mobile Technical Specs */}
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shadow-inner">
-                                        <Gauge className="w-5 h-5" />
-                                    </div>
-                                    <h3 className="text-xl font-black text-gray-900 tracking-tight">Technical Specs</h3>
-                                </div>
-
-                                <div className="bg-gray-50/50 rounded-3xl p-6 border border-gray-100">
-                                    <ProductSpecs
-                                        specs={product.specs}
-                                        additionalInfo={{
-                                            "Voltage": product.voltage,
-                                            "Recommended Age": product.ageGroup,
-                                            "Category": product.category?.charAt(0).toUpperCase() + product.category?.slice(1)
-                                        }}
-                                    />
-                                </div>
+                        {/* Mobile Content Switcher (Specs vs Box Content) */}
+                        <div className="lg:hidden space-y-6 pb-8 pt-6 border-t mt-4">
+                            {/* Tab Headers */}
+                            <div className="flex p-1 bg-gray-100/80 rounded-2xl">
+                                <button
+                                    onClick={() => setActiveTab('specs')}
+                                    className={cn(
+                                        "flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black transition-all",
+                                        activeTab === 'specs'
+                                            ? "bg-white text-gray-900 shadow-sm"
+                                            : "text-gray-500 hover:text-gray-700"
+                                    )}
+                                >
+                                    <Gauge className="w-4 h-4" />
+                                    TECH SPECS
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('box')}
+                                    className={cn(
+                                        "flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black transition-all",
+                                        activeTab === 'box'
+                                            ? "bg-white text-gray-900 shadow-sm"
+                                            : "text-gray-500 hover:text-gray-700"
+                                    )}
+                                >
+                                    <Package className="w-4 h-4" />
+                                    WHAT'S INSIDE?
+                                </button>
                             </div>
 
-                            {/* Mobile Box Content */}
-                            {boxContent && boxContent.length > 0 && (
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center shadow-inner">
-                                            <Package className="w-5 h-5" />
-                                        </div>
-                                        <h3 className="text-xl font-black text-gray-900 tracking-tight">What's Inside?</h3>
+                            {/* Tab Content */}
+                            <div className="min-h-[300px]">
+                                {activeTab === 'specs' ? (
+                                    <div className="bg-gray-50/50 rounded-3xl p-6 border border-gray-100 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                        <ProductSpecs
+                                            specs={product.specs}
+                                            additionalInfo={{
+                                                "Voltage": product.voltage,
+                                                "Recommended Age": product.ageGroup,
+                                                "Category": product.category?.charAt(0).toUpperCase() + product.category?.slice(1)
+                                            }}
+                                        />
                                     </div>
-
-                                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                                ) : (
+                                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
                                         <div className="divide-y divide-gray-50">
                                             {boxContent.map((item, idx) => (
                                                 <div key={idx} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors">
@@ -208,8 +221,8 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                             ))}
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
 
                             <div>
                                 <div className="text-center mb-6">
