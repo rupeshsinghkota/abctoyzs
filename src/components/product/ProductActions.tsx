@@ -115,10 +115,13 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
             <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full" />
 
-            {/* Automotive Performance Badges - Horizontal & Compact on Mobile */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            {/* Automotive Performance Badges - Horizontal Scroll on Mobile, Grid on Desktop */}
+            <div className="flex overflow-x-auto pb-4 -mb-4 snap-x snap-mandatory no-scrollbar gap-2 sm:grid sm:grid-cols-4 sm:gap-3 sm:pb-0 sm:mb-0">
                 {highlights.map((item, idx) => (
-                    <div key={idx} className="group flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300">
+                    <div
+                        key={idx}
+                        className="group flex flex-1 min-w-[130px] sm:min-w-0 items-center gap-3 p-2.5 rounded-xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 snap-center"
+                    >
                         <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                             <item.icon className="w-4 h-4 text-primary" strokeWidth={2} />
                         </div>
