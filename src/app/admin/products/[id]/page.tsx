@@ -74,6 +74,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         box_dimensions: '',
         net_weight: '',
         gross_weight: '',
+        marketing_suite: {
+            action: '',
+            comfort: '',
+            durability: ''
+        },
         specs: {
             battery: '',
             motor: '',
@@ -126,6 +131,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 gross_weight: data.gross_weight || '',
                 meta_title: data.meta_title || '',
                 meta_description: data.meta_description || '',
+                marketing_suite: data.marketing_suite || {
+                    action: '',
+                    comfort: '',
+                    durability: ''
+                },
                 specs: {
                     battery: data.specs?.battery || '',
                     motor: data.specs?.motor || '',
@@ -264,14 +274,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             const specs = formData.specs;
 
             // Angle 1: SPEED & POWER -> Dynamic Motion Visual
-            // Keep it VERY SHORT (max 3-4 words)
-            const speedText = specs.speed || specs.motor || "High Speed";
+            // Use AI-generated headline if available, otherwise fallback to spec
+            const speedText = formData.marketing_suite?.action || specs.speed || specs.motor || "High Speed";
 
-            // Angle 2: COMFORT & KIDS -> Lifestyle Visual (Child/Interior)
-            const comfortText = (specs.seats ? `${specs.seats} Seater` : null) || "Leather Interiors";
+            // Angle 2: COMFORT & KIDS -> Lifestyle Visual
+            const comfortText = formData.marketing_suite?.comfort || (specs.seats ? `${specs.seats} Seater` : null) || "Leather Interiors";
 
             // Angle 3: DURABILITY & LOAD -> Rugged Visual
-            const strengthText = (specs.max_load ? `Max ${specs.max_load}` : null) || specs.tire_type || "Built Tough";
+            const strengthText = formData.marketing_suite?.durability || (specs.max_load ? `Max ${specs.max_load}` : null) || specs.tire_type || "Built Tough";
 
             const angles = [
                 { type: 'Action', text: speedText, style: 'SPEED_MOTION' },
@@ -368,6 +378,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 product_dimensions: data.logistics?.dimensions || prev.product_dimensions,
                 gross_weight: data.logistics?.weight || prev.gross_weight,
                 box_content: data.logistics?.box_content?.length ? data.logistics.box_content : prev.box_content,
+                marketing_suite: data.marketing_suite || prev.marketing_suite,
                 specs: {
                     ...prev.specs,
                     battery: data.specs?.battery || '',

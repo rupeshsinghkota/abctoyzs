@@ -65,15 +65,26 @@ ${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}
             4. **MAPPING:**
                - **age_group:** Map strictly to: "1-3", "3-6", "6-12", or "10+".
 
+            5. **MARKETING SUITE:**
+               - Generate 3 punchy, high-end headlines (under 5 words each) for marketing posters:
+                 - **action:** Focus on speed/power (e.g., "Sculpted for Speed").
+                 - **comfort:** Focus on interior/luxury (e.g., "Authentic Heritage Cockpit").
+                 - **durability:** Focus on off-road/safety (e.g., "Conquer Any Terrain").
+
             Output ONLY valid JSON:
             {
                 "name": "...",
                 "price": 0,
-                "description": "<div class='prose'>...</div>",
+                "description": "<div class='prose premium-prose'>...</div>",
                 "meta_title": "...",
                 "meta_description": "...",
                 "category": "cars|bikes|jeeps|atvs|utvs|gokarts",
                 "age_group": "...",
+                "marketing_suite": {
+                    "action": "...",
+                    "comfort": "...",
+                    "durability": "..."
+                },
                 "specs": {
                     "battery": "...", "motor": "...", "speed": "...", "max_load": "...", "seats": "...",
                     "tire_type": "...", "seat_material": "...", "remote_control": true|false,
