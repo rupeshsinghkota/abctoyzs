@@ -97,49 +97,52 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     return (
         <div className="space-y-6">
-            {/* Automotive Performance Badges - Moved to Top */}
-            <div className="flex overflow-x-auto pb-2 -mb-2 snap-x snap-mandatory no-scrollbar gap-2 sm:grid sm:grid-cols-4 sm:gap-3 sm:pb-0 sm:mb-0">
-                {highlights.map((item, idx) => (
-                    <div
-                        key={idx}
-                        className="group flex flex-1 min-w-[130px] sm:min-w-0 items-center gap-3 p-2.5 rounded-xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 snap-center"
-                    >
-                        <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                            <item.icon className="w-4 h-4 text-primary" strokeWidth={2} />
+            {/* Top Section Wrapper for Desktop Reordering */}
+            <div className="flex flex-col gap-6">
+                {/* Automotive Performance Badges - Order changes on desktop */}
+                <div className="flex overflow-x-auto pb-2 -mb-2 snap-x snap-mandatory no-scrollbar gap-2 sm:grid sm:grid-cols-4 sm:gap-3 sm:pb-0 sm:mb-0 order-1 md:order-3">
+                    {highlights.map((item, idx) => (
+                        <div
+                            key={idx}
+                            className="group flex flex-1 min-w-[130px] sm:min-w-0 items-center gap-3 p-2.5 rounded-xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 snap-center"
+                        >
+                            <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                <item.icon className="w-4 h-4 text-primary" strokeWidth={2} />
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase truncate">{item.label}</span>
+                                <span className="text-[10px] font-black text-gray-900 truncate">{item.value}</span>
+                            </div>
                         </div>
-                        <div className="flex flex-col min-w-0">
-                            <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase truncate">{item.label}</span>
-                            <span className="text-[10px] font-black text-gray-900 truncate">{item.value}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
 
-            <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full" />
+                <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full order-2 md:order-2" />
 
-            {/* Price Display (Premium Deal Style) */}
-            <div className="space-y-2">
-                <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                        <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">
-                            ₹{displayPrice.toLocaleString()}
-                        </span>
-                        {discount > 0 && (
-                            <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider box-decoration-clone shadow-sm">
-                                Save {discount}%
+                {/* Price Display (Premium Deal Style) */}
+                <div className="space-y-2 order-3 md:order-1">
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">
+                                ₹{displayPrice.toLocaleString()}
                             </span>
+                            {discount > 0 && (
+                                <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider box-decoration-clone shadow-sm">
+                                    Save {discount}%
+                                </span>
+                            )}
+                        </div>
+                        {discount > 0 && (
+                            <div className="flex items-center gap-2 mt-1.5">
+                                <span className="text-sm font-bold text-gray-500 line-through decoration-gray-400 decoration-2">
+                                    MRP ₹{displayMRP.toLocaleString()}
+                                </span>
+                                <span className="text-[10px] font-black text-green-600 flex items-center gap-0.5 bg-green-50 px-1.5 py-0.5 rounded-sm">
+                                    <CheckCircle2 className="w-3 h-3" /> All Inclusive
+                                </span>
+                            </div>
                         )}
                     </div>
-                    {discount > 0 && (
-                        <div className="flex items-center gap-2 mt-1.5">
-                            <span className="text-sm font-bold text-gray-500 line-through decoration-gray-400 decoration-2">
-                                MRP ₹{displayMRP.toLocaleString()}
-                            </span>
-                            <span className="text-[10px] font-black text-green-600 flex items-center gap-0.5 bg-green-50 px-1.5 py-0.5 rounded-sm">
-                                <CheckCircle2 className="w-3 h-3" /> All Inclusive
-                            </span>
-                        </div>
-                    )}
                 </div>
             </div>
 
