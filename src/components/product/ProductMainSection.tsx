@@ -72,33 +72,37 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                     <div className="lg:sticky lg:top-28 space-y-8">
 
                         {/* Header */}
-                        <div className="space-y-4">
-                            {product.tag && (
-                                <span className="px-3 py-1 text-[10px] font-bold text-white bg-primary rounded-full uppercase tracking-wider w-fit">
-                                    {product.tag}
-                                </span>
-                            )}
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                {product.tag && (
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2.5 py-0.5 text-[10px] font-bold text-white bg-black dark:bg-white dark:text-black rounded-full uppercase tracking-widest">
+                                            {product.tag}
+                                        </span>
+                                    </div>
+                                )}
 
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black font-heading leading-tight tracking-tight text-foreground">
-                                {product.name}
-                            </h1>
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-heading leading-[0.9] tracking-tighter text-foreground">
+                                    {product.name}
+                                </h1>
+                            </div>
 
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-0.5">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <Star
                                             key={star}
                                             className={cn(
-                                                "w-4 h-4",
+                                                "w-5 h-5",
                                                 star <= Math.round(product.rating)
-                                                    ? "fill-yellow-400 text-yellow-400"
-                                                    : "fill-gray-200 text-gray-200 dark:fill-gray-800 dark:text-gray-800"
+                                                    ? "fill-black text-black dark:fill-white dark:text-white"
+                                                    : "fill-gray-100 text-gray-100"
                                             )}
                                         />
                                     ))}
                                 </div>
-                                <span className="text-sm font-medium text-muted-foreground">
-                                    {product.rating} <span className="text-gray-300 mx-1">|</span> {product.reviews} reviews
+                                <span className="text-sm font-medium text-muted-foreground underline decoration-muted-foreground/30 underline-offset-4">
+                                    {product.reviews} Verified Reviews
                                 </span>
                             </div>
 
@@ -110,50 +114,40 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             />
                         </div>
 
-                        {/* Trust Signals (Universal - Responsive Layout) */}
-                        <div className="space-y-4">
-                            {/* Stock Status - Always Visible */}
-                            <div className="flex items-center gap-3 p-3 md:p-4 bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/20 rounded-xl">
-                                <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center shrink-0">
-                                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-green-600 dark:text-green-400" />
+                        {/* Trust Signals - Clean Row (No Boxes) */}
+                        <div className="border-t border-gray-100 dark:border-gray-800 pt-6">
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+                                        <Truck className="w-4 h-4" />
+                                        <span>Free Shipping</span>
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground pl-6">On all orders</p>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-bold text-green-700 dark:text-green-400">In Stock & Ready to Ship</p>
-                                    <p className="text-[10px] md:text-xs text-green-600/80 dark:text-green-500/80">
-                                        Get it by {deliveryDate || "Saturday"}
-                                    </p>
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+                                        <ShieldCheck className="w-4 h-4" />
+                                        <span>Warranty</span>
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground pl-6">1 Year Official</p>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+                                        <RotateCcw className="w-4 h-4" />
+                                        <span>Returns</span>
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground pl-6">7 Days Easy</p>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Warranty & Delivery - Grid for Mobile compatibility */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="flex items-center gap-3 p-3 rounded-xl border hover:bg-muted/50 transition-colors">
-                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
-                                        <Truck className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold">Free Delivery</p>
-                                        <p className="text-[10px] text-muted-foreground">All over India</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3 p-3 rounded-xl border hover:bg-muted/50 transition-colors">
-                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center shrink-0">
-                                        <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-orange-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold">1 Year Warranty</p>
-                                        <p className="text-[10px] text-muted-foreground">Comprehensive coverage</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Desktop Actions (Hidden on Mobile as Sticky Bar exists) */}
-                            <div className="hidden lg:flex gap-3">
-                                <WishlistButton productId={product.id} size="lg" className="h-12 flex-1 rounded-xl border-2 border-muted hover:border-primary/50 text-muted-foreground hover:text-primary transition-all" />
-                                <button className="flex-[2] h-12 flex items-center justify-center gap-2 font-bold text-sm border-2 border-muted rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
-                                    Contact Support
-                                </button>
-                            </div>
+                        {/* Desktop Wishlist & Share */}
+                        <div className="hidden lg:flex gap-4 pt-2">
+                            <WishlistButton productId={product.id} size="lg" className="h-10 px-0 hover:bg-transparent text-muted-foreground hover:text-red-500 transition-all flex items-center gap-2" />
+                            <span className="text-sm text-gray-300">|</span>
+                            <button className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">
+                                Ask a Question
+                            </button>
                         </div>
 
                         {/* Mobile Content Repeater (Highlights & Description & Box Content) */}

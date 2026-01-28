@@ -80,23 +80,26 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
     return (
         <div className="space-y-8">
             {/* Price Display (Clean, No Box) */}
-            <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                    <span className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tight">₹{displayPrice.toLocaleString()}</span>
+            {/* Price Display (Premium) */}
+            <div className="space-y-1">
+                <div className="flex items-baseline gap-4">
+                    <span className="text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-none">
+                        ₹{displayPrice.toLocaleString()}
+                    </span>
                     {discount > 0 && (
-                        <span className="text-lg font-bold text-muted-foreground line-through decoration-2 decoration-red-500/30">
-                            ₹{displayMRP.toLocaleString()}
-                        </span>
+                        <div className="flex flex-col items-start leading-none">
+                            <span className="text-lg font-bold text-muted-foreground line-through decoration-2 decoration-red-500/50">
+                                ₹{displayMRP.toLocaleString()}
+                            </span>
+                            <span className="text-sm font-black text-red-600 uppercase tracking-wide">
+                                {discount}% OFF
+                            </span>
+                        </div>
                     )}
                 </div>
-                {discount > 0 && (
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-green-700 bg-green-100 px-3 py-1 rounded-full uppercase tracking-wider">
-                            {discount}% OFF
-                        </span>
-                        <span className="text-xs font-medium text-muted-foreground">Inclusive of all taxes</span>
-                    </div>
-                )}
+                <p className="text-xs font-bold text-green-600 pl-1 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Inclusive of all taxes
+                </p>
             </div>
 
             <div className="h-px bg-border/40 w-full" />
@@ -165,49 +168,46 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             ))}
 
             {/* Actions */}
-            <div className="space-y-4 pt-6">
+            <div className="space-y-6 pt-8">
 
-                {/* Primary: Add to Cart (Gradient) */}
+                {/* Primary: Add to Cart (Gradient Glow) */}
                 <button
                     onClick={handleAddToCart}
                     disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
                     className={cn(
-                        "w-full h-16 bg-gradient-to-r from-primary to-purple-600 text-white font-black text-xl rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed group",
-                        added && "bg-green-600 from-green-600 to-green-500"
+                        "relative w-full h-[72px] bg-gradient-to-r from-primary via-purple-600 to-primary background-animate text-white font-black text-2xl rounded-2xl flex items-center justify-center gap-4 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden",
+                        added && "bg-none bg-green-600 shadow-green-500/30"
                     )}
                 >
-                    {added ? <Check className="w-7 h-7" /> : <ShoppingCart className="w-6 h-6 fill-white/20 group-hover:scale-110 transition-transform" />}
-                    {added ? "Added to Cart" : "Add to Cart"}
+                    {/* Shine Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+
+                    {added ? <Check className="w-8 h-8" strokeWidth={3} /> : <ShoppingCart className="w-7 h-7 fill-white/20 group-hover:scale-110 transition-transform" strokeWidth={2.5} />}
+                    {added ? "ADDED TO CART" : "ADD TO CART"}
                 </button>
 
                 {/* Secondary: Buy Now & Quantity */}
                 <div className="flex gap-4 h-14">
-                    <div className="shrink-0 h-full">
-                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border-2 border-muted rounded-xl bg-white" />
+                    <div className="shrink-0 h-full w-24">
+                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border-2 border-gray-100 rounded-xl bg-gray-50/50" />
                     </div>
 
                     <button
                         onClick={handleBuyNow}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="flex-1 h-full border-2 border-primary/10 bg-primary/5 text-primary text-lg font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors disabled:opacity-50"
+                        className="flex-1 h-full bg-black text-white text-lg font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-gray-900 transition-all shadow-lg active:scale-[0.98]"
                     >
                         <ShoppingBag className="w-5 h-5" strokeWidth={2.5} />
-                        Buy Now
+                        BUY NOW
                     </button>
                 </div>
 
                 {/* Secure Checkout Trust */}
-                <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground pt-2 font-medium uppercase tracking-wide opacity-60">
-                    <CheckCircle2 className="w-3 h-3 text-green-500" />
-                    Secure Checkout by Razorpay
+                <div className="flex items-center justify-center gap-3 text-[11px] text-muted-foreground pt-4 font-bold uppercase tracking-widest opacity-50">
+                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Secure Payment</div>
+                    <span>•</span>
+                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Fast Dispatch</div>
                 </div>
-
-                {/* Stock Warning */}
-                {displayStock < 5 && displayStock > 0 && (
-                    <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/10 p-3 rounded-xl justify-center animate-pulse">
-                        <span>🔥 Hurry! Only {displayStock} left at this price!</span>
-                    </div>
-                )}
             </div>
         </div>
     );
