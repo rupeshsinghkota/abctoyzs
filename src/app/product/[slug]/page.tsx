@@ -120,7 +120,8 @@ export default async function ProductPage({ params }: PageProps) {
                 </nav>
             </div>
 
-            <main className="container mx-auto px-0 md:px-4">
+            {/* Main Section - Wider Container for Premium Feel */}
+            <main className="container max-w-[1800px] mx-auto px-0 md:px-6 lg:px-8">
                 <ProductMainSection product={product} boxContent={whatsInBox} />
 
                 {/* DESKTOP FULL WIDTH DETAILS (Below Fold) */}

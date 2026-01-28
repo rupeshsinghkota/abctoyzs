@@ -165,39 +165,39 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             ))}
 
             {/* Actions */}
-            <div className="space-y-4 pt-4">
+            <div className="space-y-4 pt-6">
 
-                {/* Row 1: Quantity + Add to Cart */}
+                {/* Primary: Add to Cart (Gradient) */}
+                <button
+                    onClick={handleAddToCart}
+                    disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
+                    className={cn(
+                        "w-full h-16 bg-gradient-to-r from-primary to-purple-600 text-white font-black text-xl rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed group",
+                        added && "bg-green-600 from-green-600 to-green-500"
+                    )}
+                >
+                    {added ? <Check className="w-7 h-7" /> : <ShoppingCart className="w-6 h-6 fill-white/20 group-hover:scale-110 transition-transform" />}
+                    {added ? "Added to Cart" : "Add to Cart"}
+                </button>
+
+                {/* Secondary: Buy Now & Quantity */}
                 <div className="flex gap-4 h-14">
                     <div className="shrink-0 h-full">
-                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border-2 border-muted rounded-2xl bg-white" />
+                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border-2 border-muted rounded-xl bg-white" />
                     </div>
 
                     <button
-                        onClick={handleAddToCart}
+                        onClick={handleBuyNow}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className={cn(
-                            "flex-1 h-full border-2 border-primary/10 bg-primary/5 text-primary font-black text-lg rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/10 hover:border-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group",
-                            added && "bg-green-50 text-green-600 border-green-200"
-                        )}
+                        className="flex-1 h-full border-2 border-primary/10 bg-primary/5 text-primary text-lg font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors disabled:opacity-50"
                     >
-                        {added ? <Check className="w-6 h-6" /> : <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform" />}
-                        {added ? "Added" : "Add to Cart"}
+                        <ShoppingBag className="w-5 h-5" strokeWidth={2.5} />
+                        Buy Now
                     </button>
                 </div>
 
-                {/* Row 2: Buy Now (Full Width) */}
-                <button
-                    onClick={handleBuyNow}
-                    disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                    className="w-full h-16 bg-gradient-to-r from-primary to-orange-600 text-white font-black text-xl rounded-2xl flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <ShoppingBag className="w-6 h-6 fill-white/20" />
-                    Buy Now
-                </button>
-
                 {/* Secure Checkout Trust */}
-                <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground pt-2">
+                <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground pt-2 font-medium uppercase tracking-wide opacity-60">
                     <CheckCircle2 className="w-3 h-3 text-green-500" />
                     Secure Checkout by Razorpay
                 </div>

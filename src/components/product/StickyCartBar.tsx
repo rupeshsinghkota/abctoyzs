@@ -73,70 +73,38 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
 
     return (
         <>
-            {/* Mobile Sticky Bar - positioned at bottom (now that global nav is hidden) */}
-            <div className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:hidden w-full max-w-full overflow-hidden pb-[env(safe-area-inset-bottom)]">
-                <div className="flex items-center gap-3 p-3">
+            {/* Mobile Sticky Bar - Premium Pill Style */}
+            <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-lg border-t border-gray-100 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] lg:hidden w-full pb-[env(safe-area-inset-bottom)]">
+                <div className="flex items-center gap-4 p-4">
                     {/* Price */}
                     <div className="flex flex-col min-w-0 flex-shrink-0">
-                        {discount > 0 && (
-                            <div className="flex items-center gap-1.5 leading-none mb-0.5">
-                                <span className="text-[10px] text-muted-foreground line-through decoration-muted-foreground/80">₹{activeMRP.toLocaleString()}</span>
-                                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1 rounded-sm">{discount}% OFF</span>
-                            </div>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wide font-bold">Total</span>
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-black text-gray-900 leading-none">₹{activePrice.toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    {/* Massive Action Button */}
+                    <button
+                        className={cn(
+                            "flex-1 h-12 rounded-full font-black text-sm flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all bg-gradient-to-r from-primary to-purple-600 text-white shadow-primary/25",
+                            addedToCart && "bg-none bg-green-600"
                         )}
-                        <span className="text-xl font-black leading-none tracking-tight">₹{activePrice.toLocaleString()}</span>
-                    </div>
-
-                    {/* Quantity Selector - Compact */}
-                    <div className="flex items-center bg-muted/60 rounded-lg flex-shrink-0 h-9">
-                        <button
-                            onClick={decrementQty}
-                            className="w-7 h-full flex items-center justify-center text-muted-foreground active:scale-90 disabled:opacity-40"
-                            disabled={quantity <= 1}
-                        >
-                            <Minus className="w-3.5 h-3.5" />
-                        </button>
-                        <span className="w-5 text-center font-bold text-sm bg-transparent">{quantity}</span>
-                        <button
-                            onClick={incrementQty}
-                            className="w-7 h-full flex items-center justify-center text-muted-foreground active:scale-90 disabled:opacity-40"
-                            disabled={quantity >= 10}
-                        >
-                            <Plus className="w-3.5 h-3.5" />
-                        </button>
-                    </div>
-
-                    {/* Buttons */}
-                    <div className="flex gap-2 flex-1 min-w-0">
-                        <button
-                            className={`flex-1 h-11 rounded-xl border-2 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all min-w-0 ${addedToCart
-                                ? 'border-green-500 text-green-600 bg-green-50'
-                                : 'border-gray-200 text-gray-700 bg-white'
-                                }`}
-                            onClick={handleAddToCart}
-                            disabled={addedToCart}
-                        >
-                            {addedToCart ? (
-                                <Check className="w-5 h-5 flex-shrink-0" />
-                            ) : (
-                                <ShoppingCart className="w-5 h-5 flex-shrink-0" />
-                            )}
-                        </button>
-                        <button
-                            className="flex-[1.5] h-11 rounded-xl bg-primary text-white font-bold text-xs shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-1.5 min-w-0"
-                            onClick={handleBuyNow}
-                            disabled={buyingNow}
-                        >
-                            {buyingNow ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                                <>
-                                    <ShoppingBag className="w-4 h-4 flex-shrink-0 fill-white/20" />
-                                    <span>Buy Now</span>
-                                </>
-                            )}
-                        </button>
-                    </div>
+                        onClick={handleAddToCart}
+                        disabled={addedToCart}
+                    >
+                        {addedToCart ? (
+                            <>
+                                <Check className="w-5 h-5" />
+                                <span>Added</span>
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingCart className="w-5 h-5 fill-white/20" />
+                                <span>Add to Cart</span>
+                            </>
+                        )}
+                    </button>
                 </div>
             </div>
         </>
