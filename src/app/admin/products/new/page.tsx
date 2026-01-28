@@ -1156,13 +1156,55 @@ export default function NewProductPage() {
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Battery</label>
-                                        <input
-                                            type="text"
-                                            value={formData.specs.battery}
-                                            onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, battery: e.target.value } })}
-                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none"
-                                            placeholder="e.g. 24V 7Ah"
-                                        />
+                                        <div className="relative">
+                                            <Battery className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                                            <input
+                                                type="text"
+                                                value={formData.specs.battery}
+                                                onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, battery: e.target.value } })}
+                                                className="w-full pl-11 pr-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none transition-all"
+                                                placeholder="e.g. 24V 7Ah"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Speed</label>
+                                        <div className="relative">
+                                            <Gauge className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                                            <input
+                                                type="text"
+                                                value={formData.specs.speed}
+                                                onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, speed: e.target.value } })}
+                                                className="w-full pl-11 pr-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none transition-all"
+                                                placeholder="e.g. 3-5 km/h"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Charging Time</label>
+                                        <div className="relative">
+                                            <Zap className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                                            <input
+                                                type="text"
+                                                value={formData.specs.charging_time}
+                                                onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, charging_time: e.target.value } })}
+                                                className="w-full pl-11 pr-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none transition-all"
+                                                placeholder="e.g. 8-12 Hours"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Run Time</label>
+                                        <div className="relative">
+                                            <Battery className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                                            <input
+                                                type="text"
+                                                value={formData.specs.run_time}
+                                                onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, run_time: e.target.value } })}
+                                                className="w-full pl-11 pr-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none transition-all"
+                                                placeholder="e.g. 45-60 Mins"
+                                            />
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Motors</label>
