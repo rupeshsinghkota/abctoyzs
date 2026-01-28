@@ -15,36 +15,19 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
         }
 
-        // Support both single image and array of images
         const allImageUrls = imageUrls || (imageUrl ? [imageUrl] : []);
-
         if (allImageUrls.length === 0) {
             return NextResponse.json({ error: "No images provided" }, { status: 400 });
         }
 
         const supabase = await createClient();
-        const brandName = BRAND_CONFIG.name;
-
-        // Imagen 3 (Nano Banana) gave 404 Not Found.
-        // Reverting to Gemini 2.0 Flash which supports multimodal input/output.
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash-exp",
-            safetySettings: [
-                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-            ],
-        });
 
         // Read brand logo
         const logoPath = path.join(process.cwd(), 'public', BRAND_CONFIG.logoWide);
         const logoBuffer = fs.readFileSync(logoPath);
         const logoBase64 = logoBuffer.toString("base64");
 
-        const generatedUrls: string[] = [];
-
-        // Download ALL product images first for complete context
+        // Download ALL product images first
         const allImageData: Array<{ url: string; base64: string }> = [];
         for (const imgUrl of allImageUrls) {
             try {
@@ -57,7 +40,6 @@ export async function POST(req: Request) {
             }
         }
 
-        // Define angles for multi-image generation
         const angles = [
             "front 3/4 view",
             "side profile view",
@@ -65,98 +47,119 @@ export async function POST(req: Request) {
             "front direct view"
         ];
 
+        // Models to try in order of preference
+        const modelsToTry = [
+            "imagen-3.0-generate-001", // Primary: High fidelity
+            "gemini-2.0-flash-exp"     // Fallback: Reliable multimodal
+        ];
+
+        const generatedUrls: string[] = [];
         let lastError: any = null;
 
         for (let i = 0; i < (generateAll ? angles.length : 1); i++) {
             const currentAngle = angles[i];
+            let imageGenerated = false;
 
-            try {
-                // Build prompt with all reference images
-                const prompt = `Study all these reference images of the SAME children's ride-on toy carefully.
+            // Try each model until one works
+            for (const modelName of modelsToTry) {
+                try {
+                    console.log(`Attempting generation with model: ${modelName} for angle: ${currentAngle}`);
 
-ANALYZE: Understand every detail - exact wheel design, headlights, grille pattern, body shape, colors.
+                    const model = genAI.getGenerativeModel({
+                        model: modelName,
+                        safetySettings: [
+                            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                        ],
+                    });
 
-GENERATE: Create a stunning professional product photo from ${currentAngle}.
+                    // Enhanced "World Class" Prompt
+                    const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
+                    
+TARGET: Photorealistic 8K image of the specific ride-on toy in the reference images.
+ANGLE: ${currentAngle}.
 
-REQUIREMENTS:
-- Photorealistic 8K quality image
-- Keep exact product details from reference photos
-- Remove all seller branding (11CART, stickers, watermarks)
-- Add "ABC TOYZ" text on license plate
-- AI DECIDE BEST BACKGROUND based on vehicle type:
-  • Jeep/SUV -> Desert sunset or mountain trail
-  • Sports Car -> Luxury driveway or city lights
-  • Bike/ATV -> Off-road track or scenic road
-- Golden hour lighting with dramatic shadows
-- 1:1 square ratio
+CRITICAL REQUIREMENTS:
+1. PRODUCT FIDELITY: The toy must look EXACTLY like the reference images (same wheels, body shape, details).
+2. BRANDING EDIT: 
+   - REMOVE all text/stickers from the windshield.
+   - REMOVE any "11CART", "UEKUT" logos.
+   - ADD "ABC TOYZ" text clearly on the license plate.
+3. BACKGROUND STRATEGY (AI Decide):
+   - Jeeps/SUVs: Epic desert sunset with dust trails or mountain pass.
+   - Supercars: Ultra-modern luxury driveway or city night neon.
+   - Bikes: Scenic coast road or race track.
+4. LIGHTING: Golden hour or cinematic studio lighting. High contrast, sharp shadows.
+5. QUALITY: Unreal Engine 5 render quality, sharp focus, no blur, no distortions.
 
-STYLE: Premium e-commerce product photography, like official brand catalog.`;
+Aspect Ratio: 1:1 (Square).`;
 
-                // Build content parts with ALL images as reference
-                const contentParts: any[] = [
-                    { text: prompt }
-                ];
+                    const contentParts: any[] = [{ text: prompt }];
 
-                // Add all product images as reference
-                for (let j = 0; j < allImageData.length; j++) {
-                    contentParts.push({ text: `REFERENCE IMAGE ${j + 1}:` });
-                    contentParts.push({ inlineData: { data: allImageData[j].base64, mimeType: "image/jpeg" } });
-                }
+                    // Add reference images
+                    for (let j = 0; j < allImageData.length; j++) {
+                        contentParts.push({ text: `REFERENCE IMAGE ${j + 1}:` });
+                        contentParts.push({ inlineData: { data: allImageData[j].base64, mimeType: "image/jpeg" } });
+                    }
 
-                // Add brand logo
-                contentParts.push({ text: "BRAND LOGO (put on license plate):" });
-                contentParts.push({ inlineData: { data: logoBase64, mimeType: "image/png" } });
+                    // Add brand logo
+                    contentParts.push({ text: "BRAND LOGO (for license plate):" });
+                    contentParts.push({ inlineData: { data: logoBase64, mimeType: "image/png" } });
 
-                const result = await model.generateContent(contentParts as any);
-                const response = await result.response;
+                    const result = await model.generateContent(contentParts as any);
+                    const response = await result.response;
 
-                if (!response.candidates || response.candidates.length === 0) {
-                    console.error(`Failed to generate image ${i + 1}`);
-                    continue;
-                }
+                    if (response.candidates && response.candidates.length > 0) {
+                        const candidate = response.candidates[0];
+                        let newImageBase64 = null;
 
-                const candidate = response.candidates[0];
-                let newImageBase64 = null;
+                        if (candidate.content?.parts) {
+                            for (const part of candidate.content.parts) {
+                                if ((part as any).inlineData?.data) {
+                                    newImageBase64 = (part as any).inlineData.data;
+                                    break;
+                                }
+                            }
+                        }
 
-                if (candidate.content?.parts) {
-                    for (const part of candidate.content.parts) {
-                        if ((part as any).inlineData?.data) {
-                            newImageBase64 = (part as any).inlineData.data;
-                            break;
+                        if (newImageBase64) {
+                            // Success! Upload and break model loop
+                            const newImageBuffer = Buffer.from(newImageBase64, 'base64');
+                            const timestamp = Date.now();
+                            const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
+                            const newFilename = `enhanced_${timestamp}_${i}_${safeName}.jpg`;
+
+                            const { error: uploadError } = await supabase.storage
+                                .from('products')
+                                .upload(newFilename, newImageBuffer, { contentType: 'image/jpeg', cacheControl: '3600' });
+
+                            if (!uploadError) {
+                                const { data: { publicUrl } } = supabase.storage
+                                    .from('products')
+                                    .getPublicUrl(newFilename);
+                                generatedUrls.push(publicUrl);
+                                imageGenerated = true; // Mark as success
+                                break; // Stop trying models for this angle
+                            }
                         }
                     }
+                } catch (err: any) {
+                    console.error(`Model ${modelName} failed:`, err.message);
+                    lastError = err;
+                    // Continue to next model
                 }
+            } // End model loop
 
-                if (newImageBase64) {
-                    const newImageBuffer = Buffer.from(newImageBase64, 'base64');
-                    const timestamp = Date.now();
-                    const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
-                    const newFilename = `enhanced_${timestamp}_${i}_${safeName}.jpg`;
-
-                    const { error: uploadError } = await supabase.storage
-                        .from('products')
-                        .upload(newFilename, newImageBuffer, {
-                            contentType: 'image/jpeg',
-                            cacheControl: '3600'
-                        });
-
-                    if (!uploadError) {
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('products')
-                            .getPublicUrl(newFilename);
-                        generatedUrls.push(publicUrl);
-                    }
-                }
-            } catch (err) {
-                console.error(`Error processing image ${i + 1}:`, err);
-                lastError = err;
-                continue;
+            if (!imageGenerated) {
+                console.error(`Failed to generate image for angle ${currentAngle} with all models.`);
             }
-        }
+        } // End angle loop
 
         if (generatedUrls.length === 0) {
-            const errorMsg = lastError?.message || lastError?.toString() || "Unknown error";
-            throw new Error(`Failed to enhance images. Reason: ${errorMsg}`);
+            const errorMsg = lastError?.message || "All models failed to generate images.";
+            throw new Error(`Generation failed. Last error: ${errorMsg}`);
         }
 
         return NextResponse.json({
@@ -167,6 +170,6 @@ STYLE: Premium e-commerce product photography, like official brand catalog.`;
 
     } catch (error: any) {
         console.error("AI Image Enhancement Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: error.message || "Failed to process request" }, { status: 500 });
     }
 }
