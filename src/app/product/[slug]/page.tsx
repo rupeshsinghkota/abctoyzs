@@ -129,16 +129,23 @@ export default async function ProductPage({ params }: PageProps) {
                 <div className="hidden lg:block mt-12 max-w-7xl mx-auto space-y-16 px-4 pb-16">
 
 
-                    {/* 2. Specs & Box Contents (Unified Compact Cards) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start px-4 md:px-0">
+                    {/* 2. Specs & Box Contents (Unified Premium Cards) */}
+                    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-8 items-stretch px-4 md:px-0">
 
                         {/* Specs Card */}
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm h-full">
-                            <div className="flex items-center gap-2.5 mb-5">
-                                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                                    <Gauge className="w-5 h-5" />
+                        <div className="relative group/specs bg-white p-8 lg:p-10 rounded-[40px] border border-gray-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] h-full overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 group-hover/specs:opacity-100 transition-opacity" />
+
+                            <div className="relative flex items-center justify-between mb-10">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner">
+                                        <Gauge className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Technical Specs</h3>
                                 </div>
-                                <h3 className="text-lg font-black text-gray-900 tracking-tight">Technical Specifications</h3>
+                                <div className="px-3 py-1 rounded-full bg-blue-50/50 border border-blue-100 text-[10px] font-black uppercase tracking-widest text-blue-600">
+                                    Verified
+                                </div>
                             </div>
 
                             <ProductSpecs
@@ -152,21 +159,28 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
 
                         {/* Box Contents Card */}
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm h-full">
-                            <div className="flex items-center gap-2.5 mb-5">
-                                <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
-                                    <Package className="w-5 h-5" />
+                        <div className="relative group/box bg-white p-8 lg:p-10 rounded-[40px] border border-gray-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] h-full overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/5">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 group-hover/box:opacity-100 transition-opacity" />
+
+                            <div className="relative flex items-center justify-between mb-10">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center shadow-inner">
+                                        <Package className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Inside the Box</h3>
                                 </div>
-                                <h3 className="text-lg font-black text-gray-900 tracking-tight">What's In The Box?</h3>
+                                <div className="px-3 py-1 rounded-full bg-orange-50 text-[10px] font-black uppercase tracking-widest text-orange-600">
+                                    {whatsInBox.length} Items
+                                </div>
                             </div>
 
-                            <ul className="grid grid-cols-1 gap-3">
+                            <ul className="grid grid-cols-1 gap-4">
                                 {whatsInBox.map((item: string, idx: number) => (
-                                    <li key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-100 hover:border-primary/20 hover:bg-white transition-all group">
-                                        <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center shrink-0 group-hover:bg-green-500 transition-colors">
-                                            <CheckCircle2 className="w-2.5 h-2.5 text-green-700 group-hover:text-white transition-colors" />
+                                    <li key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-transparent hover:border-orange-200 hover:bg-white transition-all duration-300 group/item">
+                                        <div className="w-6 h-6 rounded-lg bg-white border border-gray-100 flex items-center justify-center shrink-0 group-hover/item:bg-orange-500 group-hover/item:border-orange-500 transition-all shadow-sm">
+                                            <CheckCircle2 className="w-3 h-3 text-green-600 group-hover/item:text-white transition-colors" />
                                         </div>
-                                        <span className="text-xs font-bold text-gray-700 group-hover:text-gray-900 leading-relaxed">{item}</span>
+                                        <span className="text-sm font-bold text-gray-700 group-hover/item:text-gray-900 leading-tight transition-colors">{item}</span>
                                     </li>
                                 ))}
                             </ul>
