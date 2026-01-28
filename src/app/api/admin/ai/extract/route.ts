@@ -34,23 +34,23 @@ export async function POST(req: Request) {
 
             2. **PRODUCT DESCRIPTION (CREATIVE Generation):**
                - GENERATE a high-converting, LONG-FORM HTML marketing description.
-               - If the raw text is short/messy, EXPAND it into a premium sales pitch.
-               - **BRANDING:** strictly use "${BRAND_CONFIG.name}" as the seller/brand name. REMOVE any competitor names or original supplier branding.
-               - **FORMATTING:** Use valid HTML tags:
-                 - <h2> for main section headers (e.g., "Why Kids Love This", "Safety First")
-                 - <p> for detailed paragraphs (write at least 2-3 rich paragraphs)
-                 - <ul> and <li> for feature lists
-                 - <strong> for emphasis
+               - **STRUCTURE FOR BANNERS:** You MUST follow this structure so our system can insert banners:
+                 - **Intro:** Start with a strong, emotional hook paragraph about the product. (System inserts Banner 1 here).
+                 - **Features:** A detailed <ul> list of features.
+                 - **Safety Section:** You MUST generate a section header exactly like this: "<h3>🛡️ Safety & Quality</h3>" followed by a paragraph about safety. (System inserts Banner 2 here).
+                 - **Conclusion:** A final wrapping sentence.
+               - **BRANDING:** strictly use "${BRAND_CONFIG.name}" as the seller/brand name. REMOVE any competitor names.
+               - **FORMATTING:** Use valid HTML tags (<h2>, <p>, <ul>, <li>, <strong>).
                - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
-               - **BANNERS:** The description should be structured to support image insertions between paragraphs (the frontend will handle the actual insertion, but write enough text to space them out).
 
             3. **SEO DATA (CREATIVE Generation):**
+               - **product_name:** Format as: "ABC Toyz Premium [Product Name]" (Replace [Product Name] with the actual model).
                - **meta_title:** Generate a click-worthy title (max 60 chars) including "${BRAND_CONFIG.name}".
                - **meta_description:** Generate a compelling summary (max 160 chars) mentioning "${BRAND_CONFIG.name}".
 
             Output ONLY a JSON object with this exact schema:
             {
-                "name": "Clean Product Name (Title Case)",
+                "name": "ABC Toyz Premium [Product Name]",
                 "price": "Price found (number only) or 0",
                 "description": "<div class='prose'>...Long HTML content...</div>",
                 "meta_title": "SEO Title | ${BRAND_CONFIG.name}",
