@@ -1,4 +1,3 @@
-```
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { StickyCartBar } from '@/components/product/StickyCartBar';
@@ -33,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 
     return {
-        title: `${ product.name } - ABC Toyz`,
+        title: `${product.name} - ABC Toyz`,
         description: product.description,
         openGraph: {
             images: product.images || [],
@@ -53,7 +52,7 @@ export default async function ProductPage({ params }: PageProps) {
     // We avoid createServerClient() here as it seemed to cause 404s locally (likely auth/cookie context mismatch).
     const products = await fetchProducts(slug);
 
-    console.log(`[ProductPage] Loading slug: ${ slug } | Found: ${ products.length } `);
+    console.log(`[ProductPage] Loading slug: ${slug} | Found: ${products.length} `);
 
     if (products.length === 0) {
         console.warn(`[ProductPage] WARN: Product NOT found via fetchProducts(slug).attempting fallback fetch all...`);
@@ -71,7 +70,7 @@ export default async function ProductPage({ params }: PageProps) {
     const product = products.length > 0 ? products[0] : null;
 
     if (!product) {
-        console.error(`[ProductPage] Error: Product not found for slug: ${ slug } `);
+        console.error(`[ProductPage] Error: Product not found for slug: ${slug} `);
         notFound();
     }
 
@@ -113,7 +112,7 @@ export default async function ProductPage({ params }: PageProps) {
                         <Home className="w-3.5 h-3.5" />
                     </Link>
                     <ChevronRight className="w-3.5 h-3.5 text-border" />
-                    <Link href={`/ category / ${ product.category } `} className="hover:text-primary transition-colors capitalize font-medium">
+                    <Link href={`/ category / ${product.category} `} className="hover:text-primary transition-colors capitalize font-medium">
                         {product.category}
                     </Link>
                     <ChevronRight className="w-3.5 h-3.5 text-border" />
@@ -227,21 +226,21 @@ export default async function ProductPage({ params }: PageProps) {
                     </div>
                 </div>
 
-                {/* Related Products */ }
-    {
-        relatedProducts.length > 0 && (
-            <div className="mt-16 border-t pt-16 px-4 lg:px-0">
-                <div className="container mx-auto">
-                    <h2 className="text-2xl lg:text-3xl font-black mb-8">You Might Also Like</h2>
-                    <ProductGrid products={relatedProducts} />
-                </div>
-            </div>
-        )
-    }
+                {/* Related Products */}
+                {
+                    relatedProducts.length > 0 && (
+                        <div className="mt-16 border-t pt-16 px-4 lg:px-0">
+                            <div className="container mx-auto">
+                                <h2 className="text-2xl lg:text-3xl font-black mb-8">You Might Also Like</h2>
+                                <ProductGrid products={relatedProducts} />
+                            </div>
+                        </div>
+                    )
+                }
             </main >
 
-        {/* Mobile Footer Spacing for Sticky Bar */ }
-        < div className = "h-20 lg:hidden" />
+            {/* Mobile Footer Spacing for Sticky Bar */}
+            < div className="h-20 lg:hidden" />
 
             <StickyCartBar
                 product={product}
