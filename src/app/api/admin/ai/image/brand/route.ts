@@ -73,42 +73,66 @@ export async function POST(req: Request) {
             : [SHOT_ANGLES[angleIndex || 0]];
 
         const generatedUrls: string[] = [];
+        const brandName = BRAND_CONFIG.name;
 
         for (const angle of anglesToGenerate) {
-            const prompt = `You are a world-class e-commerce product photographer. Study ALL ${validImageParts.length} reference images carefully - they show the SAME toy vehicle from different angles.
+            const prompt = `You are a WORLD-CLASS COMMERCIAL PRODUCT PHOTOGRAPHER shooting for premium brands like Apple, Tesla, and Porsche catalogs.
 
-STEP 1 - PRODUCT ANALYSIS:
-Examine every reference image to understand:
-- Complete 3D shape and proportions of this toy vehicle
-- Exact colors and materials (metallic paint, plastic, rubber tires, etc.)
-- All logos and badges (Mercedes, BMW, Lamborghini, etc.) - their exact placement and appearance
-- Special features: headlights, taillights, mirrors, doors, seats, steering wheel
+REFERENCE IMAGES: ${validImageParts.length} photos of a children's ride-on toy vehicle from different angles. Study them ALL to understand the complete product.
 
-STEP 2 - WATERMARK REMOVAL:
-COMPLETELY REMOVE any competitor/seller branding visible in stock photos:
-- "11cart", "Amazon", "Walmart", "Flipkart", "Hamleys", "AliExpress" logos or text
-- Any watermarks, price tags, or promotional stickers
-- Website URLs or seller information
-These are NOT part of the actual product and must be erased.
+═══════════════════════════════════════════════════
+STEP 1: PRODUCT UNDERSTANDING
+═══════════════════════════════════════════════════
+Analyze every reference image to learn:
+• Complete 3D form, proportions, and silhouette of this toy vehicle
+• Exact paint colors and finishes (metallic, matte, glossy)
+• Car manufacturer badges: Mercedes star, BMW roundel, Lamborghini bull, Ferrari horse, Jeep, Ford, etc. - note their EXACT placement
+• All authentic features: LED headlights, chrome grille, alloy wheels, leather seats, steering wheel, mirrors
 
-STEP 3 - GENERATE NEW IMAGE:
-Create a BRAND NEW professional photo of this EXACT vehicle from this specific angle:
-📷 ${angle.description}
+═══════════════════════════════════════════════════
+STEP 2: BRAND SANITIZATION (CRITICAL)
+═══════════════════════════════════════════════════
+KEEP ONLY these brands:
+✓ Original car manufacturer (BMW, Mercedes, Lamborghini, Ferrari, Jeep, Ford, etc.)
+✓ ${brandName} (my store logo - provided as last image) - place on license plate
 
-SETTING:
-- Premium studio with seamless grey/white gradient backdrop
-- OR luxury garage with polished concrete floor
-- Professional 3-point lighting with soft shadows
-- Subtle floor reflection for high-end catalog feel
+REMOVE EVERYTHING ELSE:
+✗ Competitor store logos: "11cart", "Amazon", "Walmart", "Flipkart", "Hamleys", "AliExpress", "Alibaba"
+✗ Any third-party seller stickers or watermarks
+✗ Price tags, barcodes, promotional text
+✗ Website URLs, social media handles
+✗ ANY random brand stickers that are NOT the car manufacturer
 
-CRITICAL RULES:
-- The vehicle must look EXACTLY like the reference images (same model, colors, badges)
-- Car brand badges (Mercedes star, BMW logo, Lamborghini bull, etc.) MUST be clearly visible
-- Generate a completely NEW angle/composition, not copy the input photos
-- Square 1:1 aspect ratio
-- Photorealistic, sharp, advertising-quality
+═══════════════════════════════════════════════════
+STEP 3: GENERATE 8K PHOTOSHOOT QUALITY IMAGE
+═══════════════════════════════════════════════════
+Camera Angle: ${angle.description}
 
-BRANDING: Add "${BRAND_CONFIG.name}" logo (last image) to the license plate if visible in this angle.`;
+PHOTOGRAPHIC EXCELLENCE:
+• Shot on Phase One IQ4 150MP medium format camera
+• 8K ultra-high resolution with incredible detail
+• Professional studio lighting - 3-point setup with softboxes
+• Dramatic rim lighting to highlight contours
+• Perfect exposure, no blown highlights or crushed shadows
+• Tack-sharp focus across the entire vehicle
+• Shallow depth of field with subtle bokeh background
+
+BACKDROP & SETTING:
+• Seamless infinity cove (white or light grey)
+• OR luxury showroom with polished concrete/marble floor
+• Subtle reflection on floor surface
+• Clean, distraction-free environment
+• Premium automotive catalog aesthetic
+
+TECHNICAL SPECS:
+• Square 1:1 aspect ratio (perfect for e-commerce)
+• Ultra-sharp, no noise or artifacts
+• Professional color grading (slightly desaturated, premium feel)
+• The final image should look like it was shot in a multi-million dollar photography studio
+
+BRANDING: Add the ${brandName} logo (last image) onto the license plate if visible in this angle.
+
+OUTPUT: A single stunning 8K-quality product photograph that would be at home on the Mercedes or Tesla website.`;
 
             const contentParts = [
                 { text: prompt },
@@ -169,8 +193,8 @@ BRANDING: Add "${BRAND_CONFIG.name}" logo (last image) to the license plate if v
 
         return NextResponse.json({
             success: true,
-            newImageUrl: generatedUrls[0], // For single image compatibility
-            newImageUrls: generatedUrls    // For bulk generation
+            newImageUrl: generatedUrls[0],
+            newImageUrls: generatedUrls
         });
 
     } catch (error: any) {
