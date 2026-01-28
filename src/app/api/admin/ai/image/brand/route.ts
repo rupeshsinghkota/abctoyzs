@@ -45,19 +45,39 @@ export async function POST(req: Request) {
 
         const generatedUrls: string[] = [];
 
-        // Process each image individually - enhance background while keeping product identical
-        const imagesToProcess = generateAll ? allImageUrls : [allImageUrls[0]];
-
-        for (let i = 0; i < imagesToProcess.length; i++) {
-            const currentImageUrl = imagesToProcess[i];
-
+        // Download ALL product images first for complete context
+        const allImageData: Array<{ url: string; base64: string }> = [];
+        for (const imgUrl of allImageUrls) {
             try {
-                // Download current image
-                const imageRes = await fetch(currentImageUrl);
+                const imageRes = await fetch(imgUrl);
                 const imageBuffer = await imageRes.arrayBuffer();
                 const imageBase64 = Buffer.from(imageBuffer).toString("base64");
+                allImageData.push({ url: imgUrl, base64: imageBase64 });
+            } catch (err) {
+                console.error(`Failed to download image: ${imgUrl}`);
+            }
+        }
+
+        // Process each image individually but with ALL images as context
+        const imagesToProcess = generateAll ? allImageData : [allImageData[0]];
+
+        for (let i = 0; i < imagesToProcess.length; i++) {
+            const currentImage = imagesToProcess[i];
+
+            try {
+                // Build context with ALL images so AI understands the complete product
+                const totalImages = allImageData.length;
 
                 const prompt = `You are an expert photo editor, NOT an image generator. Your job is to EDIT this product photo, not recreate it.
+
+MULTI-IMAGE CONTEXT:
+I am providing ${totalImages} images of the SAME product from different angles.
+• Image 1 is the PRIMARY image you should edit
+• Other images (2-${totalImages}) are REFERENCE images showing the same product from other angles
+• Use ALL images to understand what this exact product looks like
+• The product is the SAME in all images - same model, same color, same design
+
+YOUR TASK: Edit Image 1 only, but use all reference images to ensure accuracy.
 
 ⚠️ CRITICAL RULE - PRODUCT MUST BE IDENTICAL:
 The toy in your output must look EXACTLY like the toy in the input photo.
@@ -171,11 +191,24 @@ STRICTLY FORBIDDEN:
 FINAL OUTPUT:
 One highly realistic, premium, professionally photographed ride-on toy image with clean branding and a subtle application of ${brandName} LOGO, ready for top-tier e-commerce use.`;
 
-                const contentParts = [
+                // Build content parts: prompt + current image (to edit) + all reference images + logo
+                const contentParts: any[] = [
                     { text: prompt },
-                    { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
-                    { inlineData: { data: logoBase64, mimeType: "image/png" } }
+                    { text: "IMAGE TO EDIT (primary):" },
+                    { inlineData: { data: currentImage.base64, mimeType: "image/jpeg" } }
                 ];
+
+                // Add other images as reference (if multiple images)
+                for (let j = 0; j < allImageData.length; j++) {
+                    if (allImageData[j].url !== currentImage.url) {
+                        contentParts.push({ text: `REFERENCE IMAGE ${j + 1} (same product, different angle):` });
+                        contentParts.push({ inlineData: { data: allImageData[j].base64, mimeType: "image/jpeg" } });
+                    }
+                }
+
+                // Add brand logo
+                contentParts.push({ text: "BRAND LOGO to apply on license plate:" });
+                contentParts.push({ inlineData: { data: logoBase64, mimeType: "image/png" } });
 
                 const result = await model.generateContent(contentParts as any);
                 const response = await result.response;
