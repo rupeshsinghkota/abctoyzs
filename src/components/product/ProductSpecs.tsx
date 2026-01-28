@@ -26,13 +26,13 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
         // 5. Suitability
         { label: 'Age Group', value: additionalInfo['Recommended Age'], icon: User },
         // 6. Endurance (NEW)
-        { label: 'Run Time', value: specs?.run_time || '45-60 Mins', icon: Hourglass },
+        { label: 'Run Time', value: specs?.run_time, icon: Hourglass },
         // 7. Maintenance (NEW)
-        { label: 'Charge Time', value: specs?.charging_time || '8-12 Hours', icon: PlugZap },
+        { label: 'Charge Time', value: specs?.charging_time, icon: PlugZap },
         // 8. Ride Quality
-        { label: 'Tires', value: specs?.tire_type || 'Eva Rubber', icon: Disc },
+        { label: 'Tires', value: specs?.tire_type, icon: Disc },
         // 9. Comfort
-        { label: 'Seat Type', value: specs?.seat_material || 'Leather Style', icon: Armchair },
+        { label: 'Seat Type', value: specs?.seat_material, icon: Armchair },
         // 10. Control (Safety)
         { label: 'Control', value: specs?.mobile_app ? 'App & Remote' : (specs?.remote_control ? '2.4G Remote' : 'Manual'), icon: specs?.mobile_app ? Smartphone : Radio },
         // 11. Size (Root prop usually passed in additionalInfo or we assume standard)

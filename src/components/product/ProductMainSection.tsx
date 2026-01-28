@@ -52,11 +52,11 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
     // ... (return start)
     // Feature highlights for Mobile
     const highlights = [
-        { icon: Battery, label: 'Battery', value: product.specs?.battery || product.voltage || '12V Power' },
-        { icon: Gauge, label: 'Speed', value: product.specs?.speed || '5-8 km/h' },
-        { icon: Weight, label: 'Load', value: product.specs?.max_load || '30 kg' },
-        { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : 'Remote' },
-    ];
+        { icon: Battery, label: 'Battery', value: product.specs?.battery || product.voltage },
+        { icon: Gauge, label: 'Speed', value: product.specs?.speed },
+        { icon: Weight, label: 'Load', value: product.specs?.max_load },
+        { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },
+    ].filter(h => h.value);
 
     return (
         <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-start max-w-[1600px] mx-auto">

@@ -82,11 +82,11 @@ export default async function ProductPage({ params }: PageProps) {
 
     // Feature highlights
     const highlights = [
-        { icon: Baby, label: 'Age', value: product.ageGroup ? `${product.ageGroup} Yrs` : (product.specs?.suitable_age || '2-5 Yrs') },
-        { icon: Gauge, label: 'Speed', value: product.specs?.speed || '5-8 km/h' },
-        { icon: Weight, label: 'Load', value: product.specs?.max_load || '30 kg' },
-        { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : 'Remote' },
-    ];
+        { icon: Baby, label: 'Age', value: product.ageGroup ? `${product.ageGroup} Yrs` : product.specs?.suitable_age },
+        { icon: Gauge, label: 'Speed', value: product.specs?.speed },
+        { icon: Weight, label: 'Load', value: product.specs?.max_load },
+        { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },
+    ].filter(h => h.value);
 
     // ... (previous code)
     const whatsInBox = product.box_content && product.box_content.length > 0

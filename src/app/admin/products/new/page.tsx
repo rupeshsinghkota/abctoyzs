@@ -169,11 +169,14 @@ export default function NewProductPage() {
         // Remove any existing poster blocks to avoid duplicates
         d = d.replace(/<div class="my-10 marketing-poster">[\s\S]*?<\/div>/g, '');
 
-        // Insert first poster after hook (p)
-        const firstPIdx = d.indexOf('</p>');
-        if (firstPIdx !== -1) {
+        // Insert first poster after hook (ideally after 2nd paragraph to match long-form AI output)
+        let firstPos = d.indexOf('</p>');
+        if (firstPos !== -1) {
+            const secondPos = d.indexOf('</p>', firstPos + 4);
+            if (secondPos !== -1) firstPos = secondPos; // Move to 2nd paragraph if it exists
+
             const imgHtml = `\n<div class="my-10 marketing-poster"><img src="${urls[0]}" alt="Premium Performance" class="rounded-3xl w-full shadow-2xl border-4 border-white/10" /></div>\n`;
-            d = d.slice(0, firstPIdx + 4) + imgHtml + d.slice(firstPIdx + 4);
+            d = d.slice(0, firstPos + 4) + imgHtml + d.slice(firstPos + 4);
         }
 
         // Insert second poster before Safety section
@@ -329,7 +332,7 @@ export default function NewProductPage() {
                     run_time: data.specs?.run_time || ''
                 },
                 voltage: parseVoltage(data.specs?.battery) || prev.voltage,
-                age_group: parseAgeGroup(data.specs?.suitable_age) || prev.age_group
+                age_group: data.age_group || parseAgeGroup(data.specs?.suitable_age) || prev.age_group
             }));
 
             alert('✨ Data Extracted & Form Filled!');

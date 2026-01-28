@@ -33,20 +33,26 @@ export async function POST(req: Request) {
                - Standardize units (e.g., "12 volts" -> "12V").
 
             2. **PRODUCT DESCRIPTION (CREATIVE Generation):**
-               - GENERATE a high-converting, LONG-FORM HTML marketing description.
-               - **STRUCTURE FOR BANNERS:** You MUST follow this structure so our system can insert banners:
-                 - **Intro:** Start with a strong, emotional hook paragraph about the product. (System inserts Banner 1 here).
-                 - **Features:** A detailed <ul> list of features.
-                 - **Safety Section:** You MUST generate a section header exactly like this: "<h3>🛡️ Safety & Quality</h3>" followed by a paragraph about safety. (System inserts Banner 2 here).
-                 - **Conclusion:** A final wrapping sentence.
-               - **BRANDING:** strictly use "${BRAND_CONFIG.name}" as the seller/brand name. REMOVE any competitor names.
-               - **FORMATTING:** Use valid HTML tags (<h2>, <p>, <ul>, <li>, <strong>).
+               - GENERATE a premium, high-converting, LONG-FORM HTML marketing description (at least 300-400 words).
+               - **WEAVE DETAILS:** You MUST weave all extracted technical details (Battery, Motor, Speed, Load, Tires, Seats) into the marketing narrative. Do not just list them; sell the benefits!
+               - **STRUCTURE FOR BANNERS:** You MUST follow this exact structure for our automated banner injection system:
+                 - **Hook & Intro:** Start with a bold <h2> header (e.g., "The Ultimate Adventure Awaits") followed by 2 rich paragraphs.
+                 - **Banner 1 Anchor:** End the second paragraph with a clean transition. (DO NOT ADD A TAG, just a line break).
+                 - **Feature Showcase:** A list of key features using <h3> and <ul>/<li>.
+                 - **Safety & Quality Section:** Generate a section header exactly like this: "<h3>🛡️ Safety & Quality</h3>", followed by a detailed paragraph emphasizing engineering, material safety, and parental controls.
+                 - **Banner 2 Anchor:** This section MUST be present for Banner 2 to be inserted.
+                 - **Closing:** A final "Conclusion" paragraph with a strong Call to Action for parents.
+               - **BRANDING:** Maintain strict "${BRAND_CONFIG.name}" presence.
+               - **FORMATTING:** Use valid HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>).
                - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
 
             3. **SEO DATA (CREATIVE Generation):**
                - **product_name:** Format as: "ABC Toyz Premium [Product Name]" (Replace [Product Name] with the actual model).
-               - **meta_title:** Generate a click-worthy title (max 60 chars) including "${BRAND_CONFIG.name}".
-               - **meta_description:** Generate a compelling summary (max 160 chars) mentioning "${BRAND_CONFIG.name}".
+               - **meta_title:** Click-worthy title including "${BRAND_CONFIG.name}".
+               - **meta_description:** Compelling summary mentioning "${BRAND_CONFIG.name}".
+
+            4. **MAPPING RULES:**
+               - **age_group:** Based on the suitable age, map explicitly to one of: "1-3", "3-6", "6-12", "10+". (REQUIRED FIELD).
 
             Output ONLY a JSON object with this exact schema:
             {
@@ -56,6 +62,7 @@ export async function POST(req: Request) {
                 "meta_title": "SEO Title | ${BRAND_CONFIG.name}",
                 "meta_description": "SEO Description...",
                 "category": "cars|bikes|jeeps|suv|atv|go-kart",
+                "age_group": "1-3|3-6|6-12|10+",
                 "specs": {
                     "battery": "e.g. 12V 7Ah",
                     "motor": "e.g. 2 x 35W",
