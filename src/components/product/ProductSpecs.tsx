@@ -20,11 +20,13 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
         // 2. Power Output
         { label: 'Voltage', value: additionalInfo['Voltage'], icon: Zap },
         // 3. Performance
+        { label: 'Motors', value: specs?.motor, icon: Zap },
         { label: 'Max Speed', value: specs?.speed, icon: Gauge },
         // 4. Capacity
         { label: 'Max Load', value: specs?.max_load, icon: Weight },
+        { label: 'Seats', value: specs?.seats ? `${specs.seats} Seater` : undefined, icon: Package },
         // 5. Suitability
-        { label: 'Age Group', value: additionalInfo['Recommended Age'], icon: User },
+        { label: 'Age Group', value: specs?.suitable_age || additionalInfo['Recommended Age'], icon: User },
         // 6. Endurance (NEW)
         { label: 'Run Time', value: specs?.run_time, icon: Hourglass },
         // 7. Maintenance (NEW)
@@ -35,11 +37,8 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
         { label: 'Seat Type', value: specs?.seat_material, icon: Armchair },
         // 10. Control (Safety)
         { label: 'Control', value: specs?.mobile_app ? 'App & Remote' : (specs?.remote_control ? '2.4G Remote' : 'Manual'), icon: specs?.mobile_app ? Smartphone : Radio },
-        // 11. Size (Root prop usually passed in additionalInfo or we assume standard)
-        { label: 'Start Mode', value: 'Push Button', icon: Box }, // Placeholder for Dimensions if not available yet, or we use a generic feature
-        // 12. Category
-        { label: 'Category', value: additionalInfo['Category'], icon: Package },
-
+        // 11. Logistics
+        { label: 'Category', value: additionalInfo['Category'], icon: Box },
     ].filter(item => item.value && item.value !== '-');
 
     return (

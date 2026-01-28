@@ -82,7 +82,7 @@ export default async function ProductPage({ params }: PageProps) {
 
     // Feature highlights
     const highlights = [
-        { icon: Baby, label: 'Age', value: product.ageGroup ? `${product.ageGroup} Yrs` : product.specs?.suitable_age },
+        { icon: Baby, label: 'Age', value: product.specs?.suitable_age || (product.ageGroup ? `${product.ageGroup} Yrs` : null) },
         { icon: Gauge, label: 'Speed', value: product.specs?.speed },
         { icon: Weight, label: 'Load', value: product.specs?.max_load },
         { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },

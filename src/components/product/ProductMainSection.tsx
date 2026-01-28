@@ -8,7 +8,7 @@ import { Star, Truck, ShieldCheck, CheckCircle2, RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
-import { Package, Zap, Gauge, Weight, Battery, Gamepad2 } from 'lucide-react';
+import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-react';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
     // State for attribute selection
@@ -54,6 +54,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
     const highlights = [
         { icon: Battery, label: 'Battery', value: product.specs?.battery || product.voltage },
         { icon: Gauge, label: 'Speed', value: product.specs?.speed },
+        { icon: Baby, label: 'Age', value: product.specs?.suitable_age || (product.ageGroup ? `${product.ageGroup} Yrs` : null) },
         { icon: Weight, label: 'Load', value: product.specs?.max_load },
         { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },
     ].filter(h => h.value);
