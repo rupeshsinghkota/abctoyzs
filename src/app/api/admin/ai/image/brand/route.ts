@@ -84,29 +84,43 @@ LOGO APPLICATION:
 • Do NOT repeat the logo multiple times
 
 PRIMARY OBJECTIVE:
-Regenerate the image into a premium, realistic, parent-trust-focused e-commerce product photo suitable for a professional ride-on toy website.
+Create a STUNNING, cinematic e-commerce product photo that makes parents instantly want to buy this for their kids.
 
-BACKGROUND:
-Automatically choose ONE clean environment:
-• Soft white studio background with natural floor shadow (default)
-• Minimal indoor lifestyle setting (neutral walls, clean floor)
-• Outdoor daylight setting (simple driveway or park surface)
+BACKGROUND (CHOOSE BEST MATCH FOR VEHICLE TYPE):
+For Jeep/Off-road/SUV toys:
+• Desert highway at golden hour with dramatic rock formations
+• Mountain trail with sunset sky
+• Adventure road with dust and warm lighting
+
+For Sports cars (Lamborghini, Ferrari, Porsche):
+• Luxury mansion driveway at sunset
+• City street with bokeh lights
+• Racetrack or upscale garage
+
+For Classic cars (Mercedes, BMW, Audi):
+• Elegant estate driveway
+• Premium showroom or upscale home garage
+• Scenic coastal road
+
+For Motorcycles/Bikes:
+• Open road with dramatic sky
+• Mountain backdrop
 
 BACKGROUND RULES:
-• No clutter
-• No people
-• No children
-• No pets
-• No extra toys
-• No text or graphics
-• No cartoon or fantasy elements
+• Cinematic, visually stunning backgrounds
+• Golden hour lighting preferred (warm sunset tones)
+• Winding road disappearing into distance adds depth
+• Rock formations, mountains, or scenic landscapes
+• No clutter, no people, no children, no pets
+• Background should enhance product appeal
 
 LIGHTING:
-• Soft professional studio lighting
-• Natural daylight feel
-• Even illumination across the toy
-• Gentle realistic shadow beneath wheels
-• No harsh reflections on plastic surfaces
+• Golden hour / sunset lighting (warm orange/golden tones)
+• Dramatic but natural lighting
+• Beautiful lens flare from sun (subtle)
+• Rim lighting on the toy to make it pop
+• Realistic shadows for depth
+• Professional automotive photography style
 
 COMPOSITION:
 • Full toy must be clearly visible
