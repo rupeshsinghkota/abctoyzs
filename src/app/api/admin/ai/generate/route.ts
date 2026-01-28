@@ -73,24 +73,24 @@ export async function POST(req: Request) {
                 ${contextString}
 
                 CRITICAL RULES:
-                1. NEVER output "N/A", "Unknown", or "Variable".
-                2. If exact data is missing, YOU MUST ESTIMATE based on similar products in this category (e.g. Most jeeps are 12V, 30kg load).
+                1. Do NOT guess technical specifications. If a value is not explicitly provided in the notes or clearly inferable from the product name (e.g., '12V' in title), use "Unknown".
+                2. ESTIMATE only if strong clues exist (e.g. 12V 7Ah usually implies 8-12h charge). otherwise "Unknown".
                 3. Keep values SHORT and CONCISE (Max 3-5 words).
                 
                 Output ONLY a JSON object with these exact keys:
                 {
-                    "Battery": "e.g. 12V 7Ah (Rechargeable)",
-                    "Motors": "e.g. 2 x 35W High Torque",
+                    "Battery": "e.g. 12V 7Ah or Unknown",
+                    "Motors": "e.g. 2 x 35W or Unknown",
                     "Speed": "e.g. 3-7 km/h",
-                    "Charging Time": "e.g. 8-10 Hours",
-                    "Play Time": "e.g. 45-60 Mins",
-                    "Max Load": "e.g. 35-40 kg",
+                    "Charging Time": "e.g. 8-10 Hours or Unknown",
+                    "Run Time": "e.g. 45-60 Mins or Unknown",
+                    "Max Load": "e.g. 35 kg",
                     "Suitable Age": "e.g. 2-6 Years",
-                    "Seating Capacity": "e.g. 1 Seater or 2 Seater",
+                    "Seating Capacity": "e.g. 1 Seater",
                     "Tire Type": "e.g. EVA Rubber or Plastic",
                     "Seat Material": "e.g. Leather or Plastic",
-                    "Remote Control": "e.g. 2.4G Bluetooth or No",
-                    "Mobile App Control": "e.g. Yes or No"
+                    "Remote Control": "e.g. 2.4G Bluetooth",
+                    "Mobile App Control": "e.g. Yes/No"
                 }
             `;
         } else if (type === 'logistics') {
@@ -120,13 +120,15 @@ export async function POST(req: Request) {
                     "meta_title": "SEO Title",
                     "meta_description": "SEO Desc",
                     "specs": { 
-                        "battery": "12V 7Ah (Estimate if missing)", 
-                        "motor": "2 x 35W (Estimate if missing)", 
+                        "battery": "12V 7Ah (or Unknown)", 
+                        "motor": "2 x 35W (or Unknown)", 
                         "speed": "3-7 km/h", 
+                        "charging_time": "8-10 Hours",
+                        "run_time": "45-60 Mins",
                         "max_load": "35 kg", 
-                        "tire_type": "EVA Rubber or Plastic", 
-                        "seat_material": "Leather or Plastic",
-                        "seats": "1 Seater or 2 Seater", 
+                        "tire_type": "EVA Rubber", 
+                        "seat_material": "Leather",
+                        "seats": "1 Seater", 
                         "mobile_app": true, 
                         "remote_control": true 
                     },
@@ -134,8 +136,8 @@ export async function POST(req: Request) {
                 }
 
                 RULES FOR SPECS:
-                - NEVER use "N/A" or "Unknown". Estimate realistic values.
-                - Keep strings SHORT (under 5 words).
+                - If data is missing or ambiguous, use "Unknown". Do NOT invent specs.
+                - Keep strings SHORT.
             `;
         }
 
