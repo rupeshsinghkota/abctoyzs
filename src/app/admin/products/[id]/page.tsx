@@ -248,15 +248,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
         setIsBrandingAll(true);
         try {
-            // Send ALL images to AI for comprehensive analysis
-            // AI will generate new mockups from different angles based on understanding all images
+            // Process each image individually - enhance background while keeping product identical
             const res = await fetch('/api/admin/ai/image/brand', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     imageUrls: imagesToBrand,
                     productName: formData.name,
-                    generateAll: true // Generate multiple angles
+                    generateAll: true // Enhance each image
                 })
             });
 
@@ -264,7 +263,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             if (error) throw new Error(error);
 
             if (newImageUrls && newImageUrls.length > 0) {
-                // Replace images with AI-generated mockups from different angles
+                // Replace images with enhanced versions (better background, same product)
                 setFormData(prev => {
                     const freshImages = [...prev.images];
                     newImageUrls.forEach((url: string, i: number) => {
@@ -274,11 +273,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     });
                     return { ...prev, images: freshImages };
                 });
-                alert(`✨ Generated ${newImageUrls.length} professional mockups from different angles!`);
+                alert(`✨ Enhanced ${newImageUrls.length} images with professional backgrounds!`);
             }
         } catch (error: any) {
             console.error(error);
-            alert('Image generation failed: ' + error.message);
+            alert('Image enhancement failed: ' + error.message);
         } finally {
             setIsBrandingAll(false);
         }

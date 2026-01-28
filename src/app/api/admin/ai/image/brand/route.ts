@@ -7,28 +7,23 @@ import path from 'path';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-// Different angles for e-commerce product photography
-const SHOT_ANGLES = [
-    { name: "hero_front", description: "Front 3/4 angle view - the classic hero shot showing the front and one side. This is the main showcase image." },
-    { name: "side_profile", description: "Pure side profile view showing the full length of the vehicle from directly beside it." },
-    { name: "rear_quarter", description: "Rear 3/4 angle view showing the back and one side of the vehicle." },
-    { name: "front_detail", description: "Front-facing view showing the grille, headlights, and front design details up close." },
-    { name: "interior_cockpit", description: "Interior view focusing on the steering wheel, dashboard, and seat from a child's perspective." }
-];
-
 export async function POST(req: Request) {
     try {
-        const { imageUrls, productName, generateAll, angleIndex } = await req.json();
+        const { imageUrl, imageUrls, productName, generateAll } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
         }
 
-        if (!imageUrls || imageUrls.length === 0) {
+        // Support both single image and array of images
+        const allImageUrls = imageUrls || (imageUrl ? [imageUrl] : []);
+
+        if (allImageUrls.length === 0) {
             return NextResponse.json({ error: "No images provided" }, { status: 400 });
         }
 
         const supabase = await createClient();
+        const brandName = BRAND_CONFIG.name;
 
         const model = genAI.getGenerativeModel({
             model: "gemini-2.0-flash-exp-image-generation",
@@ -43,109 +38,71 @@ export async function POST(req: Request) {
             } as any
         });
 
-        // Download ALL source images for comprehensive product understanding
-        const imageDataParts = await Promise.all(
-            imageUrls.slice(0, 6).map(async (url: string) => {
-                try {
-                    const res = await fetch(url);
-                    const buffer = await res.arrayBuffer();
-                    const base64 = Buffer.from(buffer).toString("base64");
-                    return { inlineData: { data: base64, mimeType: "image/jpeg" } };
-                } catch {
-                    return null;
-                }
-            })
-        );
-        const validImageParts = imageDataParts.filter(Boolean);
-
-        if (validImageParts.length === 0) {
-            throw new Error("Failed to download any images");
-        }
-
         // Read brand logo
         const logoPath = path.join(process.cwd(), 'public', BRAND_CONFIG.logoWide);
         const logoBuffer = fs.readFileSync(logoPath);
         const logoBase64 = logoBuffer.toString("base64");
 
-        // Determine which angle(s) to generate
-        const anglesToGenerate = generateAll
-            ? SHOT_ANGLES.slice(0, Math.min(imageUrls.length, 5))
-            : [SHOT_ANGLES[angleIndex || 0]];
-
         const generatedUrls: string[] = [];
-        const brandName = BRAND_CONFIG.name;
 
-        for (const angle of anglesToGenerate) {
-            const prompt = `You are a WORLD-CLASS COMMERCIAL PRODUCT PHOTOGRAPHER shooting for premium brands like Apple, Tesla, and Porsche catalogs.
+        // Process each image individually - enhance background while keeping product identical
+        const imagesToProcess = generateAll ? allImageUrls : [allImageUrls[0]];
 
-REFERENCE IMAGES: ${validImageParts.length} photos of a children's ride-on toy vehicle from different angles. Study them ALL to understand the complete product.
-
-═══════════════════════════════════════════════════
-STEP 1: PRODUCT UNDERSTANDING
-═══════════════════════════════════════════════════
-Analyze every reference image to learn:
-• Complete 3D form, proportions, and silhouette of this toy vehicle
-• Exact paint colors and finishes (metallic, matte, glossy)
-• Car manufacturer badges: Mercedes star, BMW roundel, Lamborghini bull, Ferrari horse, Jeep, Ford, etc. - note their EXACT placement
-• All authentic features: LED headlights, chrome grille, alloy wheels, leather seats, steering wheel, mirrors
-
-═══════════════════════════════════════════════════
-STEP 2: BRAND SANITIZATION (CRITICAL)
-═══════════════════════════════════════════════════
-KEEP ONLY these brands:
-✓ Original car manufacturer (BMW, Mercedes, Lamborghini, Ferrari, Jeep, Ford, etc.)
-✓ ${brandName} (my store logo - provided as last image) - place on license plate
-
-REMOVE EVERYTHING ELSE:
-✗ Competitor store logos: "11cart", "Amazon", "Walmart", "Flipkart", "Hamleys", "AliExpress", "Alibaba"
-✗ Any third-party seller stickers or watermarks
-✗ Price tags, barcodes, promotional text
-✗ Website URLs, social media handles
-✗ ANY random brand stickers that are NOT the car manufacturer
-
-═══════════════════════════════════════════════════
-STEP 3: GENERATE 8K PHOTOSHOOT QUALITY IMAGE
-═══════════════════════════════════════════════════
-Camera Angle: ${angle.description}
-
-PHOTOGRAPHIC EXCELLENCE:
-• Shot on Phase One IQ4 150MP medium format camera
-• 8K ultra-high resolution with incredible detail
-• Professional studio lighting - 3-point setup with softboxes
-• Dramatic rim lighting to highlight contours
-• Perfect exposure, no blown highlights or crushed shadows
-• Tack-sharp focus across the entire vehicle
-• Shallow depth of field with subtle bokeh background
-
-BACKDROP & SETTING:
-• Seamless infinity cove (white or light grey)
-• OR luxury showroom with polished concrete/marble floor
-• Subtle reflection on floor surface
-• Clean, distraction-free environment
-• Premium automotive catalog aesthetic
-
-TECHNICAL SPECS:
-• Square 1:1 aspect ratio (perfect for e-commerce)
-• Ultra-sharp, no noise or artifacts
-• Professional color grading (slightly desaturated, premium feel)
-• The final image should look like it was shot in a multi-million dollar photography studio
-
-BRANDING: Add the ${brandName} logo (last image) onto the license plate if visible in this angle.
-
-OUTPUT: A single stunning 8K-quality product photograph that would be at home on the Mercedes or Tesla website.`;
-
-            const contentParts = [
-                { text: prompt },
-                ...validImageParts,
-                { inlineData: { data: logoBase64, mimeType: "image/png" } }
-            ];
+        for (let i = 0; i < imagesToProcess.length; i++) {
+            const currentImageUrl = imagesToProcess[i];
 
             try {
+                // Download current image
+                const imageRes = await fetch(currentImageUrl);
+                const imageBuffer = await imageRes.arrayBuffer();
+                const imageBase64 = Buffer.from(imageBuffer).toString("base64");
+
+                const prompt = `PHOTO EDITING TASK: Transform this product image into professional e-commerce photography.
+
+INPUT: A photo of a children's ride-on electric toy car.
+
+WHAT TO DO:
+
+1. KEEP THE PRODUCT DETAILS EXACTLY AS-IS
+   - Same toy car model with same design
+   - Same colors - every color must match perfectly  
+   - Same car brand badges (Mercedes, BMW, Lamborghini, Ferrari, Jeep, Ford, Audi, Porsche, etc.)
+   - Same headlights, wheels, seats, mirrors, steering wheel design
+   - DO NOT redesign, recolor, or modify any product details
+
+2. ANGLE ADJUSTMENT (ALLOWED)
+   - You MAY adjust the viewing angle for better composition
+   - Choose a flattering e-commerce angle (3/4 front view works great)
+   - The product details must stay the same, just the perspective can change
+
+3. REMOVE COMPETITOR WATERMARKS
+   - Remove: "11cart", "Amazon", "Walmart", "Flipkart", "Hamleys", "AliExpress", "Alibaba" logos
+   - Remove: Seller stickers, price tags, website URLs, promotional overlays
+   - KEEP: Car manufacturer badges (BMW, Mercedes, etc.) - these are part of the product!
+
+4. PROFESSIONAL BACKGROUND
+   - Add a clean, professional e-commerce background:
+     * Pure white seamless studio OR light grey gradient OR polished floor
+   - Professional studio lighting with soft shadows
+   - Subtle floor reflection for premium catalog look
+
+5. OUTPUT
+   - Square 1:1 aspect ratio
+   - High quality, sharp, professional e-commerce photography
+   - Should look like a premium Amazon or toy store listing
+
+SUMMARY: Keep product details (colors, design, badges) exactly the same. You can adjust the angle and must replace the background with professional studio setting.`;
+                const contentParts = [
+                    { text: prompt },
+                    { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
+                    { inlineData: { data: logoBase64, mimeType: "image/png" } }
+                ];
+
                 const result = await model.generateContent(contentParts as any);
                 const response = await result.response;
 
                 if (!response.candidates || response.candidates.length === 0) {
-                    console.error(`Failed to generate ${angle.name}`);
+                    console.error(`Failed to generate image ${i + 1}`);
                     continue;
                 }
 
@@ -165,7 +122,7 @@ OUTPUT: A single stunning 8K-quality product photograph that would be at home on
                     const newImageBuffer = Buffer.from(newImageBase64, 'base64');
                     const timestamp = Date.now();
                     const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
-                    const newFilename = `mockup_${angle.name}_${timestamp}_${safeName}.jpg`;
+                    const newFilename = `enhanced_${timestamp}_${i}_${safeName}.jpg`;
 
                     const { error: uploadError } = await supabase.storage
                         .from('products')
@@ -182,13 +139,13 @@ OUTPUT: A single stunning 8K-quality product photograph that would be at home on
                     }
                 }
             } catch (err) {
-                console.error(`Error generating ${angle.name}:`, err);
+                console.error(`Error processing image ${i + 1}:`, err);
                 continue;
             }
         }
 
         if (generatedUrls.length === 0) {
-            throw new Error("Failed to generate any images. Please try again.");
+            throw new Error("Failed to enhance any images. Please try again.");
         }
 
         return NextResponse.json({
@@ -198,7 +155,7 @@ OUTPUT: A single stunning 8K-quality product photograph that would be at home on
         });
 
     } catch (error: any) {
-        console.error("AI Image Branding Error:", error);
+        console.error("AI Image Enhancement Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
