@@ -62,6 +62,9 @@ export async function POST(req: Request) {
                 [Insert img if available]
                 4. <h3>🏁 Performance</h3> <p>[...</p>
                 5. <h3>✨ Features</h3> <ul>...</ul>
+
+                MANDATORY INCLUSION:
+                - You MUST explicitly mention the "Suitable Age Range" and "Max Weight Capacity" in the body text (e.g. in the Features or Design section).
                 
                 Output ONLY the HTML string.
             `;
@@ -73,8 +76,10 @@ export async function POST(req: Request) {
                 ${contextString}
 
                 CRITICAL RULES:
-                1. Do NOT guess technical specifications. If a value is not explicitly provided in the notes or clearly inferable from the product name (e.g., '12V' in title), use "Unknown".
-                2. ESTIMATE only if strong clues exist (e.g. 12V 7Ah usually implies 8-12h charge). otherwise "Unknown".
+                1. If exact data is missing, **INFER** based on standard industry norms for this category.
+                   - Example: "12V" usually implies 3-5 km/h, 30kg load, 1-4 years age.
+                   - Example: "24V" usually implies 5-8 km/h, 50kg load, 3-8 years age.
+                2. Only use "Unknown" if you truly have NO CLUE (e.g. no voltage, no motor info provided).
                 3. Keep values SHORT and CONCISE (Max 3-5 words).
                 
                 Output ONLY a JSON object with these exact keys:
@@ -136,8 +141,12 @@ export async function POST(req: Request) {
                 }
 
                 RULES FOR SPECS:
-                - If data is missing or ambiguous, use "Unknown". Do NOT invent specs.
+                - If data is missing, INFER based on voltage/category norms (e.g. 12V = 3-5km/h).
+                - Do NOT leave fields empty if a reasonable guess can be made.
                 - Keep strings SHORT.
+
+                MANDATORY INCLUSION:
+                - You MUST explicitly mention the "Suitable Age Range" and "Max Weight Capacity" in the HTML description text.
             `;
         }
 
