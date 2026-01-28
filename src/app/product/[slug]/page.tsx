@@ -127,38 +127,35 @@ export default async function ProductPage({ params }: PageProps) {
                 {/* DESKTOP FULL WIDTH DETAILS (Below Fold) */}
                 <div className="hidden lg:block mt-12 max-w-7xl mx-auto space-y-16 px-4 pb-16">
 
-                    {/* 1. Key Highlights (Visual Grid) */}
-                    <div className="text-center">
-                        <h3 className="text-2xl font-black mb-8 text-gray-900 tracking-tight">Key Features Highlight</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {/* 1. Key Highlights (Ultra Compact Chips) */}
+                    <div className="flex justify-center">
+                        <div className="inline-flex flex-wrap justify-center gap-3 p-2 bg-white rounded-2xl border border-gray-100 shadow-sm">
                             {highlights.map((item: { icon: any, label: string, value: string }, idx: number) => (
-                                <div key={idx} className="flex flex-col items-center justify-center p-6 rounded-3xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-100">
-                                    <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center mb-4 text-primary">
-                                        <item.icon className="w-8 h-8" strokeWidth={1.5} />
+                                <div key={idx} className="flex items-center gap-3 px-4 py-2 rounded-xl bg-gray-50 border border-gray-100 hover:border-primary/20 transition-all duration-300 group">
+                                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-orange-600 shadow-sm">
+                                        <item.icon className="w-4 h-4" strokeWidth={2} />
                                     </div>
-                                    <span className="text-xs text-muted-foreground font-bold tracking-widest uppercase mb-1">{item.label}</span>
-                                    <span className="text-lg font-black text-gray-900">{item.value}</span>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase">{item.label}</span>
+                                        <span className="text-xs font-black text-gray-900 leading-none mt-0.5">{item.value}</span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* 2. Specs & Box Contents (Unified Premium Cards) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start px-4 md:px-0">
+                    {/* 2. Specs & Box Contents (Unified Compact Cards) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start px-4 md:px-0">
 
                         {/* Specs Card */}
-                        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
-                                    <Gauge className="w-6 h-6" />
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm h-full">
+                            <div className="flex items-center gap-2.5 mb-5">
+                                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                    <Gauge className="w-5 h-5" />
                                 </div>
-                                <h3 className="text-xl font-black text-gray-900 tracking-tight">Technical Specifications</h3>
+                                <h3 className="text-lg font-black text-gray-900 tracking-tight">Technical Specifications</h3>
                             </div>
 
-                            {/* ProductSpecs component should handle the table. 
-                                We are removing the redundant inner header if it exists in the component, 
-                                but since we can't see ProductSpecs internals right now, we assume this clean wrapper is best.
-                            */}
                             <ProductSpecs
                                 specs={product.specs}
                                 additionalInfo={{
@@ -170,21 +167,21 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
 
                         {/* Box Contents Card */}
-                        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="p-2.5 bg-orange-50 text-orange-600 rounded-xl">
-                                    <Package className="w-6 h-6" />
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm h-full">
+                            <div className="flex items-center gap-2.5 mb-5">
+                                <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
+                                    <Package className="w-5 h-5" />
                                 </div>
-                                <h3 className="text-xl font-black text-gray-900 tracking-tight">What's In The Box?</h3>
+                                <h3 className="text-lg font-black text-gray-900 tracking-tight">What's In The Box?</h3>
                             </div>
 
-                            <ul className="grid grid-cols-1 gap-4">
+                            <ul className="grid grid-cols-1 gap-3">
                                 {whatsInBox.map((item: string, idx: number) => (
-                                    <li key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-primary/20 hover:bg-white transition-all group">
-                                        <div className="mt-0.5 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0 group-hover:bg-green-500 transition-colors">
-                                            <CheckCircle2 className="w-3 h-3 text-green-700 group-hover:text-white transition-colors" />
+                                    <li key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-100 hover:border-primary/20 hover:bg-white transition-all group">
+                                        <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center shrink-0 group-hover:bg-green-500 transition-colors">
+                                            <CheckCircle2 className="w-2.5 h-2.5 text-green-700 group-hover:text-white transition-colors" />
                                         </div>
-                                        <span className="text-sm font-bold text-gray-700 group-hover:text-gray-900 leading-relaxed">{item}</span>
+                                        <span className="text-xs font-bold text-gray-700 group-hover:text-gray-900 leading-relaxed">{item}</span>
                                     </li>
                                 ))}
                             </ul>
