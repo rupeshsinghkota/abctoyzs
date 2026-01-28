@@ -21,8 +21,8 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     // Initial Price / Image / Stock comes from Product, but overrides if Variant selected
     const displayPrice = currentVariant ? currentVariant.price : product.price;
-    // Fallback mock MRP if missing: 30% higher than price, rounded to nearest 100 minus 1 (e.g. 9999)
-    const rawMRP = currentVariant?.price ? (currentVariant.price * 1.3) : (product.mrp || product.price * 1.3);
+    // Fallback mock MRP if missing: 40% higher than price, rounded to nearest 100 minus 1 (e.g. 9999)
+    const rawMRP = currentVariant?.price ? (currentVariant.price * 1.4) : (product.mrp || product.price * 1.4);
     const displayMRP = Math.round(rawMRP / 100) * 100 - 1; // Rounds to end in ...99
     const displayStock = currentVariant ? currentVariant.stock : 7; // Default mock stock
 
@@ -89,6 +89,26 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     return (
         <div className="space-y-6">
+            {/* Automotive Performance Badges - Moved to Top */}
+            <div className="flex overflow-x-auto pb-2 -mb-2 snap-x snap-mandatory no-scrollbar gap-2 sm:grid sm:grid-cols-4 sm:gap-3 sm:pb-0 sm:mb-0">
+                {highlights.map((item, idx) => (
+                    <div
+                        key={idx}
+                        className="group flex flex-1 min-w-[130px] sm:min-w-0 items-center gap-3 p-2.5 rounded-xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 snap-center"
+                    >
+                        <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <item.icon className="w-4 h-4 text-primary" strokeWidth={2} />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase truncate">{item.label}</span>
+                            <span className="text-[10px] font-black text-gray-900 truncate">{item.value}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full" />
+
             {/* Price Display (Premium Deal Style) */}
             <div className="space-y-2">
                 <div className="flex flex-col">
@@ -115,25 +135,6 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
             </div>
 
-            <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full" />
-
-            {/* Automotive Performance Badges - Horizontal Scroll on Mobile, Grid on Desktop */}
-            <div className="flex overflow-x-auto pb-4 -mb-4 snap-x snap-mandatory no-scrollbar gap-2 sm:grid sm:grid-cols-4 sm:gap-3 sm:pb-0 sm:mb-0">
-                {highlights.map((item, idx) => (
-                    <div
-                        key={idx}
-                        className="group flex flex-1 min-w-[130px] sm:min-w-0 items-center gap-3 p-2.5 rounded-xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 snap-center"
-                    >
-                        <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                            <item.icon className="w-4 h-4 text-primary" strokeWidth={2} />
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                            <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase truncate">{item.label}</span>
-                            <span className="text-[10px] font-black text-gray-900 truncate">{item.value}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
 
             {/* Attributes Selection */}
             {product.attributes?.map((attr) => (
