@@ -82,8 +82,11 @@ REQUIREMENTS:
 - Keep exact product details from reference photos
 - Remove all seller branding (11CART, stickers, watermarks)
 - Add "ABC TOYZ" text on license plate
-- Beautiful desert sunset background with golden hour lighting
-- Dramatic shadows and rim lighting
+- AI DECIDE BEST BACKGROUND based on vehicle type:
+  • Jeep/SUV -> Desert sunset or mountain trail
+  • Sports Car -> Luxury driveway or city lights
+  • Bike/ATV -> Off-road track or scenic road
+- Golden hour lighting with dramatic shadows
 - 1:1 square ratio
 
 STYLE: Premium e-commerce product photography, like official brand catalog.`;
