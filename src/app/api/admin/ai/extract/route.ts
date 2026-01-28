@@ -59,15 +59,20 @@ ${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}
                - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
                - **FORMATTING:** Use **bold** liberally for impact. Use valid HTML.
 
-            3. **SEO DATA:**
-               - **product_name:** "ABC Toyz Premium [Model]" (e.g. "ABC Toyz Premium Lamborghini Aventador SVJ").
+            3. **BRAND INTEGRITY & SCRUBBING (MANDATORY):**
+               - **ONLY AUTHORIZED BRAND:** The only brand name allowed to appear is "${BRAND_CONFIG.name}". 
+               - **SCRUB EXTERNAL BRANDS:** If the raw text mentions any other brands, retailers, or competitors (e.g., "Amazon", "Walmart", "Hamleys", or external retailers), you MUST REMOVE or REPLACE them with "${BRAND_CONFIG.name}".
+               - **NAMING CONVENTION:** Always refer to the product as "${BRAND_CONFIG.name} Premium [Model Name]".
+
+            4. **SEO DATA:**
+               - **product_name:** "${BRAND_CONFIG.name} Premium [Model]" (e.g. "${BRAND_CONFIG.name} Premium Lamborghini Aventador SVJ").
                - **meta_title:** Premium SEO Title (55-60 chars).
                - **meta_description:** High-conversion meta description (155-160 chars).
 
-            4. **MAPPING:**
+            5. **MAPPING:**
                - **age_group:** Map strictly to: "1-3", "3-6", "6-12", or "10+".
 
-            5. **MARKETING SUITE:**
+            6. **MARKETING SUITE:**
                - Generate 3 punchy, high-end headlines (under 5 words each) for marketing posters:
                  - **action:** Focus on speed/power (e.g., "Sculpted for Speed").
                  - **comfort:** Focus on interior/luxury (e.g., "Authentic Heritage Cockpit").
