@@ -22,6 +22,7 @@ export interface Product {
         seat_material?: string;
         remote_control?: boolean;
         features?: string[];
+        suitable_age?: string;
     };
     description: string;
     // Premium Features
