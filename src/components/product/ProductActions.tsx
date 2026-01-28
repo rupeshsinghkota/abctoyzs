@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check, ShoppingCart, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 
