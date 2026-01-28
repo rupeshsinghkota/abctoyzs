@@ -284,6 +284,65 @@ export default function NewProductPage() {
         return '';
     };
 
+
+    // --- Magic Paste Handler ---
+    const handleExtractData = async () => {
+        if (!rawText.trim()) {
+            alert('Please paste some text first!');
+            return;
+        }
+
+        setIsExtracting(true);
+        try {
+            const res = await fetch('/api/admin/ai/extract', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: rawText })
+            });
+            const { data, error } = await res.json();
+            if (error) throw new Error(error);
+
+            // Populate Form
+            setFormData(prev => ({
+                ...prev,
+                name: data.name || prev.name,
+                description: data.description || prev.description,
+                category: data.category || 'cars',
+                base_price: data.price ? String(data.price) : prev.base_price,
+                meta_title: data.name || prev.meta_title,
+                product_dimensions: data.logistics?.dimensions || prev.product_dimensions,
+                gross_weight: data.logistics?.weight || prev.gross_weight,
+                box_content: data.logistics?.box_content?.length ? data.logistics.box_content : prev.box_content,
+                specs: {
+                    ...prev.specs,
+                    battery: data.specs?.battery || '',
+                    motor: data.specs?.motor || '',
+                    speed: data.specs?.speed || '',
+                    max_load: data.specs?.max_load || '',
+                    tire_type: data.specs?.tire_type || '',
+                    seat_material: data.specs?.seat_material || '',
+                    seats: data.specs?.seats ? String(data.specs.seats) : '1',
+                    mobile_app: data.specs?.mobile_app === true,
+                    remote_control: data.specs?.remote_control === true,
+                    suitable_age: data.specs?.suitable_age || '',
+                    charging_time: data.specs?.charging_time || '',
+                    run_time: data.specs?.run_time || ''
+                },
+                voltage: parseVoltage(data.specs?.battery) || prev.voltage,
+                age_group: parseAgeGroup(data.specs?.suitable_age) || prev.age_group
+            }));
+
+            alert('✨ Data Extracted & Form Filled!');
+            setRawText('');
+
+        } catch (error: any) {
+            console.error(error);
+            alert('Extraction failed: ' + error.message);
+        } finally {
+            setIsExtracting(false);
+        }
+    };
+
     // --- Logic ---
 
     // 1. Generate Variants from Attributes
