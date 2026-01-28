@@ -245,36 +245,6 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             setIsBrandingAll(false);
         }
     };
-    // Helper to insert images into description HTML
-    const integratePostersIntoDescription = (description: string, urls: string[]) => {
-        if (!urls.length) return description;
-        let d = description;
-
-        // Remove any existing poster blocks to avoid duplicates
-        d = d.replace(/<div class="my-10 marketing-poster">[\s\S]*?<\/div>/g, '');
-
-        // Insert first poster after hook (ideally after 2nd paragraph to match long-form AI output)
-        let firstPos = d.indexOf('</p>');
-        if (firstPos !== -1) {
-            const secondPos = d.indexOf('</p>', firstPos + 4);
-            if (secondPos !== -1) firstPos = secondPos; // Move to 2nd paragraph if it exists
-
-            const imgHtml = `\n<div class="my-10 marketing-poster"><img src="${urls[0]}" alt="Premium Performance" class="rounded-3xl w-full shadow-2xl border-4 border-white/10" /></div>\n`;
-            d = d.slice(0, firstPos + 4) + imgHtml + d.slice(firstPos + 4);
-        }
-
-        // Insert second poster before Safety section
-        const safetyIdx = d.indexOf('🛡️ Safety');
-        if (safetyIdx !== -1) {
-            const h3Idx = d.lastIndexOf('<h3', safetyIdx);
-            if (h3Idx !== -1) {
-                const imgHtml = `\n<div class="my-10 marketing-poster"><img src="${urls[1]}" alt="Luxury Experience" class="rounded-3xl w-full shadow-2xl border-4 border-white/10" /></div>\n`;
-                d = d.slice(0, h3Idx) + imgHtml + d.slice(h3Idx);
-            }
-        }
-        return d;
-    };
-
     const generateMarketingSuite = async () => {
         // Fallback name logic: If name is empty, try to extract first 5 words from notes
         let effectiveName = formData.name;
@@ -379,7 +349,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             const res = await fetch('/api/admin/ai/extract', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: rawText })
+                body: JSON.stringify({
+                    text: rawText,
+                    posters: formData.banners
+                })
             });
             const { data, error } = await res.json();
             if (error) throw new Error(error);
@@ -1155,7 +1128,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             value={formData.specs.speed}
                                             onChange={(e) => setFormData({ ...formData, specs: { ...formData.specs, speed: e.target.value } })}
                                             className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:border-primary outline-none"
-                                            placeholder="e.g. 5-8 km/h"
+                                            placeholder="e.g. 4-6 km/h"
                                         />
                                     </div>
                                     <div>

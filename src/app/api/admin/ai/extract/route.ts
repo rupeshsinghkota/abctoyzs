@@ -6,7 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
     try {
-        const { text } = await req.json();
+        const { text, posters = [] } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
@@ -18,69 +18,67 @@ export async function POST(req: Request) {
 
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
+        const posterContext = posters.length > 0
+            ? `AVAILABLE MARKETING POSTERS (Use these URLs in the description):
+${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}`
+            : "No marketing posters provided.";
+
         const prompt = `
-            You are an expert E-commerce Product Data Specialist for "${BRAND_CONFIG.name}".
-            Your task is to analyze the provided RAW TEXT and output a JSON object.
+            You are a world-class E-commerce Content Strategist for "${BRAND_CONFIG.name}".
+            Your task is to analyze the RAW TEXT and output a premium Product Suite in JSON format.
 
             RAW TEXT:
             """${text}"""
 
-            CRITICAL INSTRUCTIONS:
+            ${posterContext}
+
+            CRITICAL CONTENT GUIDELINES:
 
             1. **TECHNICAL SPECS (STRICT Extraction):** 
-               - Extract ONLY what is explicitly present in the text for the 'specs' and 'logistics' fields.
-               - If a spec is OFFICIALLY missing, return an EMPTY STRING "". Do NOT guess.
-               - Standardize units (e.g., "12 volts" -> "12V").
+               - Extract ONLY what is explicitly present in the text.
+               - If missing, return EMPTY STRING "". Standardize units (e.g., "12 volts" -> "12V").
 
-            2. **PRODUCT DESCRIPTION (CREATIVE Generation):**
-               - GENERATE a premium, high-converting, LONG-FORM HTML marketing description (at least 300-400 words).
-               - **WEAVE DETAILS:** You MUST weave all extracted technical details (Battery, Motor, Speed, Load, Tires, Seats) into the marketing narrative. Do not just list them; sell the benefits!
-               - **STRUCTURE FOR BANNERS:** You MUST follow this exact structure for our automated banner injection system:
-                 - **Hook & Intro:** Start with a bold <h2> header (e.g., "The Ultimate Adventure Awaits") followed by 2 rich paragraphs.
-                 - **Banner 1 Anchor:** End the second paragraph with a clean transition. (DO NOT ADD A TAG, just a line break).
-                 - **Feature Showcase:** A list of key features using <h3> and <ul>/<li>.
-                 - **Safety & Quality Section:** Generate a section header exactly like this: "<h3>🛡️ Safety & Quality</h3>", followed by a detailed paragraph emphasizing engineering, material safety, and parental controls.
-                 - **Banner 2 Anchor:** This section MUST be present for Banner 2 to be inserted.
-                 - **Closing:** A final "Conclusion" paragraph with a strong Call to Action for parents.
-               - **BRANDING:** Maintain strict "${BRAND_CONFIG.name}" presence.
-               - **FORMATTING:** Use valid HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>).
+            2. **PREMIUM DESCRIPTION (CREATIVE & DETAILED):**
+               - GENERATE a high-end, premium HTML marketing description (450-600 words).
+               - **DETAIL WEAVING:** You MUST weave technical details (Battery, Motors, Speed, Load, Tires, Seats) directly into the storytelling. Don't just list them; explain the exhilaration of the ride and the peace of mind for parents.
+               - **POSTER INTEGRATION (VIP):** If posters are available:
+                 - Natural Placement: Insert Poster 1 after a strong introductory <h2> and 2 paragraphs.
+                 - Safety Placement: Insert Poster 2 immediately before the "🛡️ Safety & Quality" section.
+                 - HTML Format: <div class="my-10 marketing-poster"><img src="POSTER_URL" alt="Premium Feature" class="rounded-3xl w-full shadow-2xl border-4 border-white/10" /></div>
+               - **HTML STRUCTURE:**
+                 - <h2> headline (Premium and Action-oriented).
+                 - [Section 1: The Experience] 2-3 immersive paragraphs.
+                 - [Poster 1 Injection]
+                 - [Section 2: Performance & Luxury] <h3> headers with rich paragraphs about power, seats, and tires.
+                 - "<h3>🛡️ Safety & Quality</h3>" followed by a detailed paragraph about engineering and safety.
+                 - [Poster 2 Injection]
+                 - "<h3>Conclusion</h3>" with a high-conversion call to action.
                - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
 
-            3. **SEO DATA (CREATIVE Generation):**
-               - **product_name:** Format as: "ABC Toyz Premium [Product Name]" (Replace [Product Name] with the actual model).
-               - **meta_title:** Click-worthy title including "${BRAND_CONFIG.name}".
-               - **meta_description:** Compelling summary mentioning "${BRAND_CONFIG.name}".
+            3. **SEO DATA:**
+               - **product_name:** "ABC Toyz Premium [Model]" (e.g. "ABC Toyz Premium Lamborghini Aventador SVJ").
+               - **meta_title:** Premium SEO Title (55-60 chars).
+               - **meta_description:** High-conversion meta description (155-160 chars).
 
-            4. **MAPPING RULES:**
-               - **age_group:** Based on the suitable age, map explicitly to one of: "1-3", "3-6", "6-12", "10+". (REQUIRED FIELD).
+            4. **MAPPING:**
+               - **age_group:** Map strictly to: "1-3", "3-6", "6-12", or "10+".
 
-            Output ONLY a JSON object with this exact schema:
+            Output ONLY valid JSON:
             {
-                "name": "ABC Toyz Premium [Product Name]",
-                "price": "Price found (number only) or 0",
-                "description": "<div class='prose'>...Long HTML content...</div>",
-                "meta_title": "SEO Title | ${BRAND_CONFIG.name}",
-                "meta_description": "SEO Description...",
-                "category": "cars|bikes|jeeps|suv|atv|go-kart",
-                "age_group": "1-3|3-6|6-12|10+",
+                "name": "...",
+                "price": 0,
+                "description": "<div class='prose'>...</div>",
+                "meta_title": "...",
+                "meta_description": "...",
+                "category": "cars|bikes|jeeps|atvs|utvs|gokarts",
+                "age_group": "...",
                 "specs": {
-                    "battery": "e.g. 12V 7Ah",
-                    "motor": "e.g. 2 x 35W",
-                    "speed": "e.g. 3-5 km/h",
-                    "max_load": "e.g. 30 kg",
-                    "seats": "Number only (e.g. 1)",
-                    "tire_type": "e.g. EVA Rubber",
-                    "seat_material": "e.g. Leather",
-                    "remote_control": "true/false (boolean)",
-                    "mobile_app": "true/false (boolean)",
-                    "suitable_age": "e.g. 2-6 Years",
-                    "charging_time": "e.g. 8-10 Hours",
-                    "run_time": "e.g. 45-60 Mins"
+                    "battery": "...", "motor": "...", "speed": "...", "max_load": "...", "seats": "...",
+                    "tire_type": "...", "seat_material": "...", "remote_control": true|false,
+                    "mobile_app": true|false, "suitable_age": "...", "charging_time": "...", "run_time": "..."
                 },
                 "logistics": {
-                    "dimensions": "e.g. 110 x 50 x 50 cm",
-                    "weight": "e.g. 15 kg",
-                    "box_content": ["Item 1", "Item 2"]
+                    "dimensions": "...", "weight": "...", "box_content": ["...", "..."]
                 }
             }
         `;
