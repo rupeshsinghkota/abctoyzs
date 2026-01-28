@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2 } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 
@@ -79,6 +79,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     // Feature highlights derived from product specs
     const highlights = [
+        { icon: Baby, label: 'Age', value: product.ageGroup ? `${product.ageGroup} Yrs` : (product.specs?.suitable_age || '2-5 Yrs') },
         { icon: Gauge, label: 'Speed', value: product.specs?.speed || '5-8 km/h' },
         { icon: Weight, label: 'Load', value: product.specs?.max_load || '30 kg' },
         { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'Mobile App' : 'Remote' },

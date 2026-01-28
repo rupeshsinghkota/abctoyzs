@@ -1,7 +1,7 @@
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { StickyCartBar } from '@/components/product/StickyCartBar';
-import { ChevronRight, Home, Share2, Heart, ShoppingBag, Gauge, Package, ArrowRight, Wallet, ShieldCheck, Zap, Medal, Star, Weight, Gamepad2, CheckCircle2, Truck } from 'lucide-react';
+import { ChevronRight, Home, Share2, Heart, ShoppingBag, Gauge, Package, ArrowRight, Wallet, ShieldCheck, Zap, Medal, Star, Weight, Gamepad2, CheckCircle2, Truck, Baby } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { ProductSchema } from '@/components/product/ProductSchema';
@@ -82,6 +82,7 @@ export default async function ProductPage({ params }: PageProps) {
 
     // Feature highlights
     const highlights = [
+        { icon: Baby, label: 'Age', value: product.ageGroup ? `${product.ageGroup} Yrs` : (product.specs?.suitable_age || '2-5 Yrs') },
         { icon: Gauge, label: 'Speed', value: product.specs?.speed || '5-8 km/h' },
         { icon: Weight, label: 'Load', value: product.specs?.max_load || '30 kg' },
         { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : 'Remote' },
