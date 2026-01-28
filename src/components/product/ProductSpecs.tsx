@@ -25,7 +25,6 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
     ].filter(item => item.value);
 
     return (
-    return (
         <div className="h-full flex flex-col justify-between">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
                 {items.map((item, idx) => (
@@ -50,6 +49,5 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
                 </div>
             </div>
         </div>
-    );
     );
 }
