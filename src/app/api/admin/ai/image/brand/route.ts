@@ -39,20 +39,31 @@ export async function POST(req: Request) {
         const logoBase64 = logoBuffer.toString("base64");
 
         // Step 3: Ultra-Stable Generation - PRODUCT PRESERVATION MODE
-        const prompt = `Create a premium commercial product photograph of the EXACT toy vehicle shown in the first image.
-        
-        ABSOLUTE REQUIREMENTS - DO NOT VIOLATE:
-        1. THE PRODUCT MUST REMAIN 100% UNCHANGED: Do NOT modify, alter, or change ANYTHING about the toy vehicle itself. Keep every single detail exactly as shown - all logos, badges, text, stickers, decals, colors, shapes, and features must remain EXACTLY as they appear in the original image.
-        2. BACKGROUND ONLY: Replace ONLY the background with a premium setting (luxury driveway, scenic road, or studio backdrop with cinematic lighting).
-        3. OPTIONAL LICENSE PLATE: If visible, you may add the brand logo (second image) to the license plate area ONLY. Do NOT place the logo anywhere else on the vehicle.
-        
-        STRICTLY FORBIDDEN:
-        - DO NOT remove any logos or badges from the vehicle
-        - DO NOT change the vehicle's color, design, or any details
-        - DO NOT add or remove any features from the vehicle
-        - DO NOT modify the vehicle's appearance in ANY way
-        
-        OUTPUT: 1:1 SQUARE crop, photorealistic, 8K quality, advertising-grade image. The vehicle must look IDENTICAL to the input image with only a better background.`;
+        const prompt = `Professional e-commerce product photography of a children's ride-on toy vehicle.
+
+TASK: Take the toy vehicle from the first image and place it in a premium commercial setting.
+
+PRODUCT PRESERVATION (CRITICAL):
+- Keep the product EXACTLY as shown - same colors, logos, badges, stickers, and all design details
+- The toy must be instantly recognizable as the exact same product
+- Preserve all manufacturer branding (Mercedes, BMW, Lamborghini, etc.)
+
+BACKGROUND ENHANCEMENT:
+- Place on a clean, premium surface: polished concrete driveway, luxury garage floor, or sleek studio backdrop
+- Soft, professional lighting with subtle shadows for depth
+- Slight reflection on the surface for a premium feel
+- Clean, uncluttered background that makes the product pop
+
+IMAGE QUALITY:
+- Sharp focus on the entire product
+- Professional color grading - vibrant but natural
+- High contrast, punchy colors
+- Clean edges with no artifacts
+- Square 1:1 aspect ratio for e-commerce
+
+OPTIONAL: Place the store logo (second image) on the license plate if visible.
+
+Style: Apple product photography, Amazon hero image, premium toy catalog.`;
 
         const result = await model.generateContent([
             { text: prompt },
