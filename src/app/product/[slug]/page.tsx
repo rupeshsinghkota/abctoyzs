@@ -129,23 +129,23 @@ export default async function ProductPage({ params }: PageProps) {
                 <div className="hidden lg:block mt-12 max-w-7xl mx-auto space-y-16 px-4 pb-16">
 
 
-                    {/* 2. Specs & Box Contents (Unified Premium Cards) */}
-                    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-8 items-stretch px-4 md:px-0">
+                    {/* 2. Specs & Box Contents (Optimized Compact Layout) */}
+                    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 items-start px-4 md:px-0">
 
                         {/* Specs Card */}
-                        <div className="relative group/specs bg-white p-8 lg:p-10 rounded-[40px] border border-gray-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] h-full overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 group-hover/specs:opacity-100 transition-opacity" />
+                        <div className="relative group/specs bg-white p-6 lg:p-8 rounded-[32px] border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] h-full overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-primary/5">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24 opacity-50 transition-opacity" />
 
-                            <div className="relative flex items-center justify-between mb-10">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner">
-                                        <Gauge className="w-6 h-6" />
+                            <div className="relative flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shadow-inner">
+                                        <Gauge className="w-5 h-5" />
                                     </div>
-                                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Technical Specs</h3>
+                                    <h3 className="text-xl font-black text-gray-900 tracking-tight">Technical Specs</h3>
                                 </div>
-                                <div className="px-3 py-1 rounded-full bg-blue-50/50 border border-blue-100 text-[10px] font-black uppercase tracking-widest text-blue-600">
+                                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[9px] font-black uppercase tracking-wider text-blue-600">
                                     Verified
-                                </div>
+                                </span>
                             </div>
 
                             <ProductSpecs
@@ -159,31 +159,31 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
 
                         {/* Box Contents Card */}
-                        <div className="relative group/box bg-white p-8 lg:p-10 rounded-[40px] border border-gray-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] h-full overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/5">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 group-hover/box:opacity-100 transition-opacity" />
+                        <div className="relative group/box bg-white p-6 lg:p-8 rounded-[32px] border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] h-full overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-orange-500/5">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/5 rounded-full blur-3xl -mr-24 -mt-24 opacity-50 transition-opacity" />
 
-                            <div className="relative flex items-center justify-between mb-10">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center shadow-inner">
-                                        <Package className="w-6 h-6" />
+                            <div className="relative flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center shadow-inner">
+                                        <Package className="w-5 h-5" />
                                     </div>
-                                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Inside the Box</h3>
+                                    <h3 className="text-xl font-black text-gray-900 tracking-tight">Inside the Box</h3>
                                 </div>
-                                <div className="px-3 py-1 rounded-full bg-orange-50 text-[10px] font-black uppercase tracking-widest text-orange-600">
+                                <span className="px-2 py-0.5 rounded-full bg-orange-50 text-[9px] font-black uppercase tracking-wider text-orange-600">
                                     {whatsInBox.length} Items
-                                </div>
+                                </span>
                             </div>
 
-                            <ul className="grid grid-cols-1 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 relative">
                                 {whatsInBox.map((item: string, idx: number) => (
-                                    <li key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-transparent hover:border-orange-200 hover:bg-white transition-all duration-300 group/item">
-                                        <div className="w-6 h-6 rounded-lg bg-white border border-gray-100 flex items-center justify-center shrink-0 group-hover/item:bg-orange-500 group-hover/item:border-orange-500 transition-all shadow-sm">
-                                            <CheckCircle2 className="w-3 h-3 text-green-600 group-hover/item:text-white transition-colors" />
+                                    <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 border border-transparent hover:border-orange-100 hover:bg-white transition-all duration-300 group/item">
+                                        <div className="w-5 h-5 rounded-lg bg-white border border-gray-100 flex items-center justify-center shrink-0 group-hover/item:border-orange-500 transition-all">
+                                            <CheckCircle2 className="w-2.5 h-2.5 text-green-600 group-hover/item:text-orange-500 transition-colors" />
                                         </div>
-                                        <span className="text-sm font-bold text-gray-700 group-hover/item:text-gray-900 leading-tight transition-colors">{item}</span>
-                                    </li>
+                                        <span className="text-xs font-bold text-gray-600 group-hover/item:text-gray-900 truncate leading-none transition-colors">{item}</span>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -201,7 +201,6 @@ export default async function ProductPage({ params }: PageProps) {
                             dangerouslySetInnerHTML={{ __html: product.description }}
                         />
                     </div>
-
                 </div>
 
                 {/* 4. Brand Promise / Trust Signals - Redesigned for Premium Trust */}
@@ -248,27 +247,22 @@ export default async function ProductPage({ params }: PageProps) {
                 </div>
 
                 {/* Related Products */}
-                {
-                    relatedProducts.length > 0 && (
-                        <div className="mt-16 border-t pt-16 px-4 lg:px-0">
-                            <div className="container mx-auto">
-                                <h2 className="text-2xl lg:text-3xl font-black mb-8">You Might Also Like</h2>
-                                <ProductGrid products={relatedProducts} />
-                            </div>
+                {relatedProducts.length > 0 && (
+                    <div className="mt-16 border-t pt-16 px-4 lg:px-0">
+                        <div className="container mx-auto">
+                            <h2 className="text-2xl lg:text-3xl font-black mb-8">You Might Also Like</h2>
+                            <ProductGrid products={relatedProducts} />
                         </div>
-                    )
-                }
-            </main >
+                    </div>
+                )}
+            </main>
 
             {/* Mobile Footer Spacing for Sticky Bar */}
-            < div className="h-20 lg:hidden" />
+            <div className="h-20 lg:hidden" />
 
             <StickyCartBar
                 product={product}
-            // Note: We pass props, but StickyCartBar typically manages its own selection state 
-            // or needs to correspond with ProductMainSection. 
-            // For now, passing base product. ProductMainSection handles the selection UI.
             />
-        </div >
+        </div>
     );
 }

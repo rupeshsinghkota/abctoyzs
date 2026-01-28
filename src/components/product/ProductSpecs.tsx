@@ -42,21 +42,18 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
     ].filter(item => item.value && item.value !== '-');
 
     return (
-        <div className="h-full flex flex-col justify-between">
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+        <div className="flex flex-col h-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-4">
                 {items.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-4 group">
-                        <div className="relative">
-                            <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-500 group-hover:bg-primary/5 group-hover:text-primary transition-all duration-500 shadow-sm border border-gray-100 group-hover:border-primary/20 group-hover:shadow-lg group-hover:shadow-primary/5 shrink-0">
-                                {item.icon && <item.icon className="w-5 h-5" strokeWidth={1.5} />}
-                            </div>
-                            <div className="absolute -inset-1 bg-primary/20 blur opacity-0 group-hover:opacity-30 transition-opacity rounded-2xl" />
+                    <div key={idx} className="flex items-center gap-3 group/item">
+                        <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 group-hover/item:bg-primary/5 group-hover/item:text-primary transition-all duration-300 border border-gray-100/50 shrink-0">
+                            {item.icon && <item.icon className="w-4 h-4" strokeWidth={2} />}
                         </div>
-                        <div className="flex flex-col min-w-0 pt-0.5">
-                            <span className="text-[10px] uppercase tracking-[0.2em] font-black text-gray-400 group-hover:text-primary/70 transition-colors truncate mb-1">
+                        <div className="flex flex-col min-w-0 pr-2">
+                            <span className="text-[9px] uppercase tracking-[0.1em] font-bold text-gray-400 group-hover/item:text-primary transition-colors truncate">
                                 {item.label}
                             </span>
-                            <span className="text-[13px] font-black text-gray-900 leading-tight group-hover:translate-x-1 transition-transform duration-300">
+                            <span className="text-xs font-black text-gray-900 leading-tight truncate">
                                 {item.value}
                             </span>
                         </div>
@@ -64,13 +61,11 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
                 ))}
             </div>
 
-            <div className="mt-12 pt-6 border-t border-dashed border-gray-200">
-                <div className="flex items-center gap-3 px-4 py-3 bg-gray-50/50 rounded-2xl border border-gray-100">
-                    <ShieldCheck className="w-4 h-4 text-green-600 shrink-0" />
-                    <p className="text-[11px] font-medium text-gray-500 leading-relaxed">
-                        <span className="font-bold text-gray-700">Verified Precision:</span> Performance figures vary based on terrain and rider weight.
-                    </p>
-                </div>
+            <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                <p className="text-[10px] text-gray-400 font-medium">
+                    <span className="font-bold text-gray-600">Verified:</span> Specs vary by terrain.
+                </p>
             </div>
         </div>
     );
