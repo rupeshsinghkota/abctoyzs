@@ -28,6 +28,11 @@ export type Product = {
     box_dimensions?: string;
     net_weight?: string;
     gross_weight?: string;
+    marketing_suite?: {
+        action: string;
+        comfort: string;
+        durability: string;
+    };
     // Variations
     attributes?: { name: string; options: string[] }[];
     variants?: any[]; // We'll type this more strictly if needed
