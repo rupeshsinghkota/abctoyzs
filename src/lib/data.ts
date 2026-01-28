@@ -44,6 +44,12 @@ export interface Product {
     meta_title?: string;
     meta_description?: string;
 
+    marketing_suite?: {
+        action: string;
+        comfort: string;
+        durability: string;
+    };
+
     // Variations Data
     attributes?: { name: string; options: string[] }[];
     variants?: ProductVariant[];
@@ -261,7 +267,8 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
             attributes: Array.isArray(item.attributes) ? item.attributes : [],
             variants: Array.isArray(item.variants) ? item.variants : [],
             meta_title: item.meta_title,
-            meta_description: item.meta_description
+            meta_description: item.meta_description,
+            marketing_suite: item.marketing_suite
         })) as Product[];
 
     } catch (e) {

@@ -8,6 +8,12 @@ import { ChevronLeft, ChevronRight, Maximize2, Play, CirclePlay } from 'lucide-r
 interface ImageGalleryProps {
     images: string[];
     videos?: string[];
+    marketingSuite?: {
+        action: string;
+        comfort: string;
+        durability: string;
+    };
+    productName?: string;
 }
 
 type MediaItem = {
@@ -15,7 +21,7 @@ type MediaItem = {
     url: string;
 };
 
-export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
+export function ImageGallery({ images, videos = [], marketingSuite, productName }: ImageGalleryProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [desktopIndex, setDesktopIndex] = useState(0);
@@ -38,6 +44,15 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
     const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
     const scrollTo = useCallback((index: number) => emblaApi?.scrollTo(index), [emblaApi]);
+
+    // Active Headline Overlay logic
+    const activeHeadline = useMemo(() => {
+        if (!marketingSuite) return null;
+        if (desktopIndex === 0) return marketingSuite.action;
+        if (desktopIndex === 1) return marketingSuite.comfort;
+        if (desktopIndex === 2) return marketingSuite.durability;
+        return null;
+    }, [desktopIndex, marketingSuite]);
 
     return (
         <div className="w-full">
@@ -121,10 +136,10 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
             </div>
 
             {/* Desktop Standard Layout (>= 768px) */}
-            <div className="hidden md:flex gap-6 h-[600px] lg:h-[700px] w-full">
+            <div className="hidden md:flex gap-6 h-[calc(100vh-180px)] min-h-[600px] max-h-[850px] w-full">
 
                 {/* Thumbnails Strip - Floating Style */}
-                <div className="flex flex-col gap-4 w-[90px] flex-shrink-0 overflow-y-auto no-scrollbar py-2 h-full">
+                <div className="flex flex-col gap-4 w-[100px] flex-shrink-0 overflow-y-auto no-scrollbar py-2 h-full pr-2">
                     {mediaItems.map((item, idx) => (
                         <button
                             key={idx}
@@ -133,21 +148,20 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                             className={cn(
                                 "relative w-20 h-20 rounded-2xl overflow-hidden transition-all duration-300 flex-shrink-0 group",
                                 desktopIndex === idx
-                                    ? "ring-2 ring-primary ring-offset-2 opacity-100"
-                                    : "opacity-60 hover:opacity-100 grayscale hover:grayscale-0"
+                                    ? "ring-2 ring-black dark:ring-white ring-offset-4 scale-105 shadow-lg"
+                                    : "opacity-40 hover:opacity-100 grayscale hover:grayscale-0 hover:scale-105"
                             )}
                         >
-                            {/* ... video logic same ... */}
                             {item.type === 'video' ? (
                                 <div className="w-full h-full flex items-center justify-center bg-gray-50 relative">
                                     <div className="absolute inset-0 bg-black/5 z-0" />
-                                    <CirclePlay className="w-8 h-8 text-primary relative z-10 fill-white" />
+                                    <CirclePlay className="w-8 h-8 text-primary relative z-10 fill-white/80" />
                                 </div>
                             ) : (
                                 <img
                                     src={item.url}
                                     alt={`Thumbnail ${idx + 1}`}
-                                    className="w-full h-full object-contain bg-white"
+                                    className="w-full h-full object-contain bg-white transition-transform duration-500 group-hover:scale-110"
                                 />
                             )}
                         </button>
@@ -155,9 +169,9 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                 </div>
 
                 {/* Main Feature View - Immersive */}
-                <div className="relative flex-1 h-full bg-white rounded-[32px] overflow-hidden group cursor-zoom-in">
+                <div className="relative flex-1 h-full bg-white rounded-[40px] overflow-hidden group border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
                     {mediaItems[desktopIndex].type === 'video' ? (
-                        <div className="w-full h-full bg-black flex items-center justify-center rounded-[32px] overflow-hidden">
+                        <div className="w-full h-full bg-black flex items-center justify-center rounded-[40px] overflow-hidden">
                             <video
                                 src={mediaItems[desktopIndex].url}
                                 controls
@@ -167,20 +181,48 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                         </div>
                     ) : (
                         <>
-                            <div className="relative w-full h-full flex items-center justify-center">
+                            <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                                {/* Subtle Background Blur for Depth */}
+                                <div
+                                    className="absolute inset-0 opacity-10 blur-3xl scale-150 transition-all duration-1000"
+                                    style={{ backgroundImage: `url(${mediaItems[desktopIndex].url})`, backgroundSize: 'cover' }}
+                                />
+
                                 <img
                                     src={mediaItems[desktopIndex].url}
                                     alt="Product Main View"
-                                    className="w-full h-full object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-110"
+                                    className="w-full h-full object-contain p-8 transition-all duration-1000 ease-out group-hover:scale-105 relative z-10"
                                 />
-                                {/* Play Button on First Image */}
+
+                                {/* THE "SHOWROOM" HEADLINE OVERLAY */}
+                                {activeHeadline && (
+                                    <div className="absolute top-12 left-12 z-20 pointer-events-none animate-in fade-in slide-in-from-left-8 duration-700">
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
+                                                {productName || "ABC Toyz"}
+                                            </span>
+                                            <h2 className="text-4xl lg:text-5xl font-black font-heading leading-tight tracking-tighter drop-shadow-sm max-w-[400px]">
+                                                {activeHeadline}
+                                            </h2>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Fullscreen / Zoom Hint */}
+                                <div className="absolute bottom-8 left-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-black/5 backdrop-blur-md rounded-full border border-black/5">
+                                        <Maximize2 className="w-4 h-4" />
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">Showroom View</span>
+                                    </div>
+                                </div>
+
+                                {/* Play Button for Video variant link */}
                                 {desktopIndex === 0 && videos.length > 0 && (
                                     <button
                                         onClick={() => setDesktopIndex(images.length)}
-                                        className="absolute bottom-8 right-8 w-16 h-16 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-all z-20 shadow-xl border border-white/50"
+                                        className="absolute bottom-8 right-8 w-16 h-16 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center group-hover:scale-110 shadow-2xl border border-white transition-all z-20"
                                     >
                                         <Play className="w-6 h-6 text-primary fill-primary ml-1" />
-                                        <span className="sr-only">Watch Video</span>
                                     </button>
                                 )}
                             </div>

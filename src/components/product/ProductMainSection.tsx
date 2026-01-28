@@ -64,7 +64,13 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
             {/* LEFT: Gallery (66%) */}
             <div className="lg:col-span-8 bg-transparent">
                 {/* Key prop ensures gallery resets/updates when images change deeply */}
-                <ImageGallery key={displayImages[0]} images={displayImages} videos={product.videos} />
+                <ImageGallery
+                    key={displayImages[0]}
+                    images={displayImages}
+                    videos={product.videos}
+                    marketingSuite={product.marketing_suite}
+                    productName={product.name}
+                />
             </div>
 
             {/* RIGHT: Info & Actions (33%) */}
