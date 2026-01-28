@@ -162,7 +162,10 @@ export default function NewProductPage() {
                     seat_material: data["Seat Material"] || formData.specs.seat_material,
                     mobile_app: data["Mobile App Control"]?.toLowerCase().includes('yes') ?? formData.specs.mobile_app,
                     remote_control: data["Remote Control"]?.toLowerCase().includes('yes') || data["Remote Control"]?.includes('2.4') || formData.specs.remote_control
-                }
+                },
+                // Intelligent Mapping
+                age_group: parseAgeGroup(data["Suitable Age"]) || formData.age_group,
+                voltage: parseVoltage(data["Battery"]) || formData.voltage
             });
         } catch (error: any) {
             console.error(error);
@@ -253,7 +256,10 @@ export default function NewProductPage() {
                         seats: data.specs?.seats?.toString() || prev.specs.seats,
                         mobile_app: data.specs?.mobile_app ?? prev.specs.mobile_app,
                         remote_control: data.specs?.remote_control ?? prev.specs.remote_control,
-                    }
+                    },
+                    // Intelligent Mapping
+                    age_group: parseAgeGroup(data.specs?.["Suitable Age"] || data.specs?.suitable_age) || prev.age_group,
+                    voltage: parseVoltage(data.specs?.battery) || prev.voltage
                 };
             });
 
@@ -407,6 +413,35 @@ export default function NewProductPage() {
         } finally {
             setIsGeneratingPosters(false);
         }
+    };
+
+    // --- Intelligent Mapping Helpers ---
+    const parseAgeGroup = (text?: string) => {
+        if (!text) return '';
+        const t = text.toLowerCase();
+
+        // 1. Explicit Matches
+        if (t.includes('1-3') || t.includes('toddler')) return '1-3';
+        if (t.includes('3-6') || t.includes('preschool')) return '3-6';
+        if (t.includes('6-10') || t.includes('6-12') || t.includes('big kid')) return '6-10';
+        if (t.includes('10+') || t.includes('teen') || t.includes('adult')) return '10+';
+
+        // 2. Numeric Range Logic (Simple Heuristic details)
+        if (t.includes('1') || t.includes('2')) return '1-3'; // "1 to 4", "2 Years"
+        if (t.includes('3') || t.includes('4') || t.includes('5')) return '3-6';
+        if (t.includes('7') || t.includes('8') || t.includes('9')) return '6-10';
+
+        return '';
+    };
+
+    const parseVoltage = (text?: string) => {
+        if (!text) return '';
+        const match = text.match(/(\d+)V/i);
+        if (match) {
+            const v = match[1] + 'V';
+            if (['12V', '24V', '36V', '48V'].includes(v)) return v;
+        }
+        return '';
     };
 
     // --- Logic ---
