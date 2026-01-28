@@ -241,23 +241,44 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
     const brandAllImages = async () => {
         const imagesToBrand = formData.images.filter(img => img.trim() !== '');
-        if (imagesToBrand.length === 0) return;
+        if (imagesToBrand.length === 0) {
+            alert('Please upload some images first');
+            return;
+        }
 
         setIsBrandingAll(true);
         try {
-            // Process ALL in parallel for a true "at once" experience
-            const brandingPromises = formData.images.map((img, i) => {
-                if (img.trim()) {
-                    return brandImage(i);
-                }
-                return Promise.resolve(null);
+            // Send ALL images to AI for comprehensive analysis
+            // AI will generate new mockups from different angles based on understanding all images
+            const res = await fetch('/api/admin/ai/image/brand', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    imageUrls: imagesToBrand,
+                    productName: formData.name,
+                    generateAll: true // Generate multiple angles
+                })
             });
 
-            await Promise.all(brandingPromises);
-            alert('✨ All images branded and enhanced successfully!');
+            const { newImageUrls, error } = await res.json();
+            if (error) throw new Error(error);
+
+            if (newImageUrls && newImageUrls.length > 0) {
+                // Replace images with AI-generated mockups from different angles
+                setFormData(prev => {
+                    const freshImages = [...prev.images];
+                    newImageUrls.forEach((url: string, i: number) => {
+                        if (i < freshImages.length) {
+                            freshImages[i] = url;
+                        }
+                    });
+                    return { ...prev, images: freshImages };
+                });
+                alert(`✨ Generated ${newImageUrls.length} professional mockups from different angles!`);
+            }
         } catch (error: any) {
             console.error(error);
-            alert('Bulk branding failed');
+            alert('Image generation failed: ' + error.message);
         } finally {
             setIsBrandingAll(false);
         }
