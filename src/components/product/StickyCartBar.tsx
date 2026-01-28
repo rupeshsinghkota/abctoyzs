@@ -21,7 +21,21 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
     const [addedToCart, setAddedToCart] = useState(false);
 
     const activePrice = currentVariant ? currentVariant.price : product.price;
-    const activeMRP = currentVariant?.price ? (currentVariant.price * 1.3) : (product.mrp || product.price * 1.3);
+
+    // MRP Logic: Explicit > Base Match > Calculation
+    let activeMRP: number;
+    if (currentVariant) {
+        if (currentVariant.mrp) {
+            activeMRP = currentVariant.mrp;
+        } else if (currentVariant.price === product.price && product.mrp) {
+            activeMRP = product.mrp;
+        } else {
+            activeMRP = Math.round((currentVariant.price * 1.4) / 100) * 100 - 1;
+        }
+    } else {
+        activeMRP = product.mrp || (Math.round((product.price * 1.4) / 100) * 100 - 1);
+    }
+
     const discount = Math.round(((activeMRP - activePrice) / activeMRP) * 100);
 
     useEffect(() => {
