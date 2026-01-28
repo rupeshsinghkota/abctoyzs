@@ -106,17 +106,17 @@ export default async function ProductPage({ params }: PageProps) {
             {/* ... (schema and breadcrumb unchanged) */}
             <ProductSchema product={product} />
 
-            <div className="container mx-auto px-4 py-2 md:py-6">
-                <nav className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-                    <Link href="/" className="hover:text-primary transition-colors">
+            <div className="container mx-auto px-4 py-2 md:py-6 overflow-hidden">
+                <nav className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground overflow-x-auto no-scrollbar whitespace-nowrap pb-1">
+                    <Link href="/" className="hover:text-primary transition-colors shrink-0">
                         <Home className="w-3.5 h-3.5" />
                     </Link>
-                    <ChevronRight className="w-3.5 h-3.5 text-border" />
-                    <Link href={`/category/${product.category}`} className="hover:text-primary transition-colors capitalize font-medium">
+                    <ChevronRight className="w-3.5 h-3.5 text-border shrink-0" />
+                    <Link href={`/category/${product.category}`} className="hover:text-primary transition-colors capitalize font-medium shrink-0">
                         {product.category}
                     </Link>
-                    <ChevronRight className="w-3.5 h-3.5 text-border" />
-                    <span className="text-foreground font-semibold truncate max-w-[200px]">{product.name}</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-border shrink-0" />
+                    <span className="text-foreground font-semibold shrink-0">{product.name}</span>
                 </nav>
             </div>
 
