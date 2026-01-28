@@ -168,45 +168,45 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             ))}
 
             {/* Actions */}
-            <div className="space-y-6 pt-8">
+            <div className="space-y-4 pt-4">
 
-                {/* Primary: Add to Cart (Gradient Glow) */}
+                {/* Primary: Add to Cart (Compact Gradient) */}
                 <button
                     onClick={handleAddToCart}
                     disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
                     className={cn(
-                        "relative w-full h-[72px] bg-gradient-to-r from-primary via-purple-600 to-primary background-animate text-white font-black text-2xl rounded-2xl flex items-center justify-center gap-4 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden",
+                        "relative w-full h-14 bg-gradient-to-r from-primary via-purple-600 to-primary background-animate text-white font-bold text-lg rounded-xl flex items-center justify-center gap-3 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden",
                         added && "bg-none bg-green-600 shadow-green-500/30"
                     )}
                 >
                     {/* Shine Effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
 
-                    {added ? <Check className="w-8 h-8" strokeWidth={3} /> : <ShoppingCart className="w-7 h-7 fill-white/20 group-hover:scale-110 transition-transform" strokeWidth={2.5} />}
-                    {added ? "ADDED TO CART" : "ADD TO CART"}
+                    {added ? <Check className="w-6 h-6" strokeWidth={3} /> : <ShoppingCart className="w-5 h-5 fill-white/20 group-hover:scale-110 transition-transform" strokeWidth={2.5} />}
+                    {added ? "ADDED" : "ADD TO CART"}
                 </button>
 
                 {/* Secondary: Buy Now & Quantity */}
-                <div className="flex gap-4 h-14">
-                    <div className="shrink-0 h-full w-24">
-                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border-2 border-gray-100 rounded-xl bg-gray-50/50" />
+                <div className="flex gap-3 h-12">
+                    <div className="shrink-0 h-full w-20">
+                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200 rounded-lg bg-gray-50/50" />
                     </div>
 
                     <button
                         onClick={handleBuyNow}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="flex-1 h-full bg-black text-white text-lg font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-gray-900 transition-all shadow-lg active:scale-[0.98]"
+                        className="flex-1 h-full bg-black text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 hover:bg-gray-900 transition-all shadow-md active:scale-[0.98]"
                     >
-                        <ShoppingBag className="w-5 h-5" strokeWidth={2.5} />
+                        <ShoppingBag className="w-4 h-4" strokeWidth={2.5} />
                         BUY NOW
                     </button>
                 </div>
 
                 {/* Secure Checkout Trust */}
-                <div className="flex items-center justify-center gap-3 text-[11px] text-muted-foreground pt-4 font-bold uppercase tracking-widest opacity-50">
-                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Secure Payment</div>
+                <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground pt-2 font-bold uppercase tracking-wider opacity-60">
+                    <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Secure Payment</div>
                     <span>•</span>
-                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Fast Dispatch</div>
+                    <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Fast Dispatch</div>
                 </div>
             </div>
         </div>
