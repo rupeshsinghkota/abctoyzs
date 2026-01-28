@@ -38,22 +38,24 @@ ${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}
                - Extract ONLY what is explicitly present in the text.
                - If missing, return EMPTY STRING "". Standardize units (e.g., "12 volts" -> "12V").
 
-            2. **PREMIUM DESCRIPTION (CREATIVE & DETAILED):**
-               - GENERATE a high-end, premium HTML marketing description (450-600 words).
-               - **DETAIL WEAVING:** You MUST weave technical details (Battery, Motors, Speed, Load, Tires, Seats) directly into the storytelling. Don't just list them; explain the exhilaration of the ride and the peace of mind for parents.
-               - **POSTER INTEGRATION (VIP):** If posters are available:
-                 - Natural Placement: Insert Poster 1 after a strong introductory <h2> and 2 paragraphs.
-                 - Safety Placement: Insert Poster 2 immediately before the "🛡️ Safety & Quality" section.
-                 - HTML Format: <div class="my-10 marketing-poster"><img src="POSTER_URL" alt="Premium Feature" class="rounded-3xl w-full shadow-2xl border-4 border-white/10" /></div>
-               - **HTML STRUCTURE:**
-                 - <h2> headline (Premium and Action-oriented).
-                 - [Section 1: The Experience] 2-3 immersive paragraphs.
-                 - [Poster 1 Injection]
-                 - [Section 2: Performance & Luxury] <h3> headers with rich paragraphs about power, seats, and tires.
-                 - "<h3>🛡️ Safety & Quality</h3>" followed by a detailed paragraph about engineering and safety.
-                 - [Poster 2 Injection]
-                 - "<h3>Conclusion</h3>" with a high-conversion call to action.
+            2. **PREMIUM DESCRIPTION (CINEMATIC & PERSUASIVE):**
+               - GENERATE a high-end, cinematic HTML marketing description (450-600 words).
+               - **VOCABULARY:** Use "Automotive Excellence" and "Luxury Heritage" terminology. Words like: *Sculpted lines, performance-tuned, authentic craftsmanship, exhilaration, command the pavement, legacy design, adventure-ready cockpit.*
+               - **DETAIL WEAVING:** Weave technical specs (12V/24V power, dual/quad motors, leather-style seating) into the luxury narrative. Don't just list specs; describe the *feeling* of the power and the *quality* of the build.
+               - **POSTER INTEGRATION:** If posters are available:
+                 - Insert Poster 1 after a bold introductory <h2> and 2 paragraphs.
+                 - Insert Poster 2 before the "🛡️ Safety & Quality" section.
+                 - HTML Format: <div class="marketing-poster"><img src="URL" alt="Premium Perspective" /></div> (CSS handles spacing/shadows).
+               - **STRUCTURE:**
+                 - <h2> immersive headline (e.g., "The Legend Reimagined for Your Little Driver").
+                 - [Section 1] 2-3 paragraphs of immersive storytelling.
+                 - [Poster 1]
+                 - [Section 2] Performance & Features with <h3> headers.
+                 - "<h3>🛡️ Safety & Quality</h3>" followed by an engineering-focused paragraph.
+                 - [Poster 2]
+                 - "<h3>Conclusion</h3>" with a high-conversion closer.
                - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
+               - **FORMATTING:** Use **bold** liberally for impact. Use valid HTML.
 
             3. **SEO DATA:**
                - **product_name:** "ABC Toyz Premium [Model]" (e.g. "ABC Toyz Premium Lamborghini Aventador SVJ").

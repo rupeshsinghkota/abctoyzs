@@ -205,8 +205,13 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             />
 
                             <div>
-                                <h3 className="font-bold text-lg mb-2">Description</h3>
-                                <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+                                <div className="text-center mb-6">
+                                    <span className="px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-wider">
+                                        In-Depth Review
+                                    </span>
+                                    <h3 className="text-xl font-black mt-2">About This Ride-On</h3>
+                                </div>
+                                <div className="prose premium-prose max-w-none">
                                     {product.description ? (
                                         <div dangerouslySetInnerHTML={{ __html: product.description }} />
                                     ) : (
