@@ -57,11 +57,11 @@ export async function POST(req: Request) {
                 const imageBuffer = await imageRes.arrayBuffer();
                 const imageBase64 = Buffer.from(imageBuffer).toString("base64");
 
-                const prompt = `You are a professional e-commerce product photography and catalog-cleanup AI specialized in children's ride-on toys.
+                const prompt = `You are a professional e-commerce product photography AI specialized in children's ride-on toys.
 
 REFERENCE:
 Use the uploaded image as the ONLY product reference.
-The toy's physical structure, proportions, body shape, wheels, seat, lights, dashboard, handles, mirrors, stickers placement, surface detailing, and overall design MUST remain exactly the same.
+The toy's physical structure, proportions, body shape, wheels, seat, lights, dashboard, handles, mirrors, surface detailing, and overall design MUST remain exactly the same.
 
 DO NOT:
 • Redesign the toy
@@ -70,21 +70,27 @@ DO NOT:
 • Modify colors or textures
 • Add or remove parts
 
-BRANDING RULES (VERY IMPORTANT):
-• Remove or neutralize ALL existing brand names, logos, or trademarks visible on the toy (except car manufacturer badges like Mercedes, BMW, Jeep, Ford, etc.)
-• Cleanly erase supplier branding without leaving marks, blur, or artifacts
-• Preserve surface texture after branding removal so it looks factory-original
+BRANDING CLEANUP (CRITICAL - DO THIS FIRST):
+1. REMOVE all supplier/seller text and stickers:
+   • Windshield text (like "TAUTR", "CLOUD", random text)
+   • Side panel stickers from sellers
+   • Any website URLs or promotional text
+   • Random model numbers or codes
+   
+2. KEEP only car manufacturer branding:
+   • Ford, Jeep, BMW, Mercedes, Lamborghini, Ferrari, Audi, Porsche badges
+   • These are part of the licensed product design
 
-LOGO APPLICATION:
-• Apply ${brandName} LOGO only (provided as second image)
-• Logo placement must be subtle, realistic, and minimal
-• Place logo only in appropriate real-world locations (e.g. small front badge, rear badge, license plate, or side panel)
-• Logo must look physically printed or embedded — not pasted or floating
-• Do NOT oversize the logo
-• Do NOT repeat the logo multiple times
+LICENSE PLATE - VERY IMPORTANT:
+• The license plate MUST show "${brandName}" text clearly
+• Replace any existing license plate text with "${brandName}"
+• Use the logo provided (second image) as reference for placement
+• Text should be clean, readable, and properly sized for the plate
+• This is the ONLY place to put store branding
 
 PRIMARY OBJECTIVE:
-Create a STUNNING, cinematic e-commerce product photo that makes parents instantly want to buy this for their kids.
+Create a STUNNING, CINEMATIC product photo with a BEAUTIFUL OUTDOOR BACKGROUND.
+DO NOT use plain white or grey studio backgrounds. Use scenic outdoor settings.
 
 BACKGROUND (CHOOSE BEST MATCH FOR VEHICLE TYPE):
 For Jeep/Off-road/SUV toys:
