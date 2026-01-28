@@ -57,7 +57,7 @@ export async function POST(req: Request) {
                 const imageBuffer = await imageRes.arrayBuffer();
                 const imageBase64 = Buffer.from(imageBuffer).toString("base64");
 
-                const prompt = `PHOTO EDITING TASK: Transform this product image into professional e-commerce photography.
+                const prompt = `PHOTO EDITING TASK: Create a stunning e-commerce product image.
 
 INPUT: A photo of a children's ride-on electric toy car.
 
@@ -78,20 +78,27 @@ WHAT TO DO:
 3. REMOVE COMPETITOR WATERMARKS
    - Remove: "11cart", "Amazon", "Walmart", "Flipkart", "Hamleys", "AliExpress", "Alibaba" logos
    - Remove: Seller stickers, price tags, website URLs, promotional overlays
-   - KEEP: Car manufacturer badges (BMW, Mercedes, etc.) - these are part of the product!
+   - KEEP: Car manufacturer badges (BMW, Mercedes, Jeep, etc.) - these are part of the product!
 
-4. PROFESSIONAL BACKGROUND
-   - Add a clean, professional e-commerce background:
-     * Pure white seamless studio OR light grey gradient OR polished floor
-   - Professional studio lighting with soft shadows
-   - Subtle floor reflection for premium catalog look
+4. CREATIVE BACKGROUND (AI CHOOSES BEST FIT)
+   Choose a background that MATCHES the product style:
+   - For Jeep/Off-road vehicles: Desert road, mountain trail, adventure setting, sunset landscapes
+   - For Sports cars (Lamborghini, Ferrari): Luxury driveway, city street, racetrack
+   - For Classic cars (Mercedes, BMW): Elegant mansion driveway, upscale garage
+   - For General toys: Clean studio OR beautiful outdoor setting
+   
+   Background should:
+   - Be cinematic and visually stunning
+   - Have beautiful lighting (golden hour, soft shadows)
+   - Make the product look premium and desirable
+   - NOT distract from the product - product is the hero
 
 5. OUTPUT
    - Square 1:1 aspect ratio
-   - High quality, sharp, professional e-commerce photography
-   - Should look like a premium Amazon or toy store listing
+   - High quality, sharp, professional photography
+   - Cinematic look that makes parents want to buy this for their kids
 
-SUMMARY: Keep product details (colors, design, badges) exactly the same. You can adjust the angle and must replace the background with professional studio setting.`;
+SUMMARY: Keep product details (colors, design, badges) exactly the same. Choose a stunning background that matches the vehicle type. Make it look like a professional advertisement.`;
                 const contentParts = [
                     { text: prompt },
                     { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
