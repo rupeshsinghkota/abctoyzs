@@ -370,23 +370,36 @@ export default function NewProductPage() {
         setSaving(true);
 
         try {
-            // 1. Prepare Main Product Data
+            // 1. Prepare Main Product Data (Explicit mapping)
             const productData = {
-                ...formData,
                 slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+                name: formData.name,
+                description: formData.description,
                 base_price: parseFloat(formData.base_price) || 0,
                 mrp: formData.mrp ? parseFloat(formData.mrp) : undefined,
+                category: formData.category,
+                subcategory: formData.subcategory,
                 stock: parseInt(formData.stock) || 0,
-
                 images: formData.images.filter(img => img.trim()),
                 banners: formData.banners,
                 videos: formData.videos.filter(v => v.trim()),
                 box_content: formData.box_content.filter(i => i.trim()),
+                voltage: formData.voltage,
+                age_group: formData.age_group,
+                is_new: formData.is_new,
+                is_featured: formData.is_featured,
+                meta_title: formData.meta_title,
+                meta_description: formData.meta_description,
+                prompt_notes: formData.prompt_notes,
+                product_dimensions: formData.product_dimensions,
+                box_dimensions: formData.box_dimensions,
+                net_weight: formData.net_weight,
+                gross_weight: formData.gross_weight,
+                marketing_suite: formData.marketing_suite,
                 specs: {
                     ...formData.specs,
                     seats: parseInt(formData.specs.seats) || 1
                 },
-                // Save definitions
                 attributes: attributes.map(a => ({ name: a.name, options: a.options }))
             };
 
