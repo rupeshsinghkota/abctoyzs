@@ -57,40 +57,49 @@ export async function POST(req: Request) {
                 const imageBuffer = await imageRes.arrayBuffer();
                 const imageBase64 = Buffer.from(imageBuffer).toString("base64");
 
-                const prompt = `You are a professional e-commerce product photography AI specialized in children's ride-on toys.
+                const prompt = `You are an expert photo editor, NOT an image generator. Your job is to EDIT this product photo, not recreate it.
 
-REFERENCE:
-Use the uploaded image as the ONLY product reference.
-The toy's physical structure, proportions, body shape, wheels, seat, lights, dashboard, handles, mirrors, surface detailing, and overall design MUST remain exactly the same.
+⚠️ CRITICAL RULE - PRODUCT MUST BE IDENTICAL:
+The toy in your output must look EXACTLY like the toy in the input photo.
+This is PHOTO EDITING, not image generation.
 
-DO NOT:
-• Redesign the toy
-• Alter car detailing
-• Change body lines or shapes
-• Modify colors or textures
-• Add or remove parts
+WHAT MUST STAY EXACTLY THE SAME (PIXEL-PERFECT):
+• Exact same wheel design and spoke pattern
+• Exact same headlights shape and style  
+• Exact same grille design
+• Exact same body panels and shapes
+• Exact same seat design
+• Exact same roll bar/handles
+• Exact same colors (red stays red, black stays black)
+• Exact same proportions and size ratios
+• Exact same viewing angle
 
-BRANDING CLEANUP (CRITICAL - DO THIS FIRST):
-1. REMOVE all supplier/seller text and stickers:
-   • Windshield text (like "TAUTR", "CLOUD", random text)
-   • Side panel stickers from sellers
-   • Any website URLs or promotional text
-   • Random model numbers or codes
+If the input has 6-spoke wheels, output must have 6-spoke wheels.
+If the input has round headlights, output must have round headlights.
+DO NOT substitute similar-looking parts.
+
+WHAT TO EDIT:
+
+1. REMOVE these competitor stickers/text:
+   • "11CART" or "11cart" text on windshield - ERASE IT
+   • Side panel logos from other sellers  
+   • Any watermarks or promotional overlays
+   • Website URLs
    
-2. KEEP only car manufacturer branding:
-   • Ford, Jeep, BMW, Mercedes, Lamborghini, Ferrari, Audi, Porsche badges
-   • These are part of the licensed product design
+2. KEEP the manufacturer branding:
+   • "FORD" text on grille - KEEP THIS
+   • Any car brand badges (Ford, Jeep, BMW, etc.)
 
-LICENSE PLATE - VERY IMPORTANT:
-• The license plate MUST show "${brandName}" text clearly
-• Replace any existing license plate text with "${brandName}"
-• Use the logo provided (second image) as reference for placement
-• Text should be clean, readable, and properly sized for the plate
-• This is the ONLY place to put store branding
+3. LICENSE PLATE:
+   • Change any existing text to "${brandName}"
 
-PRIMARY OBJECTIVE:
-Create a STUNNING, CINEMATIC product photo with a BEAUTIFUL OUTDOOR BACKGROUND.
-DO NOT use plain white or grey studio backgrounds. Use scenic outdoor settings.
+4. BACKGROUND:
+   • Replace the background with a scenic outdoor setting
+   • Desert road with sunset for Jeep/off-road vehicles
+   • Keep the floor shadow realistic
+   • NO plain white or grey studio backgrounds
+
+OUTPUT: The SAME toy with cleaned branding, "${brandName}" on plate, and beautiful outdoor background.
 
 BACKGROUND (CHOOSE BEST MATCH FOR VEHICLE TYPE):
 For Jeep/Off-road/SUV toys:
