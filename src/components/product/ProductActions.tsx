@@ -21,9 +21,9 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     // Initial Price / Image / Stock comes from Product, but overrides if Variant selected
     const displayPrice = currentVariant ? currentVariant.price : product.price;
-    // Fallback mock MRP if missing: 30% higher than price, rounded to nearest 99 or 49 for realism
+    // Fallback mock MRP if missing: 30% higher than price, rounded to nearest 100 minus 1 (e.g. 9999)
     const rawMRP = currentVariant?.price ? (currentVariant.price * 1.3) : (product.mrp || product.price * 1.3);
-    const displayMRP = Math.round(rawMRP / 10) * 10 - 1; // Rounds to end in ...9
+    const displayMRP = Math.round(rawMRP / 100) * 100 - 1; // Rounds to end in ...99
     const displayStock = currentVariant ? currentVariant.stock : 7; // Default mock stock
 
     // Calculate Discount
@@ -97,17 +97,17 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                             ₹{displayPrice.toLocaleString()}
                         </span>
                         {discount > 0 && (
-                            <span className="bg-red-50 text-red-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider border border-red-100 animate-pulse">
-                                Save {discount}% Now
+                            <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider box-decoration-clone shadow-sm">
+                                Save {discount}%
                             </span>
                         )}
                     </div>
                     {discount > 0 && (
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm font-medium text-muted-foreground/60 line-through">
+                        <div className="flex items-center gap-2 mt-1.5">
+                            <span className="text-sm font-bold text-gray-500 line-through decoration-gray-400 decoration-2">
                                 MRP ₹{displayMRP.toLocaleString()}
                             </span>
-                            <span className="text-[10px] font-bold text-green-600 flex items-center gap-0.5">
+                            <span className="text-[10px] font-black text-green-600 flex items-center gap-0.5 bg-green-50 px-1.5 py-0.5 rounded-sm">
                                 <CheckCircle2 className="w-3 h-3" /> All Inclusive
                             </span>
                         </div>
