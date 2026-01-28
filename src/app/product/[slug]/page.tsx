@@ -142,14 +142,22 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
                     </div>
 
-                    {/* 2. Specs & Box Contents (Split Layout) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start border-t pt-10">
-                        {/* Specs Table */}
-                        <div className="bg-white p-6 rounded-2xl border shadow-sm">
-                            <h3 className="text-lg font-black mb-4 flex items-center gap-2">
-                                <Gauge className="w-5 h-5 text-primary" />
-                                Technical Specifications
-                            </h3>
+                    {/* 2. Specs & Box Contents (Unified Premium Cards) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start px-4 md:px-0">
+
+                        {/* Specs Card */}
+                        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                                    <Gauge className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-black text-gray-900 tracking-tight">Technical Specifications</h3>
+                            </div>
+
+                            {/* ProductSpecs component should handle the table. 
+                                We are removing the redundant inner header if it exists in the component, 
+                                but since we can't see ProductSpecs internals right now, we assume this clean wrapper is best.
+                            */}
                             <ProductSpecs
                                 specs={product.specs}
                                 additionalInfo={{
@@ -160,19 +168,22 @@ export default async function ProductPage({ params }: PageProps) {
                             />
                         </div>
 
-                        {/* Box Contents */}
-                        <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border border-gray-100 shadow-sm h-full">
-                            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                                <Package className="w-5 h-5 text-primary" />
-                                What's In The Box?
-                            </h3>
-                            <ul className="space-y-3">
+                        {/* Box Contents Card */}
+                        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="p-2.5 bg-orange-50 text-orange-600 rounded-xl">
+                                    <Package className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-black text-gray-900 tracking-tight">What's In The Box?</h3>
+                            </div>
+
+                            <ul className="grid grid-cols-1 gap-4">
                                 {whatsInBox.map((item: string, idx: number) => (
-                                    <li key={idx} className="flex items-center gap-3 text-sm font-medium text-gray-700 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                                        <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                                    <li key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-primary/20 hover:bg-white transition-all group">
+                                        <div className="mt-0.5 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0 group-hover:bg-green-500 transition-colors">
+                                            <CheckCircle2 className="w-3 h-3 text-green-700 group-hover:text-white transition-colors" />
                                         </div>
-                                        {item}
+                                        <span className="text-sm font-bold text-gray-700 group-hover:text-gray-900 leading-relaxed">{item}</span>
                                     </li>
                                 ))}
                             </ul>
