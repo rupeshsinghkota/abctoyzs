@@ -72,9 +72,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
             </div>
 
             {/* RIGHT: Info & Actions (33%) */}
-            <div className="lg:col-span-4 relative -mt-12 lg:mt-0 z-10">
-                <div className="bg-white rounded-t-[32px] lg:rounded-none px-6 pt-6 pb-4 lg:p-0 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] lg:shadow-none min-h-[50vh]">
-                    <div className="lg:sticky lg:top-28 space-y-8">
+            <div className="lg:col-span-4 relative -mt-16 lg:mt-0 z-10">
+                <div className="bg-white rounded-t-[32px] lg:rounded-none px-6 pt-3 pb-4 lg:p-0 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] lg:shadow-none min-h-[50vh]">
+                    <div className="lg:sticky lg:top-28 space-y-6">
 
                         <div className="space-y-4">
                             <div className="space-y-2">

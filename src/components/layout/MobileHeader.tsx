@@ -240,7 +240,7 @@ export function MobileHeader() {
     return (
         <>
             <div className="w-full bg-background/95 backdrop-blur-md shadow-sm border-b border-border/40">
-                <div className="flex items-center justify-between px-4 h-14">
+                <div className="flex items-center justify-between px-4 h-12">
                     {/* Left: Menu & Logo */}
                     <div className="flex items-center gap-3">
                         <button

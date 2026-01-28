@@ -62,7 +62,7 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                                         <img
                                             src={item.url}
                                             alt={`Product view ${index + 1}`}
-                                            className="w-full h-full object-contain drop-shadow-sm p-4"
+                                            className="w-full h-full object-contain drop-shadow-sm p-0"
                                             draggable={false}
                                         />
                                         {/* Play Button on First Image */}
