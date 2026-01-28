@@ -222,5 +222,6 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                     </div>
                 </div>
             </div>
-            );
+        </div>
+    );
 }
