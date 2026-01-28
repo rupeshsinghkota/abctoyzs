@@ -82,7 +82,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             {/* Price Display (Clean, No Box) */}
             <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                    <span className="text-4xl lg:text-5xl font-black text-foreground tracking-tight">₹{displayPrice.toLocaleString()}</span>
+                    <span className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tight">₹{displayPrice.toLocaleString()}</span>
                     {discount > 0 && (
                         <span className="text-lg font-bold text-muted-foreground line-through decoration-2 decoration-red-500/30">
                             ₹{displayMRP.toLocaleString()}
