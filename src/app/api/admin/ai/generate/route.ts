@@ -86,7 +86,11 @@ export async function POST(req: Request) {
                     "Play Time": "e.g. 45-60 Mins",
                     "Max Load": "e.g. 35-40 kg",
                     "Suitable Age": "e.g. 2-6 Years",
-                    "Seating Capacity": "e.g. 1 Seater or 2 Seater"
+                    "Seating Capacity": "e.g. 1 Seater or 2 Seater",
+                    "Tire Type": "e.g. EVA Rubber or Plastic",
+                    "Seat Material": "e.g. Leather or Plastic",
+                    "Remote Control": "e.g. 2.4G Bluetooth or No",
+                    "Mobile App Control": "e.g. Yes or No"
                 }
             `;
         } else if (type === 'logistics') {
@@ -121,6 +125,7 @@ export async function POST(req: Request) {
                         "speed": "3-7 km/h", 
                         "max_load": "35 kg", 
                         "tire_type": "EVA Rubber or Plastic", 
+                        "seat_material": "Leather or Plastic",
                         "seats": "1 Seater or 2 Seater", 
                         "mobile_app": true, 
                         "remote_control": true 

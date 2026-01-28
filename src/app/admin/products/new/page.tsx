@@ -71,6 +71,7 @@ export default function NewProductPage() {
             motor: '',
             seats: '1',
             tire_type: '',
+            seat_material: '',
             mobile_app: false,
             remote_control: false,
             max_load: '',
@@ -156,7 +157,11 @@ export default function NewProductPage() {
                     battery: data.Battery || formData.specs.battery,
                     motor: data.Motors || formData.specs.motor,
                     speed: data.Speed || formData.specs.speed,
-                    max_load: data.MaxLoad || formData.specs.max_load
+                    max_load: data.MaxLoad || formData.specs.max_load,
+                    tire_type: data["Tire Type"] || formData.specs.tire_type,
+                    seat_material: data["Seat Material"] || formData.specs.seat_material,
+                    mobile_app: data["Mobile App Control"]?.toLowerCase().includes('yes') ?? formData.specs.mobile_app,
+                    remote_control: data["Remote Control"]?.toLowerCase().includes('yes') || data["Remote Control"]?.includes('2.4') || formData.specs.remote_control
                 }
             });
         } catch (error: any) {
@@ -244,6 +249,7 @@ export default function NewProductPage() {
                         speed: data.specs?.speed || prev.specs.speed,
                         max_load: data.specs?.max_load || prev.specs.max_load,
                         tire_type: data.specs?.tire_type || prev.specs.tire_type,
+                        seat_material: data.specs?.seat_material || prev.specs.seat_material,
                         seats: data.specs?.seats?.toString() || prev.specs.seats,
                         mobile_app: data.specs?.mobile_app ?? prev.specs.mobile_app,
                         remote_control: data.specs?.remote_control ?? prev.specs.remote_control,

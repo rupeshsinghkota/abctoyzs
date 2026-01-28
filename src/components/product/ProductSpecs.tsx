@@ -1,4 +1,4 @@
-import { Package, Check, ShieldCheck, Zap, Gauge, Weight, Battery } from 'lucide-react';
+import { Package, Check, ShieldCheck, Zap, Gauge, Weight, Battery, Disc, Armchair, Smartphone, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/data';
 
@@ -18,6 +18,9 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
             { label: 'Max Speed', value: specs.speed, icon: Gauge },
             { label: 'Max Load', value: specs.max_load, icon: Weight },
             { label: 'Seats', value: specs.seats ? `${specs.seats} Seater` : undefined, icon: Package },
+            { label: 'Tires', value: specs.tire_type, icon: Disc },
+            { label: 'Seat Type', value: specs.seat_material, icon: Armchair },
+            { label: 'Control', value: specs.mobile_app ? 'App Control' : (specs.remote_control ? 'Remote' : undefined), icon: specs.mobile_app ? Smartphone : Radio },
         ] : []),
         { label: 'Voltage', value: additionalInfo['Voltage'], icon: Zap },
         { label: 'Age Group', value: additionalInfo['Recommended Age'], icon: Check },
