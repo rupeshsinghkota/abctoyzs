@@ -41,8 +41,8 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
 
     return (
         <div className="w-full">
-            {/* Mobile Carousel (< 768px) - Optimized Compact 4:3 Aspect Ratio */}
-            <div className="md:hidden relative bg-white aspect-[4/3] w-full">
+            {/* Mobile Carousel (< 768px) - Optimized 1:1 Aspect Ratio */}
+            <div className="md:hidden relative bg-white aspect-square w-full">
                 <div className="overflow-hidden h-full" ref={emblaRef}>
                     <div className="flex h-full touch-pan-y">
                         {mediaItems.map((item, index) => (
