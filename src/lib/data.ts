@@ -23,6 +23,8 @@ export interface Product {
         remote_control?: boolean;
         features?: string[];
         suitable_age?: string;
+        charging_time?: string;
+        run_time?: string;
     };
     description: string;
     // Premium Features
@@ -102,7 +104,7 @@ export const products: Product[] = [
             'https://cdn.coverr.co/videos/coverr-driving-a-go-cart-4560/1080p.mp4'
         ],
         tag: 'New',
-        specs: { battery: '12V 7Ah', mobile_app: true, max_load: '30kg', speed: '3-5 km/h' },
+        specs: { battery: '12V 7Ah', mobile_app: true, max_load: '30kg', speed: '3-5 km/h', charging_time: '8-10 Hours', run_time: '1-2 Hours' },
         description: "The officially licensed BMW M5 Competition ride-on car delivers the ultimate driving experience for your little one.",
         voltage: '12V',
         ageGroup: '3-6',
@@ -121,7 +123,7 @@ export const products: Product[] = [
             'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&auto=format&fit=crop&q=60',
         ],
         tag: 'Best Seller',
-        specs: { battery: '12V 10Ah', mobile_app: false, max_load: '35kg', speed: '3-6 km/h' },
+        specs: { battery: '12V 10Ah', mobile_app: false, max_load: '35kg', speed: '3-6 km/h', charging_time: '8-12 Hours', run_time: '45-90 Mins' },
         description: "Conquer the backyard with this rugged Jeep style ride-on.",
         voltage: '12V',
         ageGroup: '3-6',
@@ -139,7 +141,7 @@ export const products: Product[] = [
         images: [
             'https://images.unsplash.com/photo-1558981408-db0ecd8a1ee4?w=800&auto=format&fit=crop&q=60'
         ],
-        specs: { battery: '12V 4.5Ah', mobile_app: false, max_load: '25kg', speed: '3-5 km/h' },
+        specs: { battery: '12V 4.5Ah', mobile_app: false, max_load: '25kg', speed: '3-5 km/h', charging_time: '6-8 Hours', run_time: '45-60 Mins' },
         description: "For the speed enthusiasts! This Ducati replica features hand throttle acceleration.",
         voltage: '12V',
         ageGroup: '3-6',
@@ -157,7 +159,7 @@ export const products: Product[] = [
         images: [
             'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop&q=60'
         ],
-        specs: { battery: '24V 7Ah', mobile_app: true, max_load: '50kg', speed: '5-8 km/h' },
+        specs: { battery: '24V 7Ah', mobile_app: true, max_load: '50kg', speed: '5-8 km/h', charging_time: '10-14 Hours', run_time: '60-120 Mins' },
         description: "Luxury meets play. The G63 AMG ride-on is a showstopper with painted finish.",
         voltage: '24V',
         ageGroup: '6-10',
@@ -176,7 +178,7 @@ export const products: Product[] = [
             'https://images.unsplash.com/photo-1583578768565-385d56b0051e?w=800&auto=format&fit=crop&q=60'
         ],
         tag: 'Beast Mode',
-        specs: { battery: '24V 14Ah', mobile_app: true, max_load: '60kg', speed: '10-15 km/h' },
+        specs: { battery: '24V 14Ah', mobile_app: true, max_load: '60kg', speed: '10-15 km/h', charging_time: '12-16 Hours', run_time: '90-150 Mins' },
         description: "The ultimate off-road machine for kids. 2-seater, 4x4 drive.",
         voltage: '24V',
         ageGroup: '6-10',
@@ -194,7 +196,7 @@ export const products: Product[] = [
         images: [
             'https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?w=800&auto=format&fit=crop&q=60'
         ],
-        specs: { battery: '24V', mobile_app: false, max_load: '45kg', speed: '12 km/h' },
+        specs: { battery: '24V', mobile_app: false, max_load: '45kg', speed: '12 km/h', charging_time: '8-10 Hours', run_time: '40-60 Mins' },
         description: "For the young racer. Special drift wheels for sliding action.",
         voltage: '24V',
         ageGroup: '6-10',
