@@ -100,26 +100,41 @@ DO NOT substitute similar-looking parts.
 
 WHAT TO EDIT:
 
-1. REMOVE these competitor stickers/text:
-   • "11CART" or "11cart" text on windshield - ERASE IT
-   • Side panel logos from other sellers  
-   • Any watermarks or promotional overlays
-   • Website URLs
+1. ⛔ REMOVE ALL TEXT FROM WINDSHIELD - CRITICAL:
+   • Remove "11CART", "11cart", "UEKUT", "UERUT", "ICANT", "CLOUD", "TAUTR" - ALL OF IT
+   • The windshield must be COMPLETELY CLEAN and clear
+   • No text, no stickers, no logos on the windshield
+   • Just clean transparent/tinted glass
    
-2. KEEP the manufacturer branding:
-   • "FORD" text on grille - KEEP THIS
-   • Any car brand badges (Ford, Jeep, BMW, etc.)
+2. ⛔ REMOVE SIDE PANEL STICKERS:
+   • Remove any seller logos or promotional stickers from side panels
+   • The car side should only show the natural design, no added stickers
+   
+3. ✅ KEEP manufacturer branding:
+   • "FORD" text on grille - KEEP THIS, it's part of the licensed product
+   • Any car brand badges (Ford, Jeep, BMW, Mercedes, etc.)
 
-3. LICENSE PLATE:
-   • Change any existing text to "${brandName}"
+4. 🔤 LICENSE PLATE TEXT - MUST BE EXACT:
+   • The license plate MUST show exactly: "ABC TOYZ"
+   • Not random letters or numbers
+   • Not "BI+-SRY" or "UBI-EICE" or gibberish
+   • Clean, readable "ABC TOYZ" text on white plate
+   • This is the store branding
 
-4. BACKGROUND:
-   • Replace the background with a scenic outdoor setting
+5. 🌄 BACKGROUND:
+   • Replace background with scenic outdoor setting
    • Desert road with sunset for Jeep/off-road vehicles
-   • Keep the floor shadow realistic
-   • NO plain white or grey studio backgrounds
+   • Keep realistic shadow under the vehicle
 
-OUTPUT: The SAME toy with cleaned branding, "${brandName}" on plate, and beautiful outdoor background.
+IMAGE QUALITY - ULTRA HIGH:
+• Generate at maximum resolution available (8K quality)
+• Ultra-sharp focus on every detail
+• No blur, no softness
+• Crisp edges on every part of the toy
+• Professional commercial photography quality
+• Every texture visible: plastic shine, rubber tires, metal parts
+
+OUTPUT: The SAME toy, clean windshield, "ABC TOYZ" on license plate, stunning outdoor background, 8K quality.
 
 BACKGROUND (CHOOSE BEST MATCH FOR VEHICLE TYPE):
 For Jeep/Off-road/SUV toys:
