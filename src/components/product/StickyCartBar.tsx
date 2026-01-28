@@ -113,7 +113,7 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
                         </button>
                         <button
                             onClick={handleBuyNow}
-                            className="h-11 px-6 bg-black text-white text-xs font-black rounded-xl shadow-lg active:scale-95 transition-all tracking-wider flex items-center gap-2"
+                            className="h-11 px-6 bg-primary text-white text-xs font-black rounded-xl shadow-lg active:scale-95 transition-all tracking-wider flex items-center gap-2 hover:bg-orange-600"
                         >
                             BUY NOW
                         </button>
