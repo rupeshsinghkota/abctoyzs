@@ -68,6 +68,7 @@ export async function POST(req: Request) {
                 const prompt = `Professional e-commerce product photo of children's ride-on toy:
 
 PRODUCT: Keep exact same toy - same design, colors, wheels, headlights, body shape.
+ANGLE: Keep the SAME viewing angle as the input photo (front, side, 3/4, rear - whatever is in the original).
 
 BRANDING:
 - Remove ALL existing branding (windshield text, stickers, logos, badges)
