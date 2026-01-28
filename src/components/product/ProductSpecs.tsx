@@ -26,7 +26,7 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
 
     return (
         <div className="h-full flex flex-col justify-between">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-5">
                 {items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-5 group">
                         <div className="w-14 h-14 rounded-[20px] bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-primary/5 group-hover:text-primary transition-all duration-300 shadow-sm border border-gray-100/50">

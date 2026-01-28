@@ -185,16 +185,16 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     What's In The Box?
                                 </h3>
                                 <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                                    <ul className="space-y-2">
+                                    <div className="grid grid-cols-2 gap-3">
                                         {boxContent.map((item, idx) => (
-                                            <li key={idx} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                            <div key={idx} className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                                                 <div className="mt-0.5 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                                                     <CheckCircle2 className="w-3 h-3 text-green-700" />
                                                 </div>
-                                                <span className="text-sm font-medium text-gray-700 leading-tight">{item}</span>
-                                            </li>
+                                                <span className="text-xs sm:text-sm font-medium text-gray-700 leading-tight">{item}</span>
+                                            </div>
                                         ))}
-                                    </ul>
+                                    </div>
                                 </div>
                             </div>
                         )}
