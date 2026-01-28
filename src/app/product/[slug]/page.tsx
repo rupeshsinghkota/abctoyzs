@@ -74,10 +74,41 @@ export default async function ProductPage({ params }: PageProps) {
     }
 
     // Get related products (same category, excluding current)
+    // Get related products with Smart Fallback
     const allProducts = await fetchProducts();
-    const relatedProducts = allProducts
-        .filter(p => p.id !== product.id && p.category === product.category)
-        .slice(0, 6);
+
+    // 1. Primary Strategy: Same Category
+    let relatedProducts = allProducts
+        .filter(p => p.id !== product.id && p.category === product.category);
+
+    // 2. Fallback Strategy: Fill with Best Sellers / Popular if we have fewer than 4 items
+    if (relatedProducts.length < 4) {
+        const needed = 4 - relatedProducts.length;
+        const fallbackItems = allProducts
+            .filter(p =>
+                p.id !== product.id && // Not current product
+                p.category !== product.category && // Not already in list (different cat)
+                (p.tag === 'Best Seller' || p.rating >= 4.5) // Prioritize popular
+            )
+            .slice(0, needed + 2); // Fetch a few extras just in case
+
+        relatedProducts = [...relatedProducts, ...fallbackItems];
+
+        // 3. Final Fallback: If still under 4, just grab any other products
+        if (relatedProducts.length < 4) {
+            const stillNeeded = 4 - relatedProducts.length;
+            const remaining = allProducts
+                .filter(p =>
+                    p.id !== product.id &&
+                    !relatedProducts.find(rp => rp.id === p.id)
+                )
+                .slice(0, stillNeeded);
+            relatedProducts = [...relatedProducts, ...remaining];
+        }
+    }
+
+    // Limit to 6 items max for display
+    relatedProducts = relatedProducts.slice(0, 6);
 
     // Feature highlights
     const highlights = [
