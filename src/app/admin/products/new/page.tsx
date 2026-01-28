@@ -77,7 +77,9 @@ export default function NewProductPage() {
             suitable_age: '',
             max_load: '',
             speed: '',
-            features: [] as string[]
+            features: [] as string[],
+            charging_time: '',
+            run_time: ''
         }
     });
 
@@ -169,7 +171,9 @@ export default function NewProductPage() {
                     seat_material: data["Seat Material"] || formData.specs.seat_material,
                     mobile_app: data["Mobile App Control"]?.toLowerCase().includes('yes') ?? formData.specs.mobile_app,
                     remote_control: data["Remote Control"]?.toLowerCase().includes('yes') || data["Remote Control"]?.includes('2.4') || formData.specs.remote_control,
-                    suitable_age: data["Suitable Age"] || formData.specs.suitable_age
+                    suitable_age: data["Suitable Age"] || formData.specs.suitable_age,
+                    charging_time: data["Charging Time"] || formData.specs.charging_time,
+                    run_time: data["Run Time"] || formData.specs.run_time
                 }
             });
         } catch (error: any) {
@@ -261,6 +265,8 @@ export default function NewProductPage() {
                         seats: data.specs?.seats?.toString() || prev.specs.seats,
                         mobile_app: data.specs?.mobile_app ?? prev.specs.mobile_app,
                         remote_control: data.specs?.remote_control ?? prev.specs.remote_control,
+                        charging_time: data.specs?.charging_time || prev.specs.charging_time,
+                        run_time: data.specs?.run_time || prev.specs.run_time,
                     },
                     // Intelligent Mapping
                     age_group: parseAgeGroup(data.specs?.["Suitable Age"] || data.specs?.suitable_age) || prev.age_group,
