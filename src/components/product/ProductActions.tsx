@@ -200,7 +200,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     <div className="shrink-0 h-full w-20">
                         <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200/60 rounded-xl bg-gray-50/30" />
                     </div>
-                    1,
+
                     {/* 2. Add to Cart (Icon Only) */}
                     <button
                         onClick={handleAddToCart}
