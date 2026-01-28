@@ -43,17 +43,19 @@ ${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}
                - **VOCABULARY:** Use "Automotive Excellence" and "Luxury Heritage" terminology. Words like: *Sculpted lines, performance-tuned, authentic craftsmanship, exhilaration, command the pavement, legacy design, adventure-ready cockpit.*
                - **DETAIL WEAVING:** Weave technical specs (12V/24V power, dual/quad motors, leather-style seating) into the luxury narrative. Don't just list specs; describe the *feeling* of the power and the *quality* of the build.
                - **POSTER INTEGRATION:** If posters are available:
-                 - Insert Poster 1 after a bold introductory <h2> and 2 paragraphs.
-                 - Insert Poster 2 before the "🛡️ Safety & Quality" section.
-                 - HTML Format: <div class="marketing-poster"><img src="URL" alt="Premium Perspective" /></div> (CSS handles spacing/shadows).
+                 - You MUST USE EVERY POSTER PROVIDED. None should be left out.
+                 - DISTRIBUTE them naturally (e.g., after the intro, between feature sections, and before the conclusion).
+                 - HTML Format: <div class="marketing-poster"><img src="URL" alt="Premium Perspective" /></div>.
                - **STRUCTURE:**
-                 - <h2> immersive headline (e.g., "The Legend Reimagined for Your Little Driver").
-                 - [Section 1] 2-3 paragraphs of immersive storytelling.
-                 - [Poster 1]
-                 - [Section 2] Performance & Features with <h3> headers.
-                 - "<h3>🛡️ Safety & Quality</h3>" followed by an engineering-focused paragraph.
-                 - [Poster 2]
-                 - "<h3>Conclusion</h3>" with a high-conversion closer.
+                 - <h2> immersive headline.
+                 - [Section 1: Intro Storytelling] 2 paragraphs.
+                 - [Poster 1 Injection]
+                 - [Section 2: Performance & Tech] <h3> headers.
+                 - [Poster 2 Injection]
+                 - [Section 3: Luxury & Comfort] <h3> headers.
+                 - [Poster 3 Injection (if available)]
+                 - "<h3>🛡️ Safety & Quality</h3>" engineering deep-dive.
+                 - "<h3>Conclusion</h3>" high-conversion closer.
                - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
                - **FORMATTING:** Use **bold** liberally for impact. Use valid HTML.
 
