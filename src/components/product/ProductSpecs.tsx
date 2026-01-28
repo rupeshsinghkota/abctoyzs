@@ -49,11 +49,11 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
                         <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 group-hover/item:bg-primary/5 group-hover/item:text-primary transition-all duration-300 border border-gray-100/50 shrink-0">
                             {item.icon && <item.icon className="w-4 h-4" strokeWidth={2} />}
                         </div>
-                        <div className="flex flex-col min-w-0 pr-2">
-                            <span className="text-[9px] uppercase tracking-[0.1em] font-bold text-gray-400 group-hover/item:text-primary transition-colors truncate">
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-[9px] uppercase tracking-[0.1em] font-bold text-gray-400 group-hover/item:text-primary transition-colors">
                                 {item.label}
                             </span>
-                            <span className="text-xs font-black text-gray-900 leading-tight truncate">
+                            <span className="text-xs font-black text-gray-900 leading-tight">
                                 {item.value}
                             </span>
                         </div>
