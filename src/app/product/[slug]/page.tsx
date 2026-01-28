@@ -128,15 +128,15 @@ export default async function ProductPage({ params }: PageProps) {
 
                     {/* 1. Key Highlights (Visual Grid) */}
                     <div className="text-center">
-                        <h3 className="text-xl font-black mb-6">Why Kids Love It</h3>
-                        <div className="grid grid-cols-4 gap-4">
+                        <h3 className="text-2xl font-black mb-8 text-gray-900 tracking-tight">Key Features Highlight</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             {highlights.map((item: { icon: any, label: string, value: string }, idx: number) => (
-                                <div key={idx} className="flex flex-col items-center justify-center p-5 rounded-2xl bg-secondary/10 hover:bg-secondary/20 transition-all border border-transparent hover:border-border group">
-                                    <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                                        <item.icon className="w-6 h-6 text-primary" />
+                                <div key={idx} className="flex flex-col items-center justify-center p-6 rounded-3xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-100">
+                                    <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center mb-4 text-primary">
+                                        <item.icon className="w-8 h-8" strokeWidth={1.5} />
                                     </div>
-                                    <span className="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-1">{item.label}</span>
-                                    <span className="text-base font-black text-foreground">{item.value}</span>
+                                    <span className="text-xs text-muted-foreground font-bold tracking-widest uppercase mb-1">{item.label}</span>
+                                    <span className="text-lg font-black text-gray-900">{item.value}</span>
                                 </div>
                             ))}
                         </div>
@@ -196,32 +196,45 @@ export default async function ProductPage({ params }: PageProps) {
 
                 </div>
 
-                {/* 4. Brand Promise / Trust Signals */}
-                <div className="bg-primary/5 border border-primary/10 rounded-3xl p-8 lg:p-12 text-center mt-12 mb-12">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-6">
-                        <Star className="w-8 h-8 text-primary fill-primary" />
+                {/* 4. Brand Promise / Trust Signals - Redesigned for Premium Trust */}
+                <div className="border-t border-b border-gray-100 bg-gray-50/50 py-16 mt-16 mb-16">
+                    <div className="text-center max-w-3xl mx-auto px-4 mb-10">
+                        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
+                            <Star className="w-6 h-6 text-primary fill-primary" />
+                        </div>
+                        <h3 className="text-3xl font-black mb-4 text-gray-900">The ABC Toyz Promise</h3>
+                        <p className="text-gray-500 text-lg leading-relaxed">
+                            We don't just sell toys; we deliver childhood memories.
+                            Every vehicle is inspected, verified, and backed by our ironclad guarantee.
+                        </p>
                     </div>
-                    <h3 className="text-2xl font-black mb-4">Why Choose ABC Toyz?</h3>
-                    <p className="text-muted-foreground max-w-2xl mx-auto text-lg mb-10">
-                        We are India's most trusted destination for premium battery-operated ride-ons.
-                        Experience the difference of verified quality and exceptional service.
-                    </p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-transparent hover:border-primary/20 transition-all">
-                            <ShieldCheck className="w-10 h-10 text-primary mx-auto mb-4" />
-                            <div className="font-bold text-lg mb-2">Verified Safety</div>
-                            <p className="text-sm text-muted-foreground">Every vehicle meets strict safety standards (EN71/BIS certified) for your peace of mind.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
+                        {/* Trust Card 1 */}
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/30 transition-all duration-300 text-center group">
+                            <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-green-100 transition-colors">
+                                <ShieldCheck className="w-7 h-7 text-green-600" />
+                            </div>
+                            <h4 className="font-bold text-lg mb-2 text-gray-900">Certified Safe</h4>
+                            <p className="text-sm text-gray-500 leading-relaxed">BIS & EN71 compliant. Child-safe materials and speed-governed electronics for your peace of mind.</p>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-transparent hover:border-primary/20 transition-all">
-                            <Zap className="w-10 h-10 text-primary mx-auto mb-4" />
-                            <div className="font-bold text-lg mb-2">Premium Performance</div>
-                            <p className="text-sm text-muted-foreground">We stock only high-torque motors and durable heavy-duty batteries.</p>
+
+                        {/* Trust Card 2 */}
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/30 transition-all duration-300 text-center group">
+                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-100 transition-colors">
+                                <Zap className="w-7 h-7 text-blue-600" />
+                            </div>
+                            <h4 className="font-bold text-lg mb-2 text-gray-900">Power Performance</h4>
+                            <p className="text-sm text-gray-500 leading-relaxed">Genuine high-capacity batteries and copper-wound motors for longer playtime and better torque.</p>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-transparent hover:border-primary/20 transition-all">
-                            <Medal className="w-10 h-10 text-primary mx-auto mb-4" />
-                            <div className="font-bold text-lg mb-2">Service Guarantee</div>
-                            <p className="text-sm text-muted-foreground">Expert technical support and spare parts availability for years to come.</p>
+
+                        {/* Trust Card 3 */}
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/30 transition-all duration-300 text-center group">
+                            <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-100 transition-colors">
+                                <Medal className="w-7 h-7 text-purple-600" />
+                            </div>
+                            <h4 className="font-bold text-lg mb-2 text-gray-900">Lifetime Support</h4>
+                            <p className="text-sm text-gray-500 leading-relaxed">We settle for nothing less than 5 stars. Spare parts and technical help available for years.</p>
                         </div>
                     </div>
                 </div>
