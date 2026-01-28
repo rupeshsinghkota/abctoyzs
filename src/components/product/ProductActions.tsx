@@ -235,7 +235,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     <button
                         onClick={handleBuyNow}
                         disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="flex-1 h-full bg-black text-white text-sm font-black rounded-xl flex items-center justify-center gap-2 hover:bg-gray-900 transition-all shadow-md active:scale-[0.98] tracking-wider"
+                        className="flex-1 h-full bg-green-600 text-white text-sm font-black rounded-xl flex items-center justify-center gap-2 hover:bg-green-700 transition-all shadow-md active:scale-[0.98] tracking-wider"
                     >
                         <ShoppingBag className="w-4 h-4" strokeWidth={2.5} />
                         BUY NOW
