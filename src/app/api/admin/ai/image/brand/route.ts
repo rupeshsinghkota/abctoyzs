@@ -58,44 +58,49 @@ export async function POST(req: Request) {
             }
         }
 
-        // Process each image individually but with ALL images as context
-        const imagesToProcess = generateAll ? allImageData : [allImageData[0]];
+        // Define angles for multi-image generation
+        const angles = [
+            "front 3/4 view",
+            "side profile view",
+            "rear 3/4 view",
+            "front direct view"
+        ];
 
-        for (let i = 0; i < imagesToProcess.length; i++) {
-            const currentImage = imagesToProcess[i];
+        for (let i = 0; i < (generateAll ? angles.length : 1); i++) {
+            const currentAngle = angles[i];
 
             try {
-                const prompt = `Edit this children's ride-on toy photo:
+                // Build prompt with all reference images
+                const prompt = `Study all these reference images of the SAME children's ride-on toy carefully.
 
-KEEP SAME: Exact toy design, colors, wheels, headlights, body. Same viewing angle.
+ANALYZE: Understand every detail - exact wheel design, headlights, grille pattern, body shape, colors.
 
-REMOVE: ALL text and stickers from windshield. ALL seller logos (11CART, etc). ALL existing license plate text.
+GENERATE: Create a stunning professional product photo from ${currentAngle}.
 
-ADD TEXT "ABC TOYZ" ON LICENSE PLATE ONLY (not on grille, not on body, not on bumper - ONLY on the license plate area).
+REQUIREMENTS:
+- Photorealistic 8K quality image
+- Keep exact product details from reference photos
+- Remove all seller branding (11CART, stickers, watermarks)
+- Add "ABC TOYZ" text on license plate
+- Beautiful desert sunset background with golden hour lighting
+- Dramatic shadows and rim lighting
+- 1:1 square ratio
 
-DO NOT add any car/vehicle icon logos anywhere on the car body.
+STYLE: Premium e-commerce product photography, like official brand catalog.`;
 
-BACKGROUND: Desert road with golden sunset.
-
-OUTPUT: 1:1 square, 8K quality, sharp focus.`;
-
-                // Build content parts: prompt + current image (to edit) + all reference images + logo
+                // Build content parts with ALL images as reference
                 const contentParts: any[] = [
-                    { text: prompt },
-                    { text: "IMAGE TO EDIT (primary):" },
-                    { inlineData: { data: currentImage.base64, mimeType: "image/jpeg" } }
+                    { text: prompt }
                 ];
 
-                // Add other images as reference (if multiple images)
+                // Add all product images as reference
                 for (let j = 0; j < allImageData.length; j++) {
-                    if (allImageData[j].url !== currentImage.url) {
-                        contentParts.push({ text: `REFERENCE IMAGE ${j + 1} (same product, different angle):` });
-                        contentParts.push({ inlineData: { data: allImageData[j].base64, mimeType: "image/jpeg" } });
-                    }
+                    contentParts.push({ text: `REFERENCE IMAGE ${j + 1}:` });
+                    contentParts.push({ inlineData: { data: allImageData[j].base64, mimeType: "image/jpeg" } });
                 }
 
                 // Add brand logo
-                contentParts.push({ text: "BRAND LOGO to apply on license plate:" });
+                contentParts.push({ text: "BRAND LOGO (put on license plate):" });
                 contentParts.push({ inlineData: { data: logoBase64, mimeType: "image/png" } });
 
                 const result = await model.generateContent(contentParts as any);
