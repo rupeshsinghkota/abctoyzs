@@ -103,185 +103,9 @@ export default function NewProductPage() {
         }
     };
 
-    const generateAIDescription = async () => {
-        if (!formData.name) {
-            alert('Please enter a product name first');
-            return;
-        }
-
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/admin/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productName: formData.name,
-                    category: formData.category,
-                    type: 'description',
-                    notes: formData.prompt_notes
-                })
-            });
-            const { data, error } = await res.json();
-            if (error) throw new Error(error);
-            setFormData({ ...formData, description: data });
-        } catch (error: any) {
-            console.error(error);
-            alert('AI Generation failed: ' + error.message);
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
-
-    const generateAISpecs = async () => {
-        if (!formData.name) {
-            alert('Please enter a product name first');
-            return;
-        }
-
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/admin/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productName: formData.name,
-                    category: formData.category,
-                    type: 'specs',
-                    notes: formData.prompt_notes
-                })
-            });
-            const { data, error } = await res.json();
-            if (error) throw new Error(error);
-
-            setFormData({
-                ...formData,
-
-                // Intelligent Mapping
-                age_group: parseAgeGroup(data["Suitable Age"]) || formData.age_group,
-                voltage: parseVoltage(data["Battery"]) || formData.voltage,
-
-                // Explicit Age Field
-                specs: {
-                    ...formData.specs, // Re-spread to keep other updates
-                    battery: data.Battery || formData.specs.battery,
-                    motor: data.Motors || formData.specs.motor,
-                    speed: data.Speed || formData.specs.speed,
-                    max_load: data.MaxLoad || formData.specs.max_load,
-                    tire_type: data["Tire Type"] || formData.specs.tire_type,
-                    seat_material: data["Seat Material"] || formData.specs.seat_material,
-                    mobile_app: data["Mobile App Control"]?.toLowerCase().includes('yes') ?? formData.specs.mobile_app,
-                    remote_control: data["Remote Control"]?.toLowerCase().includes('yes') || data["Remote Control"]?.includes('2.4') || formData.specs.remote_control,
-                    suitable_age: data["Suitable Age"] || formData.specs.suitable_age,
-                    charging_time: data["Charging Time"] || formData.specs.charging_time,
-                    run_time: data["Run Time"] || formData.specs.run_time
-                }
-            });
-        } catch (error: any) {
-            console.error(error);
-            alert('AI Generation failed: ' + error.message);
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
-
-    const generateAILogistics = async () => {
-        if (!formData.name) {
-            alert('Please enter a product name first');
-            return;
-        }
-
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/admin/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productName: formData.name,
-                    category: formData.category,
-                    type: 'logistics',
-                    notes: formData.prompt_notes
-                })
-            });
-            const { data, error } = await res.json();
-            if (error) throw new Error(error);
-
-            setFormData({
-                ...formData,
-                product_dimensions: data.dimensions || formData.product_dimensions,
-                gross_weight: data.weight || formData.gross_weight,
-                box_content: data.whats_in_the_box && data.whats_in_the_box.length > 0 ? data.whats_in_the_box : formData.box_content
-            });
-        } catch (error: any) {
-            console.error(error);
-            alert('AI Generation failed: ' + error.message);
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
-
-    const generateFullProduct = async () => {
-        if (!formData.prompt_notes) {
-            alert('Please enter some product details or notes first');
-            return;
-        }
-
-        setIsGeneratingAI(true);
-        try {
-            const res = await fetch('/api/admin/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'all',
-                    notes: formData.prompt_notes,
-                    banners: formData.banners // Pass banners for AI to embed
-                })
-            });
-            const { data, error } = await res.json();
-            if (error) throw new Error(error);
-
-            // Populate everything
-            setFormData(prev => {
-                const finalDesc = data.description || prev.description;
-                // AI now handles image placement, so no manual injection needed
 
 
-                return {
-                    ...prev,
-                    name: data.name || prev.name,
-                    description: finalDesc,
-                    meta_title: data.meta_title || prev.meta_title,
-                    meta_description: data.meta_description || prev.meta_description,
-                    product_dimensions: data.logistics?.product_dimensions || prev.product_dimensions,
-                    gross_weight: data.logistics?.gross_weight || prev.gross_weight,
-                    box_content: data.logistics?.whats_in_the_box || prev.box_content,
-                    specs: {
-                        ...prev.specs,
-                        battery: data.specs?.battery || prev.specs.battery,
-                        motor: data.specs?.motor || prev.specs.motor,
-                        speed: data.specs?.speed || prev.specs.speed,
-                        max_load: data.specs?.max_load || prev.specs.max_load,
-                        tire_type: data.specs?.tire_type || prev.specs.tire_type,
-                        seat_material: data.specs?.seat_material || prev.specs.seat_material,
-                        seats: data.specs?.seats?.toString() || prev.specs.seats,
-                        mobile_app: data.specs?.mobile_app ?? prev.specs.mobile_app,
-                        remote_control: data.specs?.remote_control ?? prev.specs.remote_control,
-                        charging_time: data.specs?.charging_time || prev.specs.charging_time,
-                        run_time: data.specs?.run_time || prev.specs.run_time,
-                    },
-                    // Intelligent Mapping
-                    age_group: parseAgeGroup(data.specs?.["Suitable Age"] || data.specs?.suitable_age) || prev.age_group,
-                    voltage: parseVoltage(data.specs?.battery) || prev.voltage
-                };
-            });
 
-            alert('✨ Product details generated successfully!');
-        } catch (error: any) {
-            console.error(error);
-            alert('AI Generation failed: ' + error.message);
-        } finally {
-            setIsGeneratingAI(false);
-        }
-    };
 
     const brandImage = async (index: number) => {
         const imageUrl = formData.images[index];
@@ -707,17 +531,6 @@ export default function NewProductPage() {
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
                                         <label className="block text-sm font-bold uppercase tracking-wider text-muted-foreground">Description <span className="text-red-500">*</span></label>
-                                        <div className="flex gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={generateAIDescription}
-                                                disabled={isGeneratingAI || !formData.name}
-                                                className="text-[10px] sm:text-xs px-3 py-1.5 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-lg transition-all font-bold flex items-center gap-1.5 disabled:opacity-50"
-                                            >
-                                                {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                {isGeneratingAI ? 'Generating...' : 'Generate with AI'}
-                                            </button>
-                                        </div>
                                     </div>
                                     <textarea
                                         required
@@ -1143,15 +956,6 @@ export default function NewProductPage() {
                             <div className="bg-card border rounded-3xl p-6 space-y-6">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-lg font-bold">Technical Specifications</h3>
-                                    <button
-                                        type="button"
-                                        onClick={generateAISpecs}
-                                        disabled={isGeneratingAI || !formData.name}
-                                        className="text-xs px-4 py-2 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white rounded-xl transition-all font-bold flex items-center gap-2 disabled:opacity-50"
-                                    >
-                                        {isGeneratingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                        {isGeneratingAI ? 'Suggesting...' : '⚡ Suggest Specs'}
-                                    </button>
                                 </div>
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
