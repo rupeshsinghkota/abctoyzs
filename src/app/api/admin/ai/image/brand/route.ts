@@ -94,7 +94,7 @@ export async function POST(req: Request) {
                         const model = genAI.getGenerativeModel({
                             model: modelName,
                             generationConfig: {
-                                temperature: 0.2, // Slightly higher to allow prompt adherence without rigidity
+                                temperature: 0.0, // ABSOLUTE DETERMINISM. No creativity.
                                 topP: 0.95,
                                 topK: 40,
                             },
@@ -108,6 +108,10 @@ export async function POST(req: Request) {
 
                         // Enhanced "World Class" Prompt
                         const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
+
+TASK:
+1. ANALYZE the reference images. noted the exact shape of headlights, number of spokes on wheels, and sticker placement.
+2. GENERATE a photorealistic 8K image of THIS EXACT TOY.
 
 TARGET: Photorealistic 8K image of the KIDS RIDE-ON TOY CAR shown in reference images.
 CONTEXT: These images depict a "DIGITAL TWIN" of a BATTERY OPERATED TOY VEHICLE for children.
