@@ -94,7 +94,7 @@ export async function POST(req: Request) {
                         const model = genAI.getGenerativeModel({
                             model: modelName,
                             generationConfig: {
-                                temperature: 0.1, // Very Low randomness = High Consistency
+                                temperature: 0.2, // Slightly higher to allow prompt adherence without rigidity
                                 topP: 0.95,
                                 topK: 40,
                             },
@@ -110,13 +110,17 @@ export async function POST(req: Request) {
                         const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
 
 TARGET: Photorealistic 8K image of the car shown in reference images.
-CONTEXT: The provided reference images are DIFFERENT ANGLES of the SAME SINGLE PHYSICAL PRODUCT. Use them together to understand the exact 3D geometry and details of this one specific car.
+CONTEXT: These images depict a SINGLE "DIGITAL TWIN" 3D ASSET.
 ANGLE: ${currentAngle}.
 
-STRICT CONSISTENCY RULES:
-1. IDENTICAL MATCH: The generated car must be an EXACT COPY of the reference vehicle.
-   - PRESERVE: Exact Wheel Rims (count spokes), exact Headlight shape, exact Grille pattern.
-   - DO NOT CHANGE THE CAR. Only place it in a new environment.
+STRICT GEOMETRY LOCK:
+- Treat reference images as a PHOTOGRAMMETRY SCAN.
+- The 3D geometry (Body, Wheels, Grille) is LOCKED. Do not modify it.
+- Your job is RE-LIGHTING and COMPOSITING only.
+- 0% Creativity on the Car. 100% Creativity on the Environment.
+
+NEGATIVE PROMPT:
+- different wheels, different details, morphing geometry, cartoonish, low resolution, inconsistent bodywork, changed stickers, hallucinated parts.
 
 2. BRANDING EDIT:
    - REMOVE all text/stickers from the windshield.
