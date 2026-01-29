@@ -44,7 +44,11 @@ export async function POST(req: Request) {
             "front 3/4 view",
             "side profile view",
             "rear 3/4 view",
-            "front direct view"
+            "front direct view",
+            "rear direct view",
+            "top down view",
+            "interior dashboard close-up",
+            "low angle hero shot"
         ];
 
         // Models to try in order of preference
@@ -58,6 +62,24 @@ export async function POST(req: Request) {
 
         // Concurrency Control: Run max 2 at a time to avoid 503 Overload
         const CONCURRENCY_LIMIT = 2;
+
+        // Cleanup: Delete PREVIOUS generated images for this product if generateAll is true
+        if (generateAll) {
+            const { data: existingFiles, error: listError } = await supabase.storage
+                .from('products')
+                .list('', { search: 'enhanced_' });
+
+            if (existingFiles && !listError) {
+                const filesToDelete = existingFiles
+                    .filter(f => f.name.includes(productName?.replace(/[^a-z0-9]/gi, '_') || 'product'))
+                    .map(f => f.name);
+
+                if (filesToDelete.length > 0) {
+                    console.log(`Deleting ${filesToDelete.length} old AI images...`);
+                    await supabase.storage.from('products').remove(filesToDelete);
+                }
+            }
+        }
 
         async function processAngleWithRetry(currentAngle: string, index: number) {
             if (!generateAll && index > 0) return; // Skip others if single generation
