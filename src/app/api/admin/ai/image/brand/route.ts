@@ -52,15 +52,16 @@ export async function POST(req: Request) {
             "gemini-3-pro-image-preview" // STRICT: Gemini 3 Pro (Nano Banana Pro) ONLY
         ];
 
-        const generatedUrls: string[] = [];
+        const generatedUrls: string[] = []; // We will fill this by index to keep order
+        const results = new Array(angles.length).fill(null);
         let errors: string[] = [];
-        const uploadPromises: Promise<void>[] = []; // Track active uploads
 
-        for (let i = 0; i < (generateAll ? angles.length : 1); i++) {
-            const currentAngle = angles[i];
+        // Parallel Execution: Run all angles at once
+        await Promise.all(angles.map(async (currentAngle, i) => {
+            if (!generateAll && i > 0) return; // Skip others if single generation
+
             let imageGenerated = false;
 
-            // Try each model until one works
             for (const modelName of modelsToTry) {
                 try {
                     console.log(`Attempting generation with model: ${modelName} for angle: ${currentAngle}`);
@@ -125,61 +126,48 @@ Aspect Ratio: 1:1 (Square).`;
                         }
 
                         if (newImageBase64) {
-                            // Non-blocking Upload
-                            const uploadTask = async () => {
-                                const newImageBuffer = Buffer.from(newImageBase64 as string, 'base64'); // Cast safely
-                                const timestamp = Date.now();
-                                const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
-                                const newFilename = `enhanced_${timestamp}_${i}_${safeName}.jpg`;
+                            const newImageBuffer = Buffer.from(newImageBase64 as string, 'base64');
+                            const timestamp = Date.now();
+                            const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
+                            const newFilename = `enhanced_${timestamp}_${i}_${safeName}.jpg`;
 
-                                const { error: uploadError } = await supabase.storage
+                            const { error: uploadError } = await supabase.storage
+                                .from('products')
+                                .upload(newFilename, newImageBuffer, { contentType: 'image/jpeg', cacheControl: '3600' });
+
+                            if (!uploadError) {
+                                const { data: { publicUrl } } = supabase.storage
                                     .from('products')
-                                    .upload(newFilename, newImageBuffer, { contentType: 'image/jpeg', cacheControl: '3600' });
-
-                                if (!uploadError) {
-                                    const { data: { publicUrl } } = supabase.storage
-                                        .from('products')
-                                        .getPublicUrl(newFilename);
-                                    generatedUrls.push(publicUrl);
-                                } else {
-                                    console.error("Upload failed:", uploadError);
-                                }
-                            };
-
-                            uploadPromises.push(uploadTask());
-
-                            imageGenerated = true;
-                            break;
+                                    .getPublicUrl(newFilename);
+                                results[i] = publicUrl; // Store by index to preserve order
+                                imageGenerated = true;
+                                break;
+                            } else {
+                                console.error(`Upload error angle ${i}:`, uploadError);
+                            }
                         }
                     }
                 } catch (err: any) {
-                    console.error(`Model ${modelName} failed:`, err.message);
-                    errors.push(`${modelName}: ${err.message}`);
+                    console.error(`Model ${modelName} angle ${currentAngle} failed:`, err.message);
+                    errors.push(`${currentAngle} (${modelName}): ${err.message}`);
                 }
-            } // End model loop
+            }
 
             if (!imageGenerated) {
-                console.error(`Failed to generate image for angle ${currentAngle} with all models.`);
+                console.error(`Failed to generate image for angle ${currentAngle}`);
             }
-        } // End angle loop
+        }));
 
-        // Wait for all uploads to complete
-        await Promise.all(uploadPromises);
+        // Filter out nulls
+        generatedUrls.push(...results.filter(url => url !== null));
 
         if (generatedUrls.length === 0) {
             throw new Error(`Generation failed. Errors: ${errors.join(" | ")}`);
         }
 
-        // Return sorted URLs to match original order if possible, 
-        // but generatedUrls is concurrent push, so order might vary.
-        // We accept this for now, or we can index them.
-        // Actually, generatedUrls.push happens inside the upload callback which is async.
-        // So the array order is unpredictable!
-        // FIX: Use an array of size 4 and fill by index.
-
         return NextResponse.json({
             success: true,
-            newImageUrl: generatedUrls[0], // Order might be random now!
+            newImageUrl: generatedUrls[0],
             newImageUrls: generatedUrls
         });
 
