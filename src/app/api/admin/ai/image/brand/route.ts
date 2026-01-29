@@ -109,18 +109,19 @@ export async function POST(req: Request) {
                         // Enhanced "World Class" Prompt
                         const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
 
-TARGET: Photorealistic 8K image of the car shown in reference images.
-CONTEXT: These images depict a SINGLE "DIGITAL TWIN" 3D ASSET.
+TARGET: Photorealistic 8K image of the KIDS RIDE-ON TOY CAR shown in reference images.
+CONTEXT: These images depict a "DIGITAL TWIN" of a BATTERY OPERATED TOY VEHICLE for children.
 ANGLE: ${currentAngle}.
 
-STRICT GEOMETRY LOCK:
+STRICT GEOMETRY LOCK (TOY SCALE):
+- This is a TOY, not a real car.
+- PRESERVE: Plastic tire texture, visible toy screws, small seat proportions, toy dashboard.
+- DO NOT make it look like a real full-size truck. Keep the "Toy" aesthetic.
 - Treat reference images as a PHOTOGRAMMETRY SCAN.
 - The 3D geometry (Body, Wheels, Grille) is LOCKED. Do not modify it.
-- Your job is RE-LIGHTING and COMPOSITING only.
-- 0% Creativity on the Car. 100% Creativity on the Environment.
 
 NEGATIVE PROMPT:
-- different wheels, different details, morphing geometry, cartoonish, low resolution, inconsistent bodywork, changed stickers, hallucinated parts, misspelled grille text, PORD, FORA.
+- real car, full size vehicle, metal tires, realistic glass, different wheels, different details, morphing geometry, cartoonish, low resolution, misspelled grille text, PORD, FORA.
 
 2. BRANDING EDIT:
    - GRILLE TEXT: The large text on the grille is "FORD". SPELLING CHECK: F-O-R-D. Ensure it starts with "F".
