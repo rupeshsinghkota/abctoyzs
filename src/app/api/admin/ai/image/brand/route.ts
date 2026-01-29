@@ -56,35 +56,39 @@ export async function POST(req: Request) {
         const results = new Array(angles.length).fill(null);
         let errors: string[] = [];
 
-        // Parallel Execution: Run all angles at once
-        await Promise.all(angles.map(async (currentAngle, i) => {
-            if (!generateAll && i > 0) return; // Skip others if single generation
+        // Concurrency Control: Run max 2 at a time to avoid 503 Overload
+        const CONCURRENCY_LIMIT = 2;
+
+        async function processAngleWithRetry(currentAngle: string, index: number) {
+            if (!generateAll && index > 0) return; // Skip others if single generation
 
             let imageGenerated = false;
 
             for (const modelName of modelsToTry) {
-                try {
-                    console.log(`Attempting generation with model: ${modelName} for angle: ${currentAngle}`);
+                // Retry loop for 503/429 errors
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                    try {
+                        console.log(`Attempting generation (Try ${attempt}) with model: ${modelName} for angle: ${currentAngle}`);
 
-                    const model = genAI.getGenerativeModel({
-                        model: modelName,
-                        safetySettings: [
-                            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                        ],
-                    });
+                        const model = genAI.getGenerativeModel({
+                            model: modelName,
+                            safetySettings: [
+                                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                            ],
+                        });
 
-                    // Enhanced "World Class" Prompt
-                    const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
-                    
+                        // Enhanced "World Class" Prompt
+                        const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
+
 TARGET: Photorealistic 8K image of the specific ride-on toy in the reference images.
 ANGLE: ${currentAngle}.
 
 CRITICAL REQUIREMENTS:
 1. PRODUCT FIDELITY: The toy must look EXACTLY like the reference images (same wheels, body shape, details).
-2. BRANDING EDIT: 
+2. BRANDING EDIT:
    - REMOVE all text/stickers from the windshield.
    - REMOVE any "11CART", "UEKUT" logos.
    - ADD "ABC TOYZ" text clearly on the license plate.
@@ -97,66 +101,85 @@ CRITICAL REQUIREMENTS:
 
 Aspect Ratio: 1:1 (Square).`;
 
-                    const contentParts: any[] = [{ text: prompt }];
+                        const contentParts: any[] = [{ text: prompt }];
 
-                    // Add reference images
-                    for (let j = 0; j < allImageData.length; j++) {
-                        contentParts.push({ text: `REFERENCE IMAGE ${j + 1}:` });
-                        contentParts.push({ inlineData: { data: allImageData[j].base64, mimeType: "image/jpeg" } });
-                    }
+                        // Add reference images
+                        for (let j = 0; j < allImageData.length; j++) {
+                            contentParts.push({ text: `REFERENCE IMAGE ${j + 1}:` });
+                            contentParts.push({ inlineData: { data: allImageData[j].base64, mimeType: "image/jpeg" } });
+                        }
 
-                    // Add brand logo
-                    contentParts.push({ text: "BRAND LOGO (for license plate):" });
-                    contentParts.push({ inlineData: { data: logoBase64, mimeType: "image/png" } });
+                        // Add brand logo
+                        contentParts.push({ text: "BRAND LOGO (for license plate):" });
+                        contentParts.push({ inlineData: { data: logoBase64, mimeType: "image/png" } });
 
-                    const result = await model.generateContent(contentParts as any);
-                    const response = await result.response;
+                        const result = await model.generateContent(contentParts as any);
+                        const response = await result.response;
 
-                    if (response.candidates && response.candidates.length > 0) {
-                        const candidate = response.candidates[0];
-                        let newImageBase64 = null;
+                        if (response.candidates && response.candidates.length > 0) {
+                            const candidate = response.candidates[0];
+                            let newImageBase64 = null;
 
-                        if (candidate.content?.parts) {
-                            for (const part of candidate.content.parts) {
-                                if ((part as any).inlineData?.data) {
-                                    newImageBase64 = (part as any).inlineData.data;
-                                    break;
+                            if (candidate.content?.parts) {
+                                for (const part of candidate.content.parts) {
+                                    if ((part as any).inlineData?.data) {
+                                        newImageBase64 = (part as any).inlineData.data;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (newImageBase64) {
+                                const newImageBuffer = Buffer.from(newImageBase64 as string, 'base64');
+                                const timestamp = Date.now();
+                                const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
+                                const newFilename = `enhanced_${timestamp}_${index}_${safeName}.jpg`;
+
+                                const { error: uploadError } = await supabase.storage
+                                    .from('products')
+                                    .upload(newFilename, newImageBuffer, { contentType: 'image/jpeg', cacheControl: '3600' });
+
+                                if (!uploadError) {
+                                    const { data: { publicUrl } } = supabase.storage
+                                        .from('products')
+                                        .getPublicUrl(newFilename);
+                                    results[index] = publicUrl; // Store by index to preserve order
+                                    imageGenerated = true;
+                                    return; // Success, exit retry loop and model loop (function returns)
+                                } else {
+                                    console.error(`Upload error angle ${index}:`, uploadError);
                                 }
                             }
                         }
+                    } catch (err: any) {
+                        const isOverload = err.message?.includes('503') || err.message?.includes('429') || err.message?.includes('Overloaded');
+                        console.error(`Model ${modelName} angle ${currentAngle} attempt ${attempt} failed:`, err.message);
 
-                        if (newImageBase64) {
-                            const newImageBuffer = Buffer.from(newImageBase64 as string, 'base64');
-                            const timestamp = Date.now();
-                            const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
-                            const newFilename = `enhanced_${timestamp}_${i}_${safeName}.jpg`;
-
-                            const { error: uploadError } = await supabase.storage
-                                .from('products')
-                                .upload(newFilename, newImageBuffer, { contentType: 'image/jpeg', cacheControl: '3600' });
-
-                            if (!uploadError) {
-                                const { data: { publicUrl } } = supabase.storage
-                                    .from('products')
-                                    .getPublicUrl(newFilename);
-                                results[i] = publicUrl; // Store by index to preserve order
-                                imageGenerated = true;
-                                break;
-                            } else {
-                                console.error(`Upload error angle ${i}:`, uploadError);
-                            }
+                        if (isOverload && attempt < 3) {
+                            const waitTime = 2000 * attempt; // Backoff: 2s, 4s, 6s...
+                            console.log(`Waiting ${waitTime}ms before retry...`);
+                            await new Promise(resolve => setTimeout(resolve, waitTime));
+                            continue; // Retry
+                        } else {
+                            errors.push(`${currentAngle} (${modelName}): ${err.message}`);
+                            break; // Fatal error or max retries, try next model (if any)
                         }
                     }
-                } catch (err: any) {
-                    console.error(`Model ${modelName} angle ${currentAngle} failed:`, err.message);
-                    errors.push(`${currentAngle} (${modelName}): ${err.message}`);
                 }
+                if (imageGenerated) break;
             }
 
             if (!imageGenerated) {
                 console.error(`Failed to generate image for angle ${currentAngle}`);
             }
-        }));
+        }
+
+        // Chunk execution
+        for (let i = 0; i < angles.length; i += CONCURRENCY_LIMIT) {
+            const chunk = angles.slice(i, i + CONCURRENCY_LIMIT);
+            const promises = chunk.map((angle, chunkIndex) => processAngleWithRetry(angle, i + chunkIndex));
+            await Promise.all(promises);
+        }
 
         // Filter out nulls
         generatedUrls.push(...results.filter(url => url !== null));
