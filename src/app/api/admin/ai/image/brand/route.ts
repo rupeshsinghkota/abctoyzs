@@ -13,54 +13,47 @@ export async function POST(req: Request) {
         const { imageUrl, imageUrls, productName, generateAll } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
-            return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
+            return NextResponse.json(
+                { error: "GEMINI_API_KEY is not set" },
+                { status: 500 }
+            );
         }
 
-        const allImageUrls = imageUrls || (imageUrl ? [imageUrl] : []);
+        const supabase = createClient();
+
+        // Handle input images
+        let allImageUrls: string[] = [];
+        if (imageUrls && Array.isArray(imageUrls)) {
+            allImageUrls = imageUrls;
+        } else if (imageUrl) {
+            allImageUrls = [imageUrl];
+        }
+
         if (allImageUrls.length === 0) {
-            return NextResponse.json({ error: "No images provided" }, { status: 400 });
+            return NextResponse.json(
+                { error: "No image URL provided" },
+                { status: 400 }
+            );
         }
 
-        const supabase = await createClient();
+        console.log(`Processing ${allImageUrls.length} images for product: ${productName}`);
 
-        // Read brand logo
-        const logoPath = path.join(process.cwd(), 'public', BRAND_CONFIG.logoWide);
-        const logoBuffer = fs.readFileSync(logoPath);
-        const logoBase64 = logoBuffer.toString("base64");
-
-        // Download ALL product images first
-        const allImageData: Array<{ url: string; base64: string }> = [];
-        for (const imgUrl of allImageUrls) {
-            try {
-                const imageRes = await fetch(imgUrl);
-                const imageBuffer = await imageRes.arrayBuffer();
-                const imageBase64 = Buffer.from(imageBuffer).toString("base64");
-                allImageData.push({ url: imgUrl, base64: imageBase64 });
-            } catch (err) {
-                console.error(`Failed to download image: ${imgUrl}`);
-            }
-        }
-
-        const angles = [
-            "front 3/4 view",
-            "side profile view",
-            "rear 3/4 view",
-            "front direct view",
-            "rear direct view",
-            "interior dashboard close-up"
-        ];
-
-        // Models to try in order of preference
-        const modelsToTry = [
-            "gemini-3-pro-image-preview" // STRICT: Gemini 3 Pro (Nano Banana Pro) ONLY
-        ];
-
-        const generatedUrls: string[] = []; // We will fill this by index to keep order
-        const results = new Array(angles.length).fill(null);
+        // OPTION A: ONE-TO-ONE ENHANCEMENT (Background Swap / Quality Up)
+        const CONCURRENCY_LIMIT = 2;
+        const results = new Array(allImageUrls.length).fill(null);
         let errors: string[] = [];
 
-        // Concurrency Control: Run max 2 at a time to avoid 503 Overload
-        const CONCURRENCY_LIMIT = 2;
+        // Fetch Logo once
+        let logoBase64 = "";
+        try {
+            const logoResp = await fetch("https://abctoyzs.vercel.app/images/logo.png");
+            if (logoResp.ok) {
+                const buffer = await logoResp.arrayBuffer();
+                logoBase64 = Buffer.from(buffer).toString("base64");
+            }
+        } catch (e) {
+            console.error("Failed to fetch logo", e);
+        }
 
         // Cleanup: Delete PREVIOUS generated images for this product if generateAll is true
         if (generateAll) {
@@ -80,165 +73,126 @@ export async function POST(req: Request) {
             }
         }
 
-        async function processAngleWithRetry(currentAngle: string, index: number) {
-            if (!generateAll && index > 0) return; // Skip others if single generation
-
+        async function processImageEnhancement(sourceImageUrl: string, index: number) {
             let imageGenerated = false;
+            let retries = 0;
+            const MAX_RETRIES = 3;
 
-            for (const modelName of modelsToTry) {
-                // Retry loop for 503/429 errors
-                for (let attempt = 1; attempt <= 3; attempt++) {
-                    try {
-                        console.log(`Attempting generation (Try ${attempt}) with model: ${modelName} for angle: ${currentAngle}`);
+            while (!imageGenerated && retries <= MAX_RETRIES) {
+                try {
+                    // Fetch the specific source image
+                    const imageResp = await fetch(sourceImageUrl);
+                    if (!imageResp.ok) throw new Error("Failed to fetch source image");
+                    const imageBuffer = await imageResp.arrayBuffer();
+                    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
 
-                        const model = genAI.getGenerativeModel({
-                            model: modelName,
-                            generationConfig: {
-                                temperature: 0.0, // ABSOLUTE DETERMINISM. No creativity.
-                                topP: 0.95,
-                                topK: 40,
-                            },
-                            safetySettings: [
-                                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                            ],
-                        }, { timeout: 300000 });
+                    console.log(`Enhancing Image ${index + 1} (Try ${retries + 1})...`);
 
-                        // Enhanced "World Class" Prompt
-                        const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
+                    const model = genAI.getGenerativeModel({
+                        model: "gemini-3-pro-image-preview",
+                        generationConfig: {
+                            temperature: 0.0,
+                            topP: 0.95,
+                            topK: 40,
+                        },
+                        safetySettings: [
+                            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                        ],
+                    }, { timeout: 300000 });
 
-TASK:
-1. ANALYZE the reference images. noted the exact shape of headlights, number of spokes on wheels, and sticker placement.
-2. GENERATE a photorealistic 8K image of THIS EXACT TOY.
+                    // PROMPT: Focus on Background Change + Enhancement (Option A)
+                    const prompt = `PROFESSIONAL PRODUCT PHOTO EDITING:
 
-TARGET: Photorealistic 8K image of the KIDS RIDE-ON TOY CAR shown in reference images.
-CONTEXT: These images depict a "DIGITAL TWIN" of a BATTERY OPERATED TOY VEHICLE for children.
-ANGLE: ${currentAngle}.
+INPUT: 1 Reference Image.
+TASK: RE-RENDER this exact image with high-end cinematic lighting and a new background.
 
-STRICT GEOMETRY LOCK (TOY SCALE):
-- This is a TOY, not a real car.
-- PRESERVE: Plastic tire texture, visible toy screws, small seat proportions, toy dashboard.
-- DO NOT make it look like a real full-size truck. Keep the "Toy" aesthetic.
-- Treat reference images as a PHOTOGRAMMETRY SCAN.
-- The 3D geometry (Body, Wheels, Grille) is LOCKED. Do not modify it.
+STRICT EDITING RULES:
+1. SUBJECT LOCK: The car geometry must remain 100% IDENTICAL to the reference. Do not add or remove parts.
+2. ANGLE LOCK: Keep the exact same camera angle.
+3. ENHANCEMENT: Increase resolution to 8K, improve textures, lighting, and reflection quality.
+4. IDENTITY: This is a TOY CAR. Keep plastic textures.
+5. TEXT: Ensure "ABC TOYZ" is on the license plate if visible.
 
-ORIENTATION LOGIC:
-- If Angle = "Front", the product must FACE THE CAMERA.
-- If Angle = "Rear", the product must FACE AWAY from the camera (Show Tail/Exhaust).
-- If Angle = "Side", the product must be PERPENDICULAR to the camera.
-- DETECT THE VEHICLE TYPE (Car/Bike/Jeep) from reference and orient accordingly.
+BACKGROUND:
+- Place it in a Realistic Outdoor Environment (e.g. Scenic Desert Road or Salt Flats at Golden Hour).
+- Use Slight Bokeh (Blur) to separate subject from background.
 
 NEGATIVE PROMPT:
-- real car, full size vehicle, metal tires, realistic glass, different wheels, different details, morphing geometry, cartoonish, low resolution, misspelled grille text, PORD, FORA.
+- change angle, different car, different wheels, distorted, cartoonish, low res, extra wheels, real truck scale, PORD, FORA.`;
 
-2. BRANDING EDIT:
-   - GRILLE TEXT: The large text on the grille is "FORD". SPELLING CHECK: F-O-R-D. Ensure it starts with "F".
-   - WINDSHIELD: REMOVE all stickers/text.
-   - LICENSE PLATE: ADD "ABC TOYZ" text.
-   - LOGOS: REMOVE "11CART", "UEKUT".
+                    const contentParts: any[] = [{ text: prompt }];
+                    contentParts.push({ inlineData: { data: imageBase64, mimeType: "image/jpeg" } });
 
-3. BACKGROUND STRATEGY (AI Decide):
-   - Jeeps/SUVs: Epic desert sunset with dust trails or mountain pass.
-   - Supercars: Ultra-modern luxury driveway or city night neon.
-   - Bikes: Scenic coast road or race track.
-4. LIGHTING: Golden hour or cinematic studio lighting. High contrast, sharp shadows.
-5. QUALITY: Unreal Engine 5 render quality, sharp focus, no blur, no distortions.
-
-Aspect Ratio: 1:1 (Square).`;
-
-                        const contentParts: any[] = [{ text: prompt }];
-
-                        // Add reference images
-                        for (let j = 0; j < allImageData.length; j++) {
-                            contentParts.push({ text: `REFERENCE IMAGE ${j + 1}:` });
-                            contentParts.push({ inlineData: { data: allImageData[j].base64, mimeType: "image/jpeg" } });
-                        }
-
-                        // Add brand logo
-                        contentParts.push({ text: "BRAND LOGO (for license plate):" });
+                    if (logoBase64) {
+                        contentParts.push({ text: "BRAND LOGO:" });
                         contentParts.push({ inlineData: { data: logoBase64, mimeType: "image/png" } });
+                    }
 
-                        const result = await model.generateContent(contentParts as any);
-                        const response = await result.response;
+                    const result = await model.generateContent(contentParts);
+                    const response = await result.response;
 
-                        if (response.candidates && response.candidates.length > 0) {
-                            const candidate = response.candidates[0];
-                            let newImageBase64 = null;
+                    if (response.candidates && response.candidates.length > 0) {
+                        const candidate = response.candidates[0];
+                        let newImageBase64 = null;
 
-                            if (candidate.content?.parts) {
-                                for (const part of candidate.content.parts) {
-                                    if ((part as any).inlineData?.data) {
-                                        newImageBase64 = (part as any).inlineData.data;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (newImageBase64) {
-                                const newImageBuffer = Buffer.from(newImageBase64 as string, 'base64');
-                                const timestamp = Date.now();
-                                const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
-                                const newFilename = `enhanced_${timestamp}_${index}_${safeName}.jpg`;
-
-                                const { error: uploadError } = await supabase.storage
-                                    .from('products')
-                                    .upload(newFilename, newImageBuffer, { contentType: 'image/jpeg', cacheControl: '3600' });
-
-                                if (!uploadError) {
-                                    const { data: { publicUrl } } = supabase.storage
-                                        .from('products')
-                                        .getPublicUrl(newFilename);
-                                    results[index] = publicUrl; // Store by index to preserve order
-                                    imageGenerated = true;
-                                    return; // Success, exit retry loop and model loop (function returns)
-                                } else {
-                                    console.error(`Upload error angle ${index}:`, uploadError);
+                        if (candidate.content?.parts) {
+                            for (const part of candidate.content.parts) {
+                                if ((part as any).inlineData?.data) {
+                                    newImageBase64 = (part as any).inlineData.data;
+                                    break;
                                 }
                             }
                         }
-                    } catch (err: any) {
-                        const isOverload = err.message?.includes('503') || err.message?.includes('429') || err.message?.includes('Overloaded');
-                        console.error(`Model ${modelName} angle ${currentAngle} attempt ${attempt} failed:`, err.message);
 
-                        if (isOverload && attempt < 3) {
-                            const waitTime = 2000 * attempt; // Backoff: 2s, 4s, 6s...
-                            console.log(`Waiting ${waitTime}ms before retry...`);
-                            await new Promise(resolve => setTimeout(resolve, waitTime));
-                            continue; // Retry
-                        } else {
-                            errors.push(`${currentAngle} (${modelName}): ${err.message}`);
-                            break; // Fatal error or max retries, try next model (if any)
+                        if (newImageBase64) {
+                            const newImageBuffer = Buffer.from(newImageBase64 as string, 'base64');
+                            // Save
+                            const fileName = `enhanced_${productName?.replace(/[^a-z0-9]/gi, '_') || 'product'}_${index}_${Date.now()}.png`;
+                            const { error: uploadError } = await supabase.storage
+                                .from('products')
+                                .upload(fileName, newImageBuffer, { contentType: 'image/png', upsert: true });
+
+                            if (!uploadError) {
+                                const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(fileName);
+                                results[index] = publicUrl;
+                                imageGenerated = true;
+                            }
                         }
                     }
+                } catch (error: any) {
+                    console.error(`Error enhancing image ${index}:`, error);
+                    if (error.message?.includes("503") || error.message?.includes("429")) {
+                        retries++;
+                        await new Promise(r => setTimeout(r, retries * 2000));
+                    } else {
+                        errors.push(`Image ${index}: ${error.message}`);
+                        break;
+                    }
                 }
-                if (imageGenerated) break;
-            }
-
-            if (!imageGenerated) {
-                console.error(`Failed to generate image for angle ${currentAngle}`);
-            }
+            } // end while
         }
 
-        // Chunk execution
-        for (let i = 0; i < angles.length; i += CONCURRENCY_LIMIT) {
-            const chunk = angles.slice(i, i + CONCURRENCY_LIMIT);
-            const promises = chunk.map((angle, chunkIndex) => processAngleWithRetry(angle, i + chunkIndex));
-            await Promise.all(promises);
+        // Parallel Execution (Chunked by Limit)
+        for (let i = 0; i < allImageUrls.length; i += CONCURRENCY_LIMIT) {
+            const chunk = allImageUrls.slice(i, i + CONCURRENCY_LIMIT);
+            await Promise.all(chunk.map((url: string, offset: number) =>
+                processImageEnhancement(url, i + offset)
+            ));
         }
 
-        // Filter out nulls
-        generatedUrls.push(...results.filter(url => url !== null));
+        const validUrls = results.filter(u => u !== null);
 
-        if (generatedUrls.length === 0) {
-            throw new Error(`Generation failed. Errors: ${errors.join(" | ")}`);
+        if (validUrls.length === 0) {
+            return NextResponse.json({ error: "Failed to enhance images. " + errors.join(", ") }, { status: 500 });
         }
 
         return NextResponse.json({
             success: true,
-            newImageUrl: generatedUrls[0],
-            newImageUrls: generatedUrls
+            newImageUrl: validUrls[0],
+            newImageUrls: validUrls
         });
 
     } catch (error: any) {
