@@ -72,6 +72,11 @@ export async function POST(req: Request) {
 
                         const model = genAI.getGenerativeModel({
                             model: modelName,
+                            generationConfig: {
+                                temperature: 0.1, // Very Low randomness = High Consistency
+                                topP: 0.95,
+                                topK: 40,
+                            },
                             safetySettings: [
                                 { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
                                 { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
@@ -83,19 +88,19 @@ export async function POST(req: Request) {
                         // Enhanced "World Class" Prompt
                         const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
 
-TARGET: Photorealistic 8K image of the specific ride-on toy in the reference images.
+TARGET: Photorealistic 8K image of the car shown in reference images.
 ANGLE: ${currentAngle}.
 
-CRITICAL REQUIREMENTS:
-1. EXTREME PRODUCT MATCH: The generated toy MUST be an EXACT CLONE of the reference images. 
-   - SAME Wheels, Rims, Tires.
-   - SAME Grille shape, Headlights, Bumper.
-   - SAME Body curves and Stickers (except windshield).
-   - DO NOT hallucinate new features. COPY the reference.
-2. BRANDING EDIT: 
+STRICT CONSISTENCY RULES:
+1. IDENTICAL MATCH: The generated car must be an EXACT COPY of the reference vehicle.
+   - PRESERVE: Exact Wheel Rims (count spokes), exact Headlight shape, exact Grille pattern.
+   - DO NOT CHANGE THE CAR. Only place it in a new environment.
+
+2. BRANDING EDIT:
    - REMOVE all text/stickers from the windshield.
    - REMOVE any "11CART", "UEKUT" logos.
    - ADD "ABC TOYZ" text clearly on the license plate.
+
 3. BACKGROUND STRATEGY (AI Decide):
    - Jeeps/SUVs: Epic desert sunset with dust trails or mountain pass.
    - Supercars: Ultra-modern luxury driveway or city night neon.
