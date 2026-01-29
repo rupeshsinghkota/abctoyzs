@@ -49,8 +49,8 @@ export async function POST(req: Request) {
 
         // Models to try in order of preference
         const modelsToTry = [
-            "imagen-3.0-generate-001", // Primary: High fidelity
-            "gemini-2.0-flash-exp"     // Fallback: Reliable multimodal
+            "gemini-3-pro-image-preview", // Primary: Gemini 3 Pro (Nano Banana Pro)
+            "gemini-2.0-flash-exp"     // Fallback: Gemini 2.0 Flash
         ];
 
         const generatedUrls: string[] = [];
