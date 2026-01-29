@@ -128,7 +128,9 @@ BACKGROUND:
 - Depth of Field (Blur background).
 
 NEGATIVE PROMPT:
-- change design, change color, new wheels, different stickers, vector art, painting, low resolution, blurry, distorted details, changing body shape.`;
+- change design, change color, new wheels, different stickers, vector art, painting, low resolution, blurry, distorted details, changing body shape.
+
+ASPECT RATIO: 1:1 (SQUARE).`;
 
                     const contentParts: any[] = [{ text: prompt }];
                     contentParts.push({ inlineData: { data: imageBase64, mimeType: "image/jpeg" } });
