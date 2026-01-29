@@ -1,3 +1,4 @@
+
 export interface Product {
     id: string;
     slug: string;
@@ -48,7 +49,9 @@ export interface Product {
         action: string;
         comfort: string;
         durability: string;
-    };
+        features?: string[];
+        safety?: string[];
+    }; // Actually usage in code shows flat object for suite. Keeping flexible.
 
     // Variations Data
     attributes?: { name: string; options: string[] }[];
@@ -239,64 +242,25 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
 
         if (!data || data.length === 0) {
             console.warn("[fetchProducts] Warning: Supabase returned no data. count:", data?.length);
+
+            // FALLBACK MECHANISM: If looking for a specific slug but failed, try fetching ALL and filtering.
+            // This fixes issues where 'eq' or 'or' query might fail due to RLS or tricky slug characters.
+            if (slug) {
+                console.log(`[fetchProducts] Attempting Global Fallback for slug: ${slug}`);
+                const { data: allData } = await supabase.from('products').select('*, variants:product_variants(*)');
+                if (allData) {
+                    const match = allData.find((p: any) => p.slug === slug || p.id === slug);
+                    if (match) {
+                        console.log("[fetchProducts] Found via Global Fallback!");
+                        // Use helper to process single item wrapped in array
+                        return processProducts([match]);
+                    }
+                }
+            }
             return [];
         }
 
-        // Merge with static products data to allow local overrides/mocking
-        const mergedData = data.map((item: any) => {
-            const mappedProduct = {
-                id: item.id,
-                slug: item.slug || item.id,
-                name: item.name || 'Untitled Product',
-                // SAFETY: Check if category is a string before calling toLowerCase
-                category: (typeof item.category === 'string' && item.category.trim()) ? item.category.toLowerCase() : 'cars',
-                price: Number(item.base_price) || 0,
-                mrp: item.mrp ? Number(item.mrp) : undefined,
-                rating: Number(item.rating) || 0,
-                reviews: Number(item.review_count) || 0,
-                // SAFETY: Check if images is actually an array
-                image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
-                images: Array.isArray(item.images) ? item.images : [],
-                description: item.description || '',
-                banners: Array.isArray(item.banners) ? item.banners : [],
-                // Correctly map the boolean flags
-                is_new: !!item.is_new,
-                is_featured: !!item.is_featured,
-                tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
-                specs: item.specs || {},
-                voltage: item.voltage,
-                ageGroup: item.age_group,
-                subCategory: item.subCategory,
-                // Premium & Variations
-                videos: Array.isArray(item.videos) ? item.videos : [],
-                box_content: Array.isArray(item.box_content) ? item.box_content : [],
-                product_dimensions: item.product_dimensions,
-                box_dimensions: item.box_dimensions,
-                net_weight: item.net_weight,
-                gross_weight: item.gross_weight,
-                attributes: Array.isArray(item.attributes) ? item.attributes : [],
-                variants: Array.isArray(item.variants) ? item.variants : [],
-                meta_title: item.meta_title,
-                meta_description: item.meta_description,
-                marketing_suite: item.marketing_suite
-            };
-
-            // Find matching static product to overlay data
-            const staticMatch = products.find(p => p.slug === mappedProduct.slug || p.id === mappedProduct.id);
-            if (staticMatch) {
-                return {
-                    ...mappedProduct,
-                    ...staticMatch, // Static data overrides DB data (useful for hardcoding MRPs, specs, etc.)
-                    // Preserve ID and critical DB fields if needed, but here we want to trust static 'mrp' etc.
-                    // If we only want to fill missing:
-                    // mrp: mappedProduct.mrp || staticMatch.mrp,
-                    // But user specifically said "taking data from what i set", so OVERRIDE is safer for their request.
-                };
-            }
-            return mappedProduct;
-        });
-
-        return mergedData as Product[];
+        return processProducts(data);
 
     } catch (e) {
         console.error("fetchProducts error:", e);
@@ -320,14 +284,11 @@ export async function searchProducts(query: string): Promise<Product[]> {
             return [];
         }
 
-        // If DB returns empty array (valid search but no results), rely on that unless we want to force static data?
-        // Let's assume if DB is working we prefer DB. But if DB is empty (length 0) and we suspect it's just unseeded...
-        // For now, let's respect the DB result. If it's empty, it's empty. Use fallback only on error or null.
-
         if (data.length === 0) {
             return [];
         }
 
+        // Parse search results (simplified mapping)
         return data.map((item: any) => ({
             id: item.id,
             slug: item.slug || item.id,
@@ -355,4 +316,57 @@ export async function searchProducts(query: string): Promise<Product[]> {
         console.error("Search error:", e);
         return [];
     }
+}
+
+// Helper to map DB result to Product interface (extracted to avoid duplication)
+function processProducts(data: any[]): Product[] {
+    // Merge with static products data
+    return data.map((item: any) => {
+        const mappedProduct = {
+            id: item.id,
+            slug: item.slug || item.id,
+            name: item.name || 'Untitled Product',
+            // SAFETY: Check if category is a string before calling toLowerCase
+            category: (typeof item.category === 'string' && item.category.trim()) ? item.category.toLowerCase() : 'cars',
+            price: Number(item.base_price) || 0,
+            mrp: item.mrp ? Number(item.mrp) : undefined,
+            rating: Number(item.rating) || 0,
+            reviews: Number(item.review_count) || 0,
+            // SAFETY: Check if images is actually an array
+            image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
+            images: Array.isArray(item.images) ? item.images : [],
+            description: item.description || '',
+            banners: Array.isArray(item.banners) ? item.banners : [],
+            // Correctly map the boolean flags
+            is_new: !!item.is_new,
+            is_featured: !!item.is_featured,
+            tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
+            specs: item.specs || {},
+            voltage: item.voltage,
+            ageGroup: item.age_group,
+            subCategory: item.subCategory,
+            // Premium & Variations
+            videos: Array.isArray(item.videos) ? item.videos : [],
+            box_content: Array.isArray(item.box_content) ? item.box_content : [],
+            product_dimensions: item.product_dimensions,
+            box_dimensions: item.box_dimensions,
+            net_weight: item.net_weight,
+            gross_weight: item.gross_weight,
+            attributes: Array.isArray(item.attributes) ? item.attributes : [],
+            variants: Array.isArray(item.variants) ? item.variants : [],
+            meta_title: item.meta_title,
+            meta_description: item.meta_description,
+            marketing_suite: item.marketing_suite
+        };
+
+        // Find matching static product to overlay data
+        const staticMatch = products.find(p => p.slug === mappedProduct.slug || p.id === mappedProduct.id);
+        if (staticMatch) {
+            return {
+                ...mappedProduct,
+                ...staticMatch, // Static data overrides DB data (useful for hardcoding MRPs, specs, etc.)
+            };
+        }
+        return mappedProduct;
+    });
 }
