@@ -126,12 +126,15 @@ STRICT PRESERVATION RULES:
    - If Input = Back View -> Output MUST be Back View.
    - If Input = Interior -> Output MUST be Interior.
    - Do NOT turn the car around.
-3. **GEOMETRY & COLOR LOCK**: The car's shape, wheel spokes, stickers, and exact red color code must NOT change.
+3. **GEOMETRY & COLOR LOCK**: 
+   - THE COLOR IS SACRED. If it is Red, IT MUST STAY THE EXACT SAME RED. 
+   - Do not apply color filters. Do not change white balance.
+   - The car's shape, wheel spokes, and stickers must NOT change.
 4. **NO RE-DESIGN**: Do not "modernize" the car. Do not "fix" the design. Keep it exactly as is.
 5. **ALLOWED ENHANCEMENTS**: 
    - Remove grain/noise.
    - Sharpen textures.
-   - Apply "Studio Lighting" reflections (make the plastic look premium).
+   - Apply "Neutral Studio Lighting" (Pure White Light).
    - Replace Background.
 
 BRANDING CLEANUP:
@@ -142,10 +145,10 @@ BRANDING CLEANUP:
 BACKGROUND:
 - **SCENE**: ${randomBg}.
 - **STYLE**: Ultra-Realistic, Cinematic Depth of Field (Bokeh).
-- **LIGHTING**: Match the scene (e.g. Golden hour for outdoors, Softbox for studio).
+- **LIGHTING**: PURE DAYLIGHT (5500K). NO ORANGE TINT. NO FILTERS.
 
 NEGATIVE PROMPT:
-- change design, change color, new wheels, different stickers, vector art, painting, low resolution, blurry, distorted details, changing body shape.
+- change color, change paint, orange tint, blue tint, filter, color grading, change design, new wheels, different stickers, vector art, painting, low resolution, blurry.
 
 ASPECT RATIO: 1:1 (SQUARE).`;
 
