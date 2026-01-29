@@ -87,8 +87,12 @@ TARGET: Photorealistic 8K image of the specific ride-on toy in the reference ima
 ANGLE: ${currentAngle}.
 
 CRITICAL REQUIREMENTS:
-1. PRODUCT FIDELITY: The toy must look EXACTLY like the reference images (same wheels, body shape, details).
-2. BRANDING EDIT:
+1. EXTREME PRODUCT MATCH: The generated toy MUST be an EXACT CLONE of the reference images. 
+   - SAME Wheels, Rims, Tires.
+   - SAME Grille shape, Headlights, Bumper.
+   - SAME Body curves and Stickers (except windshield).
+   - DO NOT hallucinate new features. COPY the reference.
+2. BRANDING EDIT: 
    - REMOVE all text/stickers from the windshield.
    - REMOVE any "11CART", "UEKUT" logos.
    - ADD "ABC TOYZ" text clearly on the license plate.
