@@ -123,9 +123,10 @@ NEGATIVE PROMPT:
 - different wheels, different details, morphing geometry, cartoonish, low resolution, inconsistent bodywork, changed stickers, hallucinated parts.
 
 2. BRANDING EDIT:
-   - REMOVE all text/stickers from the windshield.
-   - REMOVE any "11CART", "UEKUT" logos.
-   - ADD "ABC TOYZ" text clearly on the license plate.
+   - GRILLE TEXT: CHANGE any grille text (e.g. FORD) to "ABC TOYZ".
+   - WINDSHIELD: REMOVE all stickers/text.
+   - LICENSE PLATE: ADD "ABC TOYZ" text.
+   - LOGOS: REMOVE "11CART", "UEKUT".
 
 3. BACKGROUND STRATEGY (AI Decide):
    - Jeeps/SUVs: Epic desert sunset with dust trails or mountain pass.
