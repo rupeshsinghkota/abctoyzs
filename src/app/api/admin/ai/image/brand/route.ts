@@ -89,6 +89,7 @@ export async function POST(req: Request) {
                         const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
 
 TARGET: Photorealistic 8K image of the car shown in reference images.
+CONTEXT: The provided reference images are DIFFERENT ANGLES of the SAME SINGLE PHYSICAL PRODUCT. Use them together to understand the exact 3D geometry and details of this one specific car.
 ANGLE: ${currentAngle}.
 
 STRICT CONSISTENCY RULES:
