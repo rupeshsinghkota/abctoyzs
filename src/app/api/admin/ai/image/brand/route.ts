@@ -118,10 +118,10 @@ STRICT PRESERVATION RULES:
    - Apply "Studio Lighting" reflections (make the plastic look premium).
    - Replace Background.
 
-BRANDING:
-1. Remove "11CART"/"UEKUT" logos (Paint over with red body color).
-2. License Plate -> "ABC TOYZ".
-3. Grille -> "FORD".
+BRANDING CLEANUP:
+1. **REMOVE STICKERS**: Erase ALL random stickers/decals from the windshield, doors, and hood (e.g. "4x4", "Power", "Turbo", "11CART", "UEKUT"). Make the surface CLEAN body color.
+2. **LICENSE PLATE**: Must read "ABC TOYZ".
+3. **GRILLE**: Keep "FORD".
 
 BACKGROUND:
 - High-End Outdoor Location (Luxury Driveway or Desert).
