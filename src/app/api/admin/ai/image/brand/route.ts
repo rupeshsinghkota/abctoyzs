@@ -103,28 +103,32 @@ export async function POST(req: Request) {
                         ],
                     }, { timeout: 300000 });
 
-                    // PROMPT: "NUCLEAR OPTION" - BACKGROUND REPLACEMENT ONLY
-                    const prompt = `COMMERCIAL PHOTO EDITING TASK (INPAINTING FOCUS):
+                    // PROMPT: "HIGH FIDELITY POLISH" - RELIGHTING & UPSCALING
+                    const prompt = `COMMERCIAL PHOTO RETOUCHING TASK:
 
 INPUT: 1 Reference Image.
-TASK: KEEP THE CAR EXACTLY AS IS. CHANGE ONLY THE BACKGROUND.
+TASK: IMPROVE QUALITY (8K, SHARPNESS, LIGHTING) BUT KEEP SUBJECT IDENTICAL.
 
-CRITICAL INSTRUCTIONS (DO NOT HALLUCINATE):
-1. **PROTECT THE SUBJECT**: The car's geometry, wheels, stickers, and textures are SACRED. Do not change a single pixel of the car itself unless removing specific logos.
-2. **BACKGROUND ONLY**: Your job is to masking the car and replacing the environment with a high-quality "Cinematic Golden Hour" scene.
-3. **NO RE-DRAWING**: Do not re-interpret the car. Use the input image as a PHOTOGRAPHIC TEXTURE for the car.
-4. **BRANDING**:
-   - REMOVE "11CART"/"UEKUT" logos if present (Paint over with body color).
-   - ENSURE "FORD" grille text is correct.
-   - ADD "ABC TOYZ" to license plate.
+STRICT PRESERVATION RULES:
+1. **GEOMETRY & COLOR LOCK**: The car's shape, wheel spokes, stickers, and exact red color code must NOT change.
+2. **NO RE-DESIGN**: Do not "modernize" the car. Do not "fix" the design. Keep it exactly as is.
+3. **ALLOWED ENHANCEMENTS**: 
+   - Remove grain/noise.
+   - Sharpen textures.
+   - Apply "Studio Lighting" reflections (make the plastic look premium).
+   - Replace Background.
+
+BRANDING:
+1. Remove "11CART"/"UEKUT" logos (Paint over with red body color).
+2. License Plate -> "ABC TOYZ".
+3. Grille -> "FORD".
 
 BACKGROUND:
-- Realistic Outdoor Environment (Desert/City/Coastal).
-- High Dynamic Range (HDR) Lighting.
-- Soft Bokeh background blur.
+- High-End Outdoor Location (Luxury Driveway or Desert).
+- Depth of Field (Blur background).
 
 NEGATIVE PROMPT:
-- change car, change wheels, new wheels, different tires, different stickers, drawing, illustration, 3d render style, low resolution, metal texture, real truck size.`;
+- change design, change color, new wheels, different stickers, vector art, painting, low resolution, blurry, distorted details, changing body shape.`;
 
                     const contentParts: any[] = [{ text: prompt }];
                     contentParts.push({ inlineData: { data: imageBase64, mimeType: "image/jpeg" } });
