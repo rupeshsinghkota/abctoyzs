@@ -120,10 +120,10 @@ STRICT GEOMETRY LOCK:
 - 0% Creativity on the Car. 100% Creativity on the Environment.
 
 NEGATIVE PROMPT:
-- different wheels, different details, morphing geometry, cartoonish, low resolution, inconsistent bodywork, changed stickers, hallucinated parts.
+- different wheels, different details, morphing geometry, cartoonish, low resolution, inconsistent bodywork, changed stickers, hallucinated parts, misspelled grille text.
 
 2. BRANDING EDIT:
-   - GRILLE TEXT: CHANGE any grille text (e.g. FORD) to "ABC TOYZ".
+   - GRILLE TEXT: PRESERVE original text (e.g. "FORD"). DO NOT SPELL IT WRONG (e.g. not "FORA").
    - WINDSHIELD: REMOVE all stickers/text.
    - LICENSE PLATE: ADD "ABC TOYZ" text.
    - LOGOS: REMOVE "11CART", "UEKUT".
