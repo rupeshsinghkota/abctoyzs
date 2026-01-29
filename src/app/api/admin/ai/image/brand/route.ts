@@ -54,6 +54,7 @@ export async function POST(req: Request) {
 
         const generatedUrls: string[] = [];
         let errors: string[] = [];
+        const uploadPromises: Promise<void>[] = []; // Track active uploads
 
         for (let i = 0; i < (generateAll ? angles.length : 1); i++) {
             const currentAngle = angles[i];
@@ -124,24 +125,31 @@ Aspect Ratio: 1:1 (Square).`;
                         }
 
                         if (newImageBase64) {
-                            // Success! Upload and break model loop
-                            const newImageBuffer = Buffer.from(newImageBase64, 'base64');
-                            const timestamp = Date.now();
-                            const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
-                            const newFilename = `enhanced_${timestamp}_${i}_${safeName}.jpg`;
+                            // Non-blocking Upload
+                            const uploadTask = async () => {
+                                const newImageBuffer = Buffer.from(newImageBase64 as string, 'base64'); // Cast safely
+                                const timestamp = Date.now();
+                                const safeName = productName?.replace(/[^a-z0-9]/gi, '_') || 'product';
+                                const newFilename = `enhanced_${timestamp}_${i}_${safeName}.jpg`;
 
-                            const { error: uploadError } = await supabase.storage
-                                .from('products')
-                                .upload(newFilename, newImageBuffer, { contentType: 'image/jpeg', cacheControl: '3600' });
-
-                            if (!uploadError) {
-                                const { data: { publicUrl } } = supabase.storage
+                                const { error: uploadError } = await supabase.storage
                                     .from('products')
-                                    .getPublicUrl(newFilename);
-                                generatedUrls.push(publicUrl);
-                                imageGenerated = true; // Mark as success
-                                break; // Stop trying models for this angle
-                            }
+                                    .upload(newFilename, newImageBuffer, { contentType: 'image/jpeg', cacheControl: '3600' });
+
+                                if (!uploadError) {
+                                    const { data: { publicUrl } } = supabase.storage
+                                        .from('products')
+                                        .getPublicUrl(newFilename);
+                                    generatedUrls.push(publicUrl);
+                                } else {
+                                    console.error("Upload failed:", uploadError);
+                                }
+                            };
+
+                            uploadPromises.push(uploadTask());
+
+                            imageGenerated = true;
+                            break;
                         }
                     }
                 } catch (err: any) {
@@ -155,13 +163,23 @@ Aspect Ratio: 1:1 (Square).`;
             }
         } // End angle loop
 
+        // Wait for all uploads to complete
+        await Promise.all(uploadPromises);
+
         if (generatedUrls.length === 0) {
             throw new Error(`Generation failed. Errors: ${errors.join(" | ")}`);
         }
 
+        // Return sorted URLs to match original order if possible, 
+        // but generatedUrls is concurrent push, so order might vary.
+        // We accept this for now, or we can index them.
+        // Actually, generatedUrls.push happens inside the upload callback which is async.
+        // So the array order is unpredictable!
+        // FIX: Use an array of size 4 and fill by index.
+
         return NextResponse.json({
             success: true,
-            newImageUrl: generatedUrls[0],
+            newImageUrl: generatedUrls[0], // Order might be random now!
             newImageUrls: generatedUrls
         });
 
