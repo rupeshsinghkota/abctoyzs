@@ -110,11 +110,14 @@ INPUT: 1 Reference Image.
 TASK: RE-RENDER this exact image with high-end cinematic lighting and a new background.
 
 STRICT EDITING RULES:
-1. SUBJECT LOCK: The car geometry must remain 100% IDENTICAL to the reference. Do not add or remove parts.
-2. ANGLE LOCK: Keep the exact same camera angle.
-3. ENHANCEMENT: Increase resolution to 8K, improve textures, lighting, and reflection quality.
-4. IDENTITY: This is a TOY CAR. Keep plastic textures.
-5. TEXT: Ensure "ABC TOYZ" is on the license plate if visible.
+1. SUBJECT LOCK: The car geometry (body shape, plastic parts) must remain IDENTICAL.
+2. TEXTURE FIX: Keep plastic textures. Do not make it look like metal.
+3. ENHANCEMENT: Upgrade resolution to 8K, apply Cinematic Lighting.
+
+MANDATORY BRANDING UPDATES (CRITICAL):
+1. REMOVE OLD LOGOS: Scrape off "11CART", "UEKUT", or foreign text from the windshield/body. Replace with clean car body color.
+2. LICENSE PLATE: The plate MUST read "ABC TOYZ". Overwrite any existing text.
+3. GRILLE TEXT: Ensure the grille says "FORD" (Spelling: F-O-R-D).
 
 BACKGROUND:
 - Place it in a Realistic Outdoor Environment (e.g. Scenic Desert Road or Salt Flats at Golden Hour).
