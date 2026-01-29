@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+export const maxDuration = 300; // 5 minute timeout
 
 export async function POST(req: Request) {
     try {
@@ -46,9 +47,7 @@ export async function POST(req: Request) {
             "rear 3/4 view",
             "front direct view",
             "rear direct view",
-            "top down view",
-            "interior dashboard close-up",
-            "low angle hero shot"
+            "interior dashboard close-up"
         ];
 
         // Models to try in order of preference
@@ -105,7 +104,7 @@ export async function POST(req: Request) {
                                 { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
                                 { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
                             ],
-                        });
+                        }, { timeout: 300000 });
 
                         // Enhanced "World Class" Prompt
                         const prompt = `COMMERCIAL PRODUCT PHOTOGRAPHY:
