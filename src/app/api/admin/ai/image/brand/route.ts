@@ -103,28 +103,28 @@ export async function POST(req: Request) {
                         ],
                     }, { timeout: 300000 });
 
-                    // PROMPT: Focus on Background Change + Enhancement (Option A)
-                    const prompt = `PROFESSIONAL PRODUCT PHOTO EDITING:
+                    // PROMPT: "NUCLEAR OPTION" - BACKGROUND REPLACEMENT ONLY
+                    const prompt = `COMMERCIAL PHOTO EDITING TASK (INPAINTING FOCUS):
 
 INPUT: 1 Reference Image.
-TASK: RE-RENDER this exact image with high-end cinematic lighting and a new background.
+TASK: KEEP THE CAR EXACTLY AS IS. CHANGE ONLY THE BACKGROUND.
 
-STRICT EDITING RULES:
-1. SUBJECT LOCK: The car geometry (body shape, plastic parts) must remain IDENTICAL.
-2. TEXTURE FIX: Keep plastic textures. Do not make it look like metal.
-3. ENHANCEMENT: Upgrade resolution to 8K, apply Cinematic Lighting.
-
-MANDATORY BRANDING UPDATES (CRITICAL):
-1. REMOVE OLD LOGOS: Scrape off "11CART", "UEKUT", or foreign text from the windshield/body. Replace with clean car body color.
-2. LICENSE PLATE: The plate MUST read "ABC TOYZ". Overwrite any existing text.
-3. GRILLE TEXT: Ensure the grille says "FORD" (Spelling: F-O-R-D).
+CRITICAL INSTRUCTIONS (DO NOT HALLUCINATE):
+1. **PROTECT THE SUBJECT**: The car's geometry, wheels, stickers, and textures are SACRED. Do not change a single pixel of the car itself unless removing specific logos.
+2. **BACKGROUND ONLY**: Your job is to masking the car and replacing the environment with a high-quality "Cinematic Golden Hour" scene.
+3. **NO RE-DRAWING**: Do not re-interpret the car. Use the input image as a PHOTOGRAPHIC TEXTURE for the car.
+4. **BRANDING**:
+   - REMOVE "11CART"/"UEKUT" logos if present (Paint over with body color).
+   - ENSURE "FORD" grille text is correct.
+   - ADD "ABC TOYZ" to license plate.
 
 BACKGROUND:
-- Place it in a Realistic Outdoor Environment (e.g. Scenic Desert Road or Salt Flats at Golden Hour).
-- Use Slight Bokeh (Blur) to separate subject from background.
+- Realistic Outdoor Environment (Desert/City/Coastal).
+- High Dynamic Range (HDR) Lighting.
+- Soft Bokeh background blur.
 
 NEGATIVE PROMPT:
-- change angle, different car, different wheels, distorted, cartoonish, low res, extra wheels, real truck scale, PORD, FORA.`;
+- change car, change wheels, new wheels, different tires, different stickers, drawing, illustration, 3d render style, low resolution, metal texture, real truck size.`;
 
                     const contentParts: any[] = [{ text: prompt }];
                     contentParts.push({ inlineData: { data: imageBase64, mimeType: "image/jpeg" } });
