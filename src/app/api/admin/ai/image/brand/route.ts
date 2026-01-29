@@ -49,12 +49,12 @@ export async function POST(req: Request) {
 
         // Models to try in order of preference
         const modelsToTry = [
-            "gemini-3-pro-image-preview", // Primary: Gemini 3 Pro (Nano Banana Pro)
-            "gemini-2.0-flash-exp"     // Fallback: Gemini 2.0 Flash
+            "gemini-3-pro-image-preview", // Primary: Nano Banana Pro
+            "gemini-2.0-flash"          // Fallback: Stable Flash 2.0
         ];
 
         const generatedUrls: string[] = [];
-        let lastError: any = null;
+        let errors: string[] = [];
 
         for (let i = 0; i < (generateAll ? angles.length : 1); i++) {
             const currentAngle = angles[i];
@@ -147,8 +147,7 @@ Aspect Ratio: 1:1 (Square).`;
                     }
                 } catch (err: any) {
                     console.error(`Model ${modelName} failed:`, err.message);
-                    lastError = err;
-                    // Continue to next model
+                    errors.push(`${modelName}: ${err.message}`);
                 }
             } // End model loop
 
@@ -158,8 +157,7 @@ Aspect Ratio: 1:1 (Square).`;
         } // End angle loop
 
         if (generatedUrls.length === 0) {
-            const errorMsg = lastError?.message || "All models failed to generate images.";
-            throw new Error(`Generation failed. Last error: ${errorMsg}`);
+            throw new Error(`Generation failed. Errors: ${errors.join(" | ")}`);
         }
 
         return NextResponse.json({
