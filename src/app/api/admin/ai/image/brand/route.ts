@@ -110,8 +110,13 @@ INPUT: 1 Reference Image.
 TASK: IMPROVE QUALITY (8K, SHARPNESS, LIGHTING) BUT KEEP SUBJECT IDENTICAL.
 
 STRICT PRESERVATION RULES:
-1. **GEOMETRY & COLOR LOCK**: The car's shape, wheel spokes, stickers, and exact red color code must NOT change.
-2. **NO RE-DESIGN**: Do not "modernize" the car. Do not "fix" the design. Keep it exactly as is.
+1. **COMPOSITION LOCK (CRITICAL)**: DO NOT ZOOM OUT. DO NOT CHANGE FRAMING. If the image is a Close-up/Interior, KEEP IT A CLOSE-UP.
+2. **VIEWPOINT RESPECT**: 
+   - If Input = Back View -> Output MUST be Back View.
+   - If Input = Interior -> Output MUST be Interior.
+   - Do NOT turn the car around.
+3. **GEOMETRY & COLOR LOCK**: The car's shape, wheel spokes, stickers, and exact red color code must NOT change.
+4. **NO RE-DESIGN**: Do not "modernize" the car. Do not "fix" the design. Keep it exactly as is.
 3. **ALLOWED ENHANCEMENTS**: 
    - Remove grain/noise.
    - Sharpen textures.
