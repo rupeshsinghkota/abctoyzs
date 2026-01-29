@@ -19,6 +19,7 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
     const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     const activePrice = currentVariant ? currentVariant.price : product.price;
 
@@ -39,6 +40,7 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
     const discount = Math.round(((activeMRP - activePrice) / activeMRP) * 100);
 
     useEffect(() => {
+        setMounted(true);
         const handleScroll = () => {
             // Show bar after scrolling 600px
             if (window.scrollY > 600) {
@@ -82,6 +84,10 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
         setTimeout(() => router.push('/cart'), 300);
     };
 
+    // Prevent hydration error and layout shift
+    // On server: return null
+    // On client: return null if not visible/appropriate
+    if (!mounted) return null;
     if (!isVisible && typeof window !== 'undefined' && window.innerWidth > 1024) return null;
 
     return (
