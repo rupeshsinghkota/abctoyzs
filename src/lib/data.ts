@@ -229,8 +229,15 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
             .select('*, variants:product_variants(*)');
 
         if (slug) {
-            // Support both Slug and ID lookup (fixes 404s for UUID urls)
-            query = query.or(`slug.eq.${slug},id.eq.${slug}`);
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+            if (isUUID) {
+                // If it looks like a UUID, check BOTH slug (text) and id (uuid) cols
+                query = query.or(`slug.eq.${slug},id.eq.${slug}`);
+            } else {
+                // If it's NOT a UUID (e.g. "bmw-m5"), ONLY check slug col. 
+                // Checks against ID col would crash with "invalid input syntax for type uuid"
+                query = query.eq('slug', slug);
+            }
         }
 
         const { data, error } = await query;
