@@ -120,6 +120,12 @@ STRICT GEOMETRY LOCK (TOY SCALE):
 - Treat reference images as a PHOTOGRAMMETRY SCAN.
 - The 3D geometry (Body, Wheels, Grille) is LOCKED. Do not modify it.
 
+ORIENTATION LOGIC:
+- If Angle = "Front", the product must FACE THE CAMERA.
+- If Angle = "Rear", the product must FACE AWAY from the camera (Show Tail/Exhaust).
+- If Angle = "Side", the product must be PERPENDICULAR to the camera.
+- DETECT THE VEHICLE TYPE (Car/Bike/Jeep) from reference and orient accordingly.
+
 NEGATIVE PROMPT:
 - real car, full size vehicle, metal tires, realistic glass, different wheels, different details, morphing geometry, cartoonish, low resolution, misspelled grille text, PORD, FORA.
 
