@@ -226,7 +226,8 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
             .select('*, variants:product_variants(*)');
 
         if (slug) {
-            query = query.eq('slug', slug);
+            // Support both Slug and ID lookup (fixes 404s for UUID urls)
+            query = query.or(`slug.eq.${slug},id.eq.${slug}`);
         }
 
         const { data, error } = await query;
