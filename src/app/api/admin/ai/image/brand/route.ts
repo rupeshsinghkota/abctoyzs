@@ -139,7 +139,10 @@ STRICT PRESERVATION RULES:
 BRANDING CLEANUP:
 1. **REMOVE STICKERS**: Erase ALL random stickers/decals from the windshield, doors, and hood (e.g. "4x4", "Power", "Turbo", "11CART", "UEKUT"). Make the surface CLEAN body color.
 2. **LICENSE PLATE**: Must read "ABC TOYZ".
-3. **GRILLE**: Keep "FORD".
+3. **NO HALLUCINATED BRANDS**: 
+   - DO NOT ADD any brand names (e.g. Ford, BMW, Jeep) if they are not clearly visible in the source.
+   - If the Grille is blank, KEEP IT BLANK. Do not invent a logo.
+   - If the hood is empty, KEEP IT EMPTY.
 
 BACKGROUND:
 - **SCENE**: ${randomBg}.
@@ -147,7 +150,7 @@ BACKGROUND:
 - **LIGHTING**: PURE DAYLIGHT (5500K). NO ORANGE TINT. NO FILTERS.
 
 NEGATIVE PROMPT:
-- change color, change paint, orange tint, blue tint, filter, color grading, change design, new wheels, different stickers, vector art, painting, low resolution, blurry.
+- change color, change paint, orange tint, blue tint, filter, color grading, change design, new wheels, different stickers, vector art, painting, low resolution, blurry, added text, new brand logos, ford logo, bmw logo.
 
 ASPECT RATIO: 1:1 (SQUARE).`;
 
