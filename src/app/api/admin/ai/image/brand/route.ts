@@ -103,6 +103,17 @@ export async function POST(req: Request) {
                         ],
                     }, { timeout: 300000 });
 
+                    // DYNAMIC BACKGROUND SELECTOR (Variety)
+                    const BACKGROUNDS = [
+                        "Luxury Modern Mansion Driveway (Paved, Geometric Architecture, Golden Hour)",
+                        "Scenic Coastal Highway (Ocean view, Blue Sky, Bright Sunlight)",
+                        "Urban City Rooftop at Twilight (Bokeh City Lights, Wet Concrete)",
+                        "Minimalist Concrete Architectural Space (Soft Shadows, Industrial Chic)",
+                        "Sunny Forest Glade (Dappled Light, Nature Path, Vibration Colors)",
+                        "High-Tech Showroom (Clean White/Grey, Studio Reflections, Strip Lights)"
+                    ];
+                    const randomBg = BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)];
+
                     // PROMPT: "HIGH FIDELITY POLISH" - RELIGHTING & UPSCALING
                     const prompt = `COMMERCIAL PHOTO RETOUCHING TASK:
 
@@ -117,7 +128,7 @@ STRICT PRESERVATION RULES:
    - Do NOT turn the car around.
 3. **GEOMETRY & COLOR LOCK**: The car's shape, wheel spokes, stickers, and exact red color code must NOT change.
 4. **NO RE-DESIGN**: Do not "modernize" the car. Do not "fix" the design. Keep it exactly as is.
-3. **ALLOWED ENHANCEMENTS**: 
+5. **ALLOWED ENHANCEMENTS**: 
    - Remove grain/noise.
    - Sharpen textures.
    - Apply "Studio Lighting" reflections (make the plastic look premium).
@@ -129,8 +140,9 @@ BRANDING CLEANUP:
 3. **GRILLE**: Keep "FORD".
 
 BACKGROUND:
-- High-End Outdoor Location (Luxury Driveway or Desert).
-- Depth of Field (Blur background).
+- **SCENE**: ${randomBg}.
+- **STYLE**: Ultra-Realistic, Cinematic Depth of Field (Bokeh).
+- **LIGHTING**: Match the scene (e.g. Golden hour for outdoors, Softbox for studio).
 
 NEGATIVE PROMPT:
 - change design, change color, new wheels, different stickers, vector art, painting, low resolution, blurry, distorted details, changing body shape.
