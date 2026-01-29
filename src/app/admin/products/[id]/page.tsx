@@ -493,6 +493,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             // 1. Prepare Main Product Data (Explicit mapping to match DB schema)
             const productData = {
                 id: id,
+                slug: formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
                 name: formData.name,
                 description: formData.description,
                 base_price: parseFloat(formData.base_price) || 0,
@@ -659,6 +660,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         className="w-full px-5 py-4 bg-background border-2 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-lg"
                                         placeholder="e.g. BMW M5 Competition Ride-On"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">URL Slug (SEO) <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.slug}
+                                        onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                                        className="w-full px-5 py-4 bg-background border-2 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-mono text-muted-foreground"
+                                        placeholder="e.g. bmw-m5-competition-ride-on"
                                     />
                                 </div>
 
