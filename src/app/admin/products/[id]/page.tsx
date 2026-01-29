@@ -263,17 +263,25 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             if (error) throw new Error(error);
 
             if (newImageUrls && newImageUrls.length > 0) {
-                // Replace images with enhanced versions (better background, same product)
-                setFormData(prev => {
-                    const freshImages = [...prev.images];
-                    newImageUrls.forEach((url: string, i: number) => {
-                        if (i < freshImages.length) {
-                            freshImages[i] = url;
-                        }
-                    });
-                    return { ...prev, images: freshImages };
+                // Map results back to original slots (handling gaps if expected)
+                // Note: imagesToBrand was filtered, so newImageUrls corresponds to non-empty images.
+                let brandIdx = 0;
+                const finalImages = formData.images.map(img => {
+                    if (img.trim() !== '') {
+                        const newUrl = newImageUrls[brandIdx];
+                        brandIdx++;
+                        return newUrl || img; // Keep old if generation failed (null)
+                    }
+                    return img;
                 });
-                alert(`✨ Enhanced ${newImageUrls.length} images with professional backgrounds!`);
+
+                // 1. Update UI
+                setFormData(prev => ({ ...prev, images: finalImages }));
+
+                // 2. AUTO-SAVE to Database (Persistence)
+                await AdminService.updateProduct(id, { images: finalImages.filter(i => i.trim()) });
+
+                alert(`✨ Enhanced & Saved ${newImageUrls.filter((u: any) => u).length} images!`);
             }
         } catch (error: any) {
             console.error(error);

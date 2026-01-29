@@ -114,7 +114,6 @@ export async function POST(req: Request) {
                     ];
                     const randomBg = BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)];
 
-                    // PROMPT: "HIGH FIDELITY POLISH" - RELIGHTING & UPSCALING
                     const prompt = `COMMERCIAL PHOTO RETOUCHING TASK:
 
 INPUT: 1 Reference Image.
@@ -186,8 +185,8 @@ ASPECT RATIO: 1:1 (SQUARE).`;
 
                             if (!uploadError) {
                                 const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(fileName);
-                                results[index] = publicUrl;
-                                imageGenerated = true;
+                                results[index] = publicUrl; // Success
+                                imageGenerated = true; // Break loops
                             }
                         }
                     }
@@ -212,16 +211,17 @@ ASPECT RATIO: 1:1 (SQUARE).`;
             ));
         }
 
-        const validUrls = results.filter(u => u !== null);
+        const successCount = results.filter(u => u !== null).length;
 
-        if (validUrls.length === 0) {
+        if (successCount === 0) {
             return NextResponse.json({ error: "Failed to enhance images. " + errors.join(", ") }, { status: 500 });
         }
 
+        // Return FULL 'results' array (including nulls) to preserve index alignment with frontend
         return NextResponse.json({
             success: true,
-            newImageUrl: validUrls[0],
-            newImageUrls: validUrls
+            newImageUrl: results[0],
+            newImageUrls: results
         });
 
     } catch (error: any) {
