@@ -49,8 +49,7 @@ export async function POST(req: Request) {
 
         // Models to try in order of preference
         const modelsToTry = [
-            "gemini-3-pro-image-preview", // Primary: Nano Banana Pro
-            "gemini-2.0-flash"          // Fallback: Stable Flash 2.0
+            "gemini-3-pro-image-preview" // STRICT: Gemini 3 Pro (Nano Banana Pro) ONLY
         ];
 
         const generatedUrls: string[] = [];
