@@ -154,57 +154,71 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
             {/* Attributes Selection */}
             {product.attributes?.map((attr) => (
-                <div key={attr.name} className="space-y-2">
-                    <div className="flex justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-foreground">{attr.name}</span>
-                        <div className="flex items-center gap-2">
-                            {selectedAttributes[attr.name] && (
-                                <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                                    {selectedAttributes[attr.name]}
-                                </span>
-                            )}
-                        </div>
+                <div key={attr.name} className="space-y-3">
+                    <div className="flex justify-between items-baseline">
+                        <span className="text-sm font-bold uppercase tracking-wider text-foreground">{attr.name}</span>
+                        {selectedAttributes[attr.name] && (
+                            <span className="text-xs font-medium text-muted-foreground animate-in fade-in">
+                                {selectedAttributes[attr.name]}
+                            </span>
+                        )}
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                         {attr.options.map((option) => {
                             const isSelected = selectedAttributes[attr.name] === option;
                             const optionImage = getOptionImage(attr.name, option);
 
-                            // VISUAL SWATCH (Image)
+                            // VISUAL SWATCH (Premium Image Card)
                             if (optionImage) {
                                 return (
                                     <button
                                         key={option}
                                         onClick={() => handleAttributeSelect(attr.name, option)}
                                         className={cn(
-                                            "group relative w-12 h-12 rounded-xl overflow-hidden border-2 transition-all shadow-sm hover:scale-105",
-                                            isSelected
-                                                ? "border-primary ring-2 ring-primary/20 ring-offset-1 scale-105"
-                                                : "border-transparent hover:border-border"
+                                            "group relative flex flex-col items-center gap-2 transition-all",
+                                            isSelected ? "scale-100" : "scale-95 opacity-80 hover:scale-100 hover:opacity-100"
                                         )}
                                         title={option}
                                     >
-                                        <img src={optionImage} alt={option} className="w-full h-full object-cover" />
-                                        {isSelected && (
-                                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                                <div className="bg-white rounded-full p-0.5 shadow-sm"><Check className="w-3 h-3 text-primary" /></div>
-                                            </div>
-                                        )}
+                                        <div className={cn(
+                                            "w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 transition-all shadow-sm relative",
+                                            isSelected
+                                                ? "border-primary ring-2 ring-primary/20 ring-offset-2"
+                                                : "border-gray-200 hover:border-gray-300"
+                                        )}>
+                                            <img src={optionImage} alt={option} className="w-full h-full object-cover" />
+
+                                            {/* Selected Checkmark Overlay */}
+                                            {isSelected && (
+                                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center backdrop-blur-[1px]">
+                                                    <div className="bg-white rounded-full p-1 shadow-md animate-in zoom-in spin-in-12 duration-300">
+                                                        <Check className="w-4 h-4 text-primary" strokeWidth={3} />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {/* Label below image - strictly limited width */}
+                                        <span className={cn(
+                                            "text-[10px] font-bold uppercase tracking-wide max-w-[64px] truncate transition-colors",
+                                            isSelected ? "text-primary" : "text-muted-foreground"
+                                        )}>
+                                            {option}
+                                        </span>
                                     </button>
                                 )
                             }
 
-                            // TEXT BUTTON SWATCH
+                            // TEXT BUTTON SWATCH (Clean Pill)
                             return (
                                 <button
                                     key={option}
                                     onClick={() => handleAttributeSelect(attr.name, option)}
                                     className={cn(
-                                        "px-4 py-2 text-xs font-bold rounded-lg border-2 transition-all min-w-[3rem]",
+                                        "px-5 py-2.5 text-sm font-bold rounded-xl border-2 transition-all min-w-[4rem]",
                                         isSelected
-                                            ? "border-primary bg-primary text-white shadow-md shadow-primary/20 scale-105"
-                                            : "border-muted hover:border-foreground/20 text-muted-foreground hover:text-foreground bg-white dark:bg-zinc-900"
+                                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/25 scale-105"
+                                            : "border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-900 bg-white"
                                     )}
                                 >
                                     {option}
