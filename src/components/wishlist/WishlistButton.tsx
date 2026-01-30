@@ -19,17 +19,27 @@ export function WishlistButton({ productId, size = 'md', className }: WishlistBu
     const router = useRouter();
 
     useEffect(() => {
-        checkWishlistStatus();
-    }, [productId]);
+        let isActive = true;
 
-    async function checkWishlistStatus() {
-        try {
-            const status = await WishlistService.isInWishlist(productId);
-            setIsWishlisted(status);
-        } catch (error) {
-            // Silently fail if not logged in
+        async function checkWishlistStatus() {
+            try {
+                const status = await WishlistService.isInWishlist(productId);
+                if (isActive) setIsWishlisted(status);
+            } catch (error: any) {
+                // Silently fail if not logged in or network/backend issue
+                // Specifically ignore 406 to prevent console noise if that's the issue
+                if (error?.status !== 406) {
+                    console.debug('Wishlist check silently failed:', error);
+                }
+            }
         }
-    }
+
+        checkWishlistStatus();
+
+        return () => {
+            isActive = false;
+        };
+    }, [productId]);
 
     async function handleToggle(e: React.MouseEvent) {
         e.preventDefault();

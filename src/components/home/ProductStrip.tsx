@@ -28,6 +28,15 @@ interface ProductStripProps {
 export function ProductStrip({ title, products, viewAllLink = '/shop' }: ProductStripProps) {
     const addToCart = useStore((state) => state.addToCart);
 
+    if (!Array.isArray(products)) {
+        console.error("ProductStrip received invalid products data:", products);
+        return null;
+    }
+
+    if (products.length === 0) {
+        return null;
+    }
+
     return (
         <section className="py-6 bg-background space-y-4">
             <div className="flex items-center justify-between px-4">

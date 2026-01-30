@@ -4,11 +4,12 @@ import { ProductStrip } from "@/components/home/ProductStrip";
 import { Benefits } from "@/components/home/Benefits";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { Newsletter } from "@/components/home/Newsletter";
-import { fetchProducts } from "@/lib/data";
+import { fetchProductsServer } from "@/lib/data-server"; // Use server-safe fetch
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 export default async function Home() {
   // Fetch all products
-  const products = await fetchProducts();
+  const products = await fetchProductsServer();
 
   // Filter for sections (using real logic now)
   const newArrivals = products.filter(p => p.tag === 'New' || p.is_new).slice(0, 4);
@@ -18,11 +19,19 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col min-h-screen pb-20">
-      <HeroSlider />
-      <Stories />
+      <ErrorBoundary>
+        <HeroSlider />
+      </ErrorBoundary>
+
+      <ErrorBoundary>
+        <Stories />
+      </ErrorBoundary>
+
       <Benefits />
 
-      <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
+      <ErrorBoundary>
+        <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
+      </ErrorBoundary>
 
       <CategoryGrid />
 
@@ -42,9 +51,11 @@ export default async function Home() {
         </div>
       </div>
 
-      <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
+      <ErrorBoundary>
+        <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
+      </ErrorBoundary>
 
       <Newsletter />
-    </div>
+    </div >
   );
 }
