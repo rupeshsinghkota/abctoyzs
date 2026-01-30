@@ -48,11 +48,20 @@ export function CategoryGrid() {
                         </div>
                     </Link>
                 ))}
-            </div>
 
-            <Link href="/category" className="mt-6 md:hidden w-full flex items-center justify-center gap-2 px-6 py-4 bg-secondary/50 rounded-xl font-bold">
-                View All Categories <ArrowRight className="w-4 h-4" />
-            </Link>
+                {/* View All Categories - fills the empty grid spot on mobile */}
+                <Link
+                    href="/category"
+                    className="md:hidden group relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/90 to-orange-600/90 shadow-lg hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 flex items-center justify-center"
+                >
+                    <div className="text-center text-white p-3">
+                        <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <ArrowRight className="w-5 h-5" />
+                        </div>
+                        <span className="font-bold text-xs uppercase tracking-wide">View All</span>
+                    </div>
+                </Link>
+            </div>
         </div>
     );
 }
