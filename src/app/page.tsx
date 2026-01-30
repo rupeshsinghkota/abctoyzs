@@ -4,34 +4,25 @@ import { ProductStrip } from "@/components/home/ProductStrip";
 import { Benefits } from "@/components/home/Benefits";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { Newsletter } from "@/components/home/Newsletter";
-import { fetchProductsServer } from "@/lib/data-server"; // Use server-safe fetch
-import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { fetchProducts } from "@/lib/data";
 
 export default async function Home() {
   // Fetch all products
-  const products = await fetchProductsServer();
+  const products = await fetchProducts();
 
   // Filter for sections (using real logic now)
-  const newArrivals = products.filter(p => p.tag === 'New' || p.is_new).slice(0, 10);
+  const newArrivals = products.filter(p => p.tag === 'New' || p.is_new).slice(0, 4);
 
   // If no 'Trending' tag exists in data, just take the high rated ones, or explicitly featured
-  const trending = products.filter(p => p.is_featured || p.rating >= 4.8 || p.tag === 'Best Seller').slice(0, 10);
+  const trending = products.filter(p => p.is_featured || p.rating >= 4.8 || p.tag === 'Best Seller').slice(0, 4);
 
   return (
     <div className="flex flex-col min-h-screen pb-20">
-      <ErrorBoundary>
-        <HeroSlider />
-      </ErrorBoundary>
-
-      <ErrorBoundary>
-        <Stories />
-      </ErrorBoundary>
-
+      <HeroSlider />
+      <Stories />
       <Benefits />
 
-      <ErrorBoundary>
-        <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
-      </ErrorBoundary>
+      <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
 
       <CategoryGrid />
 
@@ -51,11 +42,9 @@ export default async function Home() {
         </div>
       </div>
 
-      <ErrorBoundary>
-        <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
-      </ErrorBoundary>
+      <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
 
       <Newsletter />
-    </div >
+    </div>
   );
 }

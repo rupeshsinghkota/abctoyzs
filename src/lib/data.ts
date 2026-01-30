@@ -231,8 +231,11 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
         if (slug) {
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
             if (isUUID) {
+                // If it looks like a UUID, check BOTH slug (text) and id (uuid) cols
                 query = query.or(`slug.eq.${slug},id.eq.${slug}`);
             } else {
+                // If it's NOT a UUID (e.g. "bmw-m5"), ONLY check slug col. 
+                // Checks against ID col would crash with "invalid input syntax for type uuid"
                 query = query.eq('slug', slug);
             }
         }
@@ -247,7 +250,8 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
         if (!data || data.length === 0) {
             console.warn("[fetchProducts] Warning: Supabase returned no data. count:", data?.length);
 
-            // FALLBACK MECHANISM
+            // FALLBACK MECHANISM: If looking for a specific slug but failed, try fetching ALL and filtering.
+            // This fixes issues where 'eq' or 'or' query might fail due to RLS or tricky slug characters.
             if (slug) {
                 console.log(`[fetchProducts] Attempting Global Fallback for slug: ${slug}`);
                 const { data: allData } = await supabase.from('products').select('*, variants:product_variants(*)');
@@ -255,6 +259,7 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
                     const match = allData.find((p: any) => p.slug === slug || p.id === slug);
                     if (match) {
                         console.log("[fetchProducts] Found via Global Fallback!");
+                        // Use helper to process single item wrapped in array
                         return processProducts([match]);
                     }
                 }
@@ -321,7 +326,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
 }
 
 // Helper to map DB result to Product interface (extracted to avoid duplication)
-export function processProducts(data: any[]): Product[] {
+function processProducts(data: any[]): Product[] {
     // Merge with static products data
     return data.map((item: any) => {
         const mappedProduct = {
