@@ -112,23 +112,33 @@ export function ProductCard({ product, className }: ProductCardProps) {
             </Link>
 
             {/* Quick Add Button */}
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    addToCart({
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        image: product.image,
-                        quantity: 1,
-                        attributes: {}
-                    });
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-primary/5 to-orange-500/5 dark:from-primary/10 dark:to-orange-500/10 text-sm font-bold text-primary rounded-b-2xl border-t border-gray-100 dark:border-zinc-800 hover:from-primary hover:to-orange-500 hover:text-white transition-all duration-300 active:scale-95"
-            >
-                <ShoppingCart className="w-4 h-4" />
-                Add to Cart
-            </button>
+            {product.variants && product.variants.length > 0 ? (
+                <Link
+                    href={`/product/${product.slug}`}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-primary/5 to-orange-500/5 dark:from-primary/10 dark:to-orange-500/10 text-sm font-bold text-primary rounded-b-2xl border-t border-gray-100 dark:border-zinc-800 hover:from-primary hover:to-orange-500 hover:text-white transition-all duration-300 active:scale-95"
+                >
+                    <ShoppingCart className="w-4 h-4" />
+                    Choose Options
+                </Link>
+            ) : (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1,
+                            attributes: {}
+                        });
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-primary/5 to-orange-500/5 dark:from-primary/10 dark:to-orange-500/10 text-sm font-bold text-primary rounded-b-2xl border-t border-gray-100 dark:border-zinc-800 hover:from-primary hover:to-orange-500 hover:text-white transition-all duration-300 active:scale-95"
+                >
+                    <ShoppingCart className="w-4 h-4" />
+                    Add to Cart
+                </button>
+            )}
         </div>
     );
 }

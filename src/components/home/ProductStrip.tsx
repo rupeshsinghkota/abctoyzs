@@ -18,6 +18,7 @@ interface Product {
     mrp?: number;
     age_range?: string;
     is_featured?: boolean;
+    variants?: any[];
 }
 
 interface ProductStripProps {
@@ -69,6 +70,7 @@ export function ProductStrip({ title, products, viewAllLink = '/shop' }: Product
                     const isWishlisted = wishlist.has(product.id);
                     const hasReviews = product.reviews > 0;
                     const mrpValue = product.mrp && product.mrp > product.price ? product.mrp : product.price * 1.2;
+                    const hasVariants = product.variants && product.variants.length > 0;
 
                     return (
                         <div key={product.id} className="flex-none w-[155px] md:w-[220px] group">
@@ -121,17 +123,27 @@ export function ProductStrip({ title, products, viewAllLink = '/shop' }: Product
                                     </button>
 
                                     {/* Bottom - Quick Add Button */}
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            addToCart({ ...product, quantity: 1, image: product.image });
-                                        }}
-                                        className="absolute bottom-2 left-2 right-2 py-2 md:py-2.5 bg-white/95 dark:bg-black/90 backdrop-blur-sm rounded-xl flex items-center justify-center gap-2 font-semibold text-xs md:text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-primary hover:text-white shadow-lg"
-                                    >
-                                        <ShoppingBag className="w-4 h-4" />
-                                        <span className="hidden md:inline">Add to Cart</span>
-                                        <span className="md:hidden">Add</span>
-                                    </button>
+                                    {hasVariants ? (
+                                        <span
+                                            className="absolute bottom-2 left-2 right-2 py-2 md:py-2.5 bg-white/95 dark:bg-black/90 backdrop-blur-sm rounded-xl flex items-center justify-center gap-2 font-semibold text-xs md:text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-primary hover:text-white shadow-lg"
+                                        >
+                                            <ShoppingBag className="w-4 h-4" />
+                                            <span className="hidden md:inline">Choose Options</span>
+                                            <span className="md:hidden">Options</span>
+                                        </span>
+                                    ) : (
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                addToCart({ ...product, quantity: 1, image: product.image });
+                                            }}
+                                            className="absolute bottom-2 left-2 right-2 py-2 md:py-2.5 bg-white/95 dark:bg-black/90 backdrop-blur-sm rounded-xl flex items-center justify-center gap-2 font-semibold text-xs md:text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-primary hover:text-white shadow-lg"
+                                        >
+                                            <ShoppingBag className="w-4 h-4" />
+                                            <span className="hidden md:inline">Add to Cart</span>
+                                            <span className="md:hidden">Add</span>
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Product Details */}
