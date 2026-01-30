@@ -39,7 +39,7 @@ export function ProductStrip({ title, products, viewAllLink = '/shop' }: Product
 
             <div className="flex gap-4 overflow-x-auto px-4 pb-4 no-scrollbar">
                 {products.map((product, index) => (
-                    <div key={product.id} className={cn("flex-none w-[160px] md:w-[220px] group relative", index >= 4 && "md:hidden")}>
+                    <div key={product.id} className="flex-none w-[160px] md:w-[220px] group relative">
                         {/* Fix: Use slug for link, fallback to ID if needed but slug is preferred */}
                         <Link href={`/product/${product.slug || product.id}`} className="block space-y-3">
                             {/* Image Card */}
