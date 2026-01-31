@@ -134,13 +134,13 @@ STRICT PRESERVATION RULES:
    - Apply "Neutral Studio Lighting" (Pure White Light).
    - Replace Background.
 
-BRANDING CLEANUP:
-1. **REMOVE STICKERS**: Erase ALL random stickers/decals from the windshield, doors, and hood (e.g. "4x4", "Power", "Turbo", "11CART", "UEKUT"). Make the surface CLEAN body color.
-2. **LICENSE PLATE**: Must read "ABC TOYZ".
-3. **NO HALLUCINATED BRANDS**: 
+BRANDING & TEXT PRESERVATION:
+1. **PRESERVE PRODUCT SPECS (CRITICAL)**: If the input image contains technical details or specs (e.g., "12V 7Ah", "4 Motors", "Remote Control", "Leather Seat"), you MUST PRESERVE and NEATLY REPRODUCE this text in the output image. Place it professionally in a corner or near the product as it was in the source.
+2. **REMOVE NOISY STICKERS**: Erase ALL random, low-quality stickers/decals from the windshield and body (e.g. "4x4", "Power", "Turbo", "11CART", "UEKUT"). Replace with a clean body color.
+3. **LICENSE PLATE**: Must read "ABC TOYZ".
+4. **NO HALLUCINATED BRANDS**: 
    - DO NOT ADD any brand names (e.g. Ford, BMW, Jeep) if they are not clearly visible in the source.
    - If the Grille is blank, KEEP IT BLANK. Do not invent a logo.
-   - If the hood is empty, KEEP IT EMPTY.
 
 BACKGROUND:
 ${backgroundPrompt}
