@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import fs from 'fs';
 import path from 'path';
 
+import { AI_BACKGROUND_SCENES, getRandomScene } from "@/config/ai-scenes";
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 export const maxDuration = 300; // 5 minute timeout
 
@@ -104,15 +106,11 @@ export async function POST(req: Request) {
                     }, { timeout: 300000 });
 
                     // DYNAMIC BACKGROUND SELECTOR (Variety)
-                    const BACKGROUNDS = [
-                        "Luxury Modern Mansion Driveway (Paved, Geometric Architecture, Golden Hour)",
-                        "Scenic Coastal Highway (Ocean view, Blue Sky, Bright Sunlight)",
-                        "Urban City Rooftop at Twilight (Bokeh City Lights, Wet Concrete)",
-                        "Minimalist Concrete Architectural Space (Soft Shadows, Industrial Chic)",
-                        "Sunny Forest Glade (Dappled Light, Nature Path, Vibration Colors)",
-                        "High-Tech Showroom (Clean White/Grey, Studio Reflections, Strip Lights)"
-                    ];
-                    const randomBg = BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)];
+                    const scene = getRandomScene();
+                    const backgroundPrompt = `
+- **SCENE**: ${scene.description}.
+- **LIGHTING**: ${scene.lighting}
+- **STYLE**: ${scene.style}, Cinematic Depth of Field (Bokeh).`;
 
                     const prompt = `COMMERCIAL PHOTO RETOUCHING TASK:
 
@@ -145,8 +143,8 @@ BRANDING CLEANUP:
    - If the hood is empty, KEEP IT EMPTY.
 
 BACKGROUND:
-- **SCENE**: ${randomBg}.
-- **STYLE**: Ultra-Realistic, Cinematic Depth of Field (Bokeh).
+${backgroundPrompt}
+- **STYLE**: Ultra-Realistic.
 - **LIGHTING**: PURE DAYLIGHT (5500K). NO ORANGE TINT. NO FILTERS.
 
 NEGATIVE PROMPT:

@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import fs from 'fs';
 import path from 'path';
 
+import { AI_BACKGROUND_SCENES } from "@/config/ai-scenes";
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
@@ -46,33 +48,44 @@ export async function POST(req: Request) {
         let camAngle = "";
 
         if (layoutStyle === 'SPEED_MOTION') {
+            const scene = AI_BACKGROUND_SCENES.RACING_TRACK;
             layoutInstructions = `
-            STYLE: HIGH-ENERGY COMMERCIAL.
+            STYLE: HIGH-ENERGY COMMERCIAL PHOTOGRAPHY.
             COMPOSITION: Dynamic motion shot. The vehicle should look like it's MOVING FAST (slight motion blur on wheels/background).
-            TEXT LAYOUT: Large, BOLD, ITALICIZED typography "RACING STYLE" on the side. 
-            BACKGROUND: A blurred race track, desert flat, or neon city street to imply speed.`;
+            TEXT LAYOUT: Large, BOLD, ITALICIZED typography "RACING STYLE" on the side (or integrated). 
+            BACKGROUND: ${scene.description}.
+            LIGHTING: ${scene.lighting}
+            AESTHETIC: ${scene.style}`;
             camAngle = "Low-angle action shot, incoming 3/4 view.";
         } else if (layoutStyle === 'COMFORT_LIFESTYLE') {
+            const scene = AI_BACKGROUND_SCENES.SUNNY_PARK;
             layoutInstructions = `
             STYLE: WARM LIFESTYLE PHOTOGRAPHY.
-            COMPOSITION: Medium close-up showing the INTERIOR and SEATING. If possible, imply a happy child driving (or just the empty premium seat inviting a rider).
-            TEXT LAYOUT: Clean, soft, serif typography describing comfort.
-            BACKGROUND: A beautiful suburban driveway, garden, or park on a sunny day.`;
+            COMPOSITION: Medium close-up showing the INTERIOR and SEATING highlighting luxury comfort.
+            TEXT LAYOUT: Clean, soft, serif typography.
+            BACKGROUND: ${scene.description}.
+            LIGHTING: ${scene.lighting}
+            AESTHETIC: ${scene.style}`;
             camAngle = "Eye-level side view looking into the cockpit/seat area.";
         } else if (layoutStyle === 'DURABILITY_OFFROAD') {
             layoutInstructions = `
             STYLE: RUGGED & TOUGH.
             COMPOSITION: Powerful, grounded stance. The vehicle looks solid and unbreakable.
             TEXT LAYOUT: Strong, blocky, industrial typography.
-            BACKGROUND: A slightly rougher terrain like a gravel path, grass, or rocky texture to show off-road capability.`;
+            BACKGROUND: A slightly rougher terrain like a gravel path, grass, or rocky texture to show off-road capability.
+            LIGHTING: Sharp, high-contrast natural sunlight.
+            AESTHETIC: Gritty, detailed, high-resolution textures.`;
             camAngle = "Low-angle front view, emphasizing the tires and grille.";
         } else {
             // Default to LUXURY_MINIMAL
+            const scene = AI_BACKGROUND_SCENES.LUXURY_MANSION;
             layoutInstructions = `
             STYLE: ELEGANT & SOPHISTICATED.
-            COMPOSITION: Static, majestic hero shot. 
+            COMPOSITION: Static, majestic hero shot with premium vibes. 
             TEXT LAYOUT: Clean, thin, elegant typography "MAGAZINE STYLE" with plenty of negative space.
-            BACKGROUND: A modern architectural driveway, marble floor, or sunset vibe.`;
+            BACKGROUND: ${scene.description}.
+            LIGHTING: ${scene.lighting}
+            AESTHETIC: ${scene.style}`;
             camAngle = "Eye-level side profile or majestic front-3/4 view.";
         }
 
