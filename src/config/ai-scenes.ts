@@ -63,6 +63,30 @@ export const AI_BACKGROUND_SCENES = {
         description: "A sophisticated dark charcoal grey studio background with a subtle matte texture.",
         lighting: "Dramatic spotlighting on the product, deep shadows, premium luxury feel.",
         style: "Luxury Goods, Moody, Sophisticated, high contrast."
+    },
+    SWISS_ALPS: {
+        name: "Majestic Swiss Alps",
+        description: "A breathtaking view of snow-capped mountain peaks under a crystal clear blue sky. A winding alpine road carved into the mountainside.",
+        lighting: "Crisp morning sunlight, high-altitude clarity, subtle lens flare.",
+        style: "Epic Landscape Photography, Cinematic, 12K detail, awe-inspiring scale."
+    },
+    DESERT_OASIS: {
+        name: "Grand Desert Dunes",
+        description: "Infinite rolling sand dunes of the Sahara at sunset. The sand has a beautiful rippled texture.",
+        lighting: "Deep orange sunset glow, long dramatic shadows, warm atmospheric haze.",
+        style: "Cinematic Travel, National Geographic style, high contrast, vibrant textures."
+    },
+    FOREST_LAKE: {
+        name: "Serene Mountain Lake",
+        description: "A mirror-like lake reflecting a dense pine forest and jagged mountain peaks. A wooden pier or gravel shore in the foreground.",
+        lighting: "Soft morning mist, diffused sunlight through trees, cool refreshing tones.",
+        style: "Tranquil Nature, Sharp Reflections, 8K, peaceful atmosphere."
+    },
+    MOUNTAIN_PASS: {
+        name: "Epic High-Mountain Pass",
+        description: "A high-altitude road with dramatic hairpins and sheer drops, overlooking a vast valley below. Clouds are below the road level.",
+        lighting: "Dramatic stormy sky with sunbeams breaking through (God rays), high drama.",
+        style: "Automotive Commercial, Professional Drone Shot, extreme depth of field."
     }
 };
 
@@ -76,6 +100,11 @@ export function getRandomScene(): typeof AI_BACKGROUND_SCENES[SceneKey] {
 export function getStudioScene(): typeof AI_BACKGROUND_SCENES[SceneKey] {
     const studioKeys: SceneKey[] = ["STUDIO_PREMIUM", "STUDIO_WHITE", "STUDIO_GREY"];
     return AI_BACKGROUND_SCENES[studioKeys[Math.floor(Math.random() * studioKeys.length)]];
+}
+
+export function getHeroScene(): typeof AI_BACKGROUND_SCENES[SceneKey] {
+    const heroKeys: SceneKey[] = ["SWISS_ALPS", "DESERT_OASIS", "FOREST_LAKE", "MOUNTAIN_PASS", "LUXURY_MANSION", "COASTAL_HIGHWAY"];
+    return AI_BACKGROUND_SCENES[heroKeys[Math.floor(Math.random() * heroKeys.length)]];
 }
 
 export function getScenePrompt(sceneKey: SceneKey): string {
