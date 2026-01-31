@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import fs from 'fs';
 import path from 'path';
 
-import { AI_BACKGROUND_SCENES, getRandomScene } from "@/config/ai-scenes";
+import { AI_BACKGROUND_SCENES, getStudioScene } from "@/config/ai-scenes";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 export const maxDuration = 300; // 5 minute timeout
@@ -105,12 +105,12 @@ export async function POST(req: Request) {
                         ],
                     }, { timeout: 300000 });
 
-                    // DYNAMIC BACKGROUND SELECTOR (Variety)
-                    const scene = getRandomScene();
+                    // DYNAMIC BACKGROUND SELECTOR (Gallery Optimization)
+                    const scene = getStudioScene();
                     const backgroundPrompt = `
 - **SCENE**: ${scene.description}.
 - **LIGHTING**: ${scene.lighting}
-- **STYLE**: ${scene.style}, Cinematic Depth of Field (Bokeh).`;
+- **STYLE**: ${scene.style}`;
 
                     const prompt = `COMMERCIAL PHOTO RETOUCHING TASK:
 

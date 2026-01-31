@@ -45,6 +45,24 @@ export const AI_BACKGROUND_SCENES = {
         description: "The pit lane or starting grid of a modern Formula 1 track. Curved red and white curbs, blurred grandstands.",
         lighting: "Dramatic overcast lighting, slightly moody, focus on textures of the asphalt.",
         style: "High-energy, Action Sport, Professional Racing, motion blur on wheels."
+    },
+    STUDIO_PREMIUM: {
+        name: "Premium Product Studio",
+        description: "A professional photographic studio with a seamless infinity curve background. Extremely clean and high-end feel.",
+        lighting: "Softbox lighting from both sides, subtle rim light to define edges, neutral color temperature (5500K).",
+        style: "Commercial Product Photography, Clean, Minimalist, 8K resolution, sharp focus."
+    },
+    STUDIO_WHITE: {
+        name: "Pure White Studio",
+        description: "A bright, high-key pure white studio background with an invisible floor-to-wall transition.",
+        lighting: "Bright, even illumination, no harsh shadows, soft gray gradient under the product.",
+        style: "E-commerce Catalog, Clean, Bright, minimalist."
+    },
+    STUDIO_GREY: {
+        name: "Deep Charcoal Studio",
+        description: "A sophisticated dark charcoal grey studio background with a subtle matte texture.",
+        lighting: "Dramatic spotlighting on the product, deep shadows, premium luxury feel.",
+        style: "Luxury Goods, Moody, Sophisticated, high contrast."
     }
 };
 
@@ -53,6 +71,11 @@ export type SceneKey = keyof typeof AI_BACKGROUND_SCENES;
 export function getRandomScene(): typeof AI_BACKGROUND_SCENES[SceneKey] {
     const keys = Object.keys(AI_BACKGROUND_SCENES) as SceneKey[];
     return AI_BACKGROUND_SCENES[keys[Math.floor(Math.random() * keys.length)]];
+}
+
+export function getStudioScene(): typeof AI_BACKGROUND_SCENES[SceneKey] {
+    const studioKeys: SceneKey[] = ["STUDIO_PREMIUM", "STUDIO_WHITE", "STUDIO_GREY"];
+    return AI_BACKGROUND_SCENES[studioKeys[Math.floor(Math.random() * studioKeys.length)]];
 }
 
 export function getScenePrompt(sceneKey: SceneKey): string {
