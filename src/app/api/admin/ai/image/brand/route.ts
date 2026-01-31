@@ -135,12 +135,14 @@ STRICT PRESERVATION RULES:
    - Replace Background.
 
 BRANDING & TEXT PRESERVATION:
-1. **PRESERVE PRODUCT SPECS (CRITICAL)**: If the input image contains technical details or specs (e.g., "12V 7Ah", "4 Motors", "Remote Control", "Leather Seat"), you MUST PRESERVE and NEATLY REPRODUCE this text in the output image. Place it professionally in a corner or near the product as it was in the source.
-2. **REMOVE NOISY STICKERS**: Erase ALL random, low-quality stickers/decals from the windshield and body (e.g. "4x4", "Power", "Turbo", "11CART", "UEKUT"). Replace with a clean body color.
+1. **PRESERVE PRODUCT AUTHENTICITY (CRITICAL)**: 
+   - **KEEP**: Car Brand Logos that are part of the physical product (e.g., Ferrari shields on the hood/sides, Mercedes stars on the grille). These are DESIRED.
+   - **KEEP**: Technical specs text (e.g., "12V 7Ah", "4 Motors", "Remote Control"). Neatly reproduce these if they are present in the source.
+2. **STRICT WATERMARK REMOVAL**: 
+   - **ERASE**: All seller/retailer logos, corner watermarks, and circular icons (e.g., "JN Creations", "11Cart", or any shop branding).
+   - **ERASE**: Any floating arrows, promotional text, or generic banners ("Swing Mode", "Forward/Backward").
+   - **CLEAN SURFACE**: Ensure the car body and the environment are free of digital overlays and stickers that are not part of the physical toy.
 3. **LICENSE PLATE**: Must read "ABC TOYZ".
-4. **NO HALLUCINATED BRANDS**: 
-   - DO NOT ADD any brand names (e.g. Ford, BMW, Jeep) if they are not clearly visible in the source.
-   - If the Grille is blank, KEEP IT BLANK. Do not invent a logo.
 
 BACKGROUND:
 ${backgroundPrompt}
