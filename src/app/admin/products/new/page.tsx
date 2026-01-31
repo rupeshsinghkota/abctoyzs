@@ -8,7 +8,7 @@ import {
     ArrowLeft, Save, Loader2, ImagePlus, X, Zap,
     Users, Gauge, Battery, Smartphone, Tag, Star,
     Package, DollarSign, Hash, Layers, Split, Check,
-    Upload, Sparkles
+    Upload, Sparkles, Edit, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { VEHICLE_CATEGORIES, AGE_CATEGORIES } from '@/lib/data';
 
@@ -46,6 +46,7 @@ export default function NewProductPage() {
     // Variations State
     const [attributes, setAttributes] = useState<Attribute[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
+    const [selectingImageForVariant, setSelectingImageForVariant] = useState<number | null>(null);
 
     const [formData, setFormData] = useState({
         slug: '',
@@ -476,6 +477,16 @@ export default function NewProductPage() {
         setFormData({ ...formData, [field]: newList.length ? newList : [''] });
     };
 
+    const moveImage = (index: number, direction: 'left' | 'right') => {
+        const newImages = [...formData.images];
+        if (direction === 'left' && index > 0) {
+            [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+        } else if (direction === 'right' && index < newImages.length - 1) {
+            [newImages[index + 1], newImages[index]] = [newImages[index], newImages[index + 1]];
+        }
+        setFormData({ ...formData, images: newImages });
+    };
+
     const addAttribute = () => {
         setAttributes([...attributes, { name: '', options: [], tempOptions: '' }]);
     };
@@ -719,7 +730,27 @@ export default function NewProductPage() {
                                                             </button>
                                                         )}
 
-                                                        <div className="flex gap-1">
+                                                        <div className="flex gap-1 items-center">
+                                                            {/* Move Controls */}
+                                                            <div className="flex bg-white/20 backdrop-blur-md rounded-lg p-0.5 border border-white/20">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveImage(index, 'left')}
+                                                                    disabled={index === 0}
+                                                                    className="p-1 hover:bg-white/30 rounded transition-colors disabled:opacity-30"
+                                                                >
+                                                                    <ChevronLeft className="w-3.5 h-3.5 text-white" />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveImage(index, 'right')}
+                                                                    disabled={index === formData.images.length - 1 || !formData.images[index + 1]?.trim()}
+                                                                    className="p-1 hover:bg-white/30 rounded transition-colors disabled:opacity-30"
+                                                                >
+                                                                    <ChevronRight className="w-3.5 h-3.5 text-white" />
+                                                                </button>
+                                                            </div>
+
                                                             <button
                                                                 type="button"
                                                                 onClick={() => brandImage(index)}
@@ -736,7 +767,7 @@ export default function NewProductPage() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => removeListField('images', index)}
-                                                                className="p-2 bg-red-500 text-white rounded-full hover:scale-110 transition-transform"
+                                                                className="p-1.5 bg-red-500 text-white rounded-lg hover:scale-110 transition-transform"
                                                             >
                                                                 <X className="w-4 h-4" />
                                                             </button>
@@ -976,26 +1007,23 @@ export default function NewProductPage() {
                                         {variants.map((variant, index) => (
                                             <div key={index} className="p-4 bg-background border rounded-xl flex flex-col md:flex-row gap-4 items-start md:items-center">
 
-                                                {/* Image Picker for Variant */}
-                                                <div className="relative group w-20 h-20 bg-muted/50 rounded-lg overflow-hidden shrink-0 border-2 border-dashed hover:border-solid hover:border-primary cursor-pointer">
+                                                {/* Image Picker for Variant (Click to Open Modal) */}
+                                                <div
+                                                    className="relative group w-20 h-20 bg-muted/50 rounded-lg overflow-hidden shrink-0 border-2 border-dashed hover:border-solid hover:border-primary cursor-pointer transition-colors"
+                                                    onClick={() => setSelectingImageForVariant(index)}
+                                                >
                                                     {variant.image ? (
                                                         <img src={variant.image} alt={variant.name} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-muted-foreground"><ImagePlus className="w-6 h-6" /></div>
+                                                        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-1">
+                                                            <ImagePlus className="w-5 h-5" />
+                                                            <span className="text-[9px] font-bold uppercase">Select</span>
+                                                        </div>
                                                     )}
 
-                                                    {/* Mini Image Picker overlay on hover */}
-                                                    <div className="absolute inset-0 bg-white dark:bg-black bg-opacity-95 opacity-0 group-hover:opacity-100 transition-opacity p-1 overflow-y-auto grid grid-cols-2 gap-1 z-10">
-                                                        {validImages.map((img, i) => (
-                                                            <button
-                                                                type="button"
-                                                                key={i}
-                                                                onClick={() => updateVariant(index, 'image', img)}
-                                                                className="aspect-square bg-muted rounded overflow-hidden"
-                                                            >
-                                                                <img src={img} className="w-full h-full object-cover" />
-                                                            </button>
-                                                        ))}
+                                                    {/* Hover Overlay Hint */}
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <Edit className="w-5 h-5 text-white" />
                                                     </div>
                                                 </div>
 
@@ -1352,6 +1380,63 @@ export default function NewProductPage() {
                     Create Product
                 </button>
             </div >
+
+            {/* IMAGE PICKER MODAL */}
+            {selectingImageForVariant !== null && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+                        <div className="p-6 border-b flex justify-between items-center">
+                            <h3 className="text-xl font-black">Select Image for Variation</h3>
+                            <button
+                                type="button"
+                                onClick={() => setSelectingImageForVariant(null)}
+                                className="p-2 hover:bg-muted rounded-full transition-colors"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {/* Option to Clear Image */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (selectingImageForVariant !== null) {
+                                            updateVariant(selectingImageForVariant, 'image', '');
+                                            setSelectingImageForVariant(null);
+                                        }
+                                    }}
+                                    className="aspect-square rounded-2xl border-2 border-dashed border-muted flex flex-col items-center justify-center gap-2 hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-all font-bold text-muted-foreground"
+                                >
+                                    <X className="w-8 h-8" />
+                                    <span>No Image</span>
+                                </button>
+
+                                {/* Product Images */}
+                                {formData.images.filter(img => img.trim()).map((img, i) => (
+                                    <button
+                                        type="button"
+                                        key={i}
+                                        onClick={() => {
+                                            if (selectingImageForVariant !== null) {
+                                                updateVariant(selectingImageForVariant, 'image', img);
+                                                setSelectingImageForVariant(null);
+                                            }
+                                        }}
+                                        className="group relative aspect-square rounded-2xl overflow-hidden border-2 border-transparent hover:border-primary hover:shadow-xl hover:scale-105 transition-all outline-none"
+                                    >
+                                        <img src={img} className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <span className="text-white font-bold bg-black/50 px-3 py-1 rounded-full backdrop-blur-md">Select</span>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 }

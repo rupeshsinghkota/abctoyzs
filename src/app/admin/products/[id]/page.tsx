@@ -8,7 +8,7 @@ import {
     ArrowLeft, Save, Loader2, ImagePlus, X, Zap,
     Users, Gauge, Battery, Smartphone, Tag, Star,
     Package, DollarSign, Hash, Layers, Split, Check,
-    Upload, Sparkles, Edit
+    Upload, Sparkles, Edit, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { VEHICLE_CATEGORIES, AGE_CATEGORIES } from '@/lib/data';
 
@@ -568,6 +568,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         setFormData({ ...formData, [field]: newList.length ? newList : [''] });
     };
 
+    const moveImage = (index: number, direction: 'left' | 'right') => {
+        const newImages = [...formData.images];
+        if (direction === 'left' && index > 0) {
+            [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+        } else if (direction === 'right' && index < newImages.length - 1) {
+            [newImages[index + 1], newImages[index]] = [newImages[index], newImages[index + 1]];
+        }
+        setFormData({ ...formData, images: newImages });
+    };
+
     const addAttribute = () => {
         setAttributes([...attributes, { name: '', options: [], tempOptions: '' }]);
     };
@@ -831,12 +841,32 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                                 Set as Main
                                                             </button>
                                                         )}
-                                                        <div className="flex gap-2">
+                                                        <div className="flex gap-1 items-center">
+                                                            {/* Move Controls */}
+                                                            <div className="flex bg-white/20 backdrop-blur-md rounded-lg p-0.5 border border-white/20">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveImage(index, 'left')}
+                                                                    disabled={index === 0}
+                                                                    className="p-1 hover:bg-white/30 rounded transition-colors disabled:opacity-30"
+                                                                >
+                                                                    <ChevronLeft className="w-3.5 h-3.5 text-white" />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveImage(index, 'right')}
+                                                                    disabled={index === formData.images.length - 1 || !formData.images[index + 1]?.trim()}
+                                                                    className="p-1 hover:bg-white/30 rounded transition-colors disabled:opacity-30"
+                                                                >
+                                                                    <ChevronRight className="w-3.5 h-3.5 text-white" />
+                                                                </button>
+                                                            </div>
+
                                                             <button
                                                                 type="button"
                                                                 onClick={() => brandImage(index)}
                                                                 disabled={brandingIndex === index}
-                                                                className="p-2 bg-purple-600 text-white rounded-full hover:scale-110 transition-transform disabled:opacity-50"
+                                                                className="p-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
                                                                 title="✨ Brand & Enhance with AI"
                                                             >
                                                                 {brandingIndex === index ? (
@@ -848,7 +878,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                             <button
                                                                 type="button"
                                                                 onClick={() => removeListField('images', index)}
-                                                                className="p-2 bg-red-500 text-white rounded-full hover:scale-110 transition-transform"
+                                                                className="p-1.5 bg-red-500 text-white rounded-lg hover:scale-110 transition-transform"
                                                             >
                                                                 <X className="w-4 h-4" />
                                                             </button>
