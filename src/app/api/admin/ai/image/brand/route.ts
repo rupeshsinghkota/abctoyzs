@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         console.log(`Processing ${allImageUrls.length} images for product: ${productName}`);
 
         // OPTION A: ONE-TO-ONE ENHANCEMENT (Background Swap / Quality Up)
-        const CONCURRENCY_LIMIT = 2;
+        const CONCURRENCY_LIMIT = 1; // Strictly serial for preview model to prevent aborts
         const results = new Array(allImageUrls.length).fill(null);
         let errors: string[] = [];
 
@@ -195,9 +195,18 @@ ASPECT RATIO: 1:1 (SQUARE).`;
                     }
                 } catch (error: any) {
                     console.error(`Error enhancing image ${index}:`, error);
-                    if (error.message?.includes("503") || error.message?.includes("429")) {
+                    const isRetryable =
+                        error.message?.includes("503") ||
+                        error.message?.includes("429") ||
+                        error.message?.includes("aborted") ||
+                        error.message?.includes("timeout") ||
+                        error.message?.includes("fetch");
+
+                    if (isRetryable && retries < MAX_RETRIES) {
                         retries++;
-                        await new Promise(r => setTimeout(r, retries * 2000));
+                        const delay = retries * 5000; // 5s, 10s, 15s backoff
+                        console.log(`Retrying image ${index} in ${delay}ms...`);
+                        await new Promise(r => setTimeout(r, delay));
                     } else {
                         errors.push(`Image ${index}: ${error.message}`);
                         break;
