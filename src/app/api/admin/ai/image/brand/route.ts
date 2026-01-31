@@ -91,7 +91,7 @@ export async function POST(req: Request) {
                     console.log(`Enhancing Image ${index + 1} (Try ${retries + 1})...`);
 
                     const model = genAI.getGenerativeModel({
-                        model: "gemini-3-pro-image-preview",
+                        model: "gemini-1.5-flash",
                         generationConfig: {
                             temperature: 0.0,
                             topP: 0.95,

@@ -136,7 +136,15 @@ export default function NewProductPage() {
                     productName: formData.name
                 })
             });
-            const { newImageUrl, error } = await res.json();
+            let data;
+            const resText = await res.text();
+            try {
+                data = JSON.parse(resText);
+            } catch (e) {
+                throw new Error(`Invalid response from server. Status: ${res.status}. Help: ${resText.slice(0, 100)}`);
+            }
+
+            const { newImageUrl, error } = data;
             if (error) throw new Error(error);
 
             setFormData(prev => {
@@ -174,7 +182,15 @@ export default function NewProductPage() {
                 })
             });
 
-            const { newImageUrls, error } = await res.json();
+            let data;
+            const resText = await res.text();
+            try {
+                data = JSON.parse(resText);
+            } catch (e) {
+                throw new Error(`Invalid response from server. Status: ${res.status}. Help: ${resText.slice(0, 100)}`);
+            }
+
+            const { newImageUrls, error } = data;
             if (error) throw new Error(error);
 
             if (newImageUrls && newImageUrls.length > 0) {
