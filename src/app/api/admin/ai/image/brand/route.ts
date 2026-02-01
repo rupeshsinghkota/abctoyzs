@@ -48,12 +48,41 @@ export async function POST(req: Request) {
         }
 
         // 3. Prepare AI Interaction
-        const scene = getHeroScene();
-        // Simplified prompt to avoid MALFORMED_FUNCTION_CALL on Gemini 3 Pro
-        const prompt = `Commercial product photography of ${productName} in a ${scene.description}. The lighting is ${scene.lighting}. The style is ${scene.style}. The product has an "ABC TOYZ" license plate. High quality, 8k resolution.`;
+        // 3. STEP 1: ANALYST (Gemini 2.0 Flash)
+        // "Think" about the best background and description
+        const analystModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const analystPrompt = `You are an expert visual describer.
+        Analyze the input image of the product "${productName}".
+        
+        YOUR TASK:
+        Output a single paragraph describing the final image to be generated.
+        The description must be purely visual. DO NOT use words like "ensure", "remove", "task", "job", "verify", or "create".
+        
+        Structure the description like this:
+        "A commercial photograph of [Product Description] placed in [Scene Description]. The lighting is [Lighting]. The view is identical to the original input. The license plate reads 'ABC TOYZ'."
+        
+        CRITICAL:
+        - Decide the best background for this product (e.g., if it's a car, put it on a road; if a toy, a playroom).
+        - Mention "The license plate reads 'ABC TOYZ'".
+        - DO NOT write instructions. Write the description of the final result only.
+        `;
+
+        let generatedPrompt = "";
+        try {
+            console.log(`[AI] Step 1: Analyst thinking...`);
+            const analystResult = await analystModel.generateContent([
+                analystPrompt,
+                { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }
+            ]);
+            generatedPrompt = analystResult.response.text().trim();
+            console.log(`[AI] Step 1 Result: "${generatedPrompt}"`);
+        } catch (e) {
+            console.log(`[AI] Step 1 failed, falling back to static prompt.`);
+            generatedPrompt = `Commercial product photography of ${productName}. The product has an "ABC TOYZ" license plate. High quality, 8k resolution.`;
+        }
 
         const contentParts: any[] = [
-            { text: prompt },
+            { text: generatedPrompt },
             { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }
         ];
 
@@ -63,41 +92,24 @@ export async function POST(req: Request) {
 
         // 4. GENERATION with FALLBACK
         let resultImageBase64 = null;
-        const modelsToTry = ["gemini-3-pro-image-preview", "gemini-1.5-flash"];
+        const model = genAI.getGenerativeModel({
+            model: "gemini-3-pro-image-preview",
+            generationConfig: { temperature: 0.1, topP: 0.95 },
+            safetySettings: [
+                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+            ]
+        }, { timeout: 120000 });
 
-        for (const modelName of modelsToTry) {
-            try {
-                console.log(`[AI] Attempting generation with ${modelName}...`);
-                const model = genAI.getGenerativeModel({
-                    model: modelName,
-                    generationConfig: { temperature: 0.1, topP: 0.95 },
-                    safetySettings: [
-                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                    ]
-                }, { timeout: 120000 }); // 2 min timeout per model
+        const result = await model.generateContent(contentParts);
+        const response = await result.response;
 
-                const result = await model.generateContent(contentParts);
-                const response = await result.response;
-
-                if (response.candidates && response.candidates[0].content?.parts) {
-                    for (const part of response.candidates[0].content.parts) {
-                        if ((part as any).inlineData?.data) {
-                            resultImageBase64 = (part as any).inlineData.data;
-                            break;
-                        }
-                    }
-                }
-
-                if (resultImageBase64) {
-                    console.log(`[AI] Success with ${modelName}!`);
+        if (response.candidates && response.candidates[0].content?.parts) {
+            for (const part of response.candidates[0].content.parts) {
+                if ((part as any).inlineData?.data) {
+                    resultImageBase64 = (part as any).inlineData.data;
                     break;
                 }
-            } catch (err: any) {
-                console.error(`[AI] ${modelName} failed:`, err.message);
-                // If it's the last model, throw the error
-                if (modelName === modelsToTry[modelsToTry.length - 1]) throw err;
-                console.log(`[AI] Retrying with fallback model...`);
             }
         }
 
