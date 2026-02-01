@@ -163,49 +163,25 @@ export default function NewProductPage() {
     };
 
     const brandAllImages = async () => {
-        const imagesToBrand = formData.images.filter(img => img.trim() !== '');
-        if (imagesToBrand.length === 0) {
+        const imageIndices = formData.images
+            .map((img, i) => img.trim() !== '' ? i : -1)
+            .filter(i => i !== -1);
+
+        if (imageIndices.length === 0) {
             alert('Please upload some images first');
             return;
         }
 
         setIsBrandingAll(true);
         try {
-            // Process each image individually - enhance background while keeping product identical
-            const res = await fetch('/api/admin/ai/image/brand', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    imageUrls: imagesToBrand,
-                    productName: formData.name,
-                    generateAll: true // Enhance each image
-                })
-            });
-
-            let data;
-            const resText = await res.text();
-            try {
-                data = JSON.parse(resText);
-            } catch (e) {
-                throw new Error(`Invalid response from server. Status: ${res.status}. Help: ${resText.slice(0, 100)}`);
+            console.log(`Sequential Branding started for ${imageIndices.length} images...`);
+            let count = 0;
+            for (const index of imageIndices) {
+                console.log(`Branding image ${count + 1}/${imageIndices.length}...`);
+                const success = await brandImage(index);
+                if (success) count++;
             }
-
-            const { newImageUrls, error } = data;
-            if (error) throw new Error(error);
-
-            if (newImageUrls && newImageUrls.length > 0) {
-                // Replace images with enhanced versions (better background, same product)
-                setFormData(prev => {
-                    const freshImages = [...prev.images];
-                    newImageUrls.forEach((url: string, i: number) => {
-                        if (i < freshImages.length) {
-                            freshImages[i] = url;
-                        }
-                    });
-                    return { ...prev, images: freshImages };
-                });
-                alert(`✨ Enhanced ${newImageUrls.length} images with professional backgrounds!`);
-            }
+            alert(`✨ Enhanced ${count} images with professional backgrounds!`);
         } catch (error: any) {
             console.error(error);
             alert('Image enhancement failed: ' + error.message);

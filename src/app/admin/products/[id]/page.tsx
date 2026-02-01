@@ -250,57 +250,42 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     };
 
     const brandAllImages = async () => {
-        const imagesToBrand = formData.images.filter(img => img.trim() !== '');
-        if (imagesToBrand.length === 0) {
+        const imageIndices = formData.images
+            .map((img, i) => img.trim() !== '' ? i : -1)
+            .filter(i => i !== -1);
+
+        if (imageIndices.length === 0) {
             alert('Please upload some images first');
             return;
         }
 
         setIsBrandingAll(true);
         try {
-            // Process each image individually - enhance background while keeping product identical
-            const res = await fetch('/api/admin/ai/image/brand', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    imageUrls: imagesToBrand,
-                    productName: formData.name,
-                    generateAll: true // Enhance each image
-                })
+            console.log(`Sequential Branding started for ${imageIndices.length} images...`);
+            let count = 0;
+            const enhancedUrls: string[] = [];
+
+            for (const index of imageIndices) {
+                console.log(`Branding image ${count + 1}/${imageIndices.length}...`);
+                const newUrl = await brandImage(index);
+                if (newUrl) {
+                    count++;
+                    enhancedUrls.push(newUrl);
+                }
+            }
+
+            // After all individual branding calls update the state, we need the latest 'images' to save
+            // We can't rely on formData being updated yet due to closure, but brandImage updates it via setFormData.
+            // However, we have the original indices, so we can construct the final array.
+            setFormData(prev => {
+                const finalImages = [...prev.images];
+                // finalImages is already updated by brandImage calls
+                // Let's trigger an auto-save with the final state
+                AdminService.updateProduct(id, { images: finalImages.filter(i => i.trim()) });
+                return prev; // Return same state since brandImage already did the job
             });
 
-            let data;
-            const resText = await res.text();
-            try {
-                data = JSON.parse(resText);
-            } catch (e) {
-                throw new Error(`Invalid response from server. Status: ${res.status}. Help: ${resText.slice(0, 100)}`);
-            }
-
-            const { newImageUrls, error } = data;
-            if (error) throw new Error(error);
-
-            if (newImageUrls && newImageUrls.length > 0) {
-                // Map results back to original slots (handling gaps if expected)
-                // Note: imagesToBrand was filtered, so newImageUrls corresponds to non-empty images.
-                let brandIdx = 0;
-                const finalImages = formData.images.map(img => {
-                    if (img.trim() !== '') {
-                        const newUrl = newImageUrls[brandIdx];
-                        brandIdx++;
-                        return newUrl || img; // Keep old if generation failed (null)
-                    }
-                    return img;
-                });
-
-                // 1. Update UI
-                setFormData(prev => ({ ...prev, images: finalImages }));
-
-                // 2. AUTO-SAVE to Database (Persistence)
-                await AdminService.updateProduct(id, { images: finalImages.filter(i => i.trim()) });
-
-                alert(`✨ Enhanced & Saved ${newImageUrls.filter((u: any) => u).length} images!`);
-            }
+            alert(`✨ Enhanced & Saved ${count} images!`);
         } catch (error: any) {
             console.error(error);
             alert('Image enhancement failed: ' + error.message);
