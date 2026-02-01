@@ -177,10 +177,16 @@ export default function NewProductPage() {
             console.log(`Sequential Branding started for ${imageIndices.length} images...`);
             let count = 0;
 
-            for (const index of imageIndices) {
-                console.log(`Branding image ${count + 1}/${imageIndices.length}...`);
-                const success = await brandImage(index);
-                if (success) count++;
+            // Parallel Processing: Process 2 images at a time
+            const BATCH_SIZE = 2;
+            for (let i = 0; i < imageIndices.length; i += BATCH_SIZE) {
+                const batch = imageIndices.slice(i, i + BATCH_SIZE);
+                console.log(`Branding batch ${i / BATCH_SIZE + 1} (${batch.length} images)...`);
+
+                await Promise.all(batch.map(async (index) => {
+                    const success = await brandImage(index);
+                    if (success) count++;
+                }));
             }
 
             alert(`✨ Enhanced ${count} images with professional backgrounds!`);
