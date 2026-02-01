@@ -49,18 +49,8 @@ export async function POST(req: Request) {
 
         // 3. Prepare AI Interaction
         const scene = getHeroScene();
-        const prompt = `COMMERCIAL PHOTO RETOUCHING TASK:
-- PRODUCT: ${productName}
-- SCENE: ${scene.description}.
-- LIGHTING: ${scene.lighting}
-- STYLE: Automotive Commercial.
-
-STRICT RULES:
-1. KEEP SUBJECT IDENTICAL (Size, Shape, Color).
-2. REMOVE SELLER WATERMARKS/OVERLAYS.
-3. REPLACE BACKGROUND with the scene above.
-4. QUALITY: 8K, Photorealistic.
-5. LICENSE PLATE: "ABC TOYZ".`;
+        // Simplified prompt to avoid MALFORMED_FUNCTION_CALL on Gemini 3 Pro
+        const prompt = `Commercial product photography of ${productName} in a ${scene.description} with ${scene.lighting}. The style is ${scene.style}. Maintain the exact product appearance, color and shape from the input image. Remove watermarks. High quality, 8k resolution.`;
 
         const contentParts: any[] = [
             { text: prompt },
@@ -71,43 +61,28 @@ STRICT RULES:
             contentParts.push({ text: "BRAND LOGO:" }, { inlineData: { data: logoBase64, mimeType: "image/png" } });
         }
 
-        // 4. GENERATION with FALLBACK
+        // 4. GENERATION (Strictly Gemini 3 Pro Image)
+        console.log(`[AI] Attempting generation with gemini-3-pro-image-preview...`);
+        const model = genAI.getGenerativeModel({
+            model: "gemini-3-pro-image-preview",
+            generationConfig: { temperature: 0.1, topP: 0.95 },
+            safetySettings: [
+                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+            ]
+        }, { timeout: 120000 }); // 2 min timeout
+
+        const result = await model.generateContent(contentParts);
+        const response = await result.response;
+
         let resultImageBase64 = null;
-        const modelsToTry = ["gemini-3-pro-image-preview", "gemini-1.5-flash"];
-
-        for (const modelName of modelsToTry) {
-            try {
-                console.log(`[AI] Attempting generation with ${modelName}...`);
-                const model = genAI.getGenerativeModel({
-                    model: modelName,
-                    generationConfig: { temperature: 0.1, topP: 0.95 },
-                    safetySettings: [
-                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                    ]
-                }, { timeout: 120000 }); // 2 min timeout per model
-
-                const result = await model.generateContent(contentParts);
-                const response = await result.response;
-
-                if (response.candidates && response.candidates[0].content?.parts) {
-                    for (const part of response.candidates[0].content.parts) {
-                        if ((part as any).inlineData?.data) {
-                            resultImageBase64 = (part as any).inlineData.data;
-                            break;
-                        }
-                    }
-                }
-
-                if (resultImageBase64) {
-                    console.log(`[AI] Success with ${modelName}!`);
+        if (response.candidates && response.candidates[0].content?.parts) {
+            for (const part of response.candidates[0].content.parts) {
+                if ((part as any).inlineData?.data) {
+                    resultImageBase64 = (part as any).inlineData.data;
                     break;
                 }
-            } catch (err: any) {
-                console.error(`[AI] ${modelName} failed:`, err.message);
-                if (modelName === modelsToTry[modelsToTry.length - 1]) throw err;
-                console.log(`[AI] Retrying with fallback model...`);
             }
         }
 
