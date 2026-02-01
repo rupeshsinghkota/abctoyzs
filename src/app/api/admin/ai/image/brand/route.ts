@@ -57,7 +57,8 @@ export async function POST(req: Request) {
             generatedPrompt = `Commercial product photography of ${productName} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'.`;
         } else {
             // "Think" about the best background and description
-            const analystModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Using 1.5 Flash for speed/availability as 2.0 had issues in test
+            // Using gemini-2.0-flash as it was verified to work in scripts/verify-2step.js
+            const analystModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
             const analystPrompt = `You are an expert visual describer.
             Analyze the input image of the product "${productName}".
             
@@ -85,8 +86,9 @@ export async function POST(req: Request) {
                 console.log(`[AI] Step 1 Result (Scene): "${generatedScene}"`);
 
                 generatedPrompt = `Commercial product photography of ${productName} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'.`;
-            } catch (e) {
-                console.log(`[AI] Step 1 failed, falling back to static prompt.`);
+            } catch (e: any) {
+                console.error(`[AI] Step 1 failed: ${e.message}`);
+                console.log(`[AI] Analyst failed, falling back to static prompt.`);
                 generatedScene = "a professional modern studio with soft lighting";
                 generatedPrompt = `Commercial product photography of ${productName}. The product has an "ABC TOYZ" license plate. High quality, 8k resolution.`;
             }
