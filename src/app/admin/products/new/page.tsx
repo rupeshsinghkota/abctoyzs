@@ -174,13 +174,18 @@ export default function NewProductPage() {
 
         setIsBrandingAll(true);
         try {
-            console.log(`Sequential Branding started for ${imageIndices.length} images...`);
+            console.log(`Parallel Branding (Chunk Size: 2) started for ${imageIndices.length} images...`);
             let count = 0;
-            for (const index of imageIndices) {
-                console.log(`Branding image ${count + 1}/${imageIndices.length}...`);
-                const success = await brandImage(index);
-                if (success) count++;
+
+            // Process in chunks of 2
+            for (let i = 0; i < imageIndices.length; i += 2) {
+                const chunk = imageIndices.slice(i, i + 2);
+                console.log(`Branding chunk ${Math.floor(i / 2) + 1}...`);
+
+                const results = await Promise.all(chunk.map(index => brandImage(index)));
+                count += results.filter(r => r).length;
             }
+
             alert(`✨ Enhanced ${count} images with professional backgrounds!`);
         } catch (error: any) {
             console.error(error);
