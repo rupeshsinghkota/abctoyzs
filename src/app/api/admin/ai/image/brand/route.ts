@@ -48,37 +48,48 @@ export async function POST(req: Request) {
         }
 
         // 3. Prepare AI Interaction
-        // 3. STEP 1: ANALYST (Gemini 2.0 Flash)
-        // "Think" about the best background and description
-        const analystModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const analystPrompt = `You are an expert visual describer.
-        Analyze the input image of the product "${productName}".
-        
-        YOUR TASK:
-        Output a single paragraph describing the final image to be generated.
-        The description must be purely visual. DO NOT use words like "ensure", "remove", "task", "job", "verify", or "create".
-        
-        Structure the description like this:
-        "A commercial photograph of [Product Description] placed in [Scene Description]. The lighting is [Lighting]. The view is identical to the original input. The license plate reads 'ABC TOYZ'."
-        
-        CRITICAL:
-        - Decide the best background for this product (e.g., if it's a car, put it on a road; if a toy, a playroom).
-        - Mention "The license plate reads 'ABC TOYZ'".
-        - DO NOT write instructions. Write the description of the final result only.
-        `;
-
+        // 3. STEP 1: ANALYST (Gemini 2.0 Flash) or SCENE OVERRIDE
         let generatedPrompt = "";
-        try {
-            console.log(`[AI] Step 1: Analyst thinking...`);
-            const analystResult = await analystModel.generateContent([
-                analystPrompt,
-                { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }
-            ]);
-            generatedPrompt = analystResult.response.text().trim();
-            console.log(`[AI] Step 1 Result: "${generatedPrompt}"`);
-        } catch (e) {
-            console.log(`[AI] Step 1 failed, falling back to static prompt.`);
-            generatedPrompt = `Commercial product photography of ${productName}. The product has an "ABC TOYZ" license plate. High quality, 8k resolution.`;
+        let generatedScene = payload.sceneOverride || "";
+
+        if (generatedScene) {
+            console.log(`[AI] Using scene override: "${generatedScene.substring(0, 50)}..."`);
+            generatedPrompt = `Commercial product photography of ${productName} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'.`;
+        } else {
+            // "Think" about the best background and description
+            const analystModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Using 1.5 Flash for speed/availability as 2.0 had issues in test
+            const analystPrompt = `You are an expert visual describer.
+            Analyze the input image of the product "${productName}".
+            
+            YOUR TASK:
+            1. Analyze the product type.
+            2. Decide the SINGLE BEST commercial background scene for it (e.g., "a modern white studio", "a sunlit driveway", "a colorful playroom").
+            3. Output ONLY the description of that scene. Do not describe the product itself.
+            
+            Example Output:
+            "a luxury modern driveway with sleek concrete walls and warm sunset lighting"
+            
+            CRITICAL:
+            - Output ONLY the scene description.
+            - NO introductory text.
+            `;
+
+            try {
+                console.log(`[AI] Step 1: Analyst thinking about scene...`);
+                // Use JSON mode to force clean output if possible, or just strict prompt
+                const analystResult = await analystModel.generateContent([
+                    analystPrompt,
+                    { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }
+                ]);
+                generatedScene = analystResult.response.text().trim().replace(/^"|"$/g, ''); // Remove quotes if present
+                console.log(`[AI] Step 1 Result (Scene): "${generatedScene}"`);
+
+                generatedPrompt = `Commercial product photography of ${productName} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'.`;
+            } catch (e) {
+                console.log(`[AI] Step 1 failed, falling back to static prompt.`);
+                generatedScene = "a professional modern studio with soft lighting";
+                generatedPrompt = `Commercial product photography of ${productName}. The product has an "ABC TOYZ" license plate. High quality, 8k resolution.`;
+            }
         }
 
         const contentParts: any[] = [
@@ -90,8 +101,8 @@ export async function POST(req: Request) {
             contentParts.push({ text: "BRAND LOGO:" }, { inlineData: { data: logoBase64, mimeType: "image/png" } });
         }
 
-        // 4. GENERATION with FALLBACK
-        let resultImageBase64 = null;
+        // 4. STEP 2: ARTIST (Gemini 3 Pro)
+        console.log(`[AI] Step 2: Artist creating with gemini-3-pro-image-preview...`);
         const model = genAI.getGenerativeModel({
             model: "gemini-3-pro-image-preview",
             generationConfig: { temperature: 0.1, topP: 0.95 },
@@ -104,6 +115,7 @@ export async function POST(req: Request) {
         const result = await model.generateContent(contentParts);
         const response = await result.response;
 
+        let resultImageBase64 = null;
         if (response.candidates && response.candidates[0].content?.parts) {
             for (const part of response.candidates[0].content.parts) {
                 if ((part as any).inlineData?.data) {
@@ -130,7 +142,8 @@ export async function POST(req: Request) {
         return NextResponse.json({
             success: true,
             newImageUrl: publicUrl,
-            newImageUrls: [publicUrl] // Compatibility with frontend loops
+            newImageUrls: [publicUrl],
+            generatedScene: generatedScene // Return scene for frontend reuse
         });
 
     } catch (error: any) {

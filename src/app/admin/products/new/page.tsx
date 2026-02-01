@@ -118,9 +118,9 @@ export default function NewProductPage() {
 
 
 
-    const brandImage = async (index: number) => {
+    const brandImage = async (index: number, sceneOverride?: string) => {
         const imageUrl = formData.images[index];
-        if (!imageUrl) return;
+        if (!imageUrl) return null;
 
         // Collect all valid images for product analysis context
         const allValidImages = formData.images.filter(img => img.trim() !== '');
@@ -133,7 +133,8 @@ export default function NewProductPage() {
                 body: JSON.stringify({
                     imageUrl,
                     imageUrls: allValidImages, // Send all images for comprehensive analysis
-                    productName: formData.name
+                    productName: formData.name,
+                    sceneOverride // Pass consistency context
                 })
             });
             let data;
@@ -144,7 +145,7 @@ export default function NewProductPage() {
                 throw new Error(`Invalid response from server. Status: ${res.status}. Help: ${resText.slice(0, 100)}`);
             }
 
-            const { newImageUrl, error } = data;
+            const { newImageUrl, error, generatedScene } = data;
             if (error) throw new Error(error);
 
             setFormData(prev => {
@@ -152,7 +153,7 @@ export default function NewProductPage() {
                 freshImages[index] = newImageUrl;
                 return { ...prev, images: freshImages };
             });
-            return newImageUrl;
+            return { newImageUrl, generatedScene };
         } catch (error: any) {
             console.error(error);
             alert('Branding failed: ' + error.message);
@@ -174,17 +175,33 @@ export default function NewProductPage() {
 
         setIsBrandingAll(true);
         try {
-            console.log(`Sequential Branding started for ${imageIndices.length} images...`);
+            console.log(`Starting Consistent AI Branding for ${imageIndices.length} images...`);
             let count = 0;
+            let masterScene = "";
 
-            // Parallel Processing: Process 2 images at a time
+            // Phase 1: Analyze First Image & Establish Scene
+            if (imageIndices.length > 0) {
+                console.log("Phase 1: Analyzing product to determine best scene...");
+                const firstResult = await brandImage(imageIndices[0]);
+                if (firstResult) {
+                    count++;
+                    if (firstResult.generatedScene) {
+                        masterScene = firstResult.generatedScene;
+                        console.log("Scene Decided:", masterScene);
+                    }
+                }
+            }
+
+            // Phase 2: Process Remaining Images with Fixed Scene
+            const remainingIndices = imageIndices.slice(1);
             const BATCH_SIZE = 2;
-            for (let i = 0; i < imageIndices.length; i += BATCH_SIZE) {
-                const batch = imageIndices.slice(i, i + BATCH_SIZE);
-                console.log(`Branding batch ${i / BATCH_SIZE + 1} (${batch.length} images)...`);
+
+            for (let i = 0; i < remainingIndices.length; i += BATCH_SIZE) {
+                const batch = remainingIndices.slice(i, i + BATCH_SIZE);
+                console.log(`Phase 2: Applying scene to batch ${i / BATCH_SIZE + 1}...`);
 
                 await Promise.all(batch.map(async (index) => {
-                    const success = await brandImage(index);
+                    const success = await brandImage(index, masterScene);
                     if (success) count++;
                 }));
             }
