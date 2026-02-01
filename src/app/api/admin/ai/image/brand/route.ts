@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         console.log(`Processing ${allImageUrls.length} images for product: ${productName}`);
 
         // OPTION A: ONE-TO-ONE ENHANCEMENT (Background Swap / Quality Up)
-        const CONCURRENCY_LIMIT = 2; // Balanced for speed and reliability
+        const CONCURRENCY_LIMIT = 1; // REVERTED TO 1: Preview model aborts on parallel requests
         const results = new Array(allImageUrls.length).fill(null);
         let errors: string[] = [];
 
