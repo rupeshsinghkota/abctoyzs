@@ -6,49 +6,45 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
     try {
-        const { text, posters = [] } = await req.json();
+        const { text, posters = [], imageUrls = [] } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
         }
 
-        if (!text || text.trim().length === 0) {
-            return NextResponse.json({ error: "No text provided" }, { status: 400 });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+        const parts: any[] = [];
+
+        // 1. Add Text Context
+        let promptText = `
+            You are a world-class E-commerce Content Strategist for "${BRAND_CONFIG.name}".
+            Your task is to analyze the provided INPUT (Images + Text) and output a premium Product Suite in JSON format.
+        `;
+
+        if (text && text.trim().length > 0) {
+            promptText += `\nRAW TEXT NOTES:\n"""${text}"""\n`;
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        if (posters.length > 0) {
+            promptText += `\nAVAILABLE MARKETING POSTERS (Use these URLs in the description):\n${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}\n`;
+        }
 
-        const posterContext = posters.length > 0
-            ? `AVAILABLE MARKETING POSTERS (Use these URLs in the description):
-${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}`
-            : "No marketing posters provided.";
-
-        const prompt = `
-            You are a world-class E-commerce Content Strategist for "${BRAND_CONFIG.name}".
-            Your task is to analyze the RAW TEXT and output a premium Product Suite in JSON format.
-
-            RAW TEXT:
-            """${text}"""
-
-            ${posterContext}
-
+        promptText += `
             CRITICAL CONTENT GUIDELINES:
 
-            1. **TECHNICAL SPECS (STRICT Extraction):** 
-               - Extract ONLY what is explicitly present in the text.
-               - If missing, return EMPTY STRING "". Standardize units (e.g., "12 volts" -> "12V").
+            1. **VISUAL ANALYSIS (FROM IMAGES):**
+               - Analyze the provided product images deeply.
+               - EXTRACT all visual details: Color, Seat Material (Leather?), Tire Type (Rubber/EVA?), Rims, Lights, Dashboard features.
+               - **PRESERVE THESE DETAILS EXACTLY** in the description. Do not hallucinate features not visible or mentioned.
+               - **INVENT A SCENE:** For the marketing narrative, YOU decide the best setting/vibe (e.g., "Parkway Drive", "Formula 1 Track", "Luxury Estate") based on the car's look. Write the description as if the car is in that scene.
 
             2. **PREMIUM DESCRIPTION (CINEMATIC & PERSUASIVE):**
                - GENERATE a high-end, cinematic HTML marketing description (450-600 words).
-               - **VOCABULARY:** Use "Automotive Excellence" and "Luxury Heritage" terminology. Words like: *Sculpted lines, performance-tuned, authentic craftsmanship, exhilaration, command the pavement, legacy design, adventure-ready cockpit.*
-               - **DETAIL WEAVING:** Weave technical specs (12V/24V power, dual/quad motors, leather-style seating) into the luxury narrative. Don't just list specs; describe the *feeling* of the power and the *quality* of the build.
-               - **POSTER INTEGRATION:** If posters are available:
-                 - You MUST USE EVERY POSTER PROVIDED. None should be left out.
-                 - DISTRIBUTE them naturally (e.g., after the intro, between feature sections, and before the conclusion).
-                 - HTML Format: <div class="marketing-poster"><img src="URL" alt="Premium Perspective" /></div>.
+               - **VOCABULARY:** Use "Automotive Excellence" and "Luxury Heritage" terminology.
                - **STRUCTURE:**
                  - <h2> immersive headline.
-                 - [Section 1: Intro Storytelling] 2 paragraphs.
+                 - [Section 1: Intro Storytelling] Set the scene you invented.
                  - [Poster 1 Injection]
                  - [Section 2: Performance & Tech] <h3> headers.
                  - [Poster 2 Injection]
@@ -57,15 +53,15 @@ ${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}
                  - "<h3>🛡️ Safety & Quality</h3>" engineering deep-dive.
                  - "<h3>Conclusion</h3>" high-conversion closer.
                - **TONE:** ${BRAND_CONFIG.aiInstructions.tone}.
-               - **FORMATTING:** Use **ONLY** valid HTML. Use <strong> tags for bold text. **DO NOT** use Markdown syntax like "**" for bold.
+               - **FORMATTING:** Use **ONLY** valid HTML. Use <strong> tags for bold text.
 
             3. **BRAND INTEGRITY & SCRUBBING (MANDATORY):**
                - **ONLY AUTHORIZED BRAND:** The only brand name allowed to appear is "${BRAND_CONFIG.name}". 
-               - **SCRUB EXTERNAL BRANDS:** If the raw text mentions any other brands, retailers, or competitors (e.g., "Amazon", "Walmart", "Hamleys", or external retailers), you MUST REMOVE or REPLACE them with "${BRAND_CONFIG.name}".
+               - **SCRUB EXTERNAL BRANDS:** If the raw text mentions any other brands, retailers, or competitors, REMOVE or REPLACE them with "${BRAND_CONFIG.name}".
                - **NAMING CONVENTION:** Always refer to the product as "${BRAND_CONFIG.name} Premium [Model Name]".
 
             4. **SEO DATA:**
-               - **product_name:** "${BRAND_CONFIG.name} Premium [Model]" (e.g. "${BRAND_CONFIG.name} Premium Lamborghini Aventador SVJ").
+               - **product_name:** "${BRAND_CONFIG.name} Premium [Model]".
                - **meta_title:** Premium SEO Title (55-60 chars).
                - **meta_description:** High-conversion meta description (155-160 chars).
 
@@ -73,10 +69,7 @@ ${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}
                - **age_group:** Map strictly to: "1-3", "3-6", "6-12", or "10+".
 
             6. **MARKETING SUITE:**
-               - Generate 3 punchy, high-end headlines (under 5 words each) for marketing posters:
-                 - **action:** Focus on speed/power (e.g., "Sculpted for Speed").
-                 - **comfort:** Focus on interior/luxury (e.g., "Authentic Heritage Cockpit").
-                 - **durability:** Focus on off-road/safety (e.g., "Conquer Any Terrain").
+               - Generate 3 punchy, high-end headlines (under 5 words each).
 
             Output ONLY valid JSON:
             {
@@ -87,23 +80,42 @@ ${posters.map((url: string, i: number) => `Poster ${i + 1}: ${url}`).join('\n')}
                 "meta_description": "...",
                 "category": "cars|bikes|jeeps|atvs|utvs|gokarts",
                 "age_group": "...",
-                "marketing_suite": {
-                    "action": "...",
-                    "comfort": "...",
-                    "durability": "..."
-                },
+                "marketing_suite": { "action": "...", "comfort": "...", "durability": "..." },
                 "specs": {
                     "battery": "...", "motor": "...", "speed": "...", "max_load": "...", "seats": "...",
                     "tire_type": "...", "seat_material": "...", "remote_control": true|false,
                     "mobile_app": true|false, "suitable_age": "...", "charging_time": "...", "run_time": "..."
                 },
-                "logistics": {
-                    "dimensions": "...", "weight": "...", "box_content": ["...", "..."]
-                }
+                "logistics": { "dimensions": "...", "weight": "...", "box_content": ["...", "..."] }
             }
         `;
 
-        const result = await model.generateContent(prompt);
+        parts.push(promptText);
+
+        // 2. Fetch and Add Images
+        if (imageUrls && imageUrls.length > 0) {
+            console.log(`[AI Extract] Fetching ${imageUrls.length} images for analysis...`);
+            const validImageParts = await Promise.all(imageUrls.map(async (url: string) => {
+                try {
+                    const resp = await fetch(url);
+                    if (!resp.ok) return null;
+                    const buffer = await resp.arrayBuffer();
+                    return {
+                        inlineData: {
+                            data: Buffer.from(buffer).toString("base64"),
+                            mimeType: "image/jpeg"
+                        }
+                    };
+                } catch (e) {
+                    console.error(`Failed to fetch image ${url}`, e);
+                    return null;
+                }
+            }));
+
+            parts.push(...validImageParts.filter(p => p !== null));
+        }
+
+        const result = await model.generateContent(parts);
         const response = await result.response;
         let outputText = response.text();
 

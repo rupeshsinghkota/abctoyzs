@@ -418,7 +418,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: rawText,
-                    posters: formData.banners
+                    posters: formData.banners,
+                    imageUrls: validImages // Pass images for visual analysis
                 })
             });
             const { data, error } = await res.json();

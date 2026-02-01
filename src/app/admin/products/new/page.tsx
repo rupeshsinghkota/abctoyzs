@@ -325,7 +325,8 @@ export default function NewProductPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: rawText,
-                    posters: formData.banners
+                    posters: formData.banners,
+                    imageUrls: validImages // Pass images for visual analysis & scene invention
                 })
             });
             const { data, error } = await res.json();
