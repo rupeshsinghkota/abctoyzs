@@ -63,20 +63,21 @@ export async function POST(req: Request) {
 
             const analystParts: any[] = [];
             const analystPrompt = `You are an expert visual describer.
-            Analyze the input images of the product "${productName}".
+            Analyze the TARGET IMAGE of the product "${productName}" (and use Context Images only for shape reference).
             
             YOUR TASK:
-            1. Analyze ALL provided images to get a complete understanding of the product.
-            2. Extract key visual details (color, type, stickers, rims, spoilers, features) that MUST be preserved.
+            1. Analyze the **TARGET IMAGE** to determine the specific visual details (Exact Color, Sticker Style, Rims).
+            2. Use the **CONTEXT IMAGES** (if any) ONLY to understand the 3D shape/geometry of the product.
             3. Decide the SINGLE BEST commercial background scene for this product.
             4. Output a 2-part description separated by a pipe symbol "|".
             
             Format: [SCENE DESCRIPTION] | [PRODUCT DETAILS]
             
-            Example Output:
-            "a luxury modern driveway with sleek concrete walls" | "a red sports car with a black spoiler, 'TURBO' side stickers, and silver rims"
+            Example Output (if Target is Blue):
+            "a luxury modern driveway" | "a BLUE sports car with a black spoiler and silver rims"
             
             CRITICAL:
+            - **COLOR AUTHORITY**: Trust the TARGET IMAGE for color. Do NOT mix colors from context images.
             - NO introductory text.
             - STRICTLY follow the "Scene | Product" format.
             `;

@@ -206,8 +206,8 @@ export default function NewProductPage() {
                 console.log(`Phase 2: Applying consistent context to batch ${i / BATCH_SIZE + 1}...`);
 
                 await Promise.all(batch.map(async (index) => {
-                    // Pass BOTH overrides to ensure perfect consistency
-                    const success = await brandImage(index, masterScene, masterDetails);
+                    // Pass SCENE override for consistency, but NOT details (to respect variant colors)
+                    const success = await brandImage(index, masterScene);
                     if (success) count++;
                 }));
             }
