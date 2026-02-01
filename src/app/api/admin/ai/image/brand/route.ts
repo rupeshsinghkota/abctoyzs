@@ -48,57 +48,82 @@ export async function POST(req: Request) {
         }
 
         // 3. Prepare AI Interaction
-        // 3. STEP 1: ANALYST (Gemini 2.0 Flash) or SCENE OVERRIDE
+        // 3. STEP 1: ANALYST (Gemini 2.0 Flash) or OVERRIDE
         let generatedPrompt = "";
         let generatedScene = payload.sceneOverride || "";
+        let generatedDetails = payload.detailsOverride || "";
 
-        if (generatedScene) {
-            console.log(`[AI] Using scene override: "${generatedScene.substring(0, 50)}..."`);
-            // We don't have product details when overriding, so we rely on general instruction
-            generatedPrompt = `Commercial product photography of ${productName} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'. Preserve all product details.`;
+        if (generatedScene && generatedDetails) {
+            console.log(`[AI] Using overrides - Scene: "${generatedScene.substring(0, 30)}..." | Details: "${generatedDetails.substring(0, 30)}..."`);
+            // STRICT Consistency Mode
+            generatedPrompt = `Commercial product photography of ${generatedDetails} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'. Preserve all original details exactly.`;
         } else {
-            // "Think" about the best background and description
-            // Using gemini-2.0-flash as it was verified to work in scripts/verify-2step.js
+            // "Think" about the best background and description using ALL context images
             const analystModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+            const analystParts: any[] = [];
             const analystPrompt = `You are an expert visual describer.
-            Analyze the input image of the product "${productName}".
+            Analyze the input images of the product "${productName}".
             
             YOUR TASK:
-            1. Analyze the product's key visual details (color, type, specific features).
-            2. Decide the SINGLE BEST commercial background scene for it.
-            3. Output a 2-part description separated by a pipe symbol "|".
+            1. Analyze ALL provided images to get a complete understanding of the product.
+            2. Extract key visual details (color, type, stickers, rims, spoilers, features) that MUST be preserved.
+            3. Decide the SINGLE BEST commercial background scene for this product.
+            4. Output a 2-part description separated by a pipe symbol "|".
             
             Format: [SCENE DESCRIPTION] | [PRODUCT DETAILS]
             
             Example Output:
-            "a luxury modern driveway with sleek concrete walls" | "a red sports car with a black spoiler and silver rims"
+            "a luxury modern driveway with sleek concrete walls" | "a red sports car with a black spoiler, 'TURBO' side stickers, and silver rims"
             
             CRITICAL:
             - NO introductory text.
             - STRICTLY follow the "Scene | Product" format.
             `;
+            analystParts.push(analystPrompt);
+
+            // Add Target Image
+            analystParts.push({ inlineData: { data: imageBase64, mimeType: "image/jpeg" } });
+
+            // Add Context Images (up to 3 extra) if available to see other angles
+            if (payload.imageUrls && Array.isArray(payload.imageUrls) && payload.imageUrls.length > 0) {
+                const otherImages = payload.imageUrls.filter((url: string) => url !== sourceImageUrl).slice(0, 3);
+                if (otherImages.length > 0) {
+                    console.log(`[AI] Analyst using ${otherImages.length} extra context images...`);
+                    const contextBuffers = await Promise.all(otherImages.map(async (url: string) => {
+                        try {
+                            const res = await fetch(url);
+                            if (res.ok) return await res.arrayBuffer();
+                            return null;
+                        } catch (e) { return null; }
+                    }));
+
+                    contextBuffers.forEach(buf => {
+                        if (buf) {
+                            analystParts.push({ inlineData: { data: Buffer.from(buf).toString('base64'), mimeType: "image/jpeg" } });
+                        }
+                    });
+                }
+            }
 
             try {
-                console.log(`[AI] Step 1: Analyst thinking about scene & details...`);
-                // Use JSON mode to force clean output if possible, or just strict prompt
-                const analystResult = await analystModel.generateContent([
-                    analystPrompt,
-                    { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }
-                ]);
+                console.log(`[AI] Step 1: Analyst thinking with multi-image context...`);
+                const analystResult = await analystModel.generateContent(analystParts);
                 const rawResult = analystResult.response.text().trim().replace(/^"|"$/g, '');
 
                 const parts = rawResult.split('|');
                 generatedScene = parts[0]?.trim() || "a professional studio";
-                const productDetails = parts[1]?.trim() || productName;
+                generatedDetails = parts[1]?.trim() || productName;
 
-                console.log(`[AI] Step 1 Result: Scene="${generatedScene.substring(0, 20)}..." Details="${productDetails.substring(0, 20)}..."`);
+                console.log(`[AI] Step 1 Result: Scene="${generatedScene.substring(0, 20)}..." Details="${generatedDetails.substring(0, 20)}..."`);
 
                 // Enforce extraction + preservation
-                generatedPrompt = `Commercial product photography of ${productDetails} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'. Preserve all original details exactly.`;
+                generatedPrompt = `Commercial product photography of ${generatedDetails} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'. Preserve all original details exactly.`;
             } catch (e: any) {
                 console.error(`[AI] Step 1 failed: ${e.message}`);
                 console.log(`[AI] Analyst failed, falling back to static prompt.`);
                 generatedScene = "a professional modern studio with soft lighting";
+                generatedDetails = productName;
                 generatedPrompt = `Commercial product photography of ${productName}. The product has an "ABC TOYZ" license plate. High quality, 8k resolution.`;
             }
         }
@@ -154,7 +179,8 @@ export async function POST(req: Request) {
             success: true,
             newImageUrl: publicUrl,
             newImageUrls: [publicUrl],
-            generatedScene: generatedScene // Return scene for frontend reuse
+            generatedScene: generatedScene,
+            generatedDetails: generatedDetails // Return details for re-use
         });
 
     } catch (error: any) {

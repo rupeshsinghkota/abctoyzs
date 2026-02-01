@@ -118,7 +118,7 @@ export default function NewProductPage() {
 
 
 
-    const brandImage = async (index: number, sceneOverride?: string) => {
+    const brandImage = async (index: number, sceneOverride?: string, detailsOverride?: string) => {
         const imageUrl = formData.images[index];
         if (!imageUrl) return null;
 
@@ -134,7 +134,8 @@ export default function NewProductPage() {
                     imageUrl,
                     imageUrls: allValidImages, // Send all images for comprehensive analysis
                     productName: formData.name,
-                    sceneOverride // Pass consistency context
+                    sceneOverride, // Pass consistency context
+                    detailsOverride // Pass details context
                 })
             });
             let data;
@@ -145,7 +146,7 @@ export default function NewProductPage() {
                 throw new Error(`Invalid response from server. Status: ${res.status}. Help: ${resText.slice(0, 100)}`);
             }
 
-            const { newImageUrl, error, generatedScene } = data;
+            const { newImageUrl, error, generatedScene, generatedDetails } = data;
             if (error) throw new Error(error);
 
             setFormData(prev => {
@@ -153,7 +154,7 @@ export default function NewProductPage() {
                 freshImages[index] = newImageUrl;
                 return { ...prev, images: freshImages };
             });
-            return { newImageUrl, generatedScene };
+            return { newImageUrl, generatedScene, generatedDetails };
         } catch (error: any) {
             console.error(error);
             alert('Branding failed: ' + error.message);
@@ -175,33 +176,38 @@ export default function NewProductPage() {
 
         setIsBrandingAll(true);
         try {
-            console.log(`Starting Consistent AI Branding for ${imageIndices.length} images...`);
+            console.log(`Starting Consistent AI Branding (Global Analysis) for ${imageIndices.length} images...`);
             let count = 0;
             let masterScene = "";
+            let masterDetails = "";
 
-            // Phase 1: Analyze First Image & Establish Scene
+            // Phase 1: Analyze First Image & Establish Global Context
             if (imageIndices.length > 0) {
-                console.log("Phase 1: Analyzing product to determine best scene...");
+                console.log("Phase 1: GLOBAL ANALYSIS - Analyzing all images to decide scene & details...");
                 const firstResult = await brandImage(imageIndices[0]);
                 if (firstResult) {
                     count++;
                     if (firstResult.generatedScene) {
                         masterScene = firstResult.generatedScene;
-                        console.log("Scene Decided:", masterScene);
+                        masterDetails = firstResult.generatedDetails || "";
+                        console.log("Global Context Established:");
+                        console.log("- Scene:", masterScene);
+                        console.log("- Details:", masterDetails);
                     }
                 }
             }
 
-            // Phase 2: Process Remaining Images with Fixed Scene
+            // Phase 2: Process Remaining Images with Fixed Global Context
             const remainingIndices = imageIndices.slice(1);
-            const BATCH_SIZE = 2;
+            const BATCH_SIZE = 2; // User requested "2 then 2"
 
             for (let i = 0; i < remainingIndices.length; i += BATCH_SIZE) {
                 const batch = remainingIndices.slice(i, i + BATCH_SIZE);
-                console.log(`Phase 2: Applying scene to batch ${i / BATCH_SIZE + 1}...`);
+                console.log(`Phase 2: Applying consistent context to batch ${i / BATCH_SIZE + 1}...`);
 
                 await Promise.all(batch.map(async (index) => {
-                    const success = await brandImage(index, masterScene);
+                    // Pass BOTH overrides to ensure perfect consistency
+                    const success = await brandImage(index, masterScene, masterDetails);
                     if (success) count++;
                 }));
             }
