@@ -37,6 +37,8 @@ export async function POST(req: Request) {
                - Analyze the provided product images deeply.
                - EXTRACT all visual details: Color, Seat Material (Leather?), Tire Type (Rubber/EVA?), Rims, Lights, Dashboard features.
                - **PRESERVE THESE DETAILS EXACTLY** in the description. Do not hallucinate features not visible or mentioned.
+               - **TEXT ANALYSIS:** If the image contains text overlays describing FEATURES (e.g., "12V", "Soft Start", "2 Motors"), **EXTRACT and USE them**.
+               - **IGNORE SPAM:** Do NOT mention seller names, phone numbers, or "Sold by" watermarks.
                - **INVENT A SCENE:** For the marketing narrative, YOU decide the best setting/vibe (e.g., "Parkway Drive", "Formula 1 Track", "Luxury Estate") based on the car's look. Write the description as if the car is in that scene.
 
             2. **PREMIUM DESCRIPTION (CINEMATIC & PERSUASIVE):**
@@ -61,7 +63,12 @@ export async function POST(req: Request) {
                - **NAMING CONVENTION:** Always refer to the product as "${BRAND_CONFIG.name} Premium [Model Name]".
 
             4. **SEO DATA:**
-               - **product_name:** "${BRAND_CONFIG.name} Premium [Model]".
+               - **product_name:** "GENERATE A SPECIFIC, COMMERCIAL NAME based on image analysis."
+                  - Format: "${BRAND_CONFIG.name} [Real Model Name if identifiable] [Voltage] [Key Feature] [Body Type]"
+                  - Example: "${BRAND_CONFIG.name} Ferrari F8 Tributo Style 12V Drift Sports Car"
+                  - Example: "${BRAND_CONFIG.name} Maverick 4x4 24V Off-Road Buggy"
+                  - **MUST INCLUDE:** Voltage (if visible), Motor count (if visible), Licensing (if logo visible).
+                  - **DO NOT USE:** Generic terms like "Premium Car" or just "Ride-on". Be specific!
                - **meta_title:** Premium SEO Title (55-60 chars).
                - **meta_description:** High-conversion meta description (155-160 chars).
 
