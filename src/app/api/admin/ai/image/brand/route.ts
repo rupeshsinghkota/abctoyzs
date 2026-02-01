@@ -54,7 +54,8 @@ export async function POST(req: Request) {
 
         if (generatedScene) {
             console.log(`[AI] Using scene override: "${generatedScene.substring(0, 50)}..."`);
-            generatedPrompt = `Commercial product photography of ${productName} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'.`;
+            // We don't have product details when overriding, so we rely on general instruction
+            generatedPrompt = `Commercial product photography of ${productName} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'. Preserve all product details.`;
         } else {
             // "Think" about the best background and description
             // Using gemini-2.0-flash as it was verified to work in scripts/verify-2step.js
@@ -63,29 +64,37 @@ export async function POST(req: Request) {
             Analyze the input image of the product "${productName}".
             
             YOUR TASK:
-            1. Analyze the product type.
-            2. Decide the SINGLE BEST commercial background scene for it (e.g., "a modern white studio", "a sunlit driveway", "a colorful playroom").
-            3. Output ONLY the description of that scene. Do not describe the product itself.
+            1. Analyze the product's key visual details (color, type, specific features).
+            2. Decide the SINGLE BEST commercial background scene for it.
+            3. Output a 2-part description separated by a pipe symbol "|".
+            
+            Format: [SCENE DESCRIPTION] | [PRODUCT DETAILS]
             
             Example Output:
-            "a luxury modern driveway with sleek concrete walls and warm sunset lighting"
+            "a luxury modern driveway with sleek concrete walls" | "a red sports car with a black spoiler and silver rims"
             
             CRITICAL:
-            - Output ONLY the scene description.
             - NO introductory text.
+            - STRICTLY follow the "Scene | Product" format.
             `;
 
             try {
-                console.log(`[AI] Step 1: Analyst thinking about scene...`);
+                console.log(`[AI] Step 1: Analyst thinking about scene & details...`);
                 // Use JSON mode to force clean output if possible, or just strict prompt
                 const analystResult = await analystModel.generateContent([
                     analystPrompt,
                     { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }
                 ]);
-                generatedScene = analystResult.response.text().trim().replace(/^"|"$/g, ''); // Remove quotes if present
-                console.log(`[AI] Step 1 Result (Scene): "${generatedScene}"`);
+                const rawResult = analystResult.response.text().trim().replace(/^"|"$/g, '');
 
-                generatedPrompt = `Commercial product photography of ${productName} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'.`;
+                const parts = rawResult.split('|');
+                generatedScene = parts[0]?.trim() || "a professional studio";
+                const productDetails = parts[1]?.trim() || productName;
+
+                console.log(`[AI] Step 1 Result: Scene="${generatedScene.substring(0, 20)}..." Details="${productDetails.substring(0, 20)}..."`);
+
+                // Enforce extraction + preservation
+                generatedPrompt = `Commercial product photography of ${productDetails} in ${generatedScene}. The view is identical to the original input. The license plate reads 'ABC TOYZ'. Preserve all original details exactly.`;
             } catch (e: any) {
                 console.error(`[AI] Step 1 failed: ${e.message}`);
                 console.log(`[AI] Analyst failed, falling back to static prompt.`);
