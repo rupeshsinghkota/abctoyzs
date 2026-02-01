@@ -25,10 +25,10 @@ export async function POST(req: Request) {
 
         // Handle input images
         let allImageUrls: string[] = [];
-        if (imageUrls && Array.isArray(imageUrls)) {
-            allImageUrls = imageUrls;
-        } else if (imageUrl) {
+        if (imageUrl) {
             allImageUrls = [imageUrl];
+        } else if (imageUrls && Array.isArray(imageUrls)) {
+            allImageUrls = imageUrls;
         }
 
         if (allImageUrls.length === 0) {
