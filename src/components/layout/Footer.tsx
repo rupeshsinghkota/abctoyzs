@@ -2,15 +2,36 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Facebook, Instagram, Twitter, Youtube, Mail, MapPin, Phone, ChevronDown, ArrowRight } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube, Mail, MapPin, Phone, ChevronDown, ArrowRight, Shield, Truck, CheckCircle2, RefreshCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NewsletterService } from "@/lib/services/newsletter";
 import { usePathname } from "next/navigation";
 
 export function Footer() {
     const pathname = usePathname();
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+    const [email, setEmail] = useState("");
+    const [subscribing, setSubscribing] = useState(false);
+    const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
     if (pathname?.startsWith('/admin')) return null;
+
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSubscribing(true);
+        setStatus(null);
+
+        const result = await NewsletterService.subscribe(email);
+
+        if (result.success) {
+            setEmail("");
+            setStatus({ type: 'success', message: result.message });
+            setTimeout(() => setStatus(null), 5000);
+        } else {
+            setStatus({ type: 'error', message: result.message });
+        }
+        setSubscribing(false);
+    };
 
     const toggleSection = (section: string) => {
         setOpenSections(prev => ({
@@ -62,16 +83,34 @@ export function Footer() {
                         {/* Newsletter Mini */}
                         <div className="pt-2">
                             <p className="text-xs font-bold text-white uppercase tracking-wider mb-3">Stay Updated</p>
-                            <div className="flex gap-2">
-                                <input
-                                    type="email"
-                                    placeholder="Email address"
-                                    className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-primary/50 transition-colors"
-                                />
-                                <button className="bg-primary hover:bg-primary/90 text-white p-2 rounded-lg transition-colors">
-                                    <ArrowRight className="w-4 h-4" />
-                                </button>
-                            </div>
+                            <form onSubmit={handleSubscribe} className="space-y-2">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Email address"
+                                        disabled={subscribing}
+                                        className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
+                                        required
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={subscribing}
+                                        className="bg-primary hover:bg-primary/90 text-white p-2 rounded-lg transition-colors disabled:opacity-50"
+                                    >
+                                        {subscribing ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                {status && (
+                                    <p className={cn(
+                                        "text-[10px] font-medium animate-in fade-in slide-in-from-top-1",
+                                        status.type === 'success' ? "text-green-500" : "text-red-500"
+                                    )}>
+                                        {status.message}
+                                    </p>
+                                )}
+                            </form>
                         </div>
 
                         <div className="flex items-center gap-3 pt-4">
@@ -98,11 +137,11 @@ export function Footer() {
                     <FooterSection title="Customer Support" id="support">
                         <ul className="space-y-3">
                             <li><FooterLink href="#">Track My Order</FooterLink></li>
-                            <li><FooterLink href="#">Shipping & Delivery</FooterLink></li>
-                            <li><FooterLink href="#">Returns & Refunds</FooterLink></li>
-                            <li><FooterLink href="#">Warranty Policy</FooterLink></li>
-                            <li><FooterLink href="#">Assembly Guides</FooterLink></li>
-                            <li><FooterLink href="#">Contact Us</FooterLink></li>
+                            <li><FooterLink href="/shipping-policy">Shipping & Delivery</FooterLink></li>
+                            <li><FooterLink href="/refund-policy">Returns & Refunds</FooterLink></li>
+                            <li><FooterLink href="/refund-policy">Warranty Policy</FooterLink></li>
+                            <li><FooterLink href="/about-us">About Us</FooterLink></li>
+                            <li><FooterLink href="/contact-us">Contact Us</FooterLink></li>
                         </ul>
                     </FooterSection>
 
@@ -115,7 +154,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-white font-medium text-sm">Headquarters</p>
-                                    <p className="text-sm mt-1">123 Toy Street, Kids Valley,<br />Mumbai, MH 400001</p>
+                                    <p className="text-sm mt-1">Jhandewalan Toy Market, Near Videocon Tower,<br />New Delhi - 110055</p>
                                 </div>
                             </li>
                             <li className="flex items-start gap-4">
@@ -124,7 +163,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-white font-medium text-sm">Phone Support</p>
-                                    <p className="text-sm mt-1">+91 98765 43210</p>
+                                    <p className="text-sm mt-1">+91 80004 21913</p>
                                     <p className="text-xs text-zinc-500 mt-0.5">Mon-Sat, 9am - 7pm</p>
                                 </div>
                             </li>
@@ -134,19 +173,59 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-white font-medium text-sm">Email Us</p>
-                                    <p className="text-sm mt-1">support@abctoyz.com</p>
+                                    <p className="text-sm mt-1">support@abctoyz.in</p>
                                 </div>
                             </li>
                         </ul>
                     </FooterSection>
                 </div>
 
+                {/* Trust Indicators Ribbon */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-8 border-y border-zinc-900 mb-12">
+                    <div className="flex items-center gap-3 px-4">
+                        <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-primary shrink-0">
+                            <Shield className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-white font-bold text-xs uppercase tracking-wider">Secure Payment</p>
+                            <p className="text-[10px] text-zinc-500">100% Safe Checkout</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 px-4">
+                        <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-primary shrink-0">
+                            <Truck className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-white font-bold text-xs uppercase tracking-wider">Fast Shipping</p>
+                            <p className="text-[10px] text-zinc-500">24-48 Hour Dispatch</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 px-4">
+                        <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-primary shrink-0">
+                            <CheckCircle2 className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-white font-bold text-xs uppercase tracking-wider">Quality Checked</p>
+                            <p className="text-[10px] text-zinc-500">Safety Certified</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 px-4">
+                        <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-primary shrink-0">
+                            <RefreshCcw className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-white font-bold text-xs uppercase tracking-wider">10-Day Replacement</p>
+                            <p className="text-[10px] text-zinc-500">For Defects/Damage</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
                     <p>&copy; {new Date().getFullYear()} ABC Toyz. All rights reserved.</p>
                     <div className="flex gap-6">
-                        <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Sitemap</Link>
+                        <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
+                        <Link href="/sitemap" className="hover:text-white transition-colors">Sitemap</Link>
                     </div>
                 </div>
             </div>

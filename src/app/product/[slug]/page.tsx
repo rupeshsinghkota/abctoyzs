@@ -19,8 +19,6 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    // We use the same fetcher here. 
-    // Optimization: In Next.js, requests are deduped, so calling this again is fine.
     const products = await fetchProducts(slug);
     const product = products.length > 0 ? products[0] : null;
 
@@ -30,11 +28,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         };
     }
 
+    const title = product.meta_title || `${product.name} - Premium Ride-on Toys`;
+    const description = product.meta_description || product.description?.replace(/<[^>]*>/g, '').slice(0, 160);
+
     return {
-        title: `${product.name} - ABC Toyz`,
-        description: product.description,
+        title: title,
+        description: description,
         openGraph: {
-            images: product.images || [],
+            title: title,
+            description: description,
+            images: product.images && product.images.length > 0 ? [product.images[0]] : [],
+            type: 'article',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: title,
+            description: description,
+            images: product.images && product.images.length > 0 ? [product.images[0]] : [],
         },
     };
 }

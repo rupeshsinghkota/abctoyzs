@@ -215,10 +215,23 @@ export const AdminService = {
         const supabase = createClient();
         const { error } = await supabase
             .from('orders')
-            .update({ status })
+            .update({ status, updated_at: new Date().toISOString() })
             .eq('id', orderId);
 
         if (error) throw error;
+    },
+
+    async updateOrder(orderId: string, updates: any) {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('orders')
+            .update({ ...updates, updated_at: new Date().toISOString() })
+            .eq('id', orderId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
     },
 
     async getCustomers() {
@@ -270,12 +283,17 @@ export const AdminService = {
             .from('orders')
             .select('total_amount');
 
+        const { count: subscriberCount } = await supabase
+            .from('newsletter_subscriptions')
+            .select('*', { count: 'exact', head: true });
+
         const totalRevenue = orders?.reduce((sum, o) => sum + Number(o.total_amount), 0) || 0;
 
         return {
             totalProducts: productCount || 0,
             totalOrders: orderCount || 0,
-            totalRevenue
+            totalRevenue,
+            totalSubscribers: subscriberCount || 0
         };
     }
 };

@@ -2,11 +2,28 @@ import { ProductGrid } from '@/components/shop/ProductGrid';
 import { fetchProducts, POWER_CATEGORIES } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
+import { Metadata } from 'next';
+import { SettingsService } from '@/lib/services/settings';
+import { createClient } from '@/lib/supabase/server';
 
 interface PowerCategoryPageProps {
     params: Promise<{
         slug: string;
     }>;
+}
+
+export async function generateMetadata({ params }: PowerCategoryPageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const categoryInfo = POWER_CATEGORIES.find(c => c.value === slug.toLowerCase());
+    const title = categoryInfo?.label || slug;
+
+    const supabase = await createClient();
+    const segment = await SettingsService.getSegmentSEO(`power_${slug}`, supabase);
+
+    return {
+        title: segment.defaultTitle || `${title} - High Performance Ride-ons`,
+        description: segment.defaultDescription || `Explore our range of ${title} electric ride-on toys. Powerful motors and long-lasting batteries for maximum fun.`,
+    };
 }
 
 export default async function PowerCategoryPage({ params }: PowerCategoryPageProps) {

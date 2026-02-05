@@ -13,7 +13,7 @@ export function ProductSchema({ product }: { product: Product }) {
         },
         "offers": {
             "@type": "Offer",
-            "url": `https://abctoyz.com/product/${product.id}`,
+            "url": `https://abctoyz.in/product/${product.slug || product.id}`,
             "priceCurrency": "INR",
             "price": product.price,
             "availability": "https://schema.org/InStock"

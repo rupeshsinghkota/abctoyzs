@@ -10,17 +10,38 @@ import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { StickyCartBar } from '@/components/product/StickyCartBar';
 import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
     // State for attribute selection
     const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(() => {
         const initial: Record<string, string> = {};
+
+        // 1. First check URL for pre-selected attributes
+        let hasUrlParams = false;
         product.attributes?.forEach(attr => {
-            if (attr.options.length > 0) {
-                initial[attr.name] = attr.options[0];
+            const paramValue = searchParams?.get(attr.name.toLowerCase());
+            if (paramValue) {
+                // Find matching option (case insensitive)
+                const matchedOption = attr.options.find(opt => opt.toLowerCase() === paramValue.toLowerCase());
+                if (matchedOption) {
+                    initial[attr.name] = matchedOption;
+                    hasUrlParams = true;
+                }
             }
         });
+
+        // 2. If no URL params, fall back to defaults
+        if (!hasUrlParams) {
+            product.attributes?.forEach(attr => {
+                if (attr.options.length > 0) {
+                    initial[attr.name] = attr.options[0];
+                }
+            });
+        }
         return initial;
     });
 
@@ -28,7 +49,6 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
     const [activeTab, setActiveTab] = useState<'specs' | 'box'>('specs');
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const descriptionRef = useRef<HTMLDivElement>(null);
-    const router = useRouter();
 
     // Derived Variants State
     const currentVariant = useMemo(() => {
@@ -46,13 +66,26 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
         return product.images && product.images.length > 0 ? product.images : [product.image];
     }, [currentVariant, product.images, product.image]);
 
+    // Update URL when attributes change
+    useEffect(() => {
+        // Build new search params based on current selected attributes
+        const params = new URLSearchParams();
+        Object.entries(selectedAttributes).forEach(([key, value]) => {
+            params.set(key.toLowerCase(), value.toLowerCase());
+        });
+
+        // Use replaceState to update URL silently without page refresh or history bloating
+        const queryString = params.toString();
+        const newUrl = `${window.location.pathname}${queryString ? '?' + queryString : ''}`;
+        window.history.replaceState(null, '', newUrl);
+    }, [selectedAttributes]);
+
     // Delivery Date State (Client-side only to avoid hydration mismatch)
     const [deliveryDate, setDeliveryDate] = useState<string>("");
 
     useEffect(() => {
         const date = new Date();
         date.setDate(date.getDate() + 4);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         setDeliveryDate(date.toLocaleDateString('en-US', { weekday: 'long' }));
     }, []);
 

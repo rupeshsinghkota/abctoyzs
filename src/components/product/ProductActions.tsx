@@ -261,11 +261,10 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     </button>
                 </div>
 
-                {/* Secure Checkout Trust */}
-                <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground pt-1 font-bold uppercase tracking-wider opacity-60">
-                    <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Secure Payment</div>
-                    <span>•</span>
-                    <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Fast Dispatch</div>
+                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10px] text-muted-foreground pt-4 font-bold uppercase tracking-wider opacity-60 border-t border-gray-100/50 mt-4">
+                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> Secure Payment</div>
+                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> Fast Dispatch</div>
+                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> 10-Day Replacement</div>
                 </div>
             </div>
         </div>

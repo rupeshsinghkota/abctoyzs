@@ -2,11 +2,28 @@ import { ProductGrid } from '@/components/shop/ProductGrid';
 import { fetchProducts, AGE_CATEGORIES } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
+import { Metadata } from 'next';
+import { SettingsService } from '@/lib/services/settings';
+import { createClient } from '@/lib/supabase/server';
 
 interface AgeCategoryPageProps {
     params: Promise<{
         slug: string;
     }>;
+}
+
+export async function generateMetadata({ params }: AgeCategoryPageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const categoryInfo = AGE_CATEGORIES.find(c => c.value === slug);
+    const title = categoryInfo?.label || slug;
+
+    const supabase = await createClient();
+    const segment = await SettingsService.getSegmentSEO(`age_${slug}`, supabase);
+
+    return {
+        title: segment.defaultTitle || `Ride-on Toys for ${title} Years`,
+        description: segment.defaultDescription || `Find the perfect electric cars and bikes for children aged ${title}. Safely engineered for their development stage.`,
+    };
 }
 
 export default async function AgeCategoryPage({ params }: AgeCategoryPageProps) {

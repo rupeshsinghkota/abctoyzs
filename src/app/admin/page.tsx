@@ -7,11 +7,12 @@ import {
     Package,
     ShoppingCart,
     TrendingUp,
-    Loader2
+    Loader2,
+    Globe
 } from 'lucide-react';
 
 export default function AdminDashboard() {
-    const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, totalRevenue: 0 });
+    const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, totalRevenue: 0, totalSubscribers: 0 });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -65,6 +66,20 @@ export default function AdminDashboard() {
             value: stats.totalOrders > 0 ? `₹${(stats.totalRevenue / stats.totalOrders).toLocaleString()}` : '₹0',
             color: 'text-orange-600',
             bgColor: 'bg-orange-50 dark:bg-orange-950'
+        },
+        {
+            icon: Globe,
+            label: 'SEO Visibility',
+            value: 'Optimized',
+            color: 'text-indigo-600',
+            bgColor: 'bg-indigo-50 dark:bg-indigo-950'
+        },
+        {
+            icon: Package,
+            label: 'Subscribers',
+            value: stats.totalSubscribers,
+            color: 'text-pink-600',
+            bgColor: 'bg-pink-50 dark:bg-pink-950'
         },
     ];
 

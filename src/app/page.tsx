@@ -5,6 +5,20 @@ import { Benefits } from "@/components/home/Benefits";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { Newsletter } from "@/components/home/Newsletter";
 import { fetchProducts } from "@/lib/data";
+import { Metadata } from 'next';
+import { SettingsService } from '@/lib/services/settings';
+import { createClient } from '@/lib/supabase/server';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const supabase = await createClient();
+  const global = await SettingsService.getSEOConfig(supabase);
+  const home = await SettingsService.getSegmentSEO('homepage', supabase);
+
+  return {
+    title: home.defaultTitle || "Home of Premium Ride-on Toys",
+    description: home.defaultDescription || "Browse our collection of luxury electric cars, bikes, and jeeps for children. Fast 24-48 hour dispatch and Pan-India delivery.",
+  };
+}
 
 export default async function Home() {
   // Fetch all products

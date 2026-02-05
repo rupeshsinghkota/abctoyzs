@@ -12,6 +12,12 @@ import {
     Banknote, Loader2, ShieldCheck, Package, ChevronRight, User
 } from 'lucide-react';
 
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
+
 export default function CheckoutPage() {
     const router = useRouter();
     const { cart, clearCart } = useStore();
@@ -92,9 +98,12 @@ export default function CheckoutPage() {
 
         setPlacing(true);
         try {
+            let createdOrder: any = null;
+            const supabase = createClient();
+
             if (isLoggedIn && addresses.length > 0) {
                 // Logged-in user with saved address
-                await OrderService.createOrder({
+                createdOrder = await OrderService.createOrder({
                     total_amount: total,
                     shipping_address_id: selectedAddressId!,
                     items: cart.map(item => ({
@@ -107,9 +116,6 @@ export default function CheckoutPage() {
                 });
             } else {
                 // Guest checkout OR logged-in user with no saved addresses
-                // Auto-create account for guests and save order
-                const supabase = createClient();
-
                 let userId: string;
 
                 if (!isLoggedIn && guestAddress.email) {
@@ -127,7 +133,6 @@ export default function CheckoutPage() {
                     });
 
                     if (signUpError) {
-                        // If email exists, try to proceed anyway
                         console.error('Signup error:', signUpError);
                         throw new Error('Could not create account. Email may already exist. Please login or use a different email.');
                     }
@@ -169,7 +174,6 @@ export default function CheckoutPage() {
 
                 if (addressError) {
                     console.error('Address error:', addressError);
-                    // Continue anyway, just save order without address reference
                 }
 
                 // Create order
@@ -178,13 +182,14 @@ export default function CheckoutPage() {
                     .insert({
                         user_id: userId,
                         total_amount: total,
-                        shipping_address_id: newAddress?.id || null, // Link to the new address
+                        shipping_address_id: newAddress?.id || null,
                         status: 'processing'
                     })
                     .select()
                     .single();
 
                 if (orderError) throw orderError;
+                createdOrder = order;
 
                 // Create order items
                 const itemsToInsert = cart.map(item => ({
@@ -199,8 +204,59 @@ export default function CheckoutPage() {
                 await supabase.from('order_items').insert(itemsToInsert);
             }
 
-            clearCart();
-            router.push('/checkout/success');
+            if (paymentMethod === 'online' && createdOrder) {
+                // Razorpay Options
+                const options = {
+                    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_XXXXXXXXXXXXXX',
+                    amount: Math.round(total * 100), // Amount in paise
+                    currency: "INR",
+                    name: "ABC Toyz",
+                    description: `Order Payment for ${cart.length} items`,
+                    image: "/logo.png",
+                    handler: async function (response: any) {
+                        try {
+                            const verifyRes = await fetch('/api/checkout/verify', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    order_id: createdOrder.id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                }),
+                            });
+
+                            if (verifyRes.ok) {
+                                clearCart();
+                                router.push('/checkout/success');
+                            } else {
+                                alert("Payment verification failed. Please contact support.");
+                            }
+                        } catch (err) {
+                            console.error("Verification error:", err);
+                        }
+                    },
+                    prefill: {
+                        name: isLoggedIn ? "" : guestAddress.name,
+                        email: isLoggedIn ? "" : guestAddress.email,
+                        contact: isLoggedIn ? "" : guestAddress.phone,
+                    },
+                    theme: {
+                        color: "#f97316",
+                    },
+                };
+
+                const rzp = new window.Razorpay(options);
+                rzp.on('payment.failed', function (response: any) {
+                    alert("Payment Failed: " + response.error.description);
+                    setPlacing(false);
+                });
+                rzp.open();
+            } else {
+                // COD Flow
+                clearCart();
+                router.push('/checkout/success');
+            }
         } catch (error: any) {
             alert(error.message || 'Failed to place order. Please try again.');
             setPlacing(false);
@@ -208,7 +264,8 @@ export default function CheckoutPage() {
     }
 
     const handleGuestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setGuestAddress(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        setGuestAddress((prev: any) => ({ ...prev, [name]: value }));
     };
 
     if (cart.length === 0) {
@@ -492,17 +549,22 @@ export default function CheckoutPage() {
 
                                 <button
                                     onClick={() => setPaymentMethod('online')}
-                                    disabled
-                                    className="w-full text-left p-4 rounded-xl border-2 border-muted opacity-50 flex items-center gap-4 cursor-not-allowed"
+                                    className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${paymentMethod === 'online'
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-muted hover:border-primary/50'
+                                        }`}
                                 >
                                     <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
                                         <CreditCard className="w-6 h-6 text-blue-600" />
                                     </div>
                                     <div className="flex-1">
                                         <p className="font-bold text-sm lg:text-base">Online Payment</p>
-                                        <p className="text-xs lg:text-sm text-muted-foreground">Coming soon - UPI, Card, NetBanking</p>
+                                        <p className="text-xs lg:text-sm text-muted-foreground">UPI, Card, NetBanking (via Razorpay)</p>
                                     </div>
-                                    <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 flex-shrink-0" />
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${paymentMethod === 'online' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                                        }`}>
+                                        {paymentMethod === 'online' && <Check className="w-3 h-3 text-white" />}
+                                    </div>
                                 </button>
                             </div>
                         </div>
@@ -537,7 +599,7 @@ export default function CheckoutPage() {
                                     <span className="text-sm font-bold">Safe & Secure</span>
                                 </div>
                                 <p className="text-xs text-muted-foreground leading-relaxed">
-                                    Your data is encrypted and secure. By placing the order, you agree to our Terms of Service and Refund Policy.
+                                    Your data is encrypted and secure. By placing the order, you agree to our <Link href="/terms-of-service" className="text-primary hover:underline">Terms of Service</Link> and <Link href="/refund-policy" className="text-primary hover:underline">Refund Policy</Link>.
                                 </p>
                             </div>
 

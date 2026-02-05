@@ -3,11 +3,32 @@ import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { Metadata } from 'next';
 
 interface CategoryPageProps {
     params: Promise<{
         slug: string;
     }>;
+}
+
+import { SettingsService } from '@/lib/services/settings';
+import { createClient } from '@/lib/supabase/server';
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const title = slug.charAt(0).toUpperCase() + slug.slice(1);
+
+    const supabase = await createClient();
+    const segment = await SettingsService.getSegmentSEO(`cat_${slug}`, supabase);
+
+    return {
+        title: segment.defaultTitle || `${title} Collection`,
+        description: segment.defaultDescription || `Explore our premium collection of ${title.toLowerCase()} ride-on toys. Quality, safety, and fun guaranteed for kids in India.`,
+        openGraph: {
+            title: segment.defaultTitle || `${title} - Premium Ride-ons | abctoyz`,
+            description: segment.defaultDescription || `Shop the best ${title.toLowerCase()} for kids. High performance, durable builds, and fast shipping.`,
+        }
+    };
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
