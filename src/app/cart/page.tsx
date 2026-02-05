@@ -1,13 +1,15 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
     const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
     const router = useRouter();
+    const [srLoading, setSrLoading] = useState(false);
 
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0; // Free shipping
@@ -15,6 +17,65 @@ export default function CartPage() {
 
     const handleCheckout = () => {
         router.push('/checkout');
+    };
+
+    const handleFastCheckout = async () => {
+        setSrLoading(true);
+        try {
+            console.log("Initiating Shiprocket Session...");
+            const res = await fetch('/api/shiprocket/session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cart_data: {
+                        items: cart.map(item => ({
+                            variant_id: String(item.id),
+                            quantity: Number(item.quantity),
+                            catalog_data: {
+                                price: Number(item.price),
+                                name: String(item.name || 'Product'),
+                                image_url: item.image ? String(item.image) : undefined
+                            }
+                        }))
+                    },
+                    redirect_url: window.location.origin + '/checkout/success?oid=',
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || "Failed to start session");
+            }
+
+            const session = await res.json();
+            console.log("Session:", session);
+
+            if (session.result && session.result.token) {
+                const token = session.result.token;
+
+                // Dynamic Script Load if not present
+                if (typeof (window as any).Shiprocket === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = "https://fast-checkout.shiprocket.in/assets/js/shiprocket_checkout.js";
+                    script.async = true;
+                    script.onload = () => {
+                        (window as any).Shiprocket.checkout({ token });
+                    };
+                    document.body.appendChild(script);
+                } else {
+                    (window as any).Shiprocket.checkout({ token });
+                }
+            } else {
+                alert("Could not initiate checkout. Please use standard checkout.");
+            }
+
+        } catch (error: any) {
+            console.error("Fast Checkout Error:", error);
+            alert("Fast Checkout unavailable: " + error.message);
+        } finally {
+            setSrLoading(false);
+        }
     };
 
     if (cart.length === 0) {
@@ -108,27 +169,37 @@ export default function CartPage() {
                     </div>
 
                     <button
-                        onClick={handleCheckout}
-                        className="w-full mt-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                        onClick={handleFastCheckout}
+                        disabled={srLoading}
+                        className="w-full mt-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg transition-all shadow-orange-500/20"
                     >
-                        Proceed to Checkout
+                        {srLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
+                        Express Checkout
+                    </button>
+
+                    <button
+                        onClick={handleCheckout}
+                        className="w-full mt-3 py-3 bg-secondary text-secondary-foreground font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-secondary/90 transition-all"
+                    >
+                        Standard Checkout
                         <ArrowRight className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
             {/* Mobile Sticky Checkout */}
-            <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background border-t md:hidden z-20">
-                <div className="flex items-center justify-between mb-3">
+            <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background border-t md:hidden z-20 space-y-2">
+                <div className="flex items-center justify-between mb-1">
                     <span className="text-sm text-muted-foreground">Total</span>
                     <span className="text-xl font-black">₹{total.toLocaleString()}</span>
                 </div>
                 <button
-                    onClick={handleCheckout}
-                    className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-2"
+                    onClick={handleFastCheckout}
+                    disabled={srLoading}
+                    className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl flex items-center justify-center gap-2"
                 >
-                    Checkout
-                    <ArrowRight className="w-4 h-4" />
+                    {srLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
+                    Express Checkout
                 </button>
             </div>
         </div>

@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 
-const SHIPROCKET_API_BASE = 'https://checkout-api.shiprocket.com'; // Production
-// const SHIPROCKET_API_BASE = 'https://fastrr-api-dev.pickrr.com'; // Staging
+const SHIPROCKET_API_BASE = 'https://checkout-api.shiprocket.com'; // Verified Production Endpoint for Checkout
 
 export class ShiprocketClient {
     private apiKey: string;
@@ -12,7 +11,7 @@ export class ShiprocketClient {
         this.apiSecret = (process.env.SHIPROCKET_API_SECRET || '').trim();
 
         if (!this.apiKey || !this.apiSecret) {
-            console.warn("Missing SHIPROCKET_API_KEY or SHIPROCKET_API_SECRET");
+            console.warn("⚠️ Shiprocket Credentials credentials missing in environment variables.");
         }
     }
 
@@ -24,30 +23,39 @@ export class ShiprocketClient {
     }
 
     async post(endpoint: string, data: any) {
-        // Ensure exact string match for HMAC and Body
+        // Critical: Stringify once to ensure Body and HMAC payload are identical
         const payloadString = JSON.stringify(data);
         const hmac = this.generateHmac(payloadString);
         const url = `${SHIPROCKET_API_BASE}${endpoint}`;
 
         console.log(`[Shiprocket] POST ${url}`);
-        // console.log(`[Shiprocket] Payload: ${payloadString}`); // Debug only
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Api-Key': this.apiKey,
-                'X-Api-HMAC-SHA256': hmac
-            },
-            body: payloadString
-        });
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Api-Key': this.apiKey,
+                    'X-Api-HMAC-SHA256': hmac
+                },
+                body: payloadString
+            });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`[Shiprocket] Error ${response.status}: ${errorText}`);
-            throw new Error(`Shiprocket API Error: ${response.statusText} - ${errorText}`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`[Shiprocket] Error ${response.status}:`, errorText);
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    throw new Error(errorJson.message || errorJson.error || `API Error: ${response.status}`);
+                } catch (e) {
+                    throw new Error(`Shiprocket API Failed: ${response.status} - ${errorText}`);
+                }
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("[Shiprocket] Request Failed:", error);
+            throw error;
         }
-
-        return await response.json();
     }
 }
