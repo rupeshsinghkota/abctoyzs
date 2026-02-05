@@ -37,34 +37,34 @@ export default function CheckoutPage() {
             const session = await ShiprocketService.createSession({
                 cart_data: {
                     items: cart.map(item => ({
-                        variant_id: item.id, // Ensure this ID matches what Shiprocket expects (or is a valid unique ID)
-                        quantity: item.quantity,
+                        variant_id: String(item.id), // Ensure string
+                        quantity: Number(item.quantity),
                         catalog_data: {
-                            price: item.price,
-                            name: item.name,
-                            image_url: item.image
+                            price: Number(item.price),
+                            name: String(item.name || 'Product'),
+                            image_url: item.image ? String(item.image) : undefined
                         }
                     }))
                 },
-                redirect_url: window.location.origin + '/checkout/success', // Shiprocket will append params like ?oid=... here
+                redirect_url: window.location.origin + '/checkout/success?oid=',
                 timestamp: new Date().toISOString()
             });
 
             console.log("Shiprocket Session Created:", session);
 
-            // Per Postman docs, successful response returns { result: { token: "..." } }
-            // It does NOT return a redirect_url. We likely need to construct the URL or use the token 
-            // with a script / frontend SDK if one exists.
-
-            // However, based on similar integrations, we might redirect to a hosted checkout 
-            // OR use the token to initialize a popup.
-
             if (session.result && session.result.token) {
-                // For now, let's see if we can redirect to a standard checkout URL with this token
-                // Or if the user needs to add a script.
-                // Given the lack of a known generic script URL, logging the token.
-                console.log("Token Received:", session.result.token);
-                alert(`Session Token: ${session.result.token}\n\nIntegration Pending: Need script or hosted URL to use this token.`);
+                const token = session.result.token;
+                console.log("Token Received:", token);
+
+                // HEADLESS FLOW:
+                if (typeof (window as any).Shiprocket !== 'undefined') {
+                    (window as any).Shiprocket.checkout({
+                        token: token
+                    });
+                } else {
+                    console.warn("Shiprocket Script not loaded.");
+                    alert(`Session Token: ${token}\n\nWaiting for Shiprocket Script... (Not found on window)`);
+                }
             } else {
                 console.warn("Unexpected Response:", session);
                 alert("Session created but no token found.");
@@ -72,7 +72,12 @@ export default function CheckoutPage() {
 
         } catch (error: any) {
             console.error("Checkout Error:", error);
-            alert(`Failed to start checkout: ${error.message}`);
+            // Handle specific 401 cleanly
+            if (error.message.includes("401")) {
+                alert("Authentication Failed. Please check API Keys in Vercel.");
+            } else {
+                alert(`Failed to start checkout: ${error.message}`);
+            }
         } finally {
             setLoading(false);
         }
