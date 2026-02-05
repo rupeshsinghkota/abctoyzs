@@ -106,6 +106,14 @@ export default function CartPage() {
                             <span>₹{total.toLocaleString()}</span>
                         </div>
                     </div>
+
+                    <button
+                        onClick={handleCheckout}
+                        className="w-full mt-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                    >
+                        Proceed to Checkout
+                        <ArrowRight className="w-4 h-4" />
+                    </button>
                 </div>
             </div>
 
