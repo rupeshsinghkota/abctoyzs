@@ -7,8 +7,11 @@ export async function POST(req: Request) {
         const { order_id, razorpay_payment_id, razorpay_order_id, razorpay_signature } = await req.json();
 
         // 1. Verify Signature
-        // NOTE: In production, use your RAZORPAY_KEY_SECRET from env
-        const secret = process.env.RAZORPAY_KEY_SECRET || 'YOUR_SECRET';
+        const secret = process.env.RAZORPAY_KEY_SECRET;
+        if (!secret) {
+            throw new Error('RAZORPAY_KEY_SECRET is not configured');
+        }
+
         const body = razorpay_order_id + "|" + razorpay_payment_id;
 
         const expectedSignature = crypto

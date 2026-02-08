@@ -9,73 +9,12 @@ import { useRouter } from 'next/navigation';
 export default function CartPage() {
     const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
     const router = useRouter();
-    const [srLoading, setSrLoading] = useState(false);
-
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0; // Free shipping
     const total = subtotal + shipping;
 
     const handleCheckout = () => {
         router.push('/checkout');
-    };
-
-    const handleFastCheckout = async () => {
-        setSrLoading(true);
-        try {
-            console.log("Initiating Shiprocket Session...");
-            const res = await fetch('/api/shiprocket/session', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    cart_data: {
-                        items: cart.map(item => ({
-                            variant_id: String(item.id),
-                            quantity: Number(item.quantity),
-                            catalog_data: {
-                                price: Number(item.price),
-                                name: String(item.name || 'Product'),
-                                image_url: item.image ? String(item.image) : undefined
-                            }
-                        }))
-                    },
-                    redirect_url: window.location.origin + '/checkout/success?oid=',
-                    timestamp: new Date().toISOString()
-                })
-            });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || "Failed to start session");
-            }
-
-            const session = await res.json();
-            console.log("Session:", session);
-
-            if (session.result && session.result.token) {
-                const token = session.result.token;
-
-                // Dynamic Script Load if not present
-                if (typeof (window as any).Shiprocket === 'undefined') {
-                    const script = document.createElement('script');
-                    script.src = "https://fast-checkout.shiprocket.in/assets/js/shiprocket_checkout.js";
-                    script.async = true;
-                    script.onload = () => {
-                        (window as any).Shiprocket.checkout({ token });
-                    };
-                    document.body.appendChild(script);
-                } else {
-                    (window as any).Shiprocket.checkout({ token });
-                }
-            } else {
-                alert("Could not initiate checkout. Please use standard checkout.");
-            }
-
-        } catch (error: any) {
-            console.error("Fast Checkout Error:", error);
-            alert("Fast Checkout unavailable: " + error.message);
-        } finally {
-            setSrLoading(false);
-        }
     };
 
     if (cart.length === 0) {
@@ -169,37 +108,34 @@ export default function CartPage() {
                     </div>
 
                     <button
-                        onClick={handleFastCheckout}
-                        disabled={srLoading}
-                        className="w-full mt-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg transition-all shadow-orange-500/20"
-                    >
-                        {srLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
-                        Express Checkout
-                    </button>
-
-                    <button
                         onClick={handleCheckout}
-                        className="w-full mt-3 py-3 bg-secondary text-secondary-foreground font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-secondary/90 transition-all"
+                        className="w-full mt-6 py-4 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
                     >
-                        Standard Checkout
+                        Proceed to Checkout
                         <ArrowRight className="w-4 h-4" />
                     </button>
+
+                    <div className="mt-6 p-4 rounded-xl bg-muted/50 border border-dashed text-center">
+                        <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
+                            <Truck className="w-4 h-4" />
+                            Free delivery on all orders!
+                        </p>
+                    </div>
                 </div>
             </div>
 
             {/* Mobile Sticky Checkout */}
-            <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background border-t md:hidden z-20 space-y-2">
-                <div className="flex items-center justify-between mb-1">
+            <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background border-t md:hidden z-20">
+                <div className="flex items-center justify-between mb-3">
                     <span className="text-sm text-muted-foreground">Total</span>
                     <span className="text-xl font-black">₹{total.toLocaleString()}</span>
                 </div>
                 <button
-                    onClick={handleFastCheckout}
-                    disabled={srLoading}
-                    className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl flex items-center justify-center gap-2"
+                    onClick={handleCheckout}
+                    className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-2"
                 >
-                    {srLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
-                    Express Checkout
+                    Proceed to Checkout
+                    <ArrowRight className="w-4 h-4" />
                 </button>
             </div>
         </div>

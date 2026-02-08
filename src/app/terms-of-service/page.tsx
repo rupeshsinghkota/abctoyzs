@@ -21,7 +21,7 @@ export default function TermsOfService() {
                             <h2 className="text-2xl font-semibold text-zinc-800">1. Acceptance of Terms</h2>
                         </div>
                         <p className="text-zinc-600 leading-relaxed mb-4">
-                            By accessing and using <strong>ABC Toyz</strong> (abctoyz.in), you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.
+                            By accessing and using <strong>ABC Toyz</strong> (abctoyz.in), owned and operated by <strong>D2BCart</strong>, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.
                         </p>
                     </section>
 

@@ -33,6 +33,7 @@ export default function ContactUsClient() {
                                 icon={<MapPin className="w-6 h-6" />}
                                 title="Our Showroom"
                                 detail="Jhandewalan Toy Market, Near Videocon Tower, New Delhi - 110055"
+                                subDetail="A Brand of D2BCart"
                             />
                             <ContactCard
                                 icon={<Phone className="w-6 h-6" />}

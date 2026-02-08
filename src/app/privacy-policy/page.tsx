@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
                             <h2 className="text-2xl font-semibold text-zinc-800">Introduction</h2>
                         </div>
                         <p className="text-zinc-600 leading-relaxed mb-4">
-                            At <strong>ABC Toyz</strong>, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your personal information when you visit our website or make a purchase.
+                            At <strong>ABC Toyz</strong> (owned and operated by <strong>D2BCart</strong>), we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your personal information when you visit our website or make a purchase.
                         </p>
                     </section>
 
@@ -76,7 +76,7 @@ export default function PrivacyPolicy() {
                             For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by e-mail at <Link href="mailto:support@abctoyz.in" className="text-primary hover:underline">support@abctoyz.in</Link> or by mail using the details provided below:
                         </p>
                         <address className="mt-4 text-zinc-600 not-italic">
-                            ABC Toyz<br />
+                            <strong>D2BCart (ABC Toyz)</strong><br />
                             Jhandewalan Toy Market, Near Videocon Tower,<br />
                             New Delhi - 110055,<br />
                             India
