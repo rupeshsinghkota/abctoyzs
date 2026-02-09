@@ -55,32 +55,32 @@ export default async function Home() {
       <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
 
       {/* Lazy Loaded Content (Loads on Scroll) */}
-      <LazySection className="mt-4 md:mt-8">
-        <div className="py-8 bg-zinc-50/50">
+      <LazySection className="mt-2" placeholderHeight="h-64">
+        <div className="py-4 bg-zinc-50/50">
           <ProductStrip title="Top Rated Favorites" products={topRated} viewAllLink="/category/all" />
         </div>
       </LazySection>
 
-      <LazySection className="mt-4 md:mt-8">
+      <LazySection className="mt-2" placeholderHeight="h-64">
         <ProductStrip title="Premium Collection" products={premium} viewAllLink="/category/power/24v" />
       </LazySection>
 
       {/* Category Highlights */}
       {bikes.length > 0 && (
-        <LazySection className="mt-4 md:mt-8">
+        <LazySection className="mt-2" placeholderHeight="h-64">
           <ProductStrip title="Super Bikes" products={bikes} viewAllLink="/category/bikes" />
         </LazySection>
       )}
 
       {jeeps.length > 0 && (
-        <LazySection className="mt-4 md:mt-8">
-          <div className="py-8 bg-zinc-50/50">
+        <LazySection className="mt-2" placeholderHeight="h-64">
+          <div className="py-4 bg-zinc-50/50">
             <ProductStrip title="Rugged Jeeps & SUVs" products={jeeps} viewAllLink="/category/jeeps" />
           </div>
         </LazySection>
       )}
 
-      <LazySection className="mt-4 md:mt-8 mb-12">
+      <LazySection className="mt-2 mb-8" placeholderHeight="h-64">
         <ProductStrip title="Budget Friendly Picks" products={budget} viewAllLink="/category/all" />
       </LazySection>
 

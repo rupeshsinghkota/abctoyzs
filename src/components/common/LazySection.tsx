@@ -8,19 +8,20 @@ interface LazySectionProps {
     placeholderHeight?: string;
 }
 
-export function LazySection({ children, className = '', placeholderHeight = 'h-96' }: LazySectionProps) {
+export function LazySection({ children, className = '', placeholderHeight = 'h-64' }: LazySectionProps) {
     const [isVisible, setIsVisible] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             const [entry] = entries;
+            // Load when 10% visible OR 100px before
             if (entry.isIntersecting) {
                 setIsVisible(true);
                 observer.disconnect();
             }
         }, {
-            rootMargin: '300px' // Load 300px before appearing for smooth experience
+            rootMargin: '200px' // Slightly less eager to ensure scroll triggers it nicely but still smooth
         });
 
         if (ref.current) {
