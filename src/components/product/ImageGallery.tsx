@@ -65,6 +65,8 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                                             src={item.url}
                                             alt={`Product view ${index + 1}`}
                                             className="w-full h-full object-contain drop-shadow-sm p-0"
+                                            loading={index === 0 ? 'eager' : 'lazy'}
+                                            fetchPriority={index === 0 ? 'high' : 'auto'}
                                             draggable={false}
                                         />
                                         {/* Maximize Hint */}
@@ -190,6 +192,7 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                                 <img
                                     src={item.url}
                                     alt={`Thumbnail ${idx + 1}`}
+                                    loading="lazy"
                                     className="w-full h-full object-contain bg-white transition-transform duration-500 group-hover:scale-110"
                                 />
                             )}
@@ -220,6 +223,8 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                                 <img
                                     src={mediaItems[desktopIndex].url}
                                     alt="Product Main View"
+                                    loading="eager"
+                                    fetchPriority="high"
                                     className="w-full h-full object-contain p-8 transition-all duration-1000 ease-out group-hover:scale-105 relative z-10"
                                 />
 
