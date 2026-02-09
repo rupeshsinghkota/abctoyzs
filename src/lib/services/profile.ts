@@ -94,5 +94,17 @@ export const ProfileService = {
             .eq('id', id);
 
         if (error) throw error;
+    },
+
+    async upsertProfile(profile: Partial<Profile> & { email?: string, is_guest?: boolean }) {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('profiles')
+            .upsert(profile, { onConflict: 'id' })
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data as Profile;
     }
 };

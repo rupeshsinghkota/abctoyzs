@@ -47,6 +47,27 @@ export async function POST(req: Request) {
 
         if (updateError) throw updateError;
 
+        // 2.5 Upsert Profile (Guest or Authenticated)
+        try {
+            const profileId = order.user_id || crypto.randomUUID();
+            await supabase
+                .from('profiles')
+                .upsert({
+                    id: profileId,
+                    full_name: order.shipping_address.name,
+                    phone: order.shipping_address.phone,
+                    is_guest: !order.user_id,
+                    email: order.user_id ? null : user_email_placeholder(order) // Optional: Store placeholder for guests
+                }, { onConflict: 'id' });
+
+            // If it was a guest, we could optionally link the order to this new profile ID
+            // but the profiles table 'id' for guests is currently just a record.
+            // For now, the orders table links to user_id (auth.users). 
+        } catch (profileError) {
+            console.error('[Profile Upsert Error]:', profileError);
+            // Non-blocking
+        }
+
         // 3. Sync to Shiprocket
         try {
             const shiprocketOrder = {
