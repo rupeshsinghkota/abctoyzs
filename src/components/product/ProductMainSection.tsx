@@ -379,7 +379,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 {/* Scrollable Description Container */}
                                 <div className="relative rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden border-l-4 border-l-primary">
                                     {/* Scrollable content */}
-                                    <div className="max-h-[65vh] overflow-y-auto px-4 py-5">
+                                    <div className="max-h-[50vh] overflow-y-auto px-4 py-5">
                                         <div className="prose premium-prose max-w-none">
                                             {product.description ? (
                                                 <div dangerouslySetInnerHTML={{ __html: product.description }} />
