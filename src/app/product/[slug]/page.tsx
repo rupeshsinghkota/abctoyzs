@@ -255,7 +255,7 @@ export default async function ProductPage({ params }: PageProps) {
 
                 {/* Related Products — visible on ALL devices */}
                 {relatedProducts.length > 0 && (
-                    <div className="mt-2 md:mt-8 border-t pt-4 md:pt-10 px-4 lg:px-0 pb-8">
+                    <div className="md:mt-8 border-t pt-4 md:pt-10 px-4 lg:px-0 pb-8">
                         <div className="container mx-auto">
                             <h2 className="text-xl md:text-2xl lg:text-3xl font-black mb-6 md:mb-8">You Might Also Like</h2>
                             <ProductGrid products={relatedProducts} />
