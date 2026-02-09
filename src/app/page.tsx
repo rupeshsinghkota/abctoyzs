@@ -68,12 +68,10 @@ export default async function Home() {
         <ShopByAge />
       </LazySection>
 
-      {/* Toddler's First Ride */}
-      {toddlers.length > 0 && (
-        <LazySection className="mt-2" placeholderHeight="h-64">
-          <ProductStrip title="Toddler's First Ride" products={toddlers} viewAllLink="/category/age/1-3" />
-        </LazySection>
-      )}
+      {/* Budget Showcase - Replaces Toddler's First Ride */}
+      <LazySection className="mt-2" placeholderHeight="h-96">
+        <BudgetShowcase products={products} />
+      </LazySection>
 
       {/* First Fold Content (Eager Loaded) */}
       <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
@@ -123,10 +121,7 @@ export default async function Home() {
         </LazySection>
       )}
 
-      {/* Budget Showcase */}
-      <LazySection className="mt-2" placeholderHeight="h-96">
-        <BudgetShowcase products={products} />
-      </LazySection>
+
 
       <Testimonials />
       <Newsletter />

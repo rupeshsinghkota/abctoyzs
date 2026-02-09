@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Product } from '@/lib/data';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { ChevronRight } from 'lucide-react';
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 
 export function BudgetShowcase({ products }: { products: Product[] }) {
     if (!products || products.length === 0) return null;
@@ -40,8 +41,8 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id as any)}
                                     className={`flex-1 py-2 rounded-full text-xs md:text-sm font-bold transition-all text-center ${activeTab === tab.id
-                                        ? 'bg-black text-white shadow-md'
-                                        : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50'
+                                            ? 'bg-black text-white shadow-md'
+                                            : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50'
                                         }`}
                                 >
                                     <span className="md:hidden">{tab.mobileLabel}</span>
@@ -54,7 +55,7 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
 
                 {/* Products - Horizontal Scroll */}
                 <div className="relative group">
-                    <div className="flex overflow-x-auto gap-3 md:gap-6 pb-8 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide snap-x snap-mandatory">
+                    <HorizontalScroll className="gap-3 md:gap-6 pb-8">
                         {filtered.map(p => (
                             <div key={p.id} className="min-w-[200px] w-[200px] md:min-w-[280px] md:w-[280px] snap-start">
                                 <ProductCard product={p} className="h-full border-zinc-100 shadow-sm hover:shadow-xl" />
@@ -78,8 +79,7 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
                                 </Link>
                             </div>
                         )}
-                    </div>
-
+                    </HorizontalScroll>
                 </div>
             </div>
         </section>

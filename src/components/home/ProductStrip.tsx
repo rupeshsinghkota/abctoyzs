@@ -1,11 +1,10 @@
-'use client';
-
 import Link from 'next/link';
 import { ProductCard } from '@/components/shop/ProductCard';
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 
 interface ProductStripProps {
     title: string;
-    products: any[]; // Using any to stay flexible with the mixed types from ProductStrip vs lib/data
+    products: any[];
     viewAllLink?: string;
 }
 
@@ -19,15 +18,15 @@ export function ProductStrip({ title, products, viewAllLink = '/shop' }: Product
                 </Link>
             </div>
 
-            <div className="flex gap-3 md:gap-4 overflow-x-auto px-4 pb-6 no-scrollbar">
+            <HorizontalScroll>
                 {products.map((product) => (
                     <ProductCard
                         key={product.id}
                         product={product}
-                        className="flex-none w-[200px] md:w-[240px] lg:w-[260px]"
+                        className="flex-none w-[200px] md:w-[240px] lg:w-[260px] snap-start"
                     />
                 ))}
-            </div>
+            </HorizontalScroll>
         </section>
     );
 }
