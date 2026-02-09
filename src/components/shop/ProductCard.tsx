@@ -49,74 +49,72 @@ export function ProductCard({ product, className }: ProductCardProps) {
             "hover:shadow-[0_8px_24px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300",
             className
         )}>
-            {/* ──── Image Area ──── */}
-            <div className="relative aspect-square overflow-hidden bg-[#f5f5f4]">
+            {/* ──── Image ──── */}
+            <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-zinc-100">
+                <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+
                 {/* Wishlist — top right */}
-                <div className="absolute top-2 right-2 z-10 md:opacity-0 md:group-hover:opacity-100 transition-all duration-200">
+                <div className="absolute top-2 right-2 z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" onClick={e => e.preventDefault()}>
                     <WishlistButton
                         productId={product.id}
                         size="sm"
-                        className="bg-white shadow-sm border-none hover:bg-white text-zinc-400 hover:text-rose-500 transition-all"
+                        className="bg-white/90 backdrop-blur-sm shadow-sm border-none hover:bg-white text-zinc-400 hover:text-rose-500 transition-all"
                     />
                 </div>
 
-                {/* Tag Badge — top left, single */}
-                {(isNew || isBestSeller || (tag && !isNew && !isBestSeller)) && (
-                    <div className="absolute top-2 left-2 z-10">
-                        {isNew && (
-                            <span className="inline-block bg-emerald-500 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm">
-                                New
-                            </span>
-                        )}
-                        {isBestSeller && (
-                            <span className="inline-flex items-center gap-0.5 bg-orange-500 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm">
-                                <Flame className="w-2.5 h-2.5" /> Hot
-                            </span>
-                        )}
-                        {!isNew && !isBestSeller && tag && (
-                            <span className="inline-block bg-zinc-700 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm">
-                                {tag}
-                            </span>
-                        )}
-                    </div>
-                )}
-
-                {/* Discount — bottom left of image */}
-                {discount > 5 && (
-                    <div className="absolute bottom-2 left-2 z-10">
-                        <span className="inline-block bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                {/* Badges — top left stack */}
+                <div className="absolute top-2 left-2 z-10 flex flex-col gap-1 pointer-events-none">
+                    {isNew && (
+                        <span className="bg-emerald-500 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm w-fit">
+                            New
+                        </span>
+                    )}
+                    {isBestSeller && (
+                        <span className="inline-flex items-center gap-0.5 bg-orange-500 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm w-fit">
+                            <Flame className="w-2.5 h-2.5" /> Bestseller
+                        </span>
+                    )}
+                    {!isNew && !isBestSeller && tag && (
+                        <span className="bg-zinc-700 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm w-fit">
+                            {tag}
+                        </span>
+                    )}
+                    {discount > 5 && (
+                        <span className="bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm w-fit">
                             {discount}% OFF
                         </span>
-                    </div>
-                )}
+                    )}
+                </div>
+            </Link>
 
-                {/* Specs — frosted bar at bottom of image */}
+            {/* ──── Content ──── */}
+            <div className="p-3 flex flex-col flex-1">
+                {/* Specs — clean row with dot separators */}
                 {specs.length > 0 && (
-                    <div className="absolute bottom-0 inset-x-0 z-10 bg-white/80 backdrop-blur-sm border-t border-zinc-200/50 px-2.5 py-1.5 flex items-center justify-center gap-3">
+                    <div className="flex items-center gap-1 text-[10px] text-zinc-500 font-medium mb-1.5 overflow-hidden">
                         {specs.map((s, i) => (
-                            <span key={i} className="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-600 whitespace-nowrap">
-                                <s.icon className="w-3 h-3 text-zinc-400" />
-                                {s.text}
-                            </span>
+                            <React.Fragment key={i}>
+                                {i > 0 && <span className="text-zinc-300">·</span>}
+                                <span className="inline-flex items-center gap-0.5 whitespace-nowrap">
+                                    <s.icon className="w-3 h-3 text-zinc-400 flex-shrink-0" />
+                                    {s.text}
+                                </span>
+                            </React.Fragment>
                         ))}
                     </div>
                 )}
 
-                {/* Product Image */}
-                <Link href={`/product/${product.slug}`} className="block w-full h-full p-1.5 md:p-2">
-                    <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-105"
-                    />
-                </Link>
-            </div>
-
-            {/* ──── Content ──── */}
-            <div className="p-3 flex flex-col flex-1 gap-1">
                 {/* Category + Rating */}
-                <div className="flex items-center justify-between">
-                    <Link href={`/category/${product.category}`} className="text-[9px] text-primary/70 font-semibold uppercase tracking-widest hover:text-primary transition-colors">
+                <div className="flex items-center justify-between mb-0.5">
+                    <Link
+                        href={`/category/${product.category}`}
+                        className="text-[9px] text-primary/70 font-semibold uppercase tracking-widest hover:text-primary transition-colors"
+                        onClick={e => e.stopPropagation()}
+                    >
                         {product.category}
                     </Link>
                     {hasReviews && (
@@ -128,17 +126,17 @@ export function ProductCard({ product, className }: ProductCardProps) {
                 </div>
 
                 {/* Product Name */}
-                <Link href={`/product/${product.slug}`} className="block flex-1">
+                <Link href={`/product/${product.slug}`} className="block flex-1 mb-2">
                     <h3 className="text-[13px] md:text-sm font-semibold text-zinc-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
                         {product.name}
                     </h3>
                 </Link>
 
                 {/* Price + Action */}
-                <div className="flex items-end justify-between gap-1 mt-auto pt-2">
+                <div className="flex items-end justify-between gap-1 mt-auto">
                     <div>
                         <div className="flex items-baseline gap-1.5">
-                            <span className="text-[15px] md:text-base font-extrabold text-zinc-900">
+                            <span className="text-base md:text-lg font-extrabold text-zinc-900">
                                 ₹{product.price.toLocaleString()}
                             </span>
                             {product.mrp && product.mrp > product.price && (
@@ -148,7 +146,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
                             )}
                         </div>
                         {savings > 500 && (
-                            <p className="text-[9px] font-bold text-emerald-600">Save ₹{savings.toLocaleString()}</p>
+                            <p className="text-[10px] font-bold text-emerald-600">Save ₹{savings.toLocaleString()}</p>
                         )}
                     </div>
 
