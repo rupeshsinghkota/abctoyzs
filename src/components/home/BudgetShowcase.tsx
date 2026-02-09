@@ -40,8 +40,8 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id as any)}
                                     className={`flex-1 py-2 rounded-full text-xs md:text-sm font-bold transition-all text-center ${activeTab === tab.id
-                                            ? 'bg-black text-white shadow-md'
-                                            : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50'
+                                        ? 'bg-black text-white shadow-md'
+                                        : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50'
                                         }`}
                                 >
                                     <span className="md:hidden">{tab.mobileLabel}</span>
@@ -80,9 +80,6 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
                         )}
                     </div>
 
-                    {/* Fade gradients for scroll indication - Mobile Only */}
-                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none md:hidden" />
-                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden" />
                 </div>
             </div>
         </section>
