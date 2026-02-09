@@ -19,12 +19,12 @@ export function ProductStrip({ title, products, viewAllLink = '/shop' }: Product
                 </Link>
             </div>
 
-            <div className="flex gap-4 md:gap-6 overflow-x-auto px-4 pb-8 no-scrollbar">
+            <div className="flex gap-3 md:gap-4 overflow-x-auto px-4 pb-6 no-scrollbar">
                 {products.map((product) => (
                     <ProductCard
                         key={product.id}
                         product={product}
-                        className="flex-none w-[180px] md:w-[280px]"
+                        className="flex-none w-[200px] md:w-[240px] lg:w-[260px]"
                     />
                 ))}
             </div>
