@@ -136,7 +136,7 @@ export function Footer() {
                     {/* Support Column */}
                     <FooterSection title="Customer Support" id="support">
                         <ul className="space-y-3">
-                            <li><FooterLink href="#">Track My Order</FooterLink></li>
+                            <li><FooterLink href="/track-order">Track My Order</FooterLink></li>
                             <li><FooterLink href="/shipping-policy">Shipping & Delivery</FooterLink></li>
                             <li><FooterLink href="/refund-policy">Returns & Refunds</FooterLink></li>
                             <li><FooterLink href="/refund-policy">Warranty Policy</FooterLink></li>

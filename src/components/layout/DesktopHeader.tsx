@@ -85,6 +85,14 @@ export function DesktopHeader() {
                             </Link>
                         ))}
 
+                        <Link
+                            href="/track-order"
+                            className="text-xs font-bold uppercase tracking-widest text-primary hover:text-zinc-900 transition-colors py-1 relative group"
+                        >
+                            Track Order
+                            <span className="absolute -bottom-[17px] left-0 w-full h-[2px] bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-center" />
+                        </Link>
+
                         {/* Power Dropdown */}
                         <div className="relative group">
                             <button className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-foreground/60 hover:text-primary transition-colors py-1">
