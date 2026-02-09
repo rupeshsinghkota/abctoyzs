@@ -4,6 +4,7 @@ import { ProductStrip } from "@/components/home/ProductStrip";
 import { Benefits } from "@/components/home/Benefits";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { Newsletter } from "@/components/home/Newsletter";
+import { LazySection } from "@/components/common/LazySection";
 import { fetchProducts } from "@/lib/data";
 import { Metadata } from 'next';
 import { SettingsService } from '@/lib/services/settings';
@@ -30,7 +31,17 @@ export default async function Home() {
   const newArrivals = products.filter(p => p.tag === 'New' || p.is_new).slice(0, 10);
 
   // If no 'Trending' tag exists in data, just take the high rated ones, or explicitly featured
-  const trending = products.filter(p => p.is_featured || p.rating >= 4.8 || p.tag === 'Best Seller').slice(0, 10);
+  const trending = products.filter(p => (p.is_featured || p.rating >= 4.8 || p.tag === 'Best Seller') && !newArrivals.includes(p)).slice(0, 10);
+
+  // Additional Categories for Extended Content
+  const topRated = products.filter(p => p.rating >= 4.5).sort((a, b) => b.rating - a.rating).slice(0, 10);
+  const premium = products.filter(p => p.price >= 20000).sort((a, b) => b.price - a.price).slice(0, 10);
+  const budget = products.filter(p => p.price < 15000).sort((a, b) => a.price - b.price).slice(0, 10);
+
+  // Category Highlights
+  const bikes = products.filter(p => p.category === 'bikes').slice(0, 10);
+  const jeeps = products.filter(p => p.category === 'jeeps').slice(0, 10);
+
 
   return (
     <div className="flex flex-col min-h-screen pb-20">
@@ -38,13 +49,40 @@ export default async function Home() {
       <Stories />
       <Benefits />
 
+      {/* First Fold Content (Eager Loaded) */}
       <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
-
       <CategoryGrid />
-
-
-
       <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
+
+      {/* Lazy Loaded Content (Loads on Scroll) */}
+      <LazySection className="mt-4 md:mt-8">
+        <div className="py-8 bg-zinc-50/50">
+          <ProductStrip title="Top Rated Favorites" products={topRated} viewAllLink="/category/all" />
+        </div>
+      </LazySection>
+
+      <LazySection className="mt-4 md:mt-8">
+        <ProductStrip title="Premium Collection" products={premium} viewAllLink="/category/power/24v" />
+      </LazySection>
+
+      {/* Category Highlights */}
+      {bikes.length > 0 && (
+        <LazySection className="mt-4 md:mt-8">
+          <ProductStrip title="Super Bikes" products={bikes} viewAllLink="/category/bikes" />
+        </LazySection>
+      )}
+
+      {jeeps.length > 0 && (
+        <LazySection className="mt-4 md:mt-8">
+          <div className="py-8 bg-zinc-50/50">
+            <ProductStrip title="Rugged Jeeps & SUVs" products={jeeps} viewAllLink="/category/jeeps" />
+          </div>
+        </LazySection>
+      )}
+
+      <LazySection className="mt-4 md:mt-8 mb-12">
+        <ProductStrip title="Budget Friendly Picks" products={budget} viewAllLink="/category/all" />
+      </LazySection>
 
       <Newsletter />
     </div>
