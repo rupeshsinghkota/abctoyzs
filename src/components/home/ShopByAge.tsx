@@ -12,7 +12,7 @@ const ageGroups = [
 export function ShopByAge() {
     return (
         <section className="py-6 px-4 container mx-auto">
-            <h2 className="text-xl md:text-2xl font-black mb-6">Shop By Age</h2>
+            <h2 className="text-xl md:text-2xl font-black mb-6 text-center">Shop By Age</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {ageGroups.map((group, i) => (
                     <Link key={i} href={group.href} className="group relative aspect-square bg-zinc-100 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 block">

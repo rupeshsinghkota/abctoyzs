@@ -12,7 +12,7 @@ const powerTypes = [
 export function ShopByPower() {
     return (
         <section className="py-6 px-4 container mx-auto">
-            <h2 className="text-xl md:text-2xl font-black mb-6">Shop By Power</h2>
+            <h2 className="text-xl md:text-2xl font-black mb-6 text-center">Shop By Power</h2>
             <div className="grid md:grid-cols-3 gap-4">
                 {powerTypes.map((type, i) => (
                     <Link key={i} href={type.href} className={`flex flex-col justify-between p-6 md:p-8 rounded-[2rem] border border-transparent transition-all duration-300 group ${type.color} overflow-hidden relative`}>
