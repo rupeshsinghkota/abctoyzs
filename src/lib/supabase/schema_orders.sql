@@ -3,9 +3,14 @@ create table orders (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users(id) not null,
   total_amount decimal(10,2) not null,
-  currency text default 'USD',
-  status text default 'processing', -- processing, shipped, delivered, cancelled
+  currency text default 'INR',
+  status text default 'processing',
+  payment_status text default 'pending',
+  payment_method text default 'PREPAID',
   shipping_address_id uuid references addresses(id),
+  razorpay_order_id text,
+  shiprocket_order_id text,
+  payment_id text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -14,7 +19,7 @@ create table orders (
 create table order_items (
   id uuid default gen_random_uuid() primary key,
   order_id uuid references orders(id) on delete cascade not null,
-  product_id integer not null, -- references products table id if it exists, but might be loose coupling
+  product_id text not null,
   product_name text not null,
   product_image text,
   quantity integer default 1,
