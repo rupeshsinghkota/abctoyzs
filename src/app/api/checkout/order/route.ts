@@ -18,11 +18,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
         }
 
-        const { items, total_amount, shipping_address_id } = await req.json();
+        const { items, total_amount, shipping_address_id, payment_method } = await req.json();
 
         if (!items || !total_amount || !shipping_address_id) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
+
+        // Determine actual amount to be paid via Razorpay
+        // If COD, prepayment is 500, otherwise full amount
+        const razorpayAmount = payment_method === 'COD' ? 500 : total_amount;
 
         // 1. Create a "pending" order in database
         const { data: order, error: orderError } = await supabase
@@ -32,7 +36,8 @@ export async function POST(req: Request) {
                 total_amount: total_amount,
                 shipping_address_id: shipping_address_id,
                 payment_status: 'pending',
-                status: 'processing' // Or 'pending' depending on your flow
+                status: 'processing',
+                payment_method: payment_method || 'PREPAID' // Default to PREPAID if not specified
             })
             .select()
             .single();
@@ -57,12 +62,12 @@ export async function POST(req: Request) {
 
         // 3. Create Razorpay Order
         const razorpayOrder = await razorpay.orders.create({
-            amount: Math.round(total_amount * 100), // Amount in paise
+            amount: Math.round(razorpayAmount * 100), // Amount in paise
             currency: 'INR',
             receipt: order.id,
         });
 
-        // 4. Update order with Razorpay Order ID (optional but good for tracking)
+        // 4. Update order with Razorpay Order ID
         await supabase
             .from('orders')
             .update({ razorpay_order_id: razorpayOrder.id })
@@ -73,6 +78,7 @@ export async function POST(req: Request) {
             razorpay_order_id: razorpayOrder.id,
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency,
+            prepayment: payment_method === 'COD'
         });
 
     } catch (error: any) {

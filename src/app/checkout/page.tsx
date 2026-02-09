@@ -27,6 +27,7 @@ export default function CheckoutPage() {
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [profile, setProfile] = useState<any>(null);
+    const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
 
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0;
@@ -68,7 +69,8 @@ export default function CheckoutPage() {
                 body: JSON.stringify({
                     items: cart,
                     total_amount: total,
-                    shipping_address_id: selectedAddressId
+                    shipping_address_id: selectedAddressId,
+                    payment_method: paymentMethod
                 })
             });
 
@@ -210,7 +212,7 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
-                        {/* Payment Method Info */}
+                        {/* Payment Method Selection */}
                         <div className="bg-card border rounded-2xl overflow-hidden shadow-sm">
                             <div className="p-4 border-b bg-muted/30 flex items-center gap-3">
                                 <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
@@ -218,18 +220,49 @@ export default function CheckoutPage() {
                                 </div>
                                 <h2 className="font-bold">Payment Method</h2>
                             </div>
-                            <div className="p-4">
-                                <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-primary bg-primary/5">
-                                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                            <div className="p-4 space-y-4">
+                                {/* Prepaid Option */}
+                                <div
+                                    onClick={() => setPaymentMethod('PREPAID')}
+                                    className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'PREPAID'
+                                        ? "border-primary bg-primary/5 shadow-sm"
+                                        : "border-transparent bg-muted/30 hover:bg-muted/50"
+                                        }`}
+                                >
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === 'PREPAID' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                                         <CreditCard className="w-5 h-5" />
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-sm">Pay Securely with Razorpay</p>
-                                        <p className="text-xs text-muted-foreground">UPI, Cards, NetBanking, Wallets</p>
+                                    <div className="flex-1">
+                                        <p className="font-bold text-sm">Full Payment (Prepaid)</p>
+                                        <p className="text-xs text-muted-foreground">Pay ₹{total.toLocaleString()} fully and get faster delivery</p>
                                     </div>
-                                    <div className="ml-auto">
-                                        <Check className="w-5 h-5 text-primary" />
+                                    {paymentMethod === 'PREPAID' && (
+                                        <div className="w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center">
+                                            <Check className="w-3 h-3" />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* COD Option */}
+                                <div
+                                    onClick={() => setPaymentMethod('COD')}
+                                    className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'COD'
+                                        ? "border-primary bg-primary/5 shadow-sm"
+                                        : "border-transparent bg-muted/30 hover:bg-muted/50"
+                                        }`}
+                                >
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === 'COD' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                                        <Banknote className="w-5 h-5" />
                                     </div>
+                                    <div className="flex-1">
+                                        <p className="font-bold text-sm">COD with ₹500 Prepayment</p>
+                                        <p className="text-xs text-muted-foreground">Pay ₹500 now, rest on delivery (₹{(total - 500).toLocaleString()})</p>
+                                    </div>
+                                    {paymentMethod === 'COD' && (
+                                        <div className="w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center">
+                                            <Check className="w-3 h-3" />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -258,7 +291,7 @@ export default function CheckoutPage() {
                                     </>
                                 ) : (
                                     <>
-                                        Pay ₹{total.toLocaleString()}
+                                        {paymentMethod === 'COD' ? 'Pay ₹500 Prepymt' : `Pay ₹${total.toLocaleString()}`}
                                         <ChevronRight className="w-5 h-5" />
                                     </>
                                 )}
