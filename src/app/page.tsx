@@ -5,6 +5,8 @@ import { Benefits } from "@/components/home/Benefits";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { Newsletter } from "@/components/home/Newsletter";
 import { LazySection } from "@/components/common/LazySection";
+import { FeatureSpotlight } from "@/components/home/FeatureSpotlight";
+import { ProductGrid } from "@/components/shop/ProductGrid";
 import { fetchProducts } from "@/lib/data";
 import { Metadata } from 'next';
 import { SettingsService } from '@/lib/services/settings';
@@ -42,6 +44,9 @@ export default async function Home() {
   const bikes = products.filter(p => p.category === 'bikes').slice(0, 10);
   const jeeps = products.filter(p => p.category === 'jeeps').slice(0, 10);
 
+  // Spotlight Product (Highest Price or IsFeatured)
+  const featuredProduct = products.find(p => p.is_featured) || products.reduce((prev, current) => (prev.price > current.price) ? prev : current, products[0]);
+
 
   return (
     <div className="flex flex-col min-h-screen pb-20">
@@ -52,7 +57,19 @@ export default async function Home() {
       {/* First Fold Content (Eager Loaded) */}
       <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
       <CategoryGrid />
-      <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
+
+      <div className="container mx-auto px-4 mt-8 md:mt-12">
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-black">Trending Collection</h2>
+          <a href="/category/all" className="text-xs font-bold uppercase tracking-wider border-b border-black pb-0.5 hover:text-primary hover:border-primary transition-colors">View All</a>
+        </div>
+        <ProductGrid products={trending} initialCount={4} loadMoreCount={4} />
+      </div>
+
+      {/* Feature Spotlight (Lazy) */}
+      <LazySection className="mt-2" placeholderHeight="h-96">
+        <FeatureSpotlight product={featuredProduct} />
+      </LazySection>
 
       {/* Lazy Loaded Content (Loads on Scroll) */}
       <LazySection className="mt-2" placeholderHeight="h-64">
