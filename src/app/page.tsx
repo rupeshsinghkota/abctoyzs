@@ -9,6 +9,9 @@ import { FeatureSpotlight } from "@/components/home/FeatureSpotlight";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ProductHighlightGrid } from "@/components/home/ProductHighlightGrid";
 import { Testimonials } from "@/components/home/Testimonials";
+import { ShopByAge } from "@/components/home/ShopByAge";
+import { ShopByPower } from "@/components/home/ShopByPower";
+import { ShopByBudget } from "@/components/home/ShopByBudget";
 import { fetchProducts } from "@/lib/data";
 import { Metadata } from 'next';
 import { SettingsService } from '@/lib/services/settings';
@@ -56,9 +59,19 @@ export default async function Home() {
       <Stories />
       <Benefits />
 
+      {/* Shop By Age */}
+      <LazySection className="mt-2" placeholderHeight="h-48">
+        <ShopByAge />
+      </LazySection>
+
       {/* First Fold Content (Eager Loaded) */}
       <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
       <CategoryGrid />
+
+      {/* Shop By Power */}
+      <LazySection className="mt-2" placeholderHeight="h-64">
+        <ShopByPower />
+      </LazySection>
 
       <div className="container mx-auto px-4 mt-8 md:mt-12">
         <div className="flex items-center justify-between mb-6 md:mb-8">
@@ -71,16 +84,6 @@ export default async function Home() {
       {/* Feature Spotlight (Lazy) */}
       <LazySection className="mt-2" placeholderHeight="h-96">
         <FeatureSpotlight product={featuredProduct} />
-      </LazySection>
-
-      {/* Lazy Loaded Content (Loads on Scroll) */}
-      <LazySection className="mt-2" placeholderHeight="h-[500px]">
-        <ProductHighlightGrid
-          title="Top Rated Favorites"
-          products={topRated}
-          viewAllLink="/category/all"
-          theme="yellow"
-        />
       </LazySection>
 
       <LazySection className="mt-2" placeholderHeight="h-64">
@@ -101,6 +104,11 @@ export default async function Home() {
           </div>
         </LazySection>
       )}
+
+      {/* Shop By Budget */}
+      <LazySection className="mt-2" placeholderHeight="h-48">
+        <ShopByBudget />
+      </LazySection>
 
       <LazySection className="mt-2 mb-8" placeholderHeight="h-64">
         <ProductStrip title="Budget Friendly Picks" products={budget} viewAllLink="/category/all" />
