@@ -366,7 +366,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 )}
                             </div>
 
-                            <div className="pb-24" ref={descriptionRef}>
+                            <div className="pb-6" ref={descriptionRef}>
                                 {/* Section Header */}
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
