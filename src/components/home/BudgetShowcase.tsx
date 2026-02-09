@@ -11,9 +11,9 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
     const [activeTab, setActiveTab] = useState<'under-10k' | '10k-20k' | 'above-20k'>('under-10k');
 
     const tabs = [
-        { id: 'under-10k', label: 'Under ₹10k', link: '/category/price/under-10k' },
-        { id: '10k-20k', label: '₹10k - ₹20k', link: '/category/price/10k-20k' },
-        { id: 'above-20k', label: 'Premium > ₹20k', link: '/category/price/above-20k' },
+        { id: 'under-10k', label: 'Under ₹10k', mobileLabel: '< ₹10k', link: '/category/price/under-10k' },
+        { id: '10k-20k', label: '₹10k - ₹20k', mobileLabel: '₹10k-20k', link: '/category/price/10k-20k' },
+        { id: 'above-20k', label: 'Premium > ₹20k', mobileLabel: '> ₹20k', link: '/category/price/above-20k' },
     ];
 
     const currentTab = tabs.find(t => t.id === activeTab);
@@ -29,41 +29,38 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
     return (
         <section className="py-12 md:py-16 bg-white">
             <div className="container mx-auto px-4">
-                <div className="flex flex-col items-center mb-8 md:mb-12">
-                    <h2 className="text-3xl md:text-4xl font-black mb-6 text-center tracking-tight">Shop By Budget</h2>
+                <div className="flex flex-col items-center mb-8 md:mb-10">
+                    <h2 className="text-2xl md:text-4xl font-black mb-6 text-center tracking-tight">Shop By Budget</h2>
 
-                    {/* Tabs */}
-                    <div className="flex p-1.5 bg-zinc-100/80 backdrop-blur-sm rounded-full overflow-x-auto scrollbar-hide max-w-full">
-                        {tabs.map(tab => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
-                                className={`px-6 md:px-8 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id
-                                        ? 'bg-black text-white shadow-lg scale-100 ring-2 ring-black/10'
-                                        : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50'
-                                    }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
+                    {/* Tabs - Centered and evenly distributed */}
+                    <div className="w-full max-w-sm md:max-w-md mx-auto">
+                        <div className="flex bg-zinc-100 p-1 rounded-full">
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as any)}
+                                    className={`flex-1 py-2 rounded-full text-xs md:text-sm font-bold transition-all text-center ${activeTab === tab.id
+                                            ? 'bg-black text-white shadow-md'
+                                            : 'text-zinc-500 hover:text-black hover:bg-zinc-200/50'
+                                        }`}
+                                >
+                                    <span className="md:hidden">{tab.mobileLabel}</span>
+                                    <span className="hidden md:inline">{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Products - Horizontal Scroll on Mobile, Grid on Desktop? 
-                     User said "product should be scrollble".
-                     Usually a horizontal scroll is better for "showcase" sections. 
-                     I'll use a snap-scrolling row for all devices but limit width on desktop or use grid if too many?
-                     User said "budget option starting from lowest in that budget going towars high also product should be scrollble".
-                     I'll use a robust horizontal scroll layout for all screens to keep it consistent and "scrollable".
-                 */}
-
+                {/* Products - Horizontal Scroll */}
                 <div className="relative group">
-                    <div className="flex overflow-x-auto gap-4 pb-8 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide snap-x snap-mandatory">
+                    <div className="flex overflow-x-auto gap-3 md:gap-6 pb-8 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide snap-x snap-mandatory">
                         {filtered.map(p => (
-                            <div key={p.id} className="min-w-[260px] md:min-w-[300px] snap-start">
+                            <div key={p.id} className="min-w-[200px] w-[200px] md:min-w-[280px] md:w-[280px] snap-start">
                                 <ProductCard product={p} className="h-full border-zinc-100 shadow-sm hover:shadow-xl" />
                             </div>
                         ))}
+
                         {filtered.length === 0 && (
                             <div className="w-full text-center py-12 text-zinc-400">
                                 No products found in this range.
@@ -72,20 +69,20 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
 
                         {/* View All Card at the end */}
                         {filtered.length > 0 && currentTab && (
-                            <div className="min-w-[150px] md:min-w-[200px] snap-start flex items-center justify-center">
-                                <Link href={currentTab.link} className="flex flex-col items-center gap-4 group/view text-zinc-900">
-                                    <div className="w-16 h-16 rounded-full border-2 border-zinc-200 flex items-center justify-center group-hover/view:border-black group-hover/view:bg-black group-hover/view:text-white transition-all">
-                                        <ChevronRight className="w-6 h-6" />
+                            <div className="min-w-[120px] md:min-w-[200px] snap-start flex items-center justify-center">
+                                <Link href={currentTab.link} className="flex flex-col items-center gap-3 group/view text-zinc-900">
+                                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-zinc-200 flex items-center justify-center group-hover/view:border-black group-hover/view:bg-black group-hover/view:text-white transition-all">
+                                        <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
-                                    <span className="font-bold text-sm uppercase tracking-wider">View All</span>
+                                    <span className="font-bold text-xs md:text-sm uppercase tracking-wider text-center">View All<br /><span className="text-[10px] opacity-60 font-medium">({filtered.length}+)</span></span>
                                 </Link>
                             </div>
                         )}
                     </div>
 
-                    {/* Fade gradients for scroll indication */}
-                    <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-white to-transparent pointer-events-none md:hidden" />
-                    <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden" />
+                    {/* Fade gradients for scroll indication - Mobile Only */}
+                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none md:hidden" />
+                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden" />
                 </div>
             </div>
         </section>
