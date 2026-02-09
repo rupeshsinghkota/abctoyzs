@@ -9,8 +9,8 @@ const benefits = [
     },
     {
         icon: ShieldCheck,
-        title: "2-Year Warranty",
-        description: "Extended coverage"
+        title: "1-Year Warranty",
+        description: "Motor & Battery"
     },
     {
         icon: RotateCcw,

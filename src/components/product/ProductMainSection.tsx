@@ -286,7 +286,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                         <ShieldCheck className="w-3.5 h-3.5" />
                                         <span>Warranty</span>
                                     </div>
-                                    <p className="text-[9px] text-muted-foreground pl-5">1 Year Official</p>
+                                    <p className="text-[9px] text-muted-foreground pl-5">1 Year Motor & Battery</p>
                                 </div>
                                 <div className="flex flex-col gap-0.5">
                                     <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
