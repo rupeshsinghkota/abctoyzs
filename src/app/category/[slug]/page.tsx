@@ -5,6 +5,8 @@ import { SlidersHorizontal } from 'lucide-react';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Metadata } from 'next';
 
+export const revalidate = 300; // Revalidate every 5 minutes
+
 interface CategoryPageProps {
     params: Promise<{
         slug: string;

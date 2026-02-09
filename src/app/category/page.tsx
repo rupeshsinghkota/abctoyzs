@@ -3,6 +3,8 @@ import { ArrowRight, Sparkles, Zap, User } from 'lucide-react';
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from '@/lib/data';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 
+export const revalidate = 300; // Revalidate every 5 minutes
+
 export default function CategoryPage() {
     return (
         <div className="min-h-screen pb-24 md:pb-20 bg-background">

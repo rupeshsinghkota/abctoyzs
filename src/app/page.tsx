@@ -9,6 +9,8 @@ import { Metadata } from 'next';
 import { SettingsService } from '@/lib/services/settings';
 import { createClient } from '@/lib/supabase/server';
 
+export const revalidate = 300; // Revalidate every 5 minutes
+
 export async function generateMetadata(): Promise<Metadata> {
   const supabase = await createClient();
   const global = await SettingsService.getSEOConfig(supabase);
