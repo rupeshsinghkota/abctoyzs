@@ -9,7 +9,6 @@ import { FeatureSpotlight } from "@/components/home/FeatureSpotlight";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ProductHighlightGrid } from "@/components/home/ProductHighlightGrid";
 import { Testimonials } from "@/components/home/Testimonials";
-import { BrandGrid } from "@/components/home/BrandGrid";
 import { fetchProducts } from "@/lib/data";
 import { Metadata } from 'next';
 import { SettingsService } from '@/lib/services/settings';
@@ -56,7 +55,6 @@ export default async function Home() {
       <HeroSlider />
       <Stories />
       <Benefits />
-      <BrandGrid />
 
       {/* First Fold Content (Eager Loaded) */}
       <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
