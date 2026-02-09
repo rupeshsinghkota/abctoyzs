@@ -85,6 +85,40 @@ body {
   scrollbar-width: none;
 }
 
+/* Premium Scrollbar — for description containers */
+.premium-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s;
+}
+
+.premium-scrollbar:hover {
+  scrollbar-color: #d4d4d8 transparent;
+}
+
+.premium-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.premium-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+.premium-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+}
+
+.premium-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
 /* Premium Prose — Rich Product Description Styling */
 .premium-prose {
   line-height: 1.85;

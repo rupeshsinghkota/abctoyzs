@@ -47,7 +47,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
     // Mobile Detail Tabs State
     const [activeTab, setActiveTab] = useState<'specs' | 'box'>('specs');
-    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
     const descriptionRef = useRef<HTMLDivElement>(null);
 
     // Derived Variants State
@@ -366,9 +366,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 )}
                             </div>
 
-                            <div className="pb-24 scroll-mt-24" ref={descriptionRef}>
+                            <div className="pb-24" ref={descriptionRef}>
                                 {/* Section Header */}
-                                <div className="flex items-center gap-3 mb-5">
+                                <div className="flex items-center gap-3 mb-4">
                                     <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
                                         <Package className="w-4 h-4 text-primary" />
                                     </div>
@@ -376,42 +376,31 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
                                 </div>
 
-                                {/* Description Content */}
-                                <div className="bg-gray-50/60 rounded-2xl border border-gray-100 p-4 relative">
-                                    <div className={cn(
-                                        "prose premium-prose max-w-none relative overflow-hidden transition-all duration-500 ease-in-out",
-                                        isDescriptionExpanded ? "max-h-none" : "max-h-[500px]"
-                                    )}>
-                                        {product.description ? (
-                                            <div dangerouslySetInnerHTML={{ __html: product.description }} />
-                                        ) : (
-                                            <p>Premium ride-on toy with advanced features.</p>
-                                        )}
+                                {/* Scrollable Description Container */}
+                                <div className="relative rounded-2xl border border-gray-200/80 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                                    {/* Top fade */}
+                                    <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-white to-transparent z-10 pointer-events-none rounded-t-2xl" />
 
-                                        {/* Gradient Mask for collapsed state */}
-                                        {!isDescriptionExpanded && (
-                                            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-gray-50 via-gray-50/80 to-transparent pointer-events-none" />
-                                        )}
+                                    {/* Scrollable content */}
+                                    <div className="max-h-[60vh] overflow-y-auto premium-scrollbar px-5 py-6">
+                                        <div className="prose premium-prose max-w-none">
+                                            {product.description ? (
+                                                <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                                            ) : (
+                                                <p>Premium ride-on toy with advanced features.</p>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
 
-                                {/* Toggle Button */}
-                                <div className="mt-4 flex justify-center">
-                                    <button
-                                        onClick={() => {
-                                            if (isDescriptionExpanded) {
-                                                setIsDescriptionExpanded(false);
-                                                setTimeout(() => {
-                                                    descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                                }, 100);
-                                            } else {
-                                                setIsDescriptionExpanded(true);
-                                            }
-                                        }}
-                                        className="inline-flex items-center gap-2 text-xs font-bold text-white bg-zinc-900 px-6 py-2.5 rounded-full hover:bg-primary transition-colors uppercase tracking-wider active:scale-95"
-                                    >
-                                        {isDescriptionExpanded ? "↑ Show Less" : "↓ Read Full Description"}
-                                    </button>
+                                    {/* Bottom fade + scroll hint */}
+                                    <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none rounded-b-2xl">
+                                        <div className="h-12 bg-gradient-to-t from-white via-white/90 to-transparent" />
+                                        <div className="bg-white flex items-center justify-center gap-1.5 pb-2">
+                                            <span className="w-4 h-[2px] bg-gray-300 rounded-full" />
+                                            <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-widest">Scroll to read</span>
+                                            <span className="w-4 h-[2px] bg-gray-300 rounded-full" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
