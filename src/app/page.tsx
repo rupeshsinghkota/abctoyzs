@@ -11,7 +11,7 @@ import { ProductHighlightGrid } from "@/components/home/ProductHighlightGrid";
 import { Testimonials } from "@/components/home/Testimonials";
 import { ShopByAge } from "@/components/home/ShopByAge";
 import { ShopByPower } from "@/components/home/ShopByPower";
-import { ShopByBudget } from "@/components/home/ShopByBudget";
+import { BudgetShowcase } from "@/components/home/BudgetShowcase";
 import { fetchProducts } from "@/lib/data";
 import { Metadata } from 'next';
 import { SettingsService } from '@/lib/services/settings';
@@ -123,17 +123,10 @@ export default async function Home() {
         </LazySection>
       )}
 
-      {/* Shop By Budget */}
-      <LazySection className="mt-2" placeholderHeight="h-48">
-        <ShopByBudget />
+      {/* Budget Showcase */}
+      <LazySection className="mt-2" placeholderHeight="h-96">
+        <BudgetShowcase products={products} />
       </LazySection>
-
-      {/* Best Value */}
-      {valueRides.length > 0 && (
-        <LazySection className="mt-2 mb-8" placeholderHeight="h-64">
-          <ProductStrip title="Best Value Rides" products={valueRides} viewAllLink="/category/price/under-10k" />
-        </LazySection>
-      )}
 
       <Testimonials />
       <Newsletter />
