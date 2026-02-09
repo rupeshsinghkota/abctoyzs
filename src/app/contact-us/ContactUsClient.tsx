@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
     Mail, Phone, MapPin, Send, MessageCircle, Clock,
     Share2, ShieldCheck, HelpCircle, Building2, User
