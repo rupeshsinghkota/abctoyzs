@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Star, ShoppingCart, Zap } from 'lucide-react';
+import { Star, ShoppingCart, Zap, Gauge, Baby, Weight } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { Product } from '@/lib/data';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
@@ -30,35 +30,39 @@ export function ProductCard({ product, className }: ProductCardProps) {
     const savings = calculateSavings(product.price, product.mrp);
     const hasReviews = product.reviews > 0;
 
+    // Derive specs for the card
+    const powerLabel = product.voltage || product.specs?.battery;
+    const ageLabel = product.ageGroup || product.specs?.suitable_age;
+    const loadLabel = product.specs?.max_load;
+    const hasSpecs = powerLabel || ageLabel || loadLabel;
+
     return (
         <div className={cn(
-            "group relative bg-white rounded-[32px] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
-            "hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-500 ease-out overflow-hidden flex flex-col h-full",
+            "group relative bg-white rounded-2xl border border-zinc-100/80 transition-all duration-500 flex flex-col h-full",
+            "hover:shadow-[0_12px_40px_rgba(0,0,0,0.03)] hover:-translate-y-0.5",
             className
         )}>
             {/* Image Container with Badges */}
-            <div className="relative aspect-square overflow-hidden bg-[#F9FAFB] p-4 lg:p-6 flex items-center justify-center">
-                {/* Wishlist - Premium Blur Position */}
-                <div className="absolute top-4 right-4 z-10">
-                    <WishlistButton productId={product.id} size="sm" className="bg-white/80 backdrop-blur-md shadow-sm border-none hover:bg-white transition-all" />
+            <div className="relative aspect-square overflow-hidden bg-[#FAF9F6] m-2 rounded-xl flex items-center justify-center p-4 lg:p-6">
+                {/* Wishlist - Minimalist Side */}
+                <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <WishlistButton
+                        productId={product.id}
+                        size="sm"
+                        className="bg-white/90 backdrop-blur-sm shadow-sm border-none hover:bg-white text-zinc-400 hover:text-red-500 transition-all"
+                    />
                 </div>
 
-                {/* Glassmorphism Badges */}
-                <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
-                    {discount > 5 && (
-                        <div className="bg-red-500/10 backdrop-blur-md border border-red-500/20 px-2.5 py-1 rounded-full flex items-center gap-1 shadow-[0_4px_12px_-2px_rgba(239,68,68,0.3)]">
-                            <span className="text-[10px] lg:text-xs font-black text-red-600 uppercase tracking-wider">-{discount}%</span>
+                {/* Minimal Badges */}
+                <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
+                    {product.tag && product.tag.toLowerCase() === 'new' && (
+                        <div className="bg-[#E9EDEB] px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-semibold text-[#5D6F66] uppercase tracking-[0.05em]">New</span>
                         </div>
                     )}
-                    {product.tag && (
-                        <div className={cn(
-                            "backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1 border shadow-sm",
-                            product.tag.toLowerCase() === 'new'
-                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
-                                : "bg-zinc-900/10 border-zinc-900/20 text-zinc-900"
-                        )}>
-                            {product.tag.toLowerCase() === 'best seller' && <Zap className="w-3 h-3 fill-current" />}
-                            <span className="text-[10px] lg:text-xs font-black uppercase tracking-wider">{product.tag}</span>
+                    {discount > 5 && (
+                        <div className="bg-[#F8E7E4] px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-semibold text-[#A6645A] uppercase tracking-[0.05em]">-{discount}%</span>
                         </div>
                     )}
                 </div>
@@ -67,80 +71,93 @@ export function ProductCard({ product, className }: ProductCardProps) {
                     <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-contain transition-all duration-700 ease-out group-hover:scale-110 group-hover:rotate-1"
+                        className="w-full h-full object-contain mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                 </Link>
-
-                {/* Top Corner Glow Effect (Subtle) */}
-                <div className="absolute -top-10 -left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             </div>
 
+            {/* Technical Specs Strip */}
+            {hasSpecs && (
+                <div className="flex items-center gap-3 px-4 pt-1 pb-0 flex-wrap">
+                    {powerLabel && (
+                        <div className="flex items-center gap-1 text-zinc-400">
+                            <Gauge className="w-3 h-3" />
+                            <span className="text-[9px] lg:text-[10px] font-medium uppercase tracking-wide">{powerLabel}</span>
+                        </div>
+                    )}
+                    {ageLabel && (
+                        <div className="flex items-center gap-1 text-zinc-400">
+                            <Baby className="w-3 h-3" />
+                            <span className="text-[9px] lg:text-[10px] font-medium uppercase tracking-wide">{ageLabel}</span>
+                        </div>
+                    )}
+                    {loadLabel && (
+                        <div className="flex items-center gap-1 text-zinc-400">
+                            <Weight className="w-3 h-3" />
+                            <span className="text-[9px] lg:text-[10px] font-medium uppercase tracking-wide">{loadLabel}</span>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Content Section */}
-            <div className="p-5 lg:p-6 flex flex-col flex-1 space-y-4">
-                <div className="space-y-2 flex-1">
-                    {/* Category & Rating */}
-                    <div className="flex items-center justify-between text-[10px] lg:text-xs font-bold uppercase tracking-widest text-zinc-400">
+            <div className="px-4 pb-4 pt-2 flex flex-col flex-1">
+                <div className="flex-1 space-y-1">
+                    <div className="flex items-center justify-between text-[10px] text-zinc-400 font-medium uppercase tracking-wider">
                         <span>{product.category}</span>
                         {hasReviews && (
-                            <div className="flex items-center gap-1 text-amber-500">
-                                <Star className="w-3 h-3 fill-current" />
-                                <span className="text-zinc-900">{product.rating.toFixed(1)}</span>
+                            <div className="flex items-center gap-0.5">
+                                <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                                <span className="text-zinc-600">{product.rating.toFixed(1)}</span>
                             </div>
                         )}
                     </div>
 
                     <Link href={`/product/${product.slug}`} className="block">
-                        <h3 className="text-sm lg:text-base font-bold text-zinc-900 line-clamp-2 leading-tight hover:text-primary transition-colors">
+                        <h3 className="text-sm lg:text-[15px] font-medium text-zinc-800 line-clamp-2 leading-snug group-hover:text-zinc-900 transition-colors">
                             {product.name}
                         </h3>
                     </Link>
                 </div>
 
-                {/* Price & Savings */}
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg lg:text-xl font-black text-zinc-900">₹{product.price.toLocaleString()}</span>
+                {/* Footer: Price & Add Icon */}
+                <div className="mt-4 flex items-center justify-between gap-2">
+                    <div className="flex items-baseline gap-1.5">
+                        <span className="text-base lg:text-[17px] font-bold text-zinc-900">₹{product.price.toLocaleString()}</span>
                         {product.mrp && product.mrp > product.price && (
-                            <span className="text-xs lg:text-sm text-zinc-400 line-through">₹{product.mrp.toLocaleString()}</span>
+                            <span className="text-xs text-zinc-400 line-through decoration-zinc-300">₹{product.mrp.toLocaleString()}</span>
                         )}
                     </div>
-                    {savings > 100 && (
-                        <p className="text-[10px] lg:text-xs font-bold text-emerald-600">
-                            Save ₹{savings.toLocaleString()} INSTANTLY
-                        </p>
+
+                    {/* Minimalist Action Icon */}
+                    {product.variants && product.variants.length > 0 ? (
+                        <Link
+                            href={`/product/${product.slug}`}
+                            className="w-8 h-8 lg:w-9 lg:h-9 bg-zinc-50 border border-zinc-100 rounded-full flex items-center justify-center text-zinc-400 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all active:scale-95 shadow-sm"
+                            title="View Options"
+                        >
+                            <Zap className="w-4 h-4" />
+                        </Link>
+                    ) : (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                addToCart({
+                                    id: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    image: product.image,
+                                    quantity: 1,
+                                    attributes: {}
+                                });
+                            }}
+                            className="w-8 h-8 lg:w-9 lg:h-9 bg-zinc-50 border border-zinc-100 rounded-full flex items-center justify-center text-zinc-400 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all active:scale-95 shadow-sm"
+                            title="Add to Cart"
+                        >
+                            <ShoppingCart className="w-4 h-4" />
+                        </button>
                     )}
                 </div>
-
-                {/* Premium Action Button */}
-                {product.variants && product.variants.length > 0 ? (
-                    <Link
-                        href={`/product/${product.slug}`}
-                        className="w-full group/btn relative bg-zinc-900 hover:bg-zinc-800 text-white py-3 lg:py-4 rounded-2xl flex items-center justify-center gap-2 overflow-hidden transition-all active:scale-95"
-                    >
-                        <span className="relative z-10 text-xs font-black uppercase tracking-widest">Select Options</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-orange-500 opacity-0 group-hover/btn:opacity-10 transition-opacity" />
-                    </Link>
-                ) : (
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            addToCart({
-                                id: product.id,
-                                name: product.name,
-                                price: product.price,
-                                image: product.image,
-                                quantity: 1,
-                                attributes: {}
-                            });
-                        }}
-                        className="w-full group/btn relative bg-zinc-900 hover:bg-zinc-800 text-white py-3 lg:py-4 rounded-2xl flex items-center justify-center gap-2 overflow-hidden transition-all active:scale-95"
-                    >
-                        <ShoppingCart className="w-4 h-4 relative z-10" />
-                        <span className="relative z-10 text-xs font-black uppercase tracking-widest">Add To Cart</span>
-                        {/* Glow on hover */}
-                        <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-primary to-orange-500 transform scale-x-0 group-hover/btn:scale-x-100 transition-transform origin-left duration-500" />
-                    </button>
-                )}
             </div>
         </div>
     );
