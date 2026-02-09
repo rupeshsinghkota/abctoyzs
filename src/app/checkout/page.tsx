@@ -131,8 +131,9 @@ export default function CheckoutPage() {
                     }
                 },
                 prefill: {
-                    name: profile?.full_name || "",
-                    contact: profile?.phone || ""
+                    name: addresses.find(a => a.id === selectedAddressId)?.name || profile?.name || "",
+                    contact: addresses.find(a => a.id === selectedAddressId)?.phone || profile?.phone || "",
+                    email: profile?.email || ""
                 },
                 theme: {
                     color: "#F97316" // Orange primary color
