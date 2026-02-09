@@ -42,21 +42,7 @@ export default async function Home() {
 
       <CategoryGrid />
 
-      {/* Promo Banner Placeholder */}
-      <div className="px-4 py-6">
-        <div className="w-full h-32 md:h-48 bg-gradient-to-r from-primary to-orange-600 rounded-2xl flex items-center justify-between px-6 md:px-12 text-white relative overflow-hidden shadow-lg shadow-orange-500/20">
-          <div className="relative z-10">
-            <span className="text-xs md:text-sm font-bold opacity-90 uppercase tracking-widest">Limited Offer</span>
-            <h3 className="text-2xl md:text-3xl font-black mt-1">Get 10% OFF</h3>
-            <p className="text-sm md:text-base opacity-90">On your first app order</p>
-            <button className="mt-3 px-4 py-1.5 bg-white text-primary text-xs font-bold rounded-full">Use Code: ABCAPP</button>
-          </div>
-          <div className="relative z-10 opacity-20 transform scale-150 rotate-12">
-            {/* Decorative icon or text */}
-            <h1 className="text-8xl font-black">TOYS</h1>
-          </div>
-        </div>
-      </div>
+
 
       <ProductStrip title="Trending Now" products={trending} viewAllLink="/category/all" />
 
