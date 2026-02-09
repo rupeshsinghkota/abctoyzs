@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useStore } from '@/store/useStore';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, Loader2 } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
-    const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
+    const { cart, removeFromCart, updateQuantity } = useStore();
     const router = useRouter();
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0; // Free shipping

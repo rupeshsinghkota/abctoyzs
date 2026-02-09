@@ -9,14 +9,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
     ArrowLeft, MapPin, Plus, Check, Truck, CreditCard,
-    Banknote, Loader2, ShieldCheck, Package, ChevronRight, User
+    Banknote, Loader2, ShieldCheck, Package, ChevronRight
 } from 'lucide-react';
 
 
 declare global {
     interface Window {
         Razorpay: any;
-        Shiprocket: any; // Added for Shiprocket Fast Checkout
     }
 }
 
