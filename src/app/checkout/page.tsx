@@ -445,12 +445,18 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: ()
                     onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                 >
                     <option value="">Select State</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Maharashtra">Maharashtra</option>
-                    <option value="Karnataka">Karnataka</option>
-                    <option value="Uttar Pradesh">Uttar Pradesh</option>
-                    <option value="Rajasthan">Rajasthan</option>
-                    <option value="Other">Other</option>
+                    {[
+                        "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+                        "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+                        "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+                        "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan",
+                        "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
+                        "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
+                        "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Lakshadweep",
+                        "Puducherry", "Ladakh", "Jammu and Kashmir"
+                    ].sort().map(state => (
+                        <option key={state} value={state}>{state}</option>
+                    ))}
                 </select>
             </div>
 
