@@ -90,5 +90,34 @@ export const ShiprocketService = {
             console.error('[Shiprocket AWB Tracking Service Error]:', error);
             throw error;
         }
+    },
+
+    async getServiceability(delivery_postcode: string, weight: number = 1.0, is_cod: boolean = false) {
+        try {
+            const token = await this.authenticate();
+
+            // Shiprocket Serviceability API
+            // pickup_postcode is 110055 (Jhandewalan)
+            const url = `https://apiv2.shiprocket.in/v1/external/courier/serviceability/?pickup_postcode=110055&delivery_postcode=${delivery_postcode}&weight=${weight}&cod=${is_cod ? 1 : 0}`;
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('[Shiprocket Serviceability Error]:', error);
+                throw new Error('Pincode serviceability check failed');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('[Shiprocket Serviceability Service Error]:', error);
+            throw error;
+        }
     }
 };

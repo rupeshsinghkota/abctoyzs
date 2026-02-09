@@ -73,7 +73,7 @@ export async function POST(req: Request) {
             const shiprocketOrder = {
                 order_id: order.id,
                 order_date: new Date().toISOString(),
-                pickup_location: "Primary",
+                pickup_location: "Jhandewalan",
                 billing_customer_name: order.shipping_address.name,
                 billing_last_name: "",
                 billing_address: order.shipping_address.address_line1,
