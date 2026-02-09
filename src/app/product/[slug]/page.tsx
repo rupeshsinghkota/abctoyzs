@@ -1,7 +1,7 @@
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { ChevronRight, Home, Share2, Heart, ShoppingBag, Gauge, Package, ArrowRight, Wallet, ShieldCheck, Zap, Medal, Star, Weight, Gamepad2, CheckCircle2, Truck, Baby } from 'lucide-react';
-import { ProductGrid } from '@/components/shop/ProductGrid';
+
 import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { ProductSchema } from '@/components/product/ProductSchema';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
@@ -83,42 +83,6 @@ export default async function ProductPage({ params }: PageProps) {
         notFound();
     }
 
-    // Get related products (same category, excluding current)
-    // Get related products with Smart Fallback
-    const allProducts = await fetchProducts();
-
-    // 1. Primary Strategy: Same Category
-    let relatedProducts = allProducts
-        .filter(p => p.id !== product.id && p.category === product.category);
-
-    // 2. Fallback Strategy: Fill with Best Sellers / Popular if we have fewer than 4 items
-    if (relatedProducts.length < 4) {
-        const needed = 4 - relatedProducts.length;
-        const fallbackItems = allProducts
-            .filter(p =>
-                p.id !== product.id && // Not current product
-                p.category !== product.category && // Not already in list (different cat)
-                (p.tag === 'Best Seller' || p.rating >= 4.5) // Prioritize popular
-            )
-            .slice(0, needed + 2); // Fetch a few extras just in case
-
-        relatedProducts = [...relatedProducts, ...fallbackItems];
-
-        // 3. Final Fallback: If still under 4, just grab any other products
-        if (relatedProducts.length < 4) {
-            const stillNeeded = 4 - relatedProducts.length;
-            const remaining = allProducts
-                .filter(p =>
-                    p.id !== product.id &&
-                    !relatedProducts.find(rp => rp.id === p.id)
-                )
-                .slice(0, stillNeeded);
-            relatedProducts = [...relatedProducts, ...remaining];
-        }
-    }
-
-    // Limit to 6 items max for display
-    relatedProducts = relatedProducts.slice(0, 6);
 
     // Feature highlights
     const highlights = [
@@ -253,15 +217,7 @@ export default async function ProductPage({ params }: PageProps) {
                     )}
                 </div>
 
-                {/* Related Products — visible on ALL devices */}
-                {relatedProducts.length > 0 && (
-                    <div className="md:mt-8 border-t pt-4 md:pt-10 px-4 lg:px-0 pb-8">
-                        <div className="container mx-auto">
-                            <h2 className="text-xl md:text-2xl lg:text-3xl font-black mb-6 md:mb-8">You Might Also Like</h2>
-                            <ProductGrid products={relatedProducts} />
-                        </div>
-                    </div>
-                )}
+
             </main>
 
             {/* Mobile Footer Spacing for Sticky Bar */}
