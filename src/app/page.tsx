@@ -46,6 +46,10 @@ export default async function Home() {
   const budget = products.filter(p => p.price < 15000).sort((a, b) => a.price - b.price).slice(0, 10);
 
   // Category Highlights
+  // Filter products for new sections
+  const toddlers = products.filter(p => p.ageGroup === '1-3' || (p.specs?.suitable_age && p.specs.suitable_age.includes('1-')));
+  const valueRides = products.filter(p => p.price < 15000 && p.category !== 'accessories');
+  const performance = products.filter(p => p.voltage === '24V' || p.price > 20000);
   const bikes = products.filter(p => p.category === 'bikes').slice(0, 10);
   const jeeps = products.filter(p => p.category === 'jeeps').slice(0, 10);
 
@@ -64,6 +68,13 @@ export default async function Home() {
         <ShopByAge />
       </LazySection>
 
+      {/* Toddler's First Ride */}
+      {toddlers.length > 0 && (
+        <LazySection className="mt-2" placeholderHeight="h-64">
+          <ProductStrip title="Toddler's First Ride" products={toddlers} viewAllLink="/category/age/1-3" />
+        </LazySection>
+      )}
+
       {/* First Fold Content (Eager Loaded) */}
       <ProductStrip title="New Arrivals" products={newArrivals} viewAllLink="/category/new" />
       <CategoryGrid />
@@ -72,6 +83,13 @@ export default async function Home() {
       <LazySection className="mt-2" placeholderHeight="h-64">
         <ShopByPower />
       </LazySection>
+
+      {/* High Performance */}
+      {performance.length > 0 && (
+        <LazySection className="mt-2" placeholderHeight="h-64">
+          <ProductStrip title="High Performance Machines" products={performance} viewAllLink="/category/power/24v" />
+        </LazySection>
+      )}
 
       <div className="container mx-auto px-4 mt-8 md:mt-12">
         <div className="flex items-center justify-between mb-6 md:mb-8">
@@ -110,9 +128,12 @@ export default async function Home() {
         <ShopByBudget />
       </LazySection>
 
-      <LazySection className="mt-2 mb-8" placeholderHeight="h-64">
-        <ProductStrip title="Budget Friendly Picks" products={budget} viewAllLink="/category/all" />
-      </LazySection>
+      {/* Best Value */}
+      {valueRides.length > 0 && (
+        <LazySection className="mt-2 mb-8" placeholderHeight="h-64">
+          <ProductStrip title="Best Value Rides" products={valueRides} viewAllLink="/category/price/under-10k" />
+        </LazySection>
+      )}
 
       <Testimonials />
       <Newsletter />

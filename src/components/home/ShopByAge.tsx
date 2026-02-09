@@ -1,11 +1,12 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const ageGroups = [
-    { label: "1-3 Years", range: "Toddlers", href: "/category/age/1-3" },
-    { label: "3-5 Years", range: "Preschoolers", href: "/category/age/3-5" },
-    { label: "5-8 Years", range: "Kids", href: "/category/age/5-8" },
-    { label: "8+ Years", range: "Big Kids", href: "/category/age/8-plus" }
+    { label: "1-3 Years", range: "Toddlers", href: "/category/age/1-3", image: "/images/shop-by/age-toddler.png" },
+    { label: "3-5 Years", range: "Preschoolers", href: "/category/age/3-5", image: "/images/shop-by/age-preschool.png" },
+    { label: "5-8 Years", range: "Kids", href: "/category/age/5-8", image: "/images/shop-by/age-kids.png" },
+    { label: "8+ Years", range: "Big Kids", href: "/category/age/8-plus", image: "/images/shop-by/age-bigkids.png" }
 ];
 
 export function ShopByAge() {
@@ -15,11 +16,17 @@ export function ShopByAge() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {ageGroups.map((group, i) => (
                     <Link key={i} href={group.href} className="group relative aspect-square bg-zinc-100 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 block">
-                        <div className="absolute inset-0 bg-gradient-to-br from-zinc-200 to-zinc-300 group-hover:scale-110 transition-transform duration-700" />
-                        <div className="absolute inset-0 flex flex-col justify-end p-6">
-                            <span className="text-4xl font-black text-black/5 absolute top-4 right-4 group-hover:text-black/10 transition-colors">{i + 1}</span>
-                            <h3 className="text-lg md:text-xl font-bold relative z-10">{group.label}</h3>
-                            <p className="text-[10px] md:text-xs font-bold text-zinc-500 uppercase tracking-wider relative z-10">{group.range}</p>
+                        <Image
+                            src={group.image}
+                            alt={group.label}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-6">
+                            <span className="text-4xl font-black text-white/10 absolute top-4 right-4">{i + 1}</span>
+                            <h3 className="text-lg md:text-xl font-bold text-white relative z-10">{group.label}</h3>
+                            <p className="text-[10px] md:text-xs font-bold text-white/80 uppercase tracking-wider relative z-10">{group.range}</p>
                         </div>
                     </Link>
                 ))}
