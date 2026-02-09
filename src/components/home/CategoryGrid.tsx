@@ -30,6 +30,7 @@ export function CategoryGrid() {
                         <img
                             src={cat.image}
                             alt={cat.label}
+                            loading="lazy"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
                         />
 
