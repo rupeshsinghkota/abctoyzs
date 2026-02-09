@@ -39,7 +39,7 @@ export default async function AgeCategoryPage({ params }: AgeCategoryPageProps) 
 
     return (
         <div className="min-h-screen pb-20">
-            <div className="sticky top-16 z-30 bg-background/80 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between">
+            <div className="bg-background border-b px-4 py-3 flex items-center justify-between">
                 <div>
                     <h1 className="text-xl font-bold font-heading">Age: {categoryInfo.label}</h1>
                     <p className="text-xs text-muted-foreground">Ride-ons perfect for this age group</p>
