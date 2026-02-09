@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { AdminService } from '@/lib/services/admin';
+import { InvoiceService } from '@/lib/services/invoice';
 import {
     Loader2, Package, Calendar, User, MapPin, Search,
     CreditCard, Banknote, ShoppingCart, ChevronRight,
-    Download, Truck, Info, CheckCircle2, XCircle
+    Download, Truck, Info, CheckCircle2, XCircle, Phone,
+    FileText
 } from 'lucide-react';
 
 type Order = {
@@ -14,8 +16,10 @@ type Order = {
     total_amount: number;
     status: string;
     payment_status: string;
+    payment_method?: string;
     shipping_carrier?: string;
     tracking_id?: string;
+    shiprocket_order_id?: string;
     admin_notes?: string;
     created_at: string;
     items: any[];
@@ -55,9 +59,32 @@ export default function OrdersPage() {
     async function updateOrderDetails(orderId: string, updates: Partial<Order>) {
         setUpdating(orderId);
         try {
-            await AdminService.updateOrder(orderId, updates);
+            // Automatically add lifecycle timestamps based on status change
+            const finalUpdates = { ...updates };
+            if (updates.status) {
+                const now = new Date().toISOString();
+                switch (updates.status) {
+                    case 'shipped':
+                        (finalUpdates as any).shipped_at = now;
+                        break;
+                    case 'delivered':
+                        (finalUpdates as any).delivered_at = now;
+                        break;
+                    case 'cancelled':
+                        (finalUpdates as any).canceled_at = now;
+                        break;
+                    case 'returned':
+                        (finalUpdates as any).returned_at = now;
+                        break;
+                    case 'refunded':
+                        (finalUpdates as any).refunded_at = now;
+                        break;
+                }
+            }
+
+            await AdminService.updateOrder(orderId, finalUpdates);
             setOrders(orders.map(o =>
-                o.id === orderId ? { ...o, ...updates } : o
+                o.id === orderId ? { ...o, ...finalUpdates } : o
             ));
         } catch (error) {
             alert('Failed to update order');
@@ -67,7 +94,7 @@ export default function OrdersPage() {
     }
 
     const exportToCSV = () => {
-        const headers = ["Order ID", "Date", "Customer", "Phone", "Status", "Payment", "Amount", "Carrier", "Tracking"];
+        const headers = ["Order ID", "Date", "Customer", "Phone", "Status", "Payment", "Amount", "Method", "Carrier", "AWB", "Shiprocket ID", "Shipped At", "Delivered At", "Refunded Amnt"];
         const rows = filteredOrders.map(o => [
             o.id,
             new Date(o.created_at).toLocaleDateString(),
@@ -76,8 +103,13 @@ export default function OrdersPage() {
             o.status,
             o.payment_status,
             o.total_amount,
+            o.payment_method || "PREPAID",
             o.shipping_carrier || "N/A",
-            o.tracking_id || "N/A"
+            o.tracking_id || "N/A",
+            o.shiprocket_order_id || "N/A",
+            (o as any).shipped_at ? new Date((o as any).shipped_at).toLocaleString() : "N/A",
+            (o as any).delivered_at ? new Date((o as any).delivered_at).toLocaleString() : "N/A",
+            (o as any).refunded_amount || "0"
         ]);
 
         const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
@@ -96,7 +128,8 @@ export default function OrdersPage() {
         const matchesSearch =
             order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.shipping_address?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.shipping_address?.phone.includes(searchTerm);
+            order.shipping_address?.phone.includes(searchTerm) ||
+            order.shiprocket_order_id?.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesFilter = filterStatus === 'all' || order.status === filterStatus;
 
@@ -119,7 +152,7 @@ export default function OrdersPage() {
                     <h1 className="text-4xl font-black bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-400 bg-clip-text text-transparent tracking-tighter">
                         Order Hub
                     </h1>
-                    <p className="text-muted-foreground mt-2 font-medium">Empowering your fulfillment workflow</p>
+                    <p className="text-muted-foreground mt-2 font-medium italic">Fulfillment Excellence Powered by D2BCart</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                     <button
@@ -133,7 +166,7 @@ export default function OrdersPage() {
                         <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <input
                             type="text"
-                            placeholder="Find an order..."
+                            placeholder="Order ID, Phone, or Shiprocket ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-11 pr-5 py-3 bg-white border border-zinc-200 rounded-2xl text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none w-full md:w-80 transition-all shadow-sm font-medium"
@@ -144,11 +177,13 @@ export default function OrdersPage() {
                         onChange={(e) => setFilterStatus(e.target.value)}
                         className="px-5 py-3 bg-white border border-zinc-200 rounded-2xl text-sm font-bold outline-none cursor-pointer hover:border-zinc-300 transition-all shadow-sm"
                     >
-                        <option value="all">All Orders</option>
+                        <option value="all">All Statuses</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
                         <option value="cancelled">Cancelled</option>
+                        <option value="returned">Returned</option>
+                        <option value="refunded">Refunded</option>
                     </select>
                 </div>
             </div>
@@ -166,17 +201,26 @@ export default function OrdersPage() {
                     {filteredOrders.map((order) => (
                         <div key={order.id} className="group bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-500 ring-1 ring-zinc-50">
                             {/* Card Header: Summary Info */}
-                            <div className="p-8 border-b border-zinc-50 bg-zinc-50/30 group-hover:bg-zinc-50 transition-colors">
+                            <div className="p-8 border-b border-zinc-50 bg-zinc-50/30 group-hover:bg-zinc-100 transition-colors">
                                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                                     <div className="flex items-center gap-5">
-                                        <div className="w-14 h-14 bg-white border border-zinc-100 rounded-3xl flex items-center justify-center shadow-sm">
-                                            <Package className="w-6 h-6 text-primary" />
+                                        <div className="w-14 h-14 bg-white border border-zinc-100 rounded-3xl flex items-center justify-center shadow-sm group-hover:bg-primary transition-colors">
+                                            <Package className="w-6 h-6 text-primary group-hover:text-white" />
                                         </div>
                                         <div>
                                             <p className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] mb-1">ID Ref</p>
-                                            <p className="font-mono text-xs font-black text-zinc-600 bg-white border border-zinc-100 px-3 py-1.5 rounded-xl">
-                                                #{order.id.substring(0, 8).toUpperCase()}
-                                            </p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-mono text-xs font-black text-zinc-600 bg-white border border-zinc-100 px-3 py-1.5 rounded-xl">
+                                                    #{order.id.substring(0, 8).toUpperCase()}
+                                                </p>
+                                                <button
+                                                    onClick={() => InvoiceService.generateInvoice(order)}
+                                                    className="p-1.5 hover:bg-white rounded-lg text-zinc-400 hover:text-primary transition-colors border border-transparent hover:border-zinc-100"
+                                                    title="Download Invoice"
+                                                >
+                                                    <FileText className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -186,28 +230,27 @@ export default function OrdersPage() {
                                             <p className="text-sm font-black text-zinc-800">{order.shipping_address?.name || 'Guest'}</p>
                                             <div className="w-1 h-1 bg-zinc-300 rounded-full" />
                                             <p className="text-xs font-bold text-zinc-500 italic">
-                                                {new Date(order.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                                                {new Date(order.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="flex flex-col justify-center">
-                                        <p className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] mb-2">Payment Status</p>
-                                        <div className="flex items-center gap-3">
+                                        <p className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] mb-2">Payment</p>
+                                        <div className="flex items-center gap-2">
                                             <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black tracking-wider transition-all shadow-sm ${order.payment_status === 'paid'
-                                                    ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100'
+                                                ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100'
+                                                : order.payment_status === 'refunded'
+                                                    ? 'bg-rose-50 text-rose-600 ring-1 ring-rose-100'
                                                     : 'bg-amber-50 text-amber-600 ring-1 ring-amber-100'
                                                 }`}>
                                                 {order.payment_status === 'paid' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Info className="w-3.5 h-3.5" />}
                                                 {order.payment_status?.toUpperCase() || 'PENDING'}
                                             </div>
-                                            {order.payment_status !== 'paid' && (
-                                                <button
-                                                    onClick={() => updateOrderDetails(order.id, { payment_status: 'paid' })}
-                                                    className="text-[10px] font-black text-primary hover:underline"
-                                                >
-                                                    Mark Paid
-                                                </button>
+                                            {order.payment_method === 'COD' && (
+                                                <div className="bg-zinc-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black tracking-widest border border-zinc-700">
+                                                    COD
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -225,16 +268,18 @@ export default function OrdersPage() {
                             <div className="p-10">
                                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
                                     {/* Items List */}
-                                    <div className="lg:col-span-7 space-y-6">
-                                        <div className="flex items-center gap-3 pb-2 border-b border-zinc-50">
-                                            <ShoppingCart className="w-5 h-5 text-zinc-800" />
-                                            <h4 className="text-sm font-black uppercase tracking-widest text-zinc-800">Basket Content</h4>
-                                            <span className="ml-auto text-xs font-bold text-zinc-400">{order.items?.length || 0} Products</span>
+                                    <div className="lg:col-span-7 space-y-8">
+                                        <div className="flex items-center gap-4 pb-2 border-b border-zinc-50">
+                                            <div className="w-8 h-8 bg-zinc-100 rounded-lg flex items-center justify-center">
+                                                <ShoppingCart className="w-4 h-4 text-zinc-800" />
+                                            </div>
+                                            <h4 className="text-xs font-black uppercase tracking-widest text-zinc-800">Basket Content</h4>
+                                            <span className="ml-auto text-xs font-black text-zinc-400 italic bg-zinc-50 px-3 py-1 rounded-full">{order.items?.length || 0} ITEMS</span>
                                         </div>
                                         <div className="grid grid-cols-1 gap-4">
                                             {order.items?.map((item: any) => (
-                                                <div key={item.id} className="flex items-center gap-6 p-5 bg-zinc-50/20 rounded-[2rem] border border-zinc-50 hover:bg-white hover:shadow-lg hover:shadow-zinc-200/30 transition-all group/item">
-                                                    <div className="w-20 h-20 bg-white rounded-2xl overflow-hidden flex-shrink-0 border border-zinc-100 p-1 shadow-sm group-hover/item:scale-105 transition-transform">
+                                                <div key={item.id} className="flex items-center gap-6 p-5 bg-zinc-50/30 rounded-[2rem] border border-zinc-50 hover:bg-white hover:shadow-xl hover:shadow-zinc-200/50 transition-all group/item ring-1 ring-transparent hover:ring-zinc-100">
+                                                    <div className="w-20 h-20 bg-white rounded-2xl overflow-hidden flex-shrink-0 border border-zinc-100 p-1 shadow-sm group-hover/item:scale-105 transition-transform duration-500">
                                                         {item.product_image && (
                                                             <img
                                                                 src={item.product_image}
@@ -244,103 +289,192 @@ export default function OrdersPage() {
                                                         )}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="font-extrabold text-zinc-900 group-hover/item:text-primary transition-colors truncate">{item.product_name}</p>
+                                                        <p className="font-black text-zinc-900 group-hover/item:text-primary transition-colors truncate text-lg">{item.product_name}</p>
                                                         <div className="flex items-center gap-3 mt-2">
-                                                            <span className="text-xs font-bold bg-white border border-zinc-100 px-3 py-1 rounded-lg text-zinc-500">
-                                                                Qty: <span className="text-zinc-900">{item.quantity}</span>
+                                                            <span className="text-[10px] font-black bg-white border border-zinc-100 px-3 py-1.5 rounded-lg text-zinc-500 uppercase tracking-widest">
+                                                                QTY <span className="text-zinc-900 ml-1">{item.quantity}</span>
                                                             </span>
-                                                            <span className="text-xs font-black text-zinc-300">|</span>
-                                                            <span className="text-xs font-bold text-zinc-400 italic">Unit: ₹{item.price.toLocaleString()}</span>
+                                                            <span className="text-xs font-black text-zinc-200">•</span>
+                                                            <span className="text-xs font-bold text-zinc-400 italic">Rate: ₹{item.price.toLocaleString()}</span>
                                                         </div>
                                                     </div>
-                                                    <p className="font-black text-xl text-zinc-900">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                                    <p className="font-black text-2xl text-zinc-900">₹{(item.price * item.quantity).toLocaleString()}</p>
                                                 </div>
                                             ))}
+                                        </div>
+
+                                        {/* Admin Notes */}
+                                        <div className="pt-8 border-t border-zinc-50">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <Info className="w-4 h-4 text-zinc-400" />
+                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Internal Audit Notes</h4>
+                                            </div>
+                                            <textarea
+                                                defaultValue={order.admin_notes}
+                                                onBlur={(e) => updateOrderDetails(order.id, { admin_notes: e.target.value })}
+                                                placeholder="Write internal notes here (e.g., 'Customer requested call before delivery')"
+                                                className="w-full bg-zinc-50 border border-zinc-100 rounded-3xl p-5 text-sm font-medium placeholder:italic placeholder:text-zinc-300 focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary/20 transition-all outline-none min-h-[120px]"
+                                            />
                                         </div>
                                     </div>
 
                                     {/* Fulfillment Sidebar */}
                                     <div className="lg:col-span-5 space-y-8">
                                         {/* Status & Tracking Box */}
-                                        <div className="bg-zinc-900 text-white rounded-[2.5rem] p-8 shadow-2xl shadow-zinc-200 ring-4 ring-zinc-50">
-                                            <p className="text-[10px] font-black uppercase text-zinc-500 tracking-[0.3em] mb-6">Workflow Management</p>
+                                        <div className="bg-zinc-950 text-white rounded-[3rem] p-10 shadow-2xl shadow-zinc-200 ring-8 ring-zinc-50 border border-zinc-800">
+                                            <div className="flex items-center justify-between mb-8">
+                                                <p className="text-[10px] font-black uppercase text-zinc-500 tracking-[0.3em]">Workflow Control</p>
+                                                {order.shiprocket_order_id && (
+                                                    <div className="flex items-center gap-2 bg-zinc-900 px-3 py-1 rounded-full border border-zinc-800">
+                                                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                                        <span className="text-[9px] font-black text-zinc-400">SR: {order.shiprocket_order_id}</span>
+                                                    </div>
+                                                )}
+                                            </div>
 
-                                            <div className="space-y-6">
+                                            <div className="space-y-8">
                                                 <div>
-                                                    <label className="text-xs font-black text-zinc-400 mb-3 block">Fulfillment Status</label>
+                                                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4 block">Fulfillment State</label>
                                                     <div className="relative">
                                                         <select
                                                             value={order.status}
                                                             onChange={(e) => updateOrderDetails(order.id, { status: e.target.value })}
-                                                            className={`w-full bg-zinc-800 border-none px-6 py-4 rounded-[1.25rem] font-black text-sm outline-none cursor-pointer appearance-none transition-all ${order.status === 'delivered' ? 'text-emerald-400' :
-                                                                    order.status === 'shipped' ? 'text-sky-400' :
-                                                                        order.status === 'cancelled' ? 'text-rose-400' :
-                                                                            'text-amber-400'
+                                                            className={`w-full bg-zinc-900 border border-zinc-800 px-7 py-5 rounded-2xl font-black text-sm outline-none cursor-pointer appearance-none transition-all focus:border-primary/50 ${order.status === 'delivered' ? 'text-emerald-400 ring-2 ring-emerald-400/20' :
+                                                                order.status === 'shipped' ? 'text-sky-400 ring-2 ring-sky-400/20' :
+                                                                    order.status === 'cancelled' || order.status === 'returned' ? 'text-rose-400 ring-2 ring-rose-400/20' :
+                                                                        'text-amber-400 ring-2 ring-amber-400/20'
                                                                 }`}
                                                         >
                                                             <option value="processing">PROCESSING</option>
-                                                            <option value="shipped">SHIPPED</option>
+                                                            <option value="shipped">SHIPPED / IN TRANSIT</option>
                                                             <option value="delivered">DELIVERED</option>
                                                             <option value="cancelled">CANCELLED</option>
+                                                            <option value="returned">RETURNED</option>
+                                                            <option value="refunded">REFUNDED</option>
                                                         </select>
-                                                        <ChevronRight className="w-5 h-5 absolute right-5 top-1/2 -translate-y-1/2 rotate-90 text-zinc-600 pointer-events-none" />
+                                                        <ChevronRight className="w-5 h-5 absolute right-6 top-1/2 -translate-y-1/2 rotate-90 text-zinc-600 pointer-events-none" />
                                                     </div>
                                                 </div>
 
-                                                {(order.status === 'shipped' || order.status === 'delivered' || order.tracking_id) && (
-                                                    <div className="space-y-4 pt-4 border-t border-zinc-800">
-                                                        <div className="flex items-center gap-3 mb-4">
-                                                            <Truck className="w-5 h-5 text-primary" />
-                                                            <p className="text-xs font-black uppercase text-zinc-200 tracking-widest">Tracking Logistics</p>
+                                                <div className="space-y-6 pt-8 border-t border-zinc-900">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <Truck className="w-4 h-4 text-primary" />
+                                                            <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Tracking Logistics</p>
                                                         </div>
-                                                        <div className="grid grid-cols-2 gap-3">
+                                                        <button
+                                                            onClick={() => {
+                                                                const carrier = (document.getElementById(`carrier-${order.id}`) as HTMLInputElement)?.value;
+                                                                const awb = (document.getElementById(`awb-${order.id}`) as HTMLInputElement)?.value;
+                                                                updateOrderDetails(order.id, { shipping_carrier: carrier, tracking_id: awb });
+                                                            }}
+                                                            className="text-[10px] font-black text-primary hover:text-white transition-colors"
+                                                        >
+                                                            UPDATE NOW
+                                                        </button>
+                                                    </div>
+                                                    <div className="space-y-4">
+                                                        <div className="relative group">
                                                             <input
+                                                                id={`carrier-${order.id}`}
                                                                 type="text"
-                                                                placeholder="Carrier (Delhivery...)"
+                                                                placeholder="Carrier Name (e.g. Delhivery)"
                                                                 defaultValue={order.shipping_carrier}
-                                                                onBlur={(e) => updateOrderDetails(order.id, { shipping_carrier: e.target.value })}
-                                                                className="bg-zinc-800 border-none px-5 py-3.5 rounded-xl text-xs font-bold text-white placeholder:text-zinc-600 outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                                                                className="w-full bg-zinc-900 border border-zinc-800 px-6 py-4 rounded-xl text-xs font-bold text-white placeholder:text-zinc-600 outline-none focus:border-primary/50 transition-all"
                                                             />
+                                                            <label className="absolute -top-2 left-4 px-2 bg-zinc-900 text-[8px] font-black text-zinc-600 transition-colors group-focus-within:text-primary tracking-[0.2em]">CARRIER</label>
+                                                        </div>
+                                                        <div className="relative group">
                                                             <input
+                                                                id={`awb-${order.id}`}
                                                                 type="text"
-                                                                placeholder="Tracking ID #"
+                                                                placeholder="AWB / Air Waybill Number"
                                                                 defaultValue={order.tracking_id}
-                                                                onBlur={(e) => updateOrderDetails(order.id, { tracking_id: e.target.value })}
-                                                                className="bg-zinc-800 border-none px-5 py-3.5 rounded-xl text-xs font-bold text-white placeholder:text-zinc-600 outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                                                                className="w-full bg-zinc-900 border border-zinc-800 px-6 py-4 rounded-xl text-xs font-bold text-white placeholder:text-zinc-600 outline-none focus:border-primary/50 transition-all font-mono"
                                                             />
+                                                            <label className="absolute -top-2 left-4 px-2 bg-zinc-900 text-[8px] font-black text-zinc-600 transition-colors group-focus-within:text-primary tracking-[0.2em]">AWB NUMBER</label>
                                                         </div>
                                                     </div>
-                                                )}
+                                                </div>
+
+                                                <div className="space-y-6 pt-8 border-t border-zinc-900">
+                                                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4 block">Merchant Actions</label>
+                                                    <div className="flex flex-col gap-4">
+                                                        <div className="flex gap-4">
+                                                            <button
+                                                                onClick={() => updateOrderDetails(order.id, { payment_status: order.payment_status === 'paid' ? 'pending' : 'paid' })}
+                                                                className={`flex-1 py-4 rounded-2xl text-[10px] font-black tracking-widest flex items-center justify-center gap-2 border transition-all ${order.payment_status === 'paid'
+                                                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20'
+                                                                    : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+                                                                    }`}
+                                                            >
+                                                                <CheckCircle2 className="w-4 h-4" />
+                                                                {order.payment_status === 'paid' ? 'MARKED PAID' : 'MARK PAID'}
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    const amount = prompt("Enter Refund Amount (₹):", order.total_amount.toString());
+                                                                    const refId = prompt("Enter Razorpay Refund ID (if any):", "");
+                                                                    if (amount) {
+                                                                        updateOrderDetails(order.id, {
+                                                                            status: 'refunded',
+                                                                            payment_status: 'refunded',
+                                                                            refunded_amount: parseFloat(amount),
+                                                                            razorpay_refund_id: refId || ''
+                                                                        } as any);
+                                                                    }
+                                                                }}
+                                                                className="flex-1 py-4 rounded-2xl text-[10px] font-black tracking-widest bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-all flex items-center justify-center gap-2"
+                                                            >
+                                                                <XCircle className="w-4 h-4" />
+                                                                REFUND
+                                                            </button>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => InvoiceService.generateInvoice(order)}
+                                                            className="w-full py-4 rounded-2xl text-[10px] font-black tracking-widest bg-primary text-white hover:bg-zinc-900 transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/20"
+                                                        >
+                                                            <FileText className="w-4 h-4" />
+                                                            GENERATE & DOWNLOAD INVOICE
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Address Card */}
                                         {order.shipping_address && (
-                                            <div className="bg-white border-2 border-zinc-100 rounded-[2.5rem] p-8 shadow-sm">
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
-                                                        <MapPin className="w-5 h-5 text-primary" />
+                                            <div className="bg-white border-2 border-zinc-100 rounded-[3rem] p-10 shadow-sm hover:ring-8 hover:ring-zinc-50 transition-all duration-500 ring ring-transparent">
+                                                <div className="flex items-center gap-4 mb-8">
+                                                    <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                                                        <MapPin className="w-6 h-6 text-primary" />
                                                     </div>
-                                                    <h4 className="text-xs font-black uppercase tracking-widest text-zinc-800">Destination</h4>
+                                                    <div>
+                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Destination</h4>
+                                                        <p className="text-xl font-black text-zinc-900">Shipping Info</p>
+                                                    </div>
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <p className="text-lg font-black text-zinc-900">{order.shipping_address.name}</p>
-                                                    <p className="text-sm font-medium text-zinc-500 leading-relaxed">
-                                                        {order.shipping_address.address_line1}, {order.shipping_address.address_line2 && `${order.shipping_address.address_line2}, `}
+                                                <div className="space-y-3">
+                                                    <p className="text-xl font-black text-zinc-900">{order.shipping_address.name}</p>
+                                                    <p className="text-base font-medium text-zinc-500 leading-relaxed uppercase tracking-tight text-xs">
+                                                        {order.shipping_address.address_line1}
+                                                        {order.shipping_address.address_line2 && <>, <br />{order.shipping_address.address_line2}</>}
                                                         <br />
-                                                        {order.shipping_address.city}, {order.shipping_address.state} - <span className="font-extrabold text-zinc-800">{order.shipping_address.pincode}</span>
+                                                        {order.shipping_address.city}, {order.shipping_address.state}
+                                                        <br />
+                                                        <span className="font-extrabold text-zinc-900 text-lg tracking-widest">{order.shipping_address.pincode}</span>
                                                     </p>
                                                 </div>
-                                                <div className="mt-8 pt-6 border-t border-zinc-100 flex items-center justify-between">
+                                                <div className="mt-10 pt-8 border-t border-zinc-50 flex items-center justify-between">
                                                     <div>
-                                                        <p className="text-[10px] font-black uppercase text-zinc-300 tracking-tighter mb-1">Direct Line</p>
-                                                        <p className="text-sm font-black text-zinc-900">{order.shipping_address.phone}</p>
+                                                        <p className="text-[10px] font-black uppercase text-zinc-300 tracking-[0.2em] mb-2">Direct Reach</p>
+                                                        <p className="text-lg font-black text-zinc-900 tracking-tighter">{order.shipping_address.phone}</p>
                                                     </div>
                                                     <a
                                                         href={`tel:${order.shipping_address.phone}`}
-                                                        className="px-6 py-3 bg-zinc-900 text-white hover:bg-primary rounded-2xl text-[10px] font-black transition-all shadow-xl shadow-zinc-200"
+                                                        className="h-14 w-14 bg-zinc-950 text-white hover:bg-primary rounded-full flex items-center justify-center transition-all shadow-2xl shadow-zinc-200 hover:scale-110 active:scale-95 group"
                                                     >
-                                                        DIAL NOW
+                                                        <Phone className="w-5 h-5 group-hover:animate-bounce" />
                                                     </a>
                                                 </div>
                                             </div>

@@ -3,8 +3,10 @@
 import React, { useState } from "react";
 import {
     Search, Package, Truck, CheckCircle, Clock,
-    AlertCircle, MapPin, ChevronRight, Phone, Hash
+    AlertCircle, MapPin, ChevronRight, Phone, Hash,
+    FileText
 } from "lucide-react";
+import { InvoiceService } from "@/lib/services/invoice";
 
 export default function TrackOrderPage() {
     const [query, setQuery] = useState("");
@@ -100,6 +102,22 @@ export default function TrackOrderPage() {
                                 label="Payment"
                                 value={trackingData.order.payment_status === 'paid' ? 'Paid' : 'COD (Pending)'}
                             />
+                        </div>
+
+                        {/* Customer Action: Download Invoice */}
+                        <div className="flex justify-center mb-8">
+                            <button
+                                onClick={() => InvoiceService.generateInvoice(trackingData.order)}
+                                className="group flex items-center gap-3 bg-zinc-900 hover:bg-primary text-white px-8 py-5 rounded-3xl transition-all shadow-xl shadow-zinc-200 hover:shadow-primary/20 active:scale-95"
+                            >
+                                <div className="p-2 bg-white/10 rounded-xl group-hover:bg-white/20 transition-colors">
+                                    <FileText className="w-5 h-5" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Official Receipt</p>
+                                    <p className="font-black text-sm">Download PDF Invoice</p>
+                                </div>
+                            </button>
                         </div>
 
                         {/* Timeline */}

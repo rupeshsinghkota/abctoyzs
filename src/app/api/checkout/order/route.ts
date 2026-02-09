@@ -14,10 +14,6 @@ export async function POST(req: Request) {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
-        if (!user) {
-            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-        }
-
         const { items, total_amount, shipping_address_id, payment_method } = await req.json();
 
         if (!items || !total_amount || !shipping_address_id) {
@@ -32,7 +28,7 @@ export async function POST(req: Request) {
         const { data: order, error: orderError } = await supabase
             .from('orders')
             .insert({
-                user_id: user.id,
+                user_id: user?.id || null,
                 total_amount: total_amount,
                 shipping_address_id: shipping_address_id,
                 payment_status: 'pending',

@@ -56,8 +56,22 @@ export default function CheckoutPage() {
 
     const refreshAddresses = async (newId?: string) => {
         try {
-            const addrList = await ProfileService.getAddresses();
-            setAddresses(addrList);
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                const addrList = await ProfileService.getAddresses();
+                setAddresses(addrList);
+            } else if (newId) {
+                // For guest, we fetch just the ONE address we created
+                const { data } = await supabase
+                    .from('addresses')
+                    .select('*')
+                    .eq('id', newId)
+                    .single();
+                if (data) setAddresses([data]);
+            }
+
             if (newId) setSelectedAddressId(newId);
             setShowAddrForm(false);
         } catch (error) {
@@ -350,9 +364,8 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: ()
         e.preventDefault();
         setLoading(true);
         try {
-            await ProfileService.addAddress(formData);
-            // Since addAddress doesn't return the ID, we'll refresh and try to find the latest
-            onSuccess();
+            const newAddr = await ProfileService.addAddress(formData);
+            onSuccess(newAddr.id);
         } catch (error) {
             console.error("Failed to add address:", error);
             alert("Failed to save address. Please check all fields.");

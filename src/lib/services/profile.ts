@@ -51,9 +51,13 @@ export const ProfileService = {
 
     async getAddresses() {
         const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return [];
+
         const { data } = await supabase
             .from('addresses')
             .select('*')
+            .eq('user_id', user.id)
             .order('is_default', { ascending: false })
             .order('created_at', { ascending: false });
 
@@ -63,21 +67,23 @@ export const ProfileService = {
     async addAddress(address: Omit<Address, 'id' | 'user_id' | 'created_at'>) {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Not authenticated');
 
-        // If this is set to default, unset others first (optional logic, can be done via DB trigger too)
-        if (address.is_default) {
+        // If this is set to default and user is logged in, unset others
+        if (address.is_default && user) {
             await supabase
                 .from('addresses')
                 .update({ is_default: false })
                 .eq('user_id', user.id);
         }
 
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('addresses')
-            .insert({ ...address, user_id: user.id });
+            .insert({ ...address, user_id: user?.id || null })
+            .select()
+            .single();
 
         if (error) throw error;
+        return data as Address;
     },
 
     async deleteAddress(id: string) {
