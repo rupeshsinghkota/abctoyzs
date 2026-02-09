@@ -27,6 +27,7 @@ export default function CheckoutPage() {
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [profile, setProfile] = useState<any>(null);
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
+    const [showAddrForm, setShowAddrForm] = useState(false);
 
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0;
@@ -40,7 +41,7 @@ export default function CheckoutPage() {
                     ProfileService.getProfile()
                 ]);
                 setAddresses(addrList);
-                setProfile(userProfile);
+                if (addrList.length === 0) setShowAddrForm(true);
 
                 // Auto-select default address
                 const defaultAddr = addrList.find(a => a.is_default);
@@ -52,6 +53,17 @@ export default function CheckoutPage() {
         };
         loadCheckoutData();
     }, []);
+
+    const refreshAddresses = async (newId?: string) => {
+        try {
+            const addrList = await ProfileService.getAddresses();
+            setAddresses(addrList);
+            if (newId) setSelectedAddressId(newId);
+            setShowAddrForm(false);
+        } catch (error) {
+            console.error("Failed to refresh addresses:", error);
+        }
+    };
 
     const handlePayment = async () => {
         if (!selectedAddressId) {
@@ -163,19 +175,33 @@ export default function CheckoutPage() {
                                     </div>
                                     <h2 className="font-bold">Shipping Address</h2>
                                 </div>
-                                <Link href="/profile/addresses" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
-                                    <Plus className="w-4 h-4" /> Add New
-                                </Link>
+                                {!showAddrForm && (
+                                    <button
+                                        onClick={() => setShowAddrForm(true)}
+                                        className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
+                                    >
+                                        <Plus className="w-4 h-4" /> Add New
+                                    </button>
+                                )}
                             </div>
 
                             <div className="p-4 space-y-3">
-                                {addresses.length === 0 ? (
+                                {showAddrForm ? (
+                                    <ShippingAddressForm
+                                        onCancel={() => setShowAddrForm(false)}
+                                        onSuccess={refreshAddresses}
+                                        showCancel={addresses.length > 0}
+                                    />
+                                ) : addresses.length === 0 ? (
                                     <div className="text-center py-8 bg-muted/20 rounded-xl border border-dashed">
                                         <MapPin className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
                                         <p className="text-sm text-muted-foreground mb-4">No addresses found</p>
-                                        <Link href="/profile/addresses" className="text-sm font-bold text-primary">
+                                        <button
+                                            onClick={() => setShowAddrForm(true)}
+                                            className="text-sm font-bold text-primary"
+                                        >
                                             Add Your First Address
-                                        </Link>
+                                        </button>
                                     </div>
                                 ) : (
                                     <div className="grid gap-3">
@@ -304,6 +330,149 @@ export default function CheckoutPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: () => void, onSuccess: (id?: string) => void, showCancel: boolean }) {
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        phone: '',
+        address_line1: '',
+        address_line2: '',
+        city: '',
+        state: '',
+        pincode: '',
+        is_default: true
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            await ProfileService.addAddress(formData);
+            // Since addAddress doesn't return the ID, we'll refresh and try to find the latest
+            onSuccess();
+        } catch (error) {
+            console.error("Failed to add address:", error);
+            alert("Failed to save address. Please check all fields.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Full Name</label>
+                    <input
+                        required
+                        type="text"
+                        placeholder="e.g. Rupesh Singh"
+                        className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
+                </div>
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Phone Number</label>
+                    <input
+                        required
+                        type="tel"
+                        placeholder="e.g. 9876543210"
+                        className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                </div>
+            </div>
+
+            <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Address Line 1</label>
+                <input
+                    required
+                    type="text"
+                    placeholder="House No, Building, Street"
+                    className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                    value={formData.address_line1}
+                    onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
+                />
+            </div>
+
+            <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Address Line 2 (Optional)</label>
+                <input
+                    type="text"
+                    placeholder="Landmark, Area, Colony"
+                    className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                    value={formData.address_line2}
+                    onChange={(e) => setFormData({ ...formData, address_line2: e.target.value })}
+                />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">City</label>
+                    <input
+                        required
+                        type="text"
+                        placeholder="City"
+                        className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    />
+                </div>
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Pincode</label>
+                    <input
+                        required
+                        type="text"
+                        placeholder="6-digit ZIP"
+                        className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                        value={formData.pincode}
+                        onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                    />
+                </div>
+            </div>
+
+            <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">State</label>
+                <select
+                    required
+                    className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                    value={formData.state}
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                >
+                    <option value="">Select State</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+                {showCancel && (
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="flex-1 py-3 border rounded-xl font-bold text-sm hover:bg-muted transition-colors"
+                    >
+                        Cancel
+                    </button>
+                )}
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-[2] py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-xl transition-all disabled:opacity-50"
+                >
+                    {loading ? "Saving..." : "Save & Continue"}
+                </button>
+            </div>
+        </form>
     );
 }
 
