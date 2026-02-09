@@ -18,15 +18,17 @@ export function ProductStrip({ title, products, viewAllLink = '/shop' }: Product
                 </Link>
             </div>
 
-            <HorizontalScroll>
-                {products.map((product) => (
-                    <ProductCard
-                        key={product.id}
-                        product={product}
-                        className="flex-none w-[200px] md:w-[240px] lg:w-[260px] snap-start"
-                    />
-                ))}
-            </HorizontalScroll>
+            <div className="px-4">
+                <HorizontalScroll>
+                    {products.map((product) => (
+                        <ProductCard
+                            key={product.id}
+                            product={product}
+                            className="flex-none w-[200px] md:w-[240px] lg:w-[260px] snap-start"
+                        />
+                    ))}
+                </HorizontalScroll>
+            </div>
         </section>
     );
 }
