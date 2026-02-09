@@ -149,7 +149,7 @@ export default async function ProductPage({ params }: PageProps) {
 
 
     return (
-        <div className="min-h-screen bg-background pb-20 md:pb-0">
+        <div className="min-h-screen bg-background md:pb-0">
             {/* ... (schema and breadcrumb unchanged) */}
             <ProductSchema product={product} />
 
@@ -264,16 +264,13 @@ export default async function ProductPage({ params }: PageProps) {
 
             {/* Related Products — visible on ALL devices */}
             {relatedProducts.length > 0 && (
-                <div className="md:mt-8 border-t pt-4 md:pt-10 px-4 lg:px-0 pb-8">
+                <div className="md:mt-8 border-t pt-4 md:pt-10 px-4 lg:px-0 pb-0">
                     <div className="container mx-auto">
                         <h2 className="text-xl md:text-2xl lg:text-3xl font-black mb-6 md:mb-8">You Might Also Like</h2>
                         <ProductGrid products={relatedProducts} />
                     </div>
                 </div>
             )}
-
-            {/* Mobile Footer Spacing for Sticky Bar */}
-            <div className="h-20 lg:hidden" />
         </div>
     );
 }

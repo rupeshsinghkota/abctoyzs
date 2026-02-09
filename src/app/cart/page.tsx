@@ -38,7 +38,7 @@ export default function CartPage() {
     }
 
     return (
-        <div className="min-h-screen pb-32 bg-background md:pb-0">
+        <div className="min-h-screen pb-8 bg-background md:pb-0">
             <div className="p-4 md:container md:mx-auto md:py-8 md:flex md:gap-8 md:items-start">
 
                 {/* Cart Items */}
@@ -122,21 +122,6 @@ export default function CartPage() {
                         </p>
                     </div>
                 </div>
-            </div>
-
-            {/* Mobile Sticky Checkout */}
-            <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background border-t md:hidden z-20">
-                <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm text-muted-foreground">Total</span>
-                    <span className="text-xl font-black">₹{total.toLocaleString()}</span>
-                </div>
-                <button
-                    onClick={handleCheckout}
-                    className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-2"
-                >
-                    Proceed to Checkout
-                    <ArrowRight className="w-4 h-4" />
-                </button>
             </div>
         </div>
     );

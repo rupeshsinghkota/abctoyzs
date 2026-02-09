@@ -82,7 +82,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             return;
         }
         handleAddToCart();
-        window.location.href = '/cart';
+        window.location.href = '/checkout';
     };
 
     // Helper to find image for a specific option (e.g. Red) for the swatch
@@ -261,10 +261,10 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     </button>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10px] text-muted-foreground pt-4 font-bold uppercase tracking-wider opacity-60 border-t border-gray-100/50 mt-4">
-                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> Secure Payment</div>
-                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> Fast Dispatch</div>
-                    <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> 10-Day Replacement</div>
+                <div className="flex items-center justify-center gap-3 md:gap-6 text-[9px] md:text-[10px] text-muted-foreground pt-3 font-bold uppercase tracking-wider opacity-70 border-t border-gray-100 mt-3 whitespace-nowrap overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-1.5 shrink-0"><CheckCircle2 className="w-3 h-3 text-green-600" strokeWidth={2.5} /> Secure Payment</div>
+                    <div className="flex items-center gap-1.5 shrink-0"><CheckCircle2 className="w-3 h-3 text-green-600" strokeWidth={2.5} /> Fast Dispatch</div>
+                    <div className="flex items-center gap-1.5 shrink-0"><CheckCircle2 className="w-3 h-3 text-green-600" strokeWidth={2.5} /> 10-Day Replacement</div>
                 </div>
             </div>
         </div>
