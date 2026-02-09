@@ -20,7 +20,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
-  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -85,87 +85,308 @@ body {
   scrollbar-width: none;
 }
 
-/* Premium Prose & Marketing Poster Styles */
+/* Premium Prose — Rich Product Description Styling */
 .premium-prose {
-  line-height: 1.8;
+  line-height: 1.85;
   letter-spacing: -0.01em;
-  color: var(--muted-foreground);
+  color: #475569;
+  font-size: 1.0625rem;
 }
 
-.premium-prose h2 {
+.premium-prose>*:first-child {
+  margin-top: 0 !important;
+}
+
+.premium-prose>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Headings */
+.premium-prose h1 {
   font-weight: 900;
-  font-size: 2.25rem;
+  font-size: 2rem;
   letter-spacing: -0.04em;
-  margin-top: 4rem;
-  margin-bottom: 2rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
   color: var(--foreground);
-  text-align: center;
   line-height: 1.2;
 }
 
-.premium-prose h3 {
+.premium-prose h2 {
   font-weight: 800;
   font-size: 1.5rem;
-  letter-spacing: -0.02em;
-  margin-top: 3rem;
-  margin-bottom: 1.25rem;
+  letter-spacing: -0.03em;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
   color: var(--foreground);
+  line-height: 1.25;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f1f5f9;
 }
 
+.premium-prose h3 {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+  line-height: 1.35;
+}
+
+.premium-prose h4 {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+  line-height: 1.4;
+}
+
+/* Paragraphs */
 .premium-prose p {
-  margin-bottom: 1.75rem;
-  font-size: 1.125rem;
+  margin-bottom: 1.25rem;
+  font-size: inherit;
 }
 
+/* Strong / Emphasis */
 .premium-prose strong {
   color: var(--foreground);
+  font-weight: 700;
+}
+
+.premium-prose em {
+  font-style: italic;
+  color: #64748b;
+}
+
+/* Links */
+.premium-prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-color: var(--primary);
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.premium-prose a:hover {
+  opacity: 0.75;
+}
+
+/* Lists */
+.premium-prose ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1.5rem;
+}
+
+.premium-prose ul li {
+  position: relative;
+  padding-left: 1.75rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.premium-prose ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0.6;
+}
+
+.premium-prose ol {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1.5rem;
+  counter-reset: prose-ol;
+}
+
+.premium-prose ol li {
+  position: relative;
+  padding-left: 2.25rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.7;
+  counter-increment: prose-ol;
+}
+
+.premium-prose ol li::before {
+  content: counter(prose-ol);
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.7rem;
   font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.marketing-poster {
-  margin-top: 4rem;
-  margin-bottom: 4rem;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+/* Nested lists */
+.premium-prose ul ul,
+.premium-prose ol ol,
+.premium-prose ul ol,
+.premium-prose ol ul {
+  margin-top: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
-.marketing-poster img {
-  border-radius: 3rem !important;
-  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.25) !important;
-  border: 8px solid rgba(255, 255, 255, 0.05) !important;
+/* Blockquotes */
+.premium-prose blockquote {
+  border-left: 4px solid var(--primary);
+  background: #fff7ed;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0 0.75rem 0.75rem 0;
+  font-style: italic;
+  color: #92400e;
+}
+
+.premium-prose blockquote p {
+  margin-bottom: 0;
+}
+
+/* Tables */
+.premium-prose table {
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.5rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  font-size: 0.9375rem;
+}
+
+.premium-prose thead th {
+  background: #f8fafc;
+  font-weight: 700;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.premium-prose tbody td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #475569;
+}
+
+.premium-prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.premium-prose tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* Images inside description */
+.premium-prose img {
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin: 1.5rem auto;
   display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-.marketing-poster:hover {
-  transform: scale(1.02) translateY(-8px);
+/* Dividers */
+.premium-prose hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  margin: 2rem 0;
 }
 
+/* Inline code */
+.premium-prose code {
+  font-size: 0.875em;
+  background: #f1f5f9;
+  padding: 0.15em 0.4em;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Feature/spec callout pattern */
+.premium-prose .feature-callout,
+.premium-prose .spec-highlight {
+  background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+}
+
+/* ─── Mobile ─── */
 @media (max-width: 640px) {
-  .premium-prose h2 {
+  .premium-prose {
+    font-size: 0.9375rem;
+    line-height: 1.75;
+  }
+
+  .premium-prose h1 {
     font-size: 1.5rem;
-    margin-top: 2rem;
-    margin-bottom: 1.25rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .premium-prose h2 {
+    font-size: 1.25rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.6rem;
   }
 
   .premium-prose h3 {
-    font-size: 1.25rem;
-    margin-top: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.4rem;
   }
 
   .premium-prose p {
-    font-size: 1rem;
-    line-height: 1.7;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
   }
 
-  .marketing-poster {
-    margin-top: 2.5rem;
-    margin-bottom: 2.5rem;
+  .premium-prose ul li,
+  .premium-prose ol li {
+    margin-bottom: 0.4rem;
+    font-size: 0.9375rem;
   }
 
-  .marketing-poster img {
-    border-radius: 2rem !important;
-    border-width: 4px !important;
+  .premium-prose img {
+    border-radius: 0.75rem;
+    margin: 1rem auto;
+  }
+
+  .premium-prose table {
+    font-size: 0.8125rem;
+  }
+
+  .premium-prose thead th {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.6875rem;
+  }
+
+  .premium-prose tbody td {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .premium-prose blockquote {
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
   }
 }
