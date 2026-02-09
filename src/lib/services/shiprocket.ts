@@ -92,13 +92,13 @@ export const ShiprocketService = {
         }
     },
 
-    async getServiceability(delivery_postcode: string, weight: number = 1.0, is_cod: boolean = false) {
+    async getServiceability(delivery_postcode: string, weight: number = 20.0, length: number = 100, breadth: number = 60, height: number = 50, is_cod: boolean = false) {
         try {
             const token = await this.authenticate();
 
             // Shiprocket Serviceability API
             // pickup_postcode is 110055 (Jhandewalan)
-            const url = `https://apiv2.shiprocket.in/v1/external/courier/serviceability/?pickup_postcode=110055&delivery_postcode=${delivery_postcode}&weight=${weight}&cod=${is_cod ? 1 : 0}`;
+            const url = `https://apiv2.shiprocket.in/v1/external/courier/serviceability/?pickup_postcode=110055&delivery_postcode=${delivery_postcode}&weight=${weight}&length=${length}&breadth=${breadth}&height=${height}&cod=${is_cod ? 1 : 0}`;
 
             const response = await fetch(url, {
                 method: 'GET',

@@ -95,7 +95,33 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
         setEstimate(prev => ({ ...prev, loading: true }));
         try {
-            const res = await fetch(`/api/shipping/estimate?pincode=${pincode}`);
+            // Parse dimensions and weight from product strings or use fallbacks
+            // product.box_dimensions might be "110x60x50 cm"
+            // product.gross_weight might be "25 kg"
+
+            const parseDim = (str?: string) => {
+                if (!str) return null;
+                const matches = str.match(/(\d+(\.\d+)?)/g);
+                return matches ? matches.map(Number) : null;
+            };
+
+            const dims = parseDim(product.box_dimensions || product.product_dimensions);
+            const weightArr = parseDim(product.gross_weight || product.net_weight);
+
+            const weight = weightArr ? weightArr[0] : 20;
+            const length = dims ? dims[0] : 100;
+            const breadth = (dims && dims.length > 1) ? dims[1] : 60;
+            const height = (dims && dims.length > 2) ? dims[2] : 50;
+
+            const queryParams = new URLSearchParams({
+                pincode,
+                weight: weight.toString(),
+                length: length.toString(),
+                breadth: breadth.toString(),
+                height: height.toString()
+            });
+
+            const res = await fetch(`/api/shipping/estimate?${queryParams.toString()}`);
             const data = await res.json();
             if (data.serviceable) {
                 setEstimate({
