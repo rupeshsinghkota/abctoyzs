@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { BackToTop } from "@/components/ui/BackToTop";
 import { SettingsService } from "@/lib/services/settings";
 import { createClient } from "@/lib/supabase/server";
 import Script from "next/script";
@@ -125,6 +126,7 @@ export default function RootLayout({
         <Footer />
         <BottomNav />
         <WhatsAppButton />
+        <BackToTop />
       </body>
     </html>
   );
