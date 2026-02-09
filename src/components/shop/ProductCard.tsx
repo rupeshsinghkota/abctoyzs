@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Star, ShoppingCart, Zap, Gauge, Baby, Weight, Flame } from 'lucide-react';
 import { useStore } from '@/store/useStore';
@@ -16,7 +16,6 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className, priority = false }: ProductCardProps) {
     const addToCart = useStore((state) => state.addToCart);
-    const [imgLoaded, setImgLoaded] = useState(false);
 
     const discount = product.mrp && product.mrp > product.price
         ? Math.round(((product.mrp - product.price) / product.mrp) * 100)
@@ -53,21 +52,12 @@ export function ProductCard({ product, className, priority = false }: ProductCar
         )}>
             {/* ──── Image ──── */}
             <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-zinc-100">
-                {/* Shimmer skeleton */}
-                {!imgLoaded && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-50 to-zinc-100 animate-pulse" />
-                )}
                 <img
                     src={product.image}
                     alt={product.name}
                     loading={priority ? 'eager' : 'lazy'}
                     decoding="async"
-                    fetchPriority={priority ? 'high' : 'auto'}
-                    onLoad={() => setImgLoaded(true)}
-                    className={cn(
-                        "w-full h-full object-cover transition-opacity duration-300 group-hover:scale-105 transition-transform duration-500",
-                        imgLoaded ? "opacity-100" : "opacity-0"
-                    )}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
                 {/* Wishlist — top right */}
