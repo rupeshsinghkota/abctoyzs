@@ -367,26 +367,32 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             </div>
 
                             <div className="pb-24 scroll-mt-24" ref={descriptionRef}>
-                                <div className="text-center mb-6">
-                                    <span className="px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-wider">
-                                        In-Depth Review
-                                    </span>
-                                    <h3 className="text-xl font-black mt-2">About This Ride-On</h3>
+                                {/* Section Header */}
+                                <div className="flex items-center gap-3 mb-5">
+                                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                                        <Package className="w-4 h-4 text-primary" />
+                                    </div>
+                                    <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">Product Description</h3>
+                                    <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
                                 </div>
-                                <div className={cn(
-                                    "prose premium-prose max-w-none px-1 relative overflow-hidden transition-all duration-500 ease-in-out",
-                                    isDescriptionExpanded ? "max-h-none" : "max-h-[800px]"
-                                )}>
-                                    {product.description ? (
-                                        <div dangerouslySetInnerHTML={{ __html: product.description }} />
-                                    ) : (
-                                        <p>Premium ride-on toy with advanced features.</p>
-                                    )}
 
-                                    {/* Gradient Mask for collapsed state */}
-                                    {!isDescriptionExpanded && (
-                                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
-                                    )}
+                                {/* Description Content */}
+                                <div className="bg-gray-50/60 rounded-2xl border border-gray-100 p-4 relative">
+                                    <div className={cn(
+                                        "prose premium-prose max-w-none relative overflow-hidden transition-all duration-500 ease-in-out",
+                                        isDescriptionExpanded ? "max-h-none" : "max-h-[500px]"
+                                    )}>
+                                        {product.description ? (
+                                            <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                                        ) : (
+                                            <p>Premium ride-on toy with advanced features.</p>
+                                        )}
+
+                                        {/* Gradient Mask for collapsed state */}
+                                        {!isDescriptionExpanded && (
+                                            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-gray-50 via-gray-50/80 to-transparent pointer-events-none" />
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Toggle Button */}
@@ -395,15 +401,16 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                         onClick={() => {
                                             if (isDescriptionExpanded) {
                                                 setIsDescriptionExpanded(false);
-                                                // Smooth scroll back to title
-                                                descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                setTimeout(() => {
+                                                    descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                }, 100);
                                             } else {
                                                 setIsDescriptionExpanded(true);
                                             }
                                         }}
-                                        className="text-xs font-black text-primary border border-primary/20 bg-primary/5 px-6 py-2.5 rounded-full hover:bg-primary/10 transition-colors uppercase tracking-wider"
+                                        className="inline-flex items-center gap-2 text-xs font-bold text-white bg-zinc-900 px-6 py-2.5 rounded-full hover:bg-primary transition-colors uppercase tracking-wider active:scale-95"
                                     >
-                                        {isDescriptionExpanded ? "Show Less" : "Read Full Description"}
+                                        {isDescriptionExpanded ? "↑ Show Less" : "↓ Read Full Description"}
                                     </button>
                                 </div>
                             </div>

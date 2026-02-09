@@ -227,20 +227,30 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
                     </div>
 
-                    {/* 3. In-Depth Review (AI Generated with embedded images) */}
-                    <div className="max-w-4xl mx-auto border-t pt-10">
-                        <div className="text-center mb-6">
-                            <span className="px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-wider">
-                                In-Depth Review
-                            </span>
-                            <h3 className="text-2xl font-black mt-3">About This Ride-On</h3>
-                        </div>
+                    {/* 3. Product Description — Premium Card */}
+                    {product.description && (
+                        <div className="max-w-4xl mx-auto">
+                            {/* Section Header */}
+                            <div className="flex items-center gap-4 mb-8">
+                                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                                    <ShoppingBag className="w-5 h-5 text-primary" />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">Product Description</h3>
+                                    <p className="text-sm text-gray-400 mt-0.5">Everything you need to know</p>
+                                </div>
+                                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent ml-4" />
+                            </div>
 
-                        <div
-                            className="prose premium-prose mx-auto"
-                            dangerouslySetInnerHTML={{ __html: product.description }}
-                        />
-                    </div>
+                            {/* Description Content */}
+                            <div className="bg-gray-50/50 rounded-3xl border border-gray-100 p-8 lg:p-10">
+                                <div
+                                    className="prose premium-prose max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: product.description }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* 4. Brand Promise / Trust Signals - Redesigned for Premium Trust */}
