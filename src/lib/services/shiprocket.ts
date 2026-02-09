@@ -92,7 +92,7 @@ export const ShiprocketService = {
         }
     },
 
-    async getServiceability(delivery_postcode: string, weight: number = 20.0, length: number = 100, breadth: number = 60, height: number = 50, is_cod: boolean = false) {
+    async getServiceability(delivery_postcode: string, weight: number = 10.0, length: number = 100, breadth: number = 60, height: number = 50, is_cod: boolean = false) {
         try {
             const token = await this.authenticate();
 

@@ -5,7 +5,7 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const pincode = searchParams.get('pincode');
-        const weight = parseFloat(searchParams.get('weight') || '20.0');
+        const weight = parseFloat(searchParams.get('weight') || '10.0');
         const length = parseFloat(searchParams.get('length') || '100');
         const breadth = parseFloat(searchParams.get('breadth') || '60');
         const height = parseFloat(searchParams.get('height') || '50');

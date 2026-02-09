@@ -108,7 +108,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
             const dims = parseDim(product.box_dimensions || product.product_dimensions);
             const weightArr = parseDim(product.gross_weight || product.net_weight);
 
-            const weight = weightArr ? weightArr[0] : 20;
+            const weight = weightArr ? weightArr[0] : 10;
             const length = dims ? dims[0] : 100;
             const breadth = (dims && dims.length > 1) ? dims[1] : 60;
             const height = (dims && dims.length > 2) ? dims[2] : 50;
