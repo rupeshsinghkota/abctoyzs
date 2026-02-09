@@ -7,6 +7,7 @@ import { Newsletter } from "@/components/home/Newsletter";
 import { LazySection } from "@/components/common/LazySection";
 import { FeatureSpotlight } from "@/components/home/FeatureSpotlight";
 import { ProductGrid } from "@/components/shop/ProductGrid";
+import { ProductHighlightGrid } from "@/components/home/ProductHighlightGrid";
 import { fetchProducts } from "@/lib/data";
 import { Metadata } from 'next';
 import { SettingsService } from '@/lib/services/settings';
@@ -72,10 +73,13 @@ export default async function Home() {
       </LazySection>
 
       {/* Lazy Loaded Content (Loads on Scroll) */}
-      <LazySection className="mt-2" placeholderHeight="h-64">
-        <div className="py-4 bg-zinc-50/50">
-          <ProductStrip title="Top Rated Favorites" products={topRated} viewAllLink="/category/all" />
-        </div>
+      <LazySection className="mt-2" placeholderHeight="h-[500px]">
+        <ProductHighlightGrid
+          title="Top Rated Favorites"
+          products={topRated}
+          viewAllLink="/category/all"
+          theme="yellow"
+        />
       </LazySection>
 
       <LazySection className="mt-2" placeholderHeight="h-64">
