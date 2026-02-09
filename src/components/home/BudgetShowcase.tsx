@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { Product } from '@/lib/data';
 import { ArrowRight, Star } from 'lucide-react';
 
-const BudgetColumn = ({ title, products, link, color }: { title: string, products: Product[], link: string, color: string }) => (
-    <div className={`flex flex-col gap-4 p-4 rounded-3xl ${color} h-full`}>
+const BudgetColumn = ({ title, products, link, color, className }: { title: string, products: Product[], link: string, color: string, className?: string }) => (
+    <div className={`flex flex-col gap-4 p-4 rounded-3xl ${color} h-full snap-start ${className}`}>
         <div className="flex items-center justify-between mb-2 px-2">
             <h3 className="text-xl font-black text-zinc-900">{title}</h3>
             <Link href={link} className="p-2 bg-white rounded-full hover:bg-black hover:text-white transition-colors">
@@ -13,7 +13,7 @@ const BudgetColumn = ({ title, products, link, color }: { title: string, product
             </Link>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 flex-1">
             {products.map((product) => (
                 <Link key={product.id} href={`/product/${product.slug}`} className="flex gap-4 p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow group">
                     <div className="relative w-20 h-20 bg-zinc-50 rounded-xl overflow-hidden flex-shrink-0">
@@ -40,7 +40,7 @@ const BudgetColumn = ({ title, products, link, color }: { title: string, product
             ))}
         </div>
 
-        <Link href={link} className="mt-auto pt-4 text-center text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition-opacity">
+        <Link href={link} className="mt-4 pt-4 border-t border-black/5 text-center text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition-opacity block">
             View All Products
         </Link>
     </div>
@@ -54,26 +54,31 @@ export function BudgetShowcase({ products }: { products: Product[] }) {
     const premium = products.filter(p => p.price > 20000).slice(0, 3);
 
     return (
-        <section className="py-8 px-4 container mx-auto">
-            <h2 className="text-2xl font-black mb-8 px-2">Shop By Budget</h2>
-            <div className="grid md:grid-cols-3 gap-6">
+        <section className="py-6 md:py-8 container mx-auto overflow-hidden">
+            <h2 className="text-2xl font-black mb-6 px-4 md:px-0">Shop By Budget</h2>
+
+            {/* Horizontal Scroll on Mobile, Grid on Desktop */}
+            <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-6 md:pb-0 px-4 md:px-0 -mx-4 md:mx-0 snap-x snap-mandatory scrollbar-hide">
                 <BudgetColumn
                     title="Under ₹10,000"
                     products={budget}
                     link="/category/price/under-10k"
                     color="bg-blue-50/50 border border-blue-100"
+                    className="min-w-[85vw] md:min-w-0"
                 />
                 <BudgetColumn
                     title="₹10k - ₹20k"
                     products={mid}
                     link="/category/price/10k-20k"
                     color="bg-zinc-100/80 border border-zinc-200"
+                    className="min-w-[85vw] md:min-w-0"
                 />
                 <BudgetColumn
                     title="Above ₹20,000"
                     products={premium}
                     link="/category/price/above-20k"
                     color="bg-amber-50/50 border border-amber-100"
+                    className="min-w-[85vw] md:min-w-0"
                 />
             </div>
         </section>
