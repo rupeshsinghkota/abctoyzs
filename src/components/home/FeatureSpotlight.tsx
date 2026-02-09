@@ -6,6 +6,11 @@ import { ArrowRight, Star } from 'lucide-react';
 export function FeatureSpotlight({ product, reversed = false }: { product: Product, reversed?: boolean }) {
     if (!product) return null;
 
+    // Sanitize description: Prefer meta_description, fallback to stripping HTML tags
+    const description = product.meta_description ||
+        (product.description ? product.description.replace(/<[^>]+>/g, '').substring(0, 150) + '...' :
+            "Experience the ultimate ride with premium features, safety, and performance.");
+
     return (
         <section className="py-2 md:py-4 px-4">
             <div className="container mx-auto">
@@ -40,7 +45,7 @@ export function FeatureSpotlight({ product, reversed = false }: { product: Produ
                         </h2>
 
                         <p className="text-base md:text-lg text-gray-300 max-w-xl leading-relaxed font-medium">
-                            {product.description || "Experience the ultimate ride with premium features, safety, and performance."}
+                            {description}
                         </p>
 
                         <div className="flex flex-wrap items-center gap-6 pt-2">
