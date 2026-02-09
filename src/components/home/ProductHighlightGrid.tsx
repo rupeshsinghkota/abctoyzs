@@ -50,32 +50,32 @@ export function ProductHighlightGrid({
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="grid lg:grid-cols-[350px_1fr] gap-6">
+            <div className="grid lg:grid-cols-[350px_1fr] gap-4 md:gap-6">
                 {/* Banner Side */}
-                <div className={`${t.bg} rounded-[2rem] p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden h-[400px] lg:h-auto shadow-xl`}>
+                <div className={`${t.bg} rounded-3xl md:rounded-[2rem] p-6 md:p-10 flex flex-col justify-between relative overflow-hidden min-h-[280px] lg:h-auto shadow-xl`}>
                     {/* Decorative Background Elements */}
-                    <div className="absolute top-0 right-0 p-12 opacity-10 transform translate-x-1/2 -translate-y-1/2">
-                        <Star className="w-64 h-64 fill-current" />
+                    <div className="absolute top-0 right-0 p-8 md:p-12 opacity-10 transform translate-x-1/2 -translate-y-1/2">
+                        <Star className="w-48 h-48 md:w-64 md:h-64 fill-current" />
                     </div>
 
                     <div className="relative z-10">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/10 backdrop-blur-sm rounded-full mb-6">
-                            <Star className="w-3.5 h-3.5 fill-current" />
-                            <span className="text-xs font-bold uppercase tracking-wider opacity-80">Top Rated</span>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/10 backdrop-blur-sm rounded-full mb-4 md:mb-6">
+                            <Star className="w-3 h-3 md:w-3.5 md:h-3.5 fill-current" />
+                            <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider opacity-80">Top Rated</span>
                         </div>
 
-                        <h2 className={`text-4xl md:text-5xl font-black ${t.text} mb-4 leading-tight`}>
+                        <h2 className={`text-3xl md:text-5xl font-black ${t.text} mb-3 md:mb-4 leading-tight`}>
                             {title}
                         </h2>
-                        <p className={`text-lg font-bold ${t.subtext} mb-8 leading-relaxed`}>
+                        <p className={`text-sm md:text-lg font-bold ${t.subtext} mb-6 md:mb-8 leading-relaxed max-w-[80%]`}>
                             {description}
                         </p>
 
                         <Link
                             href={viewAllLink}
-                            className={`inline-flex items-center gap-2 px-8 py-4 ${t.button} rounded-full font-black text-sm uppercase tracking-wider transition-all transform hover:-translate-y-1 shadow-lg`}
+                            className={`inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 ${t.button} rounded-full font-black text-xs md:text-sm uppercase tracking-wider transition-all transform hover:-translate-y-1 shadow-lg`}
                         >
-                            View All <ArrowRight className="w-4 h-4" />
+                            View All <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </Link>
                     </div>
 
