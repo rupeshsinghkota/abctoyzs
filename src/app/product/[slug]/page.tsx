@@ -227,9 +227,9 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
                     </div>
 
-                    {/* 3. Product Description — Premium Card */}
+                    {/* 3. Product Description — Full Width */}
                     {product.description && (
-                        <div className="max-w-4xl mx-auto">
+                        <div>
                             {/* Section Header */}
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
@@ -245,7 +245,7 @@ export default async function ProductPage({ params }: PageProps) {
                             {/* Description Content */}
                             <div className="bg-gray-50/50 rounded-3xl border border-gray-100 p-8 lg:p-10">
                                 <div
-                                    className="prose premium-prose max-w-none"
+                                    className="prose prose-lg premium-prose max-w-none"
                                     dangerouslySetInnerHTML={{ __html: product.description }}
                                 />
                             </div>
@@ -253,54 +253,11 @@ export default async function ProductPage({ params }: PageProps) {
                     )}
                 </div>
 
-                {/* 4. Brand Promise / Trust Signals - Redesigned for Premium Trust */}
-                <div className="border-t border-b border-gray-100 bg-gray-50/50 py-16 mt-16 mb-16">
-                    <div className="text-center max-w-3xl mx-auto px-4 mb-10">
-                        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
-                            <Star className="w-6 h-6 text-primary fill-primary" />
-                        </div>
-                        <h3 className="text-3xl font-black mb-4 text-gray-900">The ABC Toyz Promise</h3>
-                        <p className="text-gray-500 text-lg leading-relaxed">
-                            We don't just sell toys; we deliver childhood memories.
-                            Every vehicle is inspected, verified, and backed by our ironclad guarantee.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
-                        {/* Trust Card 1 */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/30 transition-all duration-300 text-center group">
-                            <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-green-100 transition-colors">
-                                <ShieldCheck className="w-7 h-7 text-green-600" />
-                            </div>
-                            <h4 className="font-bold text-lg mb-2 text-gray-900">Certified Safe</h4>
-                            <p className="text-sm text-gray-500 leading-relaxed">BIS & EN71 compliant. Child-safe materials and speed-governed electronics for your peace of mind.</p>
-                        </div>
-
-                        {/* Trust Card 2 */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/30 transition-all duration-300 text-center group">
-                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-100 transition-colors">
-                                <Zap className="w-7 h-7 text-blue-600" />
-                            </div>
-                            <h4 className="font-bold text-lg mb-2 text-gray-900">Power Performance</h4>
-                            <p className="text-sm text-gray-500 leading-relaxed">Genuine high-capacity batteries and copper-wound motors for longer playtime and better torque.</p>
-                        </div>
-
-                        {/* Trust Card 3 */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/30 transition-all duration-300 text-center group">
-                            <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-100 transition-colors">
-                                <Medal className="w-7 h-7 text-purple-600" />
-                            </div>
-                            <h4 className="font-bold text-lg mb-2 text-gray-900">Lifetime Support</h4>
-                            <p className="text-sm text-gray-500 leading-relaxed">We settle for nothing less than 5 stars. Spare parts and technical help available for years.</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Related Products */}
+                {/* Related Products — visible on ALL devices */}
                 {relatedProducts.length > 0 && (
-                    <div className="mt-16 border-t pt-16 px-4 lg:px-0">
+                    <div className="mt-10 md:mt-16 border-t pt-8 md:pt-16 px-4 lg:px-0 pb-8">
                         <div className="container mx-auto">
-                            <h2 className="text-2xl lg:text-3xl font-black mb-8">You Might Also Like</h2>
+                            <h2 className="text-xl md:text-2xl lg:text-3xl font-black mb-6 md:mb-8">You Might Also Like</h2>
                             <ProductGrid products={relatedProducts} />
                         </div>
                     </div>

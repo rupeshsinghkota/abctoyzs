@@ -377,12 +377,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 </div>
 
                                 {/* Scrollable Description Container */}
-                                <div className="relative rounded-2xl border border-gray-200/80 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
-                                    {/* Top fade */}
-                                    <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-white to-transparent z-10 pointer-events-none rounded-t-2xl" />
-
+                                <div className="relative rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden border-l-4 border-l-primary">
                                     {/* Scrollable content */}
-                                    <div className="max-h-[40vh] overflow-y-auto premium-scrollbar px-5 py-6">
+                                    <div className="max-h-[45vh] overflow-y-auto px-4 py-5">
                                         <div className="prose premium-prose max-w-none">
                                             {product.description ? (
                                                 <div dangerouslySetInnerHTML={{ __html: product.description }} />
@@ -392,14 +389,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                         </div>
                                     </div>
 
-                                    {/* Bottom fade + scroll hint */}
-                                    <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none rounded-b-2xl">
-                                        <div className="h-12 bg-gradient-to-t from-white via-white/90 to-transparent" />
-                                        <div className="bg-white flex items-center justify-center gap-1.5 pb-2">
-                                            <span className="w-4 h-[2px] bg-gray-300 rounded-full" />
-                                            <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-widest">Scroll to read</span>
-                                            <span className="w-4 h-[2px] bg-gray-300 rounded-full" />
-                                        </div>
+                                    {/* Bottom fade + scroll indicator */}
+                                    <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none">
+                                        <div className="h-10 bg-gradient-to-t from-white to-transparent" />
                                     </div>
                                 </div>
                             </div>
