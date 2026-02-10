@@ -416,7 +416,17 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     productName: formData.name,
                     price: formData.base_price,
                     originalImageUrl: formData.images[0],
-                    vibe: formData.prompt_notes // Use prompt notes as vibe? or maybe category
+                    vibe: formData.prompt_notes,
+                    specs: {
+                        voltage: formData.voltage,
+                        age: formData.specs?.suitable_age,
+                        motor: formData.specs?.motor,
+                        speed: formData.specs?.speed,
+                        runTime: formData.specs?.run_time,
+                        maxLoad: formData.specs?.max_load,
+                        seats: formData.specs?.seats,
+                        remoteControl: formData.specs?.remote_control,
+                    }
                 })
             });
 
@@ -460,7 +470,17 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     productName: `${formData.name} - ${variant.name}`,
                     price: variant.price,
                     originalImageUrl: variant.image,
-                    vibe: formData.prompt_notes
+                    vibe: formData.prompt_notes,
+                    specs: {
+                        voltage: formData.voltage,
+                        age: formData.specs?.suitable_age,
+                        motor: formData.specs?.motor,
+                        speed: formData.specs?.speed,
+                        runTime: formData.specs?.run_time,
+                        maxLoad: formData.specs?.max_load,
+                        seats: formData.specs?.seats,
+                        remoteControl: formData.specs?.remote_control,
+                    }
                 })
             });
 
@@ -512,7 +532,17 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                 productName: `${formData.name} - ${variant.name}`,
                                 price: variant.price,
                                 originalImageUrl: variant.image,
-                                vibe: formData.prompt_notes
+                                vibe: formData.prompt_notes,
+                                specs: {
+                                    voltage: formData.voltage,
+                                    age: formData.specs?.suitable_age,
+                                    motor: formData.specs?.motor,
+                                    speed: formData.specs?.speed,
+                                    runTime: formData.specs?.run_time,
+                                    maxLoad: formData.specs?.max_load,
+                                    seats: formData.specs?.seats,
+                                    remoteControl: formData.specs?.remote_control,
+                                }
                             })
                         });
 

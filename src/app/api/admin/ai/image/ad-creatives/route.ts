@@ -9,7 +9,18 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export async function POST(req: Request) {
     try {
-        const { productName, price, originalImageUrl, vibe } = await req.json();
+        const { productName, price, originalImageUrl, vibe, specs } = await req.json();
+
+        // Build spec highlights for text overlay
+        const specItems: string[] = [];
+        if (specs?.voltage) specItems.push(`⚡ ${specs.voltage}`);
+        if (specs?.age) specItems.push(`👶 Ages ${specs.age}`);
+        if (specs?.speed) specItems.push(`🏎️ ${specs.speed}`);
+        if (specs?.motor) specItems.push(`🔧 ${specs.motor}`);
+        if (specs?.runTime) specItems.push(`🔋 ${specs.runTime}`);
+        if (specs?.maxLoad) specItems.push(`⚖️ ${specs.maxLoad}`);
+        if (specs?.remoteControl) specItems.push(`🎮 Remote Control`);
+        const specLine = specItems.length > 0 ? specItems.join('  |  ') : '';
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
@@ -79,7 +90,11 @@ HUMAN ELEMENT:
 - Appropriate clothing (casual premium — think Gap Kids or Zara Kids)
 
 TYPOGRAPHY & BRANDING:
+- HEADLINE: Product name "${productName}" displayed prominently in bold, clean sans-serif white text
 - Price badge: Clean, modern "Only ₹${price}" in a sleek pill-shaped badge
+${specLine ? `- SPEC STRIP: Show these key specs as small feature icons/badges beneath the headline:
+  ${specLine}
+  Use small pill-shaped badges with icons, arranged horizontally. Clean, modern, minimal design.` : ''}
 - Font: San-serif, bold, white text on a semi-transparent dark background
 - Position: Lower-right corner for Square, lower-center for Story, left side for Landscape
 - NO gibberish text, NO distorted letters — must be perfectly readable
