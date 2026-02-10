@@ -56,21 +56,36 @@ export async function POST(req: Request) {
                 compositionDesc = "Cinematic wide composition. Product on Right side, Negative space on Left for text overlay.";
             }
 
-            const prompt = `A professional advertising creative for a Ride-on Toy ("${productName}").
-            FORMAT: ${aspectRatioDesc}.
-            VIBE: ${vibe || "Premium Luxury"}.
-            COMPOSITION: ${compositionDesc}.
+            const prompt = `You are a World-Class Automotive Advertising Director. Create a Masterpiece Marketing Image for a Premium Ride-on Vehicle ("${productName}").
+
+            CORE INSTRUCTION:
+            Generate a **Photorealistic, High-Definition (8k), Cinematic** advertising image containing the provided product.
             
-            VISUAL ELEMENTS:
-            1. **BACKGROUND:** High-end, photorealistic scene matching the vibe (e.g. Modern Driveway, Sunny Park, or Racetrack).
-            2. **PRODUCT:** The vehicle provided in the input image. Isolate it and blend it naturally into the scene (correct lighting, shadows).
-            3. **TEXT OVERLAY:** Add a commercially designed price tag or badge: "Only ₹${price}".
-            4. **LOGO:** Discreetly placed ABC Toyz logo.
+            FORMAT & COMPOSITION:
+            - **${aspectRatioDesc}**
+            - **${compositionDesc}**
+            - **Angle:** Dynamic Low-Angle or Eye-Level (Hero Shot).
+            - **Depth:** Shallow depth of field (Bokeh) to separate subject from background.
+
+            VISUAL STYLE (MANDATORY):
+            - **Lighting:** Golden Hour (Warm, Soft) OR Studio Box (Clean, High Contrast).
+            - **Quality:** Ray-traced, Octane Render style, Hyper-detailed textures (plastic gloss, rubber tires, metal chrome).
+            - **Atmosphere:** Aspirational, wealthy, premium lifestyle (e.g., Luxury Driveway, manicured lawn, modern park).
             
-            CRITICAL:
-            - The car MUST look exactly like the reference image.
-            - Include a happy child interacting with the car if it fits the composition naturaly.
-            - High commercial production value.`;
+            ELEMENTS:
+            1. **HERO SUBJECT:** The vehicle from the input image. **MUST LOOK EXACTLY LIKE REFERENCE**. Match reflections and lighting to the scene.
+            2. **HUMAN ELEMENT:** A happy, diverse child (appropriate age) interacting naturally (driving, sitting, or standing proud). **Must look real, not uncanny.**
+            3. **TEXT OVERLAY:** A sleek, modern price tag/badge: "Only ₹${price}". **Clean typography, no gibberish.**
+            4. **BRANDING:** Subtle "ABC Toyz" watermark if it fits naturally.
+
+            NEGATIVE CONSTRAINTS (DO NOT DO):
+            - NO Cartoonish or Illustrated look. MUST BE PHOTOREALISTIC.
+            - NO Distorted faces or extra limbs on the child.
+            - NO Extra wheels or deformed car parts.
+            - NO Cluttered text or messy backgrounds.
+            - NO cropping of the main vehicle (keep it fully in frame).
+
+            VIBE OVERRIDE: ${vibe || "Premium Luxury, Clean, Minimalist"}.`;
 
             const inputs = [prompt, { inlineData: { data: logoBase64, mimeType: "image/png" } }];
             if (productBase64) {
