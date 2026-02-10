@@ -29,17 +29,23 @@ export async function GET(request: NextRequest) {
             const isBaseInStock = (product as any).stock !== undefined ? (product as any).stock > 0 : true;
 
             // --- FACEBOOK SPECIFIC OPTIMIZATION ---
-            // 1. Image Strategy: Prioritize AI Square Ad -> Lifestyle Banner -> White Background
-            // Facebook Ads perform better with "in-context" photos rather than white background.
-            const socialImage = product.ad_creatives?.square || ((product.banners && product.banners.length > 0)
+            // 1. Image Strategy: Prioritize AI Square Ad from the first Set -> Lifestyle Banner -> White Background
+            const adSets = Array.isArray(product.ad_creatives) ? product.ad_creatives : (product.ad_creatives ? [product.ad_creatives] : []);
+
+            const firstSquare = adSets.length > 0 ? adSets[0].square : null;
+            const socialImage = firstSquare || ((product.banners && product.banners.length > 0)
                 ? product.banners[0]
                 : product.image);
 
-            // Add Story Creative to additional images for automatic placement optimization
-            let additionalImages = [...(product.images || [])];
-            if (product.ad_creatives?.story) {
-                additionalImages.unshift(product.ad_creatives.story);
-            }
+            // Collect ALL AI images from ALL sets for additional_images
+            let aiImages: string[] = [];
+            adSets.forEach(set => {
+                if (set.square && set.square !== socialImage) aiImages.push(set.square);
+                if (set.story) aiImages.push(set.story);
+                if (set.landscape) aiImages.push(set.landscape);
+            });
+
+            let additionalImages = [...aiImages, ...(product.images || [])];
 
             // 2. Title Strategy: Clean Title
             // User requested to remove "Best Seller" or other tags from the title.
@@ -96,14 +102,21 @@ export async function GET(request: NextRequest) {
                     ? `${baseItem.link}&${params.toString()}`
                     : baseItem.link;
 
-                const variantAdCreatives = (variant as any).ad_creatives || {};
-                const variantImage = variantAdCreatives.square || variant.image || socialImage;
+                const variantAdData = (variant as any).ad_creatives;
+                const variantAdSets = Array.isArray(variantAdData) ? variantAdData : (variantAdData ? [variantAdData] : []);
 
-                // Variant Specific Additional Images (e.g. Story Ad for this specific color)
-                let variantAdditionalImages = [...additionalImages];
-                if (variantAdCreatives.story) {
-                    variantAdditionalImages.unshift(variantAdCreatives.story);
-                }
+                const variantFirstSquare = variantAdSets.length > 0 ? variantAdSets[0].square : null;
+                const variantImage = variantFirstSquare || variant.image || socialImage;
+
+                // Collect ALL variant-specific AI images
+                let variantAiImages: string[] = [];
+                variantAdSets.forEach(set => {
+                    if (set.square && set.square !== variantImage) variantAiImages.push(set.square);
+                    if (set.story) variantAiImages.push(set.story);
+                    if (set.landscape) variantAiImages.push(set.landscape);
+                });
+
+                let variantAdditionalImages = [...variantAiImages, ...additionalImages];
 
                 return {
                     ...baseItem,
@@ -141,6 +154,9 @@ export async function GET(request: NextRequest) {
       <g:availability>${item.availability}</g:availability>
       <g:price>${item.price}</g:price>
       ${item.sale_price ? `<g:sale_price>${item.sale_price}</g:sale_price>` : ''}
+      ${(item as any).additional_images && (item as any).additional_images.length > 0
+                ? (item as any).additional_images.slice(0, 10).map((img: string) => `<g:additional_image_link>${clean(img)}</g:additional_image_link>`).join('\n      ')
+                : ''}
       <g:google_product_category>${clean(item.google_category)}</g:google_product_category>
       <g:custom_label_0>${clean(item.custom_label_0)}</g:custom_label_0>
       <g:custom_label_1>${clean(item.custom_label_1)}</g:custom_label_1>

@@ -411,43 +411,48 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
         setIsGeneratingAds(true);
         try {
-            const res = await fetch('/api/admin/ai/image/ad-creatives', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productName: formData.name,
-                    price: formData.base_price,
-                    mrp: formData.mrp,
-                    originalImageUrl: formData.images[0],
-                    vibe: formData.prompt_notes,
-                    scene: adScene,
-                    audience: adAudience,
-                    specs: {
-                        voltage: formData.voltage,
-                        age: formData.specs?.suitable_age,
-                        motor: formData.specs?.motor,
-                        speed: formData.specs?.speed,
-                        runTime: formData.specs?.run_time,
-                        maxLoad: formData.specs?.max_load,
-                        seats: formData.specs?.seats,
-                        remoteControl: formData.specs?.remote_control,
-                    }
-                })
-            });
+            const modes = ['functional', 'celebration', 'adventure'];
+            const allCreatives: any[] = [];
 
-            const data = await res.json();
-            if (data.error) throw new Error(data.error);
+            for (const mode of modes) {
+                const res = await fetch('/api/admin/ai/image/ad-creatives', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productName: formData.name,
+                        price: formData.base_price,
+                        mrp: formData.mrp,
+                        originalImageUrl: formData.images[0],
+                        vibe: formData.prompt_notes,
+                        mode,
+                        specs: {
+                            voltage: formData.voltage,
+                            age: formData.specs?.suitable_age,
+                            motor: formData.specs?.motor,
+                            speed: formData.specs?.speed,
+                            runTime: formData.specs?.run_time,
+                            maxLoad: formData.specs?.max_load,
+                            seats: formData.specs?.seats,
+                            remoteControl: formData.specs?.remote_control,
+                        }
+                    })
+                });
+
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+
+                allCreatives.push({
+                    ...data.creatives,
+                    mode
+                });
+            }
 
             setFormData(prev => ({
                 ...prev,
-                ad_creatives: {
-                    square: data.creatives.square,
-                    story: data.creatives.story,
-                    landscape: data.creatives.landscape
-                }
+                ad_creatives: allCreatives as any
             }));
 
-            alert('✨ Facebook Ads Generated Successfully!');
+            alert('✨ 3 Different Ad Styles Generated Successfully!');
 
         } catch (error: any) {
             console.error('Ad Generation Failed:', error);
@@ -468,41 +473,46 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         setIsGeneratingAds(true);
 
         try {
-            const res = await fetch('/api/admin/ai/image/ad-creatives', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productName: `${formData.name} - ${variant.name}`,
-                    price: variant.price,
-                    mrp: (variant as any).mrp || formData.mrp,
-                    originalImageUrl: variant.image,
-                    vibe: formData.prompt_notes,
-                    scene: adScene,
-                    audience: adAudience,
-                    specs: {
-                        voltage: formData.voltage,
-                        age: formData.specs?.suitable_age,
-                        motor: formData.specs?.motor,
-                        speed: formData.specs?.speed,
-                        runTime: formData.specs?.run_time,
-                        maxLoad: formData.specs?.max_load,
-                        seats: formData.specs?.seats,
-                        remoteControl: formData.specs?.remote_control,
-                    }
-                })
-            });
+            const modes = ['functional', 'celebration', 'adventure'];
+            const allCreatives: any[] = [];
 
-            const data = await res.json();
-            if (data.error) throw new Error(data.error);
+            for (const mode of modes) {
+                const res = await fetch('/api/admin/ai/image/ad-creatives', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productName: `${formData.name} - ${variant.name}`,
+                        price: variant.price,
+                        mrp: (variant as any).mrp || formData.mrp,
+                        originalImageUrl: variant.image,
+                        vibe: formData.prompt_notes,
+                        mode,
+                        specs: {
+                            voltage: formData.voltage,
+                            age: formData.specs?.suitable_age,
+                            motor: formData.specs?.motor,
+                            speed: formData.specs?.speed,
+                            runTime: formData.specs?.run_time,
+                            maxLoad: formData.specs?.max_load,
+                            seats: formData.specs?.seats,
+                            remoteControl: formData.specs?.remote_control,
+                        }
+                    })
+                });
+
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+
+                allCreatives.push({
+                    ...data.creatives,
+                    mode
+                });
+            }
 
             const newVars = [...variants];
-            newVars[index].ad_creatives = {
-                square: data.creatives.square,
-                story: data.creatives.story,
-                landscape: data.creatives.landscape
-            };
+            newVars[index].ad_creatives = allCreatives as any;
             setVariants(newVars);
-            alert(`✨ Ads Generated for ${variant.name}!`);
+            alert(`✨ 3 Ad Styles Generated for ${variant.name}!`);
 
         } catch (error: any) {
             console.error('Variant Ad Generation Failed:', error);
@@ -529,50 +539,59 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         const newVars = [...variants];
 
         try {
+            const modes = ['functional', 'celebration', 'adventure'];
+
             for (let i = 0; i < newVars.length; i++) {
                 const variant = newVars[i];
-                if (variant.image && !variant.ad_creatives?.square) {
+                // For bulk, only generate if no ads exist at all
+                if (variant.image && (!variant.ad_creatives || (Array.isArray(variant.ad_creatives) && variant.ad_creatives.length === 0))) {
                     try {
-                        const res = await fetch('/api/admin/ai/image/ad-creatives', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                productName: `${formData.name} - ${variant.name}`,
-                                price: variant.price,
-                                mrp: (variant as any).mrp || formData.mrp,
-                                originalImageUrl: variant.image,
-                                vibe: formData.prompt_notes,
-                                scene: adScene,
-                                audience: adAudience,
-                                specs: {
-                                    voltage: formData.voltage,
-                                    age: formData.specs?.suitable_age,
-                                    motor: formData.specs?.motor,
-                                    speed: formData.specs?.speed,
-                                    runTime: formData.specs?.run_time,
-                                    maxLoad: formData.specs?.max_load,
-                                    seats: formData.specs?.seats,
-                                    remoteControl: formData.specs?.remote_control,
-                                }
-                            })
-                        });
+                        const allCreatives: any[] = [];
+                        for (const mode of modes) {
+                            const res = await fetch('/api/admin/ai/image/ad-creatives', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    productName: `${formData.name} - ${variant.name}`,
+                                    price: variant.price,
+                                    mrp: (variant as any).mrp || formData.mrp,
+                                    originalImageUrl: variant.image,
+                                    vibe: formData.prompt_notes,
+                                    mode,
+                                    specs: {
+                                        voltage: formData.voltage,
+                                        age: formData.specs?.suitable_age,
+                                        motor: formData.specs?.motor,
+                                        speed: formData.specs?.speed,
+                                        runTime: formData.specs?.run_time,
+                                        maxLoad: formData.specs?.max_load,
+                                        seats: formData.specs?.seats,
+                                        remoteControl: formData.specs?.remote_control,
+                                    }
+                                })
+                            });
 
-                        const data = await res.json();
-                        if (data.creatives) {
-                            newVars[i].ad_creatives = {
-                                square: data.creatives.square,
-                                story: data.creatives.story,
-                                landscape: data.creatives.landscape
-                            };
+                            const data = await res.json();
+                            if (data.creatives) {
+                                allCreatives.push({
+                                    ...data.creatives,
+                                    mode
+                                });
+                            }
+                        }
+
+                        if (allCreatives.length > 0) {
+                            newVars[i].ad_creatives = allCreatives as any;
                             successCount++;
+                            // Partial update for UX
+                            setVariants([...newVars]);
                         }
                     } catch (err) {
                         console.error(`Failed to generate for ${variant.name}`, err);
                     }
                 }
             }
-            setVariants(newVars);
-            alert(`✨ Successfully generated ads for ${successCount} variants!`);
+            alert(`✨ Successfully generated ad sets for ${successCount} variants!`);
         } catch (error) {
             alert('Bulk generation stopped due to error.');
         } finally {
@@ -1178,43 +1197,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                 {/* AI Ad Creatives Section */}
                                 <div className="pt-8 border-t border-dashed">
                                     <div className="flex justify-between items-center mb-6">
-                                        <div>
-                                            <h3 className="text-lg font-bold flex items-center gap-2">
-                                                <Zap className="w-5 h-5 text-yellow-500" />
-                                                Facebook Ad Creatives
+                                        <div className="flex flex-col">
+                                            <h3 className="font-bold text-lg flex items-center gap-2">
+                                                <Zap className="w-5 h-5 text-blue-500" />
+                                                AI Ad Creatives
                                             </h3>
                                             <p className="text-sm text-muted-foreground">Auto-generated for Feed, Stories, and Audience Network</p>
-                                        </div>
-                                        <div className="flex flex-wrap gap-4 mb-4 md:mb-0">
-                                            {/* Scene Selector */}
-                                            <div className="flex flex-col gap-1.5">
-                                                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">Scene</label>
-                                                <select
-                                                    value={adScene}
-                                                    onChange={(e) => setAdScene(e.target.value)}
-                                                    className="bg-muted border border-border rounded-lg px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                                >
-                                                    <option>Urban Luxe</option>
-                                                    <option>Nature Explorer</option>
-                                                    <option>Modern Minimal</option>
-                                                    <option>Twilight Ride</option>
-                                                </select>
-                                            </div>
-
-                                            {/* Audience Selector */}
-                                            <div className="flex flex-col gap-1.5">
-                                                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">Audience</label>
-                                                <select
-                                                    value={adAudience}
-                                                    onChange={(e) => setAdAudience(e.target.value)}
-                                                    className="bg-muted border border-border rounded-lg px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                                >
-                                                    <option>Boy</option>
-                                                    <option>Girl</option>
-                                                    <option>Both</option>
-                                                    <option>No Child</option>
-                                                </select>
-                                            </div>
                                         </div>
                                         <div className="flex gap-3">
                                             {variants.length > 0 && (
@@ -1243,42 +1231,94 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {/* Square (Feed) */}
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Feed (1:1)</label>
-                                            <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
-                                                {formData.ad_creatives?.square ? (
-                                                    <img src={formData.ad_creatives.square} className="w-full h-full object-cover" alt="Feed Ad" />
-                                                ) : (
-                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
-                                                )}
-                                            </div>
-                                        </div>
+                                    <div className="space-y-8">
+                                        {Array.isArray(formData.ad_creatives) ? (
+                                            formData.ad_creatives.map((set, idx) => (
+                                                <div key={idx} className="bg-muted/30 p-6 rounded-2xl border border-border">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                                            <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                                            Ad Set {idx + 1}: {set.mode?.toUpperCase() || 'MODERN'}
+                                                        </h4>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                        {/* Square (Feed) */}
+                                                        <div className="space-y-2">
+                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Feed (1:1)</label>
+                                                            <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                                                                {set.square ? (
+                                                                    <img src={set.square} className="w-full h-full object-cover" alt="Feed Ad" />
+                                                                ) : (
+                                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
 
-                                        {/* Story (9:16) */}
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Story (9:16)</label>
-                                            <div className="aspect-[9/16] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all w-2/3 mx-auto">
-                                                {formData.ad_creatives?.story ? (
-                                                    <img src={formData.ad_creatives.story} className="w-full h-full object-cover" alt="Story Ad" />
-                                                ) : (
-                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
-                                                )}
-                                            </div>
-                                        </div>
+                                                        {/* Story (9:16) */}
+                                                        <div className="space-y-2">
+                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Story (9:16)</label>
+                                                            <div className="aspect-[9/16] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all w-2/3 mx-auto shadow-sm">
+                                                                {set.story ? (
+                                                                    <img src={set.story} className="w-full h-full object-cover" alt="Story Ad" />
+                                                                ) : (
+                                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
 
-                                        {/* Landscape (Audience Network) */}
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Banner (1.91:1)</label>
-                                            <div className="aspect-[1.91/1] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
-                                                {formData.ad_creatives?.landscape ? (
-                                                    <img src={formData.ad_creatives.landscape} className="w-full h-full object-cover" alt="Banner Ad" />
-                                                ) : (
-                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
-                                                )}
+                                                        {/* Landscape (Audience Network) */}
+                                                        <div className="space-y-2">
+                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Landscape (16:9)</label>
+                                                            <div className="aspect-[16/9] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                                                                {set.landscape ? (
+                                                                    <img src={set.landscape} className="w-full h-full object-cover" alt="Landscape Ad" />
+                                                                ) : (
+                                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                {/* Square (Feed) */}
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Feed (1:1)</label>
+                                                    <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
+                                                        {formData.ad_creatives?.square ? (
+                                                            <img src={formData.ad_creatives.square} className="w-full h-full object-cover" alt="Feed Ad" />
+                                                        ) : (
+                                                            <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Story (9:16) */}
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Story (9:16)</label>
+                                                    <div className="aspect-[9/16] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all w-2/3 mx-auto">
+                                                        {formData.ad_creatives?.story ? (
+                                                            <img src={formData.ad_creatives.story} className="w-full h-full object-cover" alt="Story Ad" />
+                                                        ) : (
+                                                            <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Landscape (Audience Network) */}
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Landscape (16:9)</label>
+                                                    <div className="aspect-[16/9] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
+                                                        {formData.ad_creatives?.landscape ? (
+                                                            <img src={formData.ad_creatives.landscape} className="w-full h-full object-cover" alt="Landscape Ad" />
+                                                        ) : (
+                                                            <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -1525,13 +1565,33 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                 {/* AI Ad Creatives for Variant */}
                                                 <div className="flex flex-col gap-2 min-w-[140px]">
                                                     <label className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
-                                                        <Zap className="w-3 h-3 text-yellow-500" /> Facebook Ads
+                                                        <Zap className="w-3 h-3 text-blue-500" /> AI Ad Sets
                                                     </label>
-                                                    {variant.ad_creatives?.square ? (
-                                                        <div className="grid grid-cols-3 gap-1">
-                                                            <img src={variant.ad_creatives.square} className="w-8 h-8 rounded object-cover border" title="Feed" />
-                                                            <img src={variant.ad_creatives.story} className="w-8 h-8 rounded object-cover border" title="Story" />
-                                                            <img src={variant.ad_creatives.landscape} className="w-8 h-8 rounded object-cover border" title="Banner" />
+                                                    {variant.ad_creatives ? (
+                                                        <div className="space-y-1.5 focus:outline-none">
+                                                            {Array.isArray(variant.ad_creatives) ? (
+                                                                variant.ad_creatives.map((set: any, sIdx: number) => (
+                                                                    <div key={sIdx} className="grid grid-cols-3 gap-1 border-b border-muted pb-1 last:border-0" title={`${set.mode || 'Default'}`}>
+                                                                        <img src={set.square} className="w-8 h-8 rounded object-cover border" title="Feed" />
+                                                                        <img src={set.story} className="w-8 h-8 rounded object-cover border" title="Story" />
+                                                                        <img src={set.landscape} className="w-8 h-8 rounded object-cover border" title="Banner" />
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="grid grid-cols-3 gap-1">
+                                                                    <img src={variant.ad_creatives.square} className="w-8 h-8 rounded object-cover border" title="Feed" />
+                                                                    <img src={variant.ad_creatives.story} className="w-8 h-8 rounded object-cover border" title="Story" />
+                                                                    <img src={variant.ad_creatives.landscape} className="w-8 h-8 rounded object-cover border" title="Banner" />
+                                                                </div>
+                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => generateVariantAds(index)}
+                                                                className="text-[9px] text-blue-500 font-bold hover:underline"
+                                                                disabled={isGeneratingAds}
+                                                            >
+                                                                Regenerate All
+                                                            </button>
                                                         </div>
                                                     ) : (
                                                         <button

@@ -9,11 +9,33 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export async function POST(req: Request) {
     try {
-        const { productName, price, mrp, originalImageUrl, vibe, specs, scene, audience } = await req.json();
+        const { productName, price, mrp, originalImageUrl, vibe, specs, scene: initialScene, audience: initialAudience, mode } = await req.json();
 
-        // 0. Build Scene & Audience Prompts
+        // 0. Define Presets based on Mode
+        let activeScene = initialScene || 'Urban Luxe';
+        let activeAudience = initialAudience || 'Boy';
+        let activeStyle: 'Minimal' | 'Poster' = 'Minimal';
+        let headlineTheme = "";
+
+        if (mode === 'celebration') {
+            activeScene = 'Birthday Celebration';
+            activeAudience = 'Both';
+            activeStyle = 'Poster';
+            headlineTheme = "Gifting / Birthday joy / The perfect surprise";
+        } else if (mode === 'adventure') {
+            activeScene = 'Nature Explorer';
+            activeAudience = 'Both';
+            activeStyle = 'Poster';
+            headlineTheme = "Outdoor adventure / Exploring nature / Childhood freedom";
+        } else if (mode === 'functional') {
+            activeScene = 'Urban Luxe';
+            activeAudience = 'No Child';
+            activeStyle = 'Minimal';
+        }
+
+        // 0.1 Build Scene & Audience Prompts
         let scenePrompt = "";
-        switch (scene) {
+        switch (activeScene) {
             case 'Nature Explorer':
                 scenePrompt = "SETTING: Lush green park, forest trail, or sun-drenched garden. Natural warm sunlight filtering through trees. Earthy tones.";
                 break;
@@ -23,13 +45,16 @@ export async function POST(req: Request) {
             case 'Twilight Ride':
                 scenePrompt = "SETTING: Modern city at dusk. Ambient city lights, neon signs, and glowing storefronts. Dramatic lighting with cool blue and warm orange contrasts.";
                 break;
+            case 'Birthday Celebration':
+                scenePrompt = "SETTING: Indoor birthday party or sunny backyard party. Vibrant balloons, confetti in the air, a wrapped gift box nearby. Celebration atmosphere.";
+                break;
             case 'Urban Luxe':
             default:
                 scenePrompt = "SETTING: Modern luxury home driveway or upscale city promenade. Polished concrete or clean pavement. Wealthy, aspirational urban environment.";
         }
 
         let audiencePrompt = "";
-        switch (audience) {
+        switch (activeAudience) {
             case 'Boy':
                 audiencePrompt = "A happy, photogenic young boy (age 3-6) riding or playing with the vehicle.";
                 break;
@@ -40,8 +65,10 @@ export async function POST(req: Request) {
                 audiencePrompt = "Two happy young children (a boy and a girl, age 3-6) playing together with the vehicle.";
                 break;
             case 'No Child':
-            default:
                 audiencePrompt = "The product is shown alone in its environment, with NO children visible. Focus entirely on the vehicle's design and details.";
+                break;
+            default:
+                audiencePrompt = "A happy, photogenic young child (age 3-6) naturally interacting with the vehicle.";
         }
 
         // Build spec highlights for text overlay — filter out empty/N/A values
@@ -105,60 +132,57 @@ export async function POST(req: Request) {
 
             // Build the price line
             let priceText = `₹${numPrice.toLocaleString('en-IN')}`;
-            let priceSection = `PRICE TAG: Show "${priceText}" in large bold white text inside a dark rounded pill badge.`;
+            let priceSection = `PRICE TAG: Show "${priceText}" in large bold white text ${activeStyle === 'Poster' ? 'with a subtle shadow' : 'inside a dark rounded pill badge'}.`;
             if (numMrp > numPrice) {
                 priceSection += `
   Next to it show "₹${numMrp.toLocaleString('en-IN')}" in smaller grey text with a strikethrough line.
-  Above or near the price, add a RED circular starburst badge with "${discount}% OFF" in bold white text — like a retail sale sticker.`;
+  Above or near the price, add a RED circular starburst badge with "${discount}% OFF" in bold white text.`;
             }
 
-            const prompt = `Generate a professional e-commerce product advertisement image.
+            const prompt = `Generate a professional e-commerce product ${activeStyle === 'Poster' ? 'lifestyle poster' : 'advertisement image'}.
 
 PRODUCT: "${shortName}" — a children's ride-on toy vehicle.
-Use the reference product photo provided to accurately depict the vehicle.
+Use the reference photo provided for the vehicle.
 
---- IMAGE LAYOUT (${format} — ${aspectRatio}) ---
+--- IMAGE LAYOUT (${format}) ---
 
-The image has 3 visual layers from top to bottom:
+${activeStyle === 'Poster' ? `POSTER LAYOUT:
+- TOP: Small brand logo top-left.
+- MIDDLE: Emotional lifestyle hero scene.
+- BOTTOM: Headline + Price + Specs on a soft dark gradient overlay.` : `MINIMAL LAYOUT:
+- Clean 3-layer system with logo strip, hero zone, and information bar.`}
 
-LAYER 1 — TOP STRIP (8% height):
-- A thin semi-transparent dark overlay strip across the top
-- LEFT side: ABC Toyz brand logo (use the provided logo image), small and white
-${numMrp > numPrice ? `- RIGHT side: Small red diagonal "SALE" ribbon badge` : ''}
+--- CONTENT DIRECTIVES ---
 
-LAYER 2 — HERO ZONE (60% height):
+LAYER 1 — TOP STRIP:
+- Logo: ABC Toyz brand logo in the top-left corner.
+${numMrp > numPrice ? `- Sale: Small red "SALE" ribbon in top-right.` : ''}
+
+LAYER 2 — HERO ZONE:
 - Photorealistic scene: ${compositionDesc}
 - ${scenePrompt}
-- The ride-on vehicle on the specified surface, integrated perfectly with shadows and reflections.
+- The ride-on vehicle integrated perfectly.
 - HUMAN ELEMENT: ${audiencePrompt}
-- Lighting matching the setting (Golden hour, Studio, or Twilight).
-- Camera: 35mm, f/2.8, eye-level or slightly low angle
-- KEEP THIS AREA MOSTLY VISUAL — minimal to no text here
+${activeScene === 'Birthday Celebration' ? '- Add colorful balloons and confetti for a festive look.' : ''}
 
-LAYER 3 — BOTTOM INFO BAR (30% height):
-- Dark semi-transparent gradient overlay (black at 70-80% opacity)
-- All text goes HERE, neatly arranged:
+LAYER 3 — BOTTOM INFO BAR:
+- Dark semi-transparent gradient overlay at the bottom.
+${activeStyle === 'Poster' ? `  LINE 1: CATCHY HEADLINE — Write a short, emotional headline like "${headlineTheme || 'Premium Ride-On Toys'}" in BOLD thick white font.
+  LINE 2: "${shortName}" model name in slightly smaller text.` : `  LINE 1: "${shortName}" in bold white sans-serif.`}
+  LINE ${activeStyle === 'Poster' ? '3' : '2'}: ${priceSection}
+${specLine ? `  LINE ${activeStyle === 'Poster' ? '4' : '3'}: Specs as pill badges: ${specLine}` : ''}
+  LAST LINE: "🚚 Free Shipping  •  💳 COD Available  •  abctoyz.in"
 
-  LINE 1: "${shortName}" — product name in bold white sans-serif, 1 line max, medium size
-  LINE 2: ${priceSection}
-${specLine ? `  LINE 3: Spec highlights as a single row of tiny pill badges:
-  ${specLine}` : ''}
-${numMrp > numPrice ? `  LINE 4: "Save ₹${savings.toLocaleString('en-IN')}" in small green text` : ''}
-  LAST LINE: "🚚 Free Shipping  •  💳 COD Available  •  abctoyz.in" in very small white/grey text at the bottom edge
-
---- TEXT RULES ---
-- ALL text must be sharp, clean, and PERFECTLY READABLE — no blur, no distortion
-- Use only simple sans-serif font (like Helvetica or Arial)
-- Keep text SHORT — abbreviate if needed. Never let text wrap more than 1 line
-- Product name should be SHORT, not the full database name
-- NO random/gibberish characters anywhere
+--- TYPOGRAPHY RULES ---
+- FONT: Use a modern, thick, impactful sans-serif (style: Montserrat/Bebas Neue) for headlines.
+- READABILITY: All text must be 100% sharp and readable. Add subtle shadows to text if background is busy.
+- Product name should be SHORT.
+- NO random/gibberish characters.
 
 --- PHOTO RULES ---
-- PHOTOREALISTIC only — NO cartoon, illustration, or painting style
-- Vehicle must match the reference image exactly (color, shape, design)
-- No extra wheels, deformed parts, or missing components
-- No distorted human faces or anatomy
-- Clean, uncluttered background
+- PHOTOREALISTIC only — NO cartoon/illustration.
+- Vehicle must match reference image exactly.
+- Clean, premium, aspirational environment.
 
 VIBE: ${vibe || "Premium, Aspirational, Clean, Modern"}.`;
 
