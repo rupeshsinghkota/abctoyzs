@@ -15,6 +15,10 @@ export type Order = {
     total_amount: number;
     currency: string;
     status: 'processing' | 'shipped' | 'delivered' | 'cancelled';
+    payment_method?: string;
+    shiprocket_order_id?: string;
+    payment_status?: string;
+    razorpay_order_id?: string;
     created_at: string;
     items?: OrderItem[];
 };
