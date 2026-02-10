@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
       <g:id>${item.id}</g:id>
       <g:title>${cdata(item.title)}</g:title>
       <g:description>${cdata(clean(item.description))}</g:description>
-      <g:link>${item.link}</g:link>
+      <g:link>${clean(item.link)}</g:link>
       <g:image_link>${item.image}</g:image_link>
       ${item.additional_images.map(img => `<g:additional_image_link>${img}</g:additional_image_link>`).join('')}
       <g:brand>${clean(item.brand)}</g:brand>
