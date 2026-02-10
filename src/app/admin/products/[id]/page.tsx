@@ -1200,24 +1200,27 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                         <div className="flex flex-col">
                                             <h3 className="font-bold text-lg flex items-center gap-2">
                                                 <Zap className="w-5 h-5 text-blue-500" />
-                                                AI Ad Creatives
+                                                AI Ad Creatives {variants.length > 0 && <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full ml-2">Main Product</span>}
                                             </h3>
-                                            <p className="text-sm text-muted-foreground">Auto-generated for Feed, Stories, and Audience Network</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {variants.length > 0
+                                                    ? "Optional 'General Branding' ads for manual campaigns. (Variants handle the Feed automatically)"
+                                                    : "Auto-generated for Feed, Stories, and Audience Network"}
+                                            </p>
                                         </div>
                                         <div className="flex gap-3">
                                             {variants.length > 0 && (
                                                 <button
                                                     type="button"
                                                     onClick={async () => {
-                                                        if (!confirm('Generate ads for Main Product AND all eligible Variants?')) return;
-                                                        await generateAdCreatives();
+                                                        if (!confirm('Generate ads for all eligible Variants?')) return;
                                                         await generateAllVariantAds(true);
                                                     }}
                                                     disabled={isGeneratingAds}
                                                     className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-purple-500/20 disabled:opacity-50"
                                                 >
                                                     {isGeneratingAds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                                    Generate Everything
+                                                    Generate All Variant Ads
                                                 </button>
                                             )}
                                             <button

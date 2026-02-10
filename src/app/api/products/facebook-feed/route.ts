@@ -29,13 +29,12 @@ export async function GET(request: NextRequest) {
             const isBaseInStock = (product as any).stock !== undefined ? (product as any).stock > 0 : true;
 
             // --- FACEBOOK SPECIFIC OPTIMIZATION ---
-            // 1. Image Strategy: Prioritize AI Square Ad from the first Set -> Lifestyle Banner -> White Background
+            // 1. Image Strategy: Prioritize AI Square Ad from the first Set -> Original Product Image
             const adSets = Array.isArray(product.ad_creatives) ? product.ad_creatives : (product.ad_creatives ? [product.ad_creatives] : []);
 
             const firstSquare = adSets.length > 0 ? adSets[0].square : null;
-            const socialImage = firstSquare || ((product.banners && product.banners.length > 0)
-                ? product.banners[0]
-                : product.image);
+            // For the main product entry, we WANT the poster if available
+            const socialImage = firstSquare || product.image;
 
             // Collect ALL AI images from ALL sets for additional_images
             let aiImages: string[] = [];
@@ -45,7 +44,8 @@ export async function GET(request: NextRequest) {
                 if (set.landscape) aiImages.push(set.landscape);
             });
 
-            let additionalImages = [...aiImages, ...(product.images || [])];
+            // For the main product, additional images include its original photos too
+            let additionalImages = [...aiImages, ...(product.images || []).filter(img => img !== socialImage)];
 
             // 2. Title Strategy: Clean Title
             // User requested to remove "Best Seller" or other tags from the title.
@@ -106,7 +106,8 @@ export async function GET(request: NextRequest) {
                 const variantAdSets = Array.isArray(variantAdData) ? variantAdData : (variantAdData ? [variantAdData] : []);
 
                 const variantFirstSquare = variantAdSets.length > 0 ? variantAdSets[0].square : null;
-                const variantImage = variantFirstSquare || variant.image || socialImage;
+                // CRITICAL: Variants should fall back to product.image (ORIGINAL), not socialImage (which might be a Main Ad Poster with wrong color)
+                const variantImage = variantFirstSquare || variant.image || product.image;
 
                 // Collect ALL variant-specific AI images
                 let variantAiImages: string[] = [];
@@ -116,7 +117,9 @@ export async function GET(request: NextRequest) {
                     if (set.landscape) variantAiImages.push(set.landscape);
                 });
 
-                let variantAdditionalImages = [...variantAiImages, ...additionalImages];
+                // For variants, we only include variant-specific AI ads + original product images. 
+                // We EXCLUDE main product AI ads as they likely show the wrong color/vibe for a specific variant.
+                let variantAdditionalImages = [...variantAiImages, ...(product.images || []).filter(img => img !== variantImage)];
 
                 return {
                     ...baseItem,
