@@ -105,7 +105,7 @@ VIBE: ${vibe || "Premium Luxury, Aspirational, Clean, Modern"}.`;
 
             // Use new SDK with ALL capabilities
             const response = await ai.models.generateContent({
-                model: "gemini-2.0-flash-exp-image-generation",
+                model: "gemini-3-pro-image-preview",
                 contents: contents,
                 config: {
                     responseModalities: ["Image"],
