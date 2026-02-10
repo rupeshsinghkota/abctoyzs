@@ -46,6 +46,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [isBrandingAll, setIsBrandingAll] = useState(false);
     const [isGeneratingPosters, setIsGeneratingPosters] = useState(false);
     const [isGeneratingAds, setIsGeneratingAds] = useState(false);
+    const [adScene, setAdScene] = useState('Urban Luxe');
+    const [adAudience, setAdAudience] = useState('Boy');
     const [generatedPosters, setGeneratedPosters] = useState<string[]>([]);
 
     // Magic Paste State
@@ -418,6 +420,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     mrp: formData.mrp,
                     originalImageUrl: formData.images[0],
                     vibe: formData.prompt_notes,
+                    scene: adScene,
+                    audience: adAudience,
                     specs: {
                         voltage: formData.voltage,
                         age: formData.specs?.suitable_age,
@@ -473,6 +477,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     mrp: (variant as any).mrp || formData.mrp,
                     originalImageUrl: variant.image,
                     vibe: formData.prompt_notes,
+                    scene: adScene,
+                    audience: adAudience,
                     specs: {
                         voltage: formData.voltage,
                         age: formData.specs?.suitable_age,
@@ -536,6 +542,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                 mrp: (variant as any).mrp || formData.mrp,
                                 originalImageUrl: variant.image,
                                 vibe: formData.prompt_notes,
+                                scene: adScene,
+                                audience: adAudience,
                                 specs: {
                                     voltage: formData.voltage,
                                     age: formData.specs?.suitable_age,
@@ -1176,6 +1184,37 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                 Facebook Ad Creatives
                                             </h3>
                                             <p className="text-sm text-muted-foreground">Auto-generated for Feed, Stories, and Audience Network</p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-4 mb-4 md:mb-0">
+                                            {/* Scene Selector */}
+                                            <div className="flex flex-col gap-1.5">
+                                                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">Scene</label>
+                                                <select
+                                                    value={adScene}
+                                                    onChange={(e) => setAdScene(e.target.value)}
+                                                    className="bg-muted border border-border rounded-lg px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                                >
+                                                    <option>Urban Luxe</option>
+                                                    <option>Nature Explorer</option>
+                                                    <option>Modern Minimal</option>
+                                                    <option>Twilight Ride</option>
+                                                </select>
+                                            </div>
+
+                                            {/* Audience Selector */}
+                                            <div className="flex flex-col gap-1.5">
+                                                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">Audience</label>
+                                                <select
+                                                    value={adAudience}
+                                                    onChange={(e) => setAdAudience(e.target.value)}
+                                                    className="bg-muted border border-border rounded-lg px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                                >
+                                                    <option>Boy</option>
+                                                    <option>Girl</option>
+                                                    <option>Both</option>
+                                                    <option>No Child</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div className="flex gap-3">
                                             {variants.length > 0 && (

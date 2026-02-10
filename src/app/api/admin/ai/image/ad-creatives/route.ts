@@ -9,7 +9,40 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export async function POST(req: Request) {
     try {
-        const { productName, price, mrp, originalImageUrl, vibe, specs } = await req.json();
+        const { productName, price, mrp, originalImageUrl, vibe, specs, scene, audience } = await req.json();
+
+        // 0. Build Scene & Audience Prompts
+        let scenePrompt = "";
+        switch (scene) {
+            case 'Nature Explorer':
+                scenePrompt = "SETTING: Lush green park, forest trail, or sun-drenched garden. Natural warm sunlight filtering through trees. Earthy tones.";
+                break;
+            case 'Modern Minimal':
+                scenePrompt = "SETTING: High-end professional studio with a clean white or light grey infinity cove. Soft, even commercial lighting. Elegant and focused.";
+                break;
+            case 'Twilight Ride':
+                scenePrompt = "SETTING: Modern city at dusk. Ambient city lights, neon signs, and glowing storefronts. Dramatic lighting with cool blue and warm orange contrasts.";
+                break;
+            case 'Urban Luxe':
+            default:
+                scenePrompt = "SETTING: Modern luxury home driveway or upscale city promenade. Polished concrete or clean pavement. Wealthy, aspirational urban environment.";
+        }
+
+        let audiencePrompt = "";
+        switch (audience) {
+            case 'Boy':
+                audiencePrompt = "A happy, photogenic young boy (age 3-6) riding or playing with the vehicle.";
+                break;
+            case 'Girl':
+                audiencePrompt = "A happy, photogenic young girl (age 3-6) riding or playing with the vehicle.";
+                break;
+            case 'Both':
+                audiencePrompt = "Two happy young children (a boy and a girl, age 3-6) playing together with the vehicle.";
+                break;
+            case 'No Child':
+            default:
+                audiencePrompt = "The product is shown alone in its environment, with NO children visible. Focus entirely on the vehicle's design and details.";
+        }
 
         // Build spec highlights for text overlay — filter out empty/N/A values
         const isValid = (v: any) => v && String(v).trim() !== '' && String(v).toLowerCase() !== 'n/a' && String(v).toLowerCase() !== 'na';
@@ -95,9 +128,10 @@ ${numMrp > numPrice ? `- RIGHT side: Small red diagonal "SALE" ribbon badge` : '
 
 LAYER 2 — HERO ZONE (60% height):
 - Photorealistic scene: ${compositionDesc}
-- The ride-on vehicle on a clean, well-lit surface (driveway, park path, or studio)
-- A happy child (age 3-6) riding or playing with it
-- Golden hour lighting, shallow depth of field, aspirational lifestyle
+- ${scenePrompt}
+- The ride-on vehicle on the specified surface, integrated perfectly with shadows and reflections.
+- HUMAN ELEMENT: ${audiencePrompt}
+- Lighting matching the setting (Golden hour, Studio, or Twilight).
 - Camera: 35mm, f/2.8, eye-level or slightly low angle
 - KEEP THIS AREA MOSTLY VISUAL — minimal to no text here
 
