@@ -111,23 +111,33 @@ export default function CheckoutPage() {
                 description: "Purchase from ABC Toyz",
                 order_id: orderData.razorpay_order_id,
                 handler: async function (response: any) {
-                    // 3. Verify Payment
-                    const verifyRes = await fetch('/api/checkout/verify', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            order_id: orderData.order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_signature: response.razorpay_signature
-                        })
-                    });
+                    setLoading(true); // Show loading spinner during verification
+                    try {
+                        // 3. Verify Payment
+                        const verifyRes = await fetch('/api/checkout/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                order_id: orderData.order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
 
-                    if (verifyRes.ok) {
-                        clearCart();
-                        router.push(`/checkout/success?oid=${orderData.order_id}`);
-                    } else {
-                        alert("Payment verification failed. Please contact support.");
+                        if (verifyRes.ok) {
+                            clearCart();
+                            router.push(`/checkout/success?oid=${orderData.order_id}`);
+                        } else {
+                            const errorData = await verifyRes.json();
+                            console.error("Verification failed:", errorData);
+                            alert("Payment verification failed. Please contact support.");
+                            setLoading(false);
+                        }
+                    } catch (error) {
+                        console.error("Verification Error:", error);
+                        alert("An error occurred during payment verification.");
+                        setLoading(false);
                     }
                 },
                 prefill: {
