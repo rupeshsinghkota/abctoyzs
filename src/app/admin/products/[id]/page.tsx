@@ -484,6 +484,60 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         }
     };
 
+    const generateAllVariantAds = async () => {
+        if (isGeneratingAds) return;
+
+        const variantsToGenerate = variants.filter(v => v.image && !v.ad_creatives?.square);
+        if (variantsToGenerate.length === 0) {
+            alert('No eligible variants found (must have an image and no existing ads).');
+            return;
+        }
+
+        if (!confirm(`Generate ads for ${variantsToGenerate.length} variants? This might take a minute.`)) return;
+
+        setIsGeneratingAds(true);
+        let successCount = 0;
+        const newVars = [...variants];
+
+        try {
+            for (let i = 0; i < newVars.length; i++) {
+                const variant = newVars[i];
+                if (variant.image && !variant.ad_creatives?.square) {
+                    try {
+                        const res = await fetch('/api/admin/ai/image/ad-creatives', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                productName: `${formData.name} - ${variant.name}`,
+                                price: variant.price,
+                                originalImageUrl: variant.image,
+                                vibe: formData.prompt_notes
+                            })
+                        });
+
+                        const data = await res.json();
+                        if (data.creatives) {
+                            newVars[i].ad_creatives = {
+                                square: data.creatives.square,
+                                story: data.creatives.story,
+                                landscape: data.creatives.landscape
+                            };
+                            successCount++;
+                        }
+                    } catch (err) {
+                        console.error(`Failed to generate for ${variant.name}`, err);
+                    }
+                }
+            }
+            setVariants(newVars);
+            alert(`✨ Successfully generated ads for ${successCount} variants!`);
+        } catch (error) {
+            alert('Bulk generation stopped due to error.');
+        } finally {
+            setIsGeneratingAds(false);
+        }
+    };
+
     // --- Intelligent Mapping Helpers ---
     const parseAgeGroup = (text?: string) => {
         if (!text) return '';
@@ -1297,7 +1351,19 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         {activeTab === 'variations' && (
                             <div className="bg-card border rounded-3xl p-6 space-y-6">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-lg font-bold">Manage Variations ({variants.length})</h3>
+                                    <div className="flex items-center gap-4">
+                                        <h3 className="text-lg font-bold">Manage Variations ({variants.length})</h3>
+                                        <button
+                                            type="button"
+                                            onClick={generateAllVariantAds}
+                                            disabled={isGeneratingAds || variants.length === 0}
+                                            className="text-xs px-3 py-1.5 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded-full font-bold flex items-center gap-1 transition-colors disabled:opacity-50"
+                                            title="Generate ads for all variants that have images but no ads"
+                                        >
+                                            <Sparkles className="w-3 h-3" />
+                                            {isGeneratingAds ? 'Processing...' : 'Generate All Ads'}
+                                        </button>
+                                    </div>
                                     {variants.length === 0 && <span className="text-sm text-yellow-600 font-medium">Use Attributes tab to generate first.</span>}
                                 </div>
 
