@@ -35,13 +35,9 @@ export async function GET(request: NextRequest) {
                 ? product.banners[0]
                 : product.image;
 
-            // 2. Title Strategy: Social Proof
-            // If it has high reviews, append to title for social ads? 
-            // Actually, best to keep clean, but maybe use the 'tag' if available.
-            let socialTitle = product.name;
-            if (product.tag) {
-                socialTitle = `${product.tag}: ${product.name}`; // e.g. "Best Seller: BMW M5..."
-            }
+            // 2. Title Strategy: Clean Title
+            // User requested to remove "Best Seller" or other tags from the title.
+            const socialTitle = product.name;
 
             // Base product data
             const baseItem = {
