@@ -36,16 +36,18 @@ export async function GET(request: NextRequest) {
             // For the main product entry, we WANT the poster if available
             const socialImage = firstSquare || product.image;
 
-            // Collect ALL AI images from ALL sets for additional_images
-            let aiImages: string[] = [];
+            // Collect ALL AI images from ALL sets, but group by ratio to protect Carousel ads
+            let squareAds: string[] = [];
+            let otherAds: string[] = [];
+
             adSets.forEach(set => {
-                if (set.square && set.square !== socialImage) aiImages.push(set.square);
-                if (set.story) aiImages.push(set.story);
-                if (set.landscape) aiImages.push(set.landscape);
+                if (set.square && set.square !== socialImage) squareAds.push(set.square);
+                if (set.story) otherAds.push(set.story);
+                if (set.landscape) otherAds.push(set.landscape);
             });
 
-            // For the main product, additional images include its original photos too
-            let additionalImages = [...aiImages, ...(product.images || []).filter(img => img !== socialImage)];
+            // Squares first for Carousel consistency, followed by Story/Landscape for placement optimization
+            let additionalImages = [...squareAds, ...otherAds, ...(product.images || []).filter(img => img !== socialImage)];
 
             // 2. Title Strategy: Clean Title
             // User requested to remove "Best Seller" or other tags from the title.
@@ -109,17 +111,18 @@ export async function GET(request: NextRequest) {
                 // CRITICAL: Variants should fall back to product.image (ORIGINAL), not socialImage (which might be a Main Ad Poster with wrong color)
                 const variantImage = variantFirstSquare || variant.image || product.image;
 
-                // Collect ALL variant-specific AI images
-                let variantAiImages: string[] = [];
+                // Collect variant-specific AI images, grouping squares first
+                let variantSquares: string[] = [];
+                let variantOthers: string[] = [];
+
                 variantAdSets.forEach(set => {
-                    if (set.square && set.square !== variantImage) variantAiImages.push(set.square);
-                    if (set.story) variantAiImages.push(set.story);
-                    if (set.landscape) variantAiImages.push(set.landscape);
+                    if (set.square && set.square !== variantImage) variantSquares.push(set.square);
+                    if (set.story) variantOthers.push(set.story);
+                    if (set.landscape) variantOthers.push(set.landscape);
                 });
 
-                // For variants, we only include variant-specific AI ads + original product images. 
-                // We EXCLUDE main product AI ads as they likely show the wrong color/vibe for a specific variant.
-                let variantAdditionalImages = [...variantAiImages, ...(product.images || []).filter(img => img !== variantImage)];
+                // Priority: Variant Squares -> Variant Story/Landscape -> Base Product Assets
+                let variantAdditionalImages = [...variantSquares, ...variantOthers, ...(product.images || []).filter(img => img !== variantImage)];
 
                 return {
                     ...baseItem,
