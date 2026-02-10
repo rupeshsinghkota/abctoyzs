@@ -66,8 +66,6 @@ export const OrderService = {
         return order as Order & { shipping_address: any };
     },
 
-},
-
     // Create a real order from checkout
     async createOrder(orderData: {
         total_amount: number;
@@ -116,40 +114,40 @@ export const OrderService = {
         return order;
     },
 
-        // Helper to create a mock order (for testing)
-        async createMockOrder() {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not logged in");
+    // Helper to create a mock order (for testing)
+    async createMockOrder() {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Not logged in");
 
-    // Create Order
-    const { data: order, error } = await supabase
-        .from('orders')
-        .insert({
-            user_id: user.id,
-            total_amount: 599.99,
-            status: 'processing'
-        })
-        .select()
-        .single();
+        // Create Order
+        const { data: order, error } = await supabase
+            .from('orders')
+            .insert({
+                user_id: user.id,
+                total_amount: 599.99,
+                status: 'processing'
+            })
+            .select()
+            .single();
 
-    if (error) throw error;
+        if (error) throw error;
 
-    // Create Items
-    const { error: itemError } = await supabase
-        .from('order_items')
-        .insert([
-            {
-                order_id: order.id,
-                product_id: 1,
-                product_name: 'Lamborghini Aventador 24V Drift',
-                product_image: '/hero/hero_car_1769365166894.png',
-                price: 599.99,
-                quantity: 1
-            }
-        ]);
+        // Create Items
+        const { error: itemError } = await supabase
+            .from('order_items')
+            .insert([
+                {
+                    order_id: order.id,
+                    product_id: 1,
+                    product_name: 'Lamborghini Aventador 24V Drift',
+                    product_image: '/hero/hero_car_1769365166894.png',
+                    price: 599.99,
+                    quantity: 1
+                }
+            ]);
 
-    if (itemError) throw itemError;
-    return order;
-}
+        if (itemError) throw itemError;
+        return order;
+    }
 };
