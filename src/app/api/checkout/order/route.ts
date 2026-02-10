@@ -33,7 +33,8 @@ export async function POST(req: Request) {
                 shipping_address_id: shipping_address_id,
                 payment_status: 'pending',
                 status: 'processing',
-                payment_method: payment_method || 'PREPAID' // Default to PREPAID if not specified
+                payment_method: payment_method || 'PREPAID', // Default to PREPAID if not specified
+                guest_email: (await req.json()).guest_email // Extract guest_email
             })
             .select()
             .single();

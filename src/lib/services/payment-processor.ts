@@ -27,7 +27,7 @@ export const PaymentProcessor = {
         let userId = order.user_id;
         let isNewUser = false;
         let tempPassword = null;
-        let userEmail = user_email_placeholder(order);
+        let userEmail = order.guest_email || user_email_placeholder(order);
 
         if (!userId) {
             // Check if user exists by email

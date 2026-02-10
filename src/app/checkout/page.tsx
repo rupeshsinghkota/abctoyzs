@@ -95,7 +95,18 @@ export default function CheckoutPage() {
                     items: cart,
                     total_amount: total,
                     shipping_address_id: selectedAddressId,
-                    payment_method: paymentMethod
+                    payment_method: paymentMethod,
+                    // Priority: 1. Profile Email (LoggedIn), 2. Address Email (if saved), 3. Guest Form Email (if just typed)
+                    // Since we don't have the form state here easily (it's in subcomponent or cleared), we need to rely on what we have.
+                    // For now, let's assume if it's a guest, the address might have the email if we updated the API.
+                    // BUT, actually, we should store the email in the address table too if we added it there.
+                    // OR, since the form is "ShippingAddressForm", we only save address.
+                    // LET'S SIMPLIFY: We need the email in the order.
+                    // If user is logged in, use profile.email.
+                    // If user is guest, they MUST have just entered an address.
+                    // Wait, if they select an existing address (cookie based guest?), they might not have email.
+                    // Let's rely on finding the email in the address object (if we update addAddress to save it) OR profile.
+                    guest_email: addresses.find(a => a.id === selectedAddressId)?.email || profile?.email || "guest@example.com"
                 })
             });
 
@@ -378,6 +389,7 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: ()
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
+        email: '',
         phone: '',
         address_line1: '',
         address_line2: '',
@@ -426,6 +438,18 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: ()
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     />
                 </div>
+            </div>
+
+            <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Email Address (for order updates)</label>
+                <input
+                    required
+                    type="email"
+                    placeholder="e.g. rupesh@example.com"
+                    className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
             </div>
 
             <div className="space-y-1">

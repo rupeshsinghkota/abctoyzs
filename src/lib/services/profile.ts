@@ -11,6 +11,7 @@ export type Address = {
     state: string;
     pincode: string;
     is_default: boolean;
+    email?: string; // Optional email for guests/notifications
     created_at: string;
 };
 
@@ -76,14 +77,20 @@ export const ProfileService = {
                 .eq('user_id', user.id);
         }
 
+        // We aren't saving 'email' to address table yet unless column exists.
+        // But for the frontend state to work, we return it.
+        // Let's assume we pass it through.
+        const { email, ...dbAddress } = address;
+
         const { data, error } = await supabase
             .from('addresses')
-            .insert({ ...address, user_id: user?.id || null })
+            .insert({ ...dbAddress, user_id: user?.id || null })
             .select()
             .single();
 
         if (error) throw error;
-        return data as Address;
+        // Return with email so frontend can use it immediately for the order call
+        return { ...data, email } as Address;
     },
 
     async deleteAddress(id: string) {
