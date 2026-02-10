@@ -10,6 +10,7 @@ import { BackToTop } from "@/components/ui/BackToTop";
 import { SettingsService } from "@/lib/services/settings";
 import { createClient } from "@/lib/supabase/server";
 import Script from "next/script";
+import { Suspense } from "react";
 import GoogleTracking from "@/components/tracking/GoogleTracking";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -95,7 +96,9 @@ export default function RootLayout({
           plusJakarta.variable
         )}
       >
-        <GoogleTracking />
+        <Suspense fallback={null}>
+          <GoogleTracking />
+        </Suspense>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="lazyOnload"
