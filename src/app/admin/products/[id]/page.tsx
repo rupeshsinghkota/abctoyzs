@@ -531,7 +531,13 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         const silent = typeof arg === 'boolean' ? arg : false;
         if (isGeneratingAds) return;
 
-        const variantsToGenerate = variants.filter(v => v.image && !v.ad_creatives?.square);
+        const hasNoAds = (v: any) => {
+            if (!v.ad_creatives) return true;
+            if (Array.isArray(v.ad_creatives)) return v.ad_creatives.length === 0;
+            return !v.ad_creatives.square; // Legacy fallback
+        };
+
+        const variantsToGenerate = variants.filter(v => v.image && hasNoAds(v));
         if (variantsToGenerate.length === 0) {
             if (!silent) alert('No eligible variants found (must have an image and no existing ads).');
             return;
@@ -548,8 +554,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
             for (let i = 0; i < newVars.length; i++) {
                 const variant = newVars[i];
-                // For bulk, only generate if no ads exist at all
-                if (variant.image && (!variant.ad_creatives || (Array.isArray(variant.ad_creatives) && variant.ad_creatives.length === 0))) {
+                // Use the same helper for consistency
+                if (variant.image && hasNoAds(variant)) {
                     try {
                         const allCreatives: any[] = [];
                         for (const mode of modes) {
