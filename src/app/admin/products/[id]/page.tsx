@@ -409,6 +409,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             return;
         }
 
+        if (isGeneratingAds) return;
+        if (variants.length > 0) {
+            alert('For variable products, please generate ads in the Variations section or use "Generate All Variant Ads".');
+            return;
+        }
         setIsGeneratingAds(true);
         try {
             const modes = ['functional', 'celebration', 'adventure'];
@@ -1209,7 +1214,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             </p>
                                         </div>
                                         <div className="flex gap-3">
-                                            {variants.length > 0 && (
+                                            {variants.length > 0 ? (
                                                 <button
                                                     type="button"
                                                     onClick={async () => {
@@ -1222,16 +1227,17 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                     {isGeneratingAds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                                                     Generate All Variant Ads
                                                 </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => generateAdCreatives()}
+                                                    disabled={isGeneratingAds}
+                                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
+                                                >
+                                                    {isGeneratingAds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                                                    Generate Ad Creatives
+                                                </button>
                                             )}
-                                            <button
-                                                type="button"
-                                                onClick={() => generateAdCreatives()}
-                                                disabled={isGeneratingAds}
-                                                className={`px-4 py-2 ${variants.length > 0 ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80' : 'bg-blue-600 hover:bg-blue-700 text-white'} rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg disabled:opacity-50`}
-                                            >
-                                                {isGeneratingAds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                                                {variants.length > 0 ? 'Main Product Only' : 'Generate Ad Creatives'}
-                                            </button>
                                         </div>
                                     </div>
                                     <div className="space-y-8">
