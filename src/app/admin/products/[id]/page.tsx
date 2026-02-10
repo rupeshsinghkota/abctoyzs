@@ -484,16 +484,17 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         }
     };
 
-    const generateAllVariantAds = async () => {
+    const generateAllVariantAds = async (arg?: any) => {
+        const silent = typeof arg === 'boolean' ? arg : false;
         if (isGeneratingAds) return;
 
         const variantsToGenerate = variants.filter(v => v.image && !v.ad_creatives?.square);
         if (variantsToGenerate.length === 0) {
-            alert('No eligible variants found (must have an image and no existing ads).');
+            if (!silent) alert('No eligible variants found (must have an image and no existing ads).');
             return;
         }
 
-        if (!confirm(`Generate ads for ${variantsToGenerate.length} variants? This might take a minute.`)) return;
+        if (!silent && !confirm(`Generate ads for ${variantsToGenerate.length} variants? This might take a minute.`)) return;
 
         setIsGeneratingAds(true);
         let successCount = 0;
@@ -1143,17 +1144,33 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             </h3>
                                             <p className="text-sm text-muted-foreground">Auto-generated for Feed, Stories, and Audience Network</p>
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={generateAdCreatives}
-                                            disabled={isGeneratingAds}
-                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20 disabled:opacity-50"
-                                        >
-                                            {isGeneratingAds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                            Generate Ads
-                                        </button>
+                                        <div className="flex gap-3">
+                                            {variants.length > 0 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={async () => {
+                                                        if (!confirm('Generate ads for Main Product AND all eligible Variants?')) return;
+                                                        await generateAdCreatives();
+                                                        await generateAllVariantAds(true);
+                                                    }}
+                                                    disabled={isGeneratingAds}
+                                                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-purple-500/20 disabled:opacity-50"
+                                                >
+                                                    {isGeneratingAds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                    Generate Everything
+                                                </button>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => generateAdCreatives()}
+                                                disabled={isGeneratingAds}
+                                                className={`px-4 py-2 ${variants.length > 0 ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80' : 'bg-blue-600 hover:bg-blue-700 text-white'} rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg disabled:opacity-50`}
+                                            >
+                                                {isGeneratingAds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                                                {variants.length > 0 ? 'Main Product Only' : 'Generate Ad Creatives'}
+                                            </button>
+                                        </div>
                                     </div>
-
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {/* Square (Feed) */}
                                         <div className="space-y-2">
@@ -1355,7 +1372,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                         <h3 className="text-lg font-bold">Manage Variations ({variants.length})</h3>
                                         <button
                                             type="button"
-                                            onClick={generateAllVariantAds}
+                                            onClick={() => generateAllVariantAds(false)}
                                             disabled={isGeneratingAds || variants.length === 0}
                                             className="text-xs px-3 py-1.5 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded-full font-bold flex items-center gap-1 transition-colors disabled:opacity-50"
                                             title="Generate ads for all variants that have images but no ads"
