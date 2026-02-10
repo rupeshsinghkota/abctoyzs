@@ -79,8 +79,17 @@ export async function GET(request: NextRequest) {
                 const displayPrice = variantMrp || variantPrice;
                 const salePrice = variantMrp && variantMrp > variantPrice ? variantPrice : undefined;
 
-                // For variants, we try to find a variant specific image, 
-                // BUT if not, we fallback to the Social Image (Banner) calculated above, NOT the plain product.image
+                // Construct Variant Deep Link
+                const params = new URLSearchParams();
+                if (color) params.set('color', color);
+                if (voltage) params.set('voltage', voltage);
+
+                // Note: Facebook Base Link already has UTM params, so use '&'
+                // baseItem.link is "...slug?utm_source=facebook..."
+                const variantLink = params.toString()
+                    ? `${baseItem.link}&${params.toString()}`
+                    : baseItem.link;
+
                 const variantImage = variant.image || socialImage;
 
                 return {
@@ -88,6 +97,7 @@ export async function GET(request: NextRequest) {
                     id: variant.id,
                     item_group_id: product.id,
                     title: variantTitle,
+                    link: variantLink, // Use specific variant link
                     image: variantImage,
                     availability: isVariantInStock ? 'in_stock' : 'out_of_stock',
                     price: `${displayPrice} INR`,

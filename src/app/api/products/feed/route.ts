@@ -126,11 +126,20 @@ export async function GET(request: NextRequest) {
         const displayPrice = variantMrp || variantPrice;
         const salePrice = variantMrp && variantMrp > variantPrice ? variantPrice : undefined;
 
+        // Construct Variant Deep Link
+        const params = new URLSearchParams();
+        if (color) params.set('color', color);
+        if (voltage) params.set('voltage', voltage);
+        const variantLink = params.toString()
+          ? `${baseItem.link}${baseItem.link.includes('?') ? '&' : '?'}${params.toString()}`
+          : baseItem.link;
+
         return {
           ...baseItem,
           id: variant.id,
           item_group_id: product.id,
           title: variantTitle,
+          link: variantLink, // Use specific variant link
           image: variant.image || product.image,
           additional_images: baseItem.additional_images,
           availability: isVariantInStock ? 'in_stock' : 'out_of_stock',
