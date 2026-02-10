@@ -380,7 +380,6 @@ function processProducts(data: any[]): Product[] {
             attributes: Array.isArray(item.attributes) ? item.attributes : [],
             variants: Array.isArray(item.variants) ? item.variants : [],
             meta_title: item.meta_title,
-            meta_title: item.meta_title,
             meta_description: item.meta_description,
             marketing_suite: item.marketing_suite,
             ad_creatives: item.ad_creatives
