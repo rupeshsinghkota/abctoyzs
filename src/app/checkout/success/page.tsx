@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { CheckCircle, Home, ShoppingBag, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { OrderService, Order } from '@/lib/services/orders';
 import { trackConversion } from '@/components/tracking/GoogleTracking';
 import confetti from 'canvas-confetti';
 
-export default function CheckoutSuccessPage() {
+function SuccessContent() {
     const searchParams = useSearchParams();
     const oid = searchParams.get('oid');
     const [order, setOrder] = useState<Order | null>(null);
@@ -94,5 +94,17 @@ export default function CheckoutSuccessPage() {
                 </Link>
             </div>
         </div>
+    );
+}
+
+export default function CheckoutSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        }>
+            <SuccessContent />
+        </Suspense>
     );
 }
