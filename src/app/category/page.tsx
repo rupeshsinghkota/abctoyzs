@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Sparkles, Zap, User } from 'lucide-react';
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from '@/lib/data';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
@@ -32,10 +33,12 @@ export default function CategoryPage() {
                                 className="group relative rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 shadow-lg md:shadow-xl hover:shadow-2xl transition-all duration-300"
                             >
                                 {/* Image */}
-                                <img
+                                <Image
                                     src={cat.image}
                                     alt={cat.label}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
+                                    fill
+                                    sizes="(max-width: 768px) 33vw, 25vw"
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
                                 />
 
                                 {/* Gradient Overlay */}
@@ -73,7 +76,7 @@ export default function CategoryPage() {
                                 href={`/category/power/${power.value}`}
                                 className="group relative rounded-xl overflow-hidden aspect-[4/3] md:aspect-video shadow-sm hover:shadow-md transition-all"
                             >
-                                <img src={power.img} alt={power.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                <Image src={power.img} alt={power.label} fill sizes="33vw" className="object-cover group-hover:scale-110 transition-transform duration-500" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                                 <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
                                     <div className="text-xs font-bold bg-yellow-500 text-black px-1.5 py-0.5 rounded inline-block mb-1">
@@ -103,7 +106,7 @@ export default function CategoryPage() {
                                 href={`/category/age/${age.value}`}
                                 className="group relative rounded-xl overflow-hidden aspect-square shadow-sm hover:shadow-md transition-all"
                             >
-                                <img src={age.img} alt={age.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                <Image src={age.img} alt={age.label} fill sizes="33vw" className="object-cover group-hover:scale-110 transition-transform duration-500" />
                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black/30 backdrop-blur-[1px]">
                                     <span className="text-2xl md:text-3xl font-black drop-shadow-md">

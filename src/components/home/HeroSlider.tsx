@@ -62,10 +62,13 @@ export function HeroSlider() {
                 {slides.map((slide) => (
                     <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect-[3/2] sm:aspect-[16/9] md:aspect-[21/9]">
                         <div className="absolute inset-0 w-full h-full">
-                            <img
+                            <Image
                                 src={slide.image}
                                 alt={slide.title}
-                                className="w-full h-full object-cover"
+                                fill
+                                sizes="100vw"
+                                priority={slide.id === 1}
+                                className="object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                         </div>
