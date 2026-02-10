@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
   <channel>
     <title>ABC Toyz Facebook Catalog</title>
     <link>${baseUrl}</link>
-    <description>Premium Ride-on Cars - Optimized for Facebook & Instagram</description>
+    <description>Premium Ride-on Cars - Optimized for Facebook &amp; Instagram</description>
     ${items.map(item => `
     <item>
       <g:id>${item.id}</g:id>
