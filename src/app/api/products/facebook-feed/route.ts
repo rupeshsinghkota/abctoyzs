@@ -96,7 +96,14 @@ export async function GET(request: NextRequest) {
                     ? `${baseItem.link}&${params.toString()}`
                     : baseItem.link;
 
-                const variantImage = variant.image || socialImage;
+                const variantAdCreatives = (variant as any).ad_creatives || {};
+                const variantImage = variantAdCreatives.square || variant.image || socialImage;
+
+                // Variant Specific Additional Images (e.g. Story Ad for this specific color)
+                let variantAdditionalImages = [...additionalImages];
+                if (variantAdCreatives.story) {
+                    variantAdditionalImages.unshift(variantAdCreatives.story);
+                }
 
                 return {
                     ...baseItem,
@@ -105,6 +112,7 @@ export async function GET(request: NextRequest) {
                     title: variantTitle,
                     link: variantLink, // Use specific variant link
                     image: variantImage,
+                    additional_images: variantAdditionalImages,
                     availability: isVariantInStock ? 'in_stock' : 'out_of_stock',
                     price: `${displayPrice} INR`,
                     sale_price: salePrice ? `${salePrice} INR` : undefined,
