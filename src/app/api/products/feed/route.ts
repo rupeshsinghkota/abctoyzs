@@ -65,6 +65,24 @@ export async function GET(request: NextRequest) {
       // Build enhanced description
       const richDescription = buildRichDescription(product);
 
+      // --- RANKING BOOST FIELDS ---
+      // 1. Highlights: Extract top specs for bullet points
+      const highlights: string[] = [];
+      if (product.specs) {
+        if (product.specs.battery) highlights.push(`Battery: ${product.specs.battery}`);
+        if (product.specs.motor) highlights.push(`Motor: ${product.specs.motor}`);
+        if (product.specs.seats) highlights.push(`Seats: ${product.specs.seats}`);
+        if (product.specs.max_load) highlights.push(`Max Load: ${product.specs.max_load}`);
+        if (product.specs.speed) highlights.push(`Speed: ${product.specs.speed}`);
+      }
+
+      // 2. Age Group Mapping (Google values: newborn, infant, toddler, kids, adult)
+      let googleAgeGroup = 'kids'; // Default to kids for most ride-ons
+      if (product.ageGroup === '1-3') googleAgeGroup = 'toddler';
+
+      // 3. Product Type (Breadcrumb style categorization)
+      const productType = `Toys & Games > Toys > Ride-on Cars > ${product.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : 'Electric Vehicles'}`;
+
       // Base product data
       const baseItem = {
         id: product.id,
@@ -81,6 +99,10 @@ export async function GET(request: NextRequest) {
         shipping: { country: 'IN', service: 'Standard', price: '0 INR' },
         google_category: 'Toys & Games > Toys > Riding Toys > Electric Riding Toys',
         category: product.category,
+        product_type: productType,
+        age_group: googleAgeGroup,
+        highlights: highlights.slice(0, 6),
+        custom_label_2: product.ageGroup ? `${product.ageGroup} Years` : undefined, // Explicit age range for ad targeting
         mpn: product.id,
       };
 
@@ -147,12 +169,16 @@ export async function GET(request: NextRequest) {
         <g:price>0 INR</g:price>
       </g:shipping>
       <g:google_product_category>${clean(item.google_category)}</g:google_product_category>
+      <g:product_type>${clean(item.product_type)}</g:product_type>
       <g:custom_label_0>${clean(item.category)}</g:custom_label_0>
       <g:mpn>${clean(item.mpn)}</g:mpn>
+      <g:age_group>${item.age_group}</g:age_group>
+      ${item.highlights.map(h => `<g:product_highlight>${clean(h)}</g:product_highlight>`).join('')}
       ${(item as any).item_group_id ? `<g:item_group_id>${(item as any).item_group_id}</g:item_group_id>` : ''}
       ${(item as any).color ? `<g:color>${clean((item as any).color)}</g:color>` : ''}
       ${(item as any).size ? `<g:size>${clean((item as any).size)}</g:size>` : ''}
       ${(item as any).custom_label_1 ? `<g:custom_label_1>${clean((item as any).custom_label_1)}</g:custom_label_1>` : ''}
+      ${(item as any).custom_label_2 ? `<g:custom_label_2>${clean((item as any).custom_label_2)}</g:custom_label_2>` : ''}
     </item>
     `).join('')}
   </channel>
