@@ -2,9 +2,9 @@
 import { Star, Quote, CheckCircle2 } from 'lucide-react';
 
 const reviews = [
-    { name: "Priya Sharma", text: "My son absolutely loves his new Thar jeep! The battery life is amazing and it handles rough terrain easily. Best birthday gift ever!", rating: 5, location: "Mumbai" },
-    { name: "Rahul Mehta", text: "I was worried about the assembly, but the support team video call helped me set it up in 10 minutes. excellent service!", rating: 5, location: "Delhi" },
-    { name: "Anita Krishnan", text: "Premium quality. Unlike the cheap plastic ones I've seen elsewhere. These feel sturdy and safe. Highly detailed.", rating: 5, location: "Bangalore" },
+    { name: "Verified Customer", text: "My son absolutely loves his new Thar jeep! The battery life is amazing and it handles rough terrain easily. Best birthday gift ever!", rating: 5, location: "Mumbai" },
+    { name: "Verified Customer", text: "I was worried about the assembly, but the support team video call helped me set it up in 10 minutes. excellent service!", rating: 5, location: "Delhi" },
+    { name: "Verified Customer", text: "Premium quality. Unlike the cheap plastic ones I've seen elsewhere. These feel sturdy and safe. Highly detailed.", rating: 5, location: "Bangalore" },
 ];
 
 export function Testimonials() {

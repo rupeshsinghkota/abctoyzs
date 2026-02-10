@@ -87,7 +87,7 @@ export default function RootLayout({
           plusJakarta.variable
         )}
       >
-        {/* Google Analytics - GA4 */}
+        {/* Google Analytics - GA4 (Uncomment and add ID when ready)
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX`}
           strategy="afterInteractive"
@@ -100,8 +100,9 @@ export default function RootLayout({
             gtag('config', 'G-XXXXXXXXXX');
           `}
         </Script>
+        */}
 
-        {/* Facebook Pixel */}
+        {/* Facebook Pixel (Uncomment and add ID when ready)
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -116,6 +117,7 @@ export default function RootLayout({
             fbq('track', 'PageView');
           `}
         </Script>
+        */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="lazyOnload"

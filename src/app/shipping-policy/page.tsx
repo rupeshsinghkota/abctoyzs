@@ -24,12 +24,20 @@ export default function ShippingPolicy() {
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
+                                <p className="text-sm font-bold text-zinc-900 mb-1">Shipping Cost</p>
+                                <p className="text-zinc-600 text-sm">Free (All Orders)</p>
+                            </div>
+                            <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
+                                <p className="text-sm font-bold text-zinc-900 mb-1">Dispatch Time</p>
+                                <p className="text-zinc-600 text-sm">24-48 Hours</p>
+                            </div>
+                            <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
                                 <p className="text-sm font-bold text-zinc-900 mb-1">Metro Cities</p>
-                                <p className="text-zinc-600 text-sm">3-5 days</p>
+                                <p className="text-zinc-600 text-sm">3-5 days delivery</p>
                             </div>
                             <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
                                 <p className="text-sm font-bold text-zinc-900 mb-1">Rest of India</p>
-                                <p className="text-zinc-600 text-sm">5-7 days</p>
+                                <p className="text-zinc-600 text-sm">5-7 days delivery</p>
                             </div>
                         </div>
                     </section>

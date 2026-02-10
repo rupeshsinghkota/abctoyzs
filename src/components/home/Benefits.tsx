@@ -5,7 +5,7 @@ const benefits = [
     {
         icon: Truck,
         title: "Free Delivery",
-        description: "On orders above ₹999"
+        description: "Pan-India Shipping"
     },
     {
         icon: ShieldCheck,
@@ -14,8 +14,8 @@ const benefits = [
     },
     {
         icon: RotateCcw,
-        title: "7 Days Return",
-        description: "No questions asked"
+        title: "10-Day Replacement",
+        description: "For damaged items"
     },
     {
         icon: CreditCard,

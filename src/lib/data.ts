@@ -244,7 +244,8 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
 
         if (error) {
             console.error("[fetchProducts] Supabase error:", error);
-            return [];
+            console.log("[fetchProducts] Falling back to static data.");
+            return processProducts(products); // Fallback to static data
         }
 
         if (!data || data.length === 0) {
@@ -264,14 +265,26 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
                     }
                 }
             }
-            return [];
+
+            console.log("[fetchProducts] Falling back to static data (no DB data found).");
+            // If slug provided, filter static data
+            if (slug) {
+                const staticMatch = products.find(p => p.slug === slug || p.id === slug);
+                return staticMatch ? processProducts([staticMatch as any]) : []; // processProducts expects array
+            }
+            return processProducts(products); // Return all static products
         }
 
         return processProducts(data);
 
     } catch (e) {
         console.error("fetchProducts error:", e);
-        return [];
+        console.log("[fetchProducts] Falling back to static data (exception).");
+        if (slug) {
+            const staticMatch = products.find(p => p.slug === slug || p.id === slug);
+            return staticMatch ? processProducts([staticMatch as any]) : [];
+        }
+        return processProducts(products);
     }
 }
 
