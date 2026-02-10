@@ -11,16 +11,18 @@ export async function POST(req: Request) {
     try {
         const { productName, price, mrp, originalImageUrl, vibe, specs } = await req.json();
 
-        // Build spec highlights for text overlay
+        // Build spec highlights for text overlay — filter out empty/N/A values
+        const isValid = (v: any) => v && String(v).trim() !== '' && String(v).toLowerCase() !== 'n/a' && String(v).toLowerCase() !== 'na';
         const specItems: string[] = [];
-        if (specs?.voltage) specItems.push(`⚡ ${specs.voltage}`);
-        if (specs?.age) specItems.push(`👶 Ages ${specs.age}`);
-        if (specs?.speed) specItems.push(`🏎️ ${specs.speed}`);
-        if (specs?.motor) specItems.push(`🔧 ${specs.motor}`);
-        if (specs?.runTime) specItems.push(`🔋 ${specs.runTime}`);
-        if (specs?.maxLoad) specItems.push(`⚖️ ${specs.maxLoad}`);
-        if (specs?.remoteControl) specItems.push(`🎮 Remote Control`);
-        const specLine = specItems.length > 0 ? specItems.join('  |  ') : '';
+        if (isValid(specs?.voltage)) specItems.push(`⚡ ${specs.voltage}`);
+        if (isValid(specs?.age)) specItems.push(`👶 ${specs.age} Yrs`);
+        if (isValid(specs?.speed)) specItems.push(`🏎️ ${specs.speed}`);
+        if (isValid(specs?.motor)) specItems.push(`🔧 ${specs.motor}`);
+        if (isValid(specs?.runTime)) specItems.push(`🔋 ${specs.runTime}`);
+        if (isValid(specs?.maxLoad)) specItems.push(`⚖️ ${specs.maxLoad}`);
+        if (specs?.remoteControl) specItems.push(`🎮 Remote`);
+        // Keep max 4 specs to avoid clutter
+        const specLine = specItems.slice(0, 4).join('  •  ');
 
         // Calculate discount
         const numPrice = Number(price) || 0;
@@ -86,9 +88,10 @@ Use the reference product photo provided to accurately depict the vehicle.
 
 The image has 3 visual layers from top to bottom:
 
-LAYER 1 — TOP BAR (10% height):
-- LEFT: ABC Toyz brand logo (use the provided logo image), small, clean
-${numMrp > numPrice ? `- RIGHT: Red diagonal "SALE" ribbon or small red badge` : '- RIGHT: Leave clean or add a subtle "NEW" badge if appropriate'}
+LAYER 1 — TOP STRIP (8% height):
+- A thin semi-transparent dark overlay strip across the top
+- LEFT side: ABC Toyz brand logo (use the provided logo image), small and white
+${numMrp > numPrice ? `- RIGHT side: Small red diagonal "SALE" ribbon badge` : ''}
 
 LAYER 2 — HERO ZONE (60% height):
 - Photorealistic scene: ${compositionDesc}
@@ -104,8 +107,10 @@ LAYER 3 — BOTTOM INFO BAR (30% height):
 
   LINE 1: "${shortName}" — product name in bold white sans-serif, 1 line max, medium size
   LINE 2: ${priceSection}
-${specLine ? `  LINE 3: Spec highlights as a single row of small pill badges:\n  ${specLine}` : ''}
+${specLine ? `  LINE 3: Spec highlights as a single row of tiny pill badges:
+  ${specLine}` : ''}
 ${numMrp > numPrice ? `  LINE 4: "Save ₹${savings.toLocaleString('en-IN')}" in small green text` : ''}
+  LAST LINE: "🚚 Free Shipping  •  💳 COD Available  •  abctoyz.in" in very small white/grey text at the bottom edge
 
 --- TEXT RULES ---
 - ALL text must be sharp, clean, and PERFECTLY READABLE — no blur, no distortion
