@@ -9,7 +9,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export async function POST(req: Request) {
     try {
-        const { productName, price, originalImageUrl, vibe, specs } = await req.json();
+        const { productName, price, mrp, originalImageUrl, vibe, specs } = await req.json();
 
         // Build spec highlights for text overlay
         const specItems: string[] = [];
@@ -21,6 +21,12 @@ export async function POST(req: Request) {
         if (specs?.maxLoad) specItems.push(`⚖️ ${specs.maxLoad}`);
         if (specs?.remoteControl) specItems.push(`🎮 Remote Control`);
         const specLine = specItems.length > 0 ? specItems.join('  |  ') : '';
+
+        // Calculate discount
+        const numPrice = Number(price) || 0;
+        const numMrp = Number(mrp) || 0;
+        const discount = numMrp > numPrice ? Math.round(((numMrp - numPrice) / numMrp) * 100) : 0;
+        const savings = numMrp > numPrice ? numMrp - numPrice : 0;
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
@@ -90,8 +96,13 @@ HUMAN ELEMENT:
 - Appropriate clothing (casual premium — think Gap Kids or Zara Kids)
 
 TYPOGRAPHY & BRANDING:
-- HEADLINE: Product name "${productName}" displayed prominently in bold, clean sans-serif white text
-- Price badge: Clean, modern "Only ₹${price}" in a sleek pill-shaped badge
+- LOGO: Place the ABC Toyz logo (from the provided logo image) in the TOP-LEFT corner. Keep it small but clearly visible. White or light version on dark overlay.
+- HEADLINE: Product name "${productName}" displayed prominently in bold, clean sans-serif white text. This is the MAIN TEXT ELEMENT.
+- Price badge: Clean, modern "Only ₹${numPrice.toLocaleString('en-IN')}" in a sleek pill-shaped badge${numMrp > numPrice ? `
+- STRIKETHROUGH MRP: Show "₹${numMrp.toLocaleString('en-IN')}" with a strikethrough line next to the sale price, in smaller grey/muted text
+- DISCOUNT BADGE: A bold, eye-catching RED circular/burst badge showing "${discount}% OFF" — positioned near the price. Make it pop like a real retail sale sticker.
+- SALE RIBBON: A diagonal red ribbon or banner in the top-right corner saying "SALE" in bold white uppercase text. Classic retail urgency element.
+- SAVINGS TEXT: Small text below price: "Save ₹${savings.toLocaleString('en-IN')}" in green` : ''}
 ${specLine ? `- SPEC STRIP: Show these key specs as small feature icons/badges beneath the headline:
   ${specLine}
   Use small pill-shaped badges with icons, arranged horizontally. Clean, modern, minimal design.` : ''}

@@ -415,6 +415,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 body: JSON.stringify({
                     productName: formData.name,
                     price: formData.base_price,
+                    mrp: formData.mrp,
                     originalImageUrl: formData.images[0],
                     vibe: formData.prompt_notes,
                     specs: {
@@ -469,6 +470,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 body: JSON.stringify({
                     productName: `${formData.name} - ${variant.name}`,
                     price: variant.price,
+                    mrp: (variant as any).mrp || formData.mrp,
                     originalImageUrl: variant.image,
                     vibe: formData.prompt_notes,
                     specs: {
@@ -531,6 +533,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                             body: JSON.stringify({
                                 productName: `${formData.name} - ${variant.name}`,
                                 price: variant.price,
+                                mrp: (variant as any).mrp || formData.mrp,
                                 originalImageUrl: variant.image,
                                 vibe: formData.prompt_notes,
                                 specs: {
