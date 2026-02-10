@@ -34,21 +34,6 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         }
     }
 
-    async function handleCancel() {
-        if (!confirm("Are you sure you want to cancel this order?")) return;
-
-        setCancelling(true);
-        try {
-            await OrderService.cancelOrder(params.id);
-            toast.success("Order cancelled successfully");
-            loadOrder(); // Refresh status
-        } catch (error: any) {
-            toast.error(error.message || "Failed to cancel order");
-        } finally {
-            setCancelling(false);
-        }
-    }
-
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -107,16 +92,6 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
 
                     {/* Actions */}
                     <div className="flex flex-wrap gap-3 mt-6">
-                        {order.status === 'processing' && (
-                            <button
-                                onClick={handleCancel}
-                                disabled={cancelling}
-                                className="flex-1 bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
-                            >
-                                {cancelling ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
-                                Cancel Order
-                            </button>
-                        )}
                         {order.shiprocket_order_id && (
                             <button className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2">
                                 <Truck className="w-4 h-4" />
