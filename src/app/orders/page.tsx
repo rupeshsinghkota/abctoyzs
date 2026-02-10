@@ -87,9 +87,9 @@ export default function OrdersPage() {
                     </div>
                 ) : (
                     orders.map((order) => (
-                        <div key={order.id} className="bg-card border rounded-2xl overflow-hidden shadow-sm">
+                        <Link href={`/orders/${order.id}`} key={order.id} className="block bg-card border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
                             {/* Order Header */}
-                            <div className="p-4 border-b bg-muted/20 flex flex-wrap gap-4 items-center justify-between">
+                            <div className="p-4 border-b bg-muted/20 flex flex-wrap gap-4 items-center justify-between group-hover:bg-muted/30 transition-colors">
                                 <div>
                                     <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Order Placed</p>
                                     <div className="flex items-center gap-2 font-medium">
@@ -110,22 +110,27 @@ export default function OrdersPage() {
                             </div>
 
                             {/* Order Status */}
-                            <div className="px-4 py-3 bg-primary/5 flex items-center gap-2">
-                                {order.status === 'delivered' ? (
-                                    <CheckCircle className="w-4 h-4 text-green-600" />
-                                ) : order.status === 'shipped' ? (
-                                    <Truck className="w-4 h-4 text-blue-600" />
-                                ) : (
-                                    <Clock className="w-4 h-4 text-orange-600" />
-                                )}
-                                <span className="text-sm font-bold capitalize text-primary">
-                                    Status: {order.status}
+                            <div className="px-4 py-3 bg-primary/5 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    {order.status === 'delivered' ? (
+                                        <CheckCircle className="w-4 h-4 text-green-600" />
+                                    ) : order.status === 'shipped' ? (
+                                        <Truck className="w-4 h-4 text-blue-600" />
+                                    ) : (
+                                        <Clock className="w-4 h-4 text-orange-600" />
+                                    )}
+                                    <span className="text-sm font-bold capitalize text-primary">
+                                        Status: {order.status}
+                                    </span>
+                                </div>
+                                <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:underline">
+                                    View Details <ArrowLeft className="w-3 h-3 rotate-180" />
                                 </span>
                             </div>
 
                             {/* Items */}
                             <div className="p-4 space-y-4">
-                                {order.items?.map((item) => (
+                                {order.items?.slice(0, 2).map((item) => (
                                     <div key={item.id} className="flex gap-4">
                                         <div className="w-20 h-20 bg-muted rounded-xl relative overflow-hidden flex-shrink-0">
                                             {item.product_image && (
@@ -139,8 +144,13 @@ export default function OrdersPage() {
                                         </div>
                                     </div>
                                 ))}
+                                {order.items && order.items.length > 2 && (
+                                    <p className="text-xs text-muted-foreground font-medium pl-1">
+                                        + {order.items.length - 2} more items...
+                                    </p>
+                                )}
                             </div>
-                        </div>
+                        </Link>
                     ))
                 )}
             </div>

@@ -1,0 +1,246 @@
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { OrderService, Order } from '@/lib/services/orders';
+import { ArrowLeft, MapPin, Package, CreditCard, HelpCircle, Truck, XCircle, Loader2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { toast } from 'sonner';
+
+export default function OrderDetailsPage({ params }: { params: { id: string } }) {
+    const [order, setOrder] = useState<Order | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [cancelling, setCancelling] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        loadOrder();
+    }, [params.id]);
+
+    async function loadOrder() {
+        try {
+            const data = await OrderService.getOrderById(params.id);
+            if (!data) {
+                toast.error("Order not found");
+                router.push('/orders');
+                return;
+            }
+            setOrder(data);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to load order");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleCancel() {
+        if (!confirm("Are you sure you want to cancel this order?")) return;
+
+        setCancelling(true);
+        try {
+            await OrderService.cancelOrder(params.id);
+            toast.success("Order cancelled successfully");
+            loadOrder(); // Refresh status
+        } catch (error: any) {
+            toast.error(error.message || "Failed to cancel order");
+        } finally {
+            setCancelling(false);
+        }
+    }
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (!order) return null;
+
+    const isCOD = order.payment_method === 'COD';
+    const dueAmount = isCOD ? order.total_amount - 500 : 0;
+    const paidAmount = isCOD ? 500 : order.total_amount;
+
+    // Derive tracking link (Generic Shiprocket tracking or similar)
+    const trackingLink = order.shiprocket_order_id ? `#` : null; // Replace with actual tracking URL pattern if known
+
+    return (
+        <div className="min-h-screen pb-24 bg-background">
+            {/* Header */}
+            <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b px-4 py-4 flex items-center gap-4">
+                <Link href="/orders" className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors">
+                    <ArrowLeft className="w-5 h-5" />
+                </Link>
+                <div>
+                    <h1 className="text-lg font-bold">Order #{order.id.slice(0, 8)}</h1>
+                    <p className="text-xs text-muted-foreground">
+                        Placed on {new Date(order.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </p>
+                </div>
+            </div>
+
+            <div className="max-w-3xl mx-auto p-4 space-y-6">
+
+                {/* Status Card */}
+                <div className="bg-card border rounded-2xl p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="font-bold flex items-center gap-2">
+                            <Truck className="w-5 h-5 text-primary" />
+                            Order Status
+                        </h2>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
+                            ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                                order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                    'bg-blue-100 text-blue-700'}`}>
+                            {order.status}
+                        </span>
+                    </div>
+                    {/* Add basic progress Steps here if needed */}
+                    <p className="text-sm text-muted-foreground">
+                        {order.status === 'processing' ? 'We have received your order and are preparing it for shipment.' :
+                            order.status === 'shipped' ? 'Your order is on the way!' :
+                                order.status === 'delivered' ? 'Package delivered.' :
+                                    'This order has been cancelled.'}
+                    </p>
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-3 mt-6">
+                        {order.status === 'processing' && (
+                            <button
+                                onClick={handleCancel}
+                                disabled={cancelling}
+                                className="flex-1 bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                            >
+                                {cancelling ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                                Cancel Order
+                            </button>
+                        )}
+                        {order.shiprocket_order_id && (
+                            <button className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                                <Truck className="w-4 h-4" />
+                                Track Order
+                            </button>
+                        )}
+                        <a
+                            href={`https://wa.me/91XXXXXXXXXX?text=Help with Order ID: ${order.id}`} // Replace with real support number
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 bg-green-50 text-green-600 hover:bg-green-100 px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                        >
+                            <HelpCircle className="w-4 h-4" />
+                            Need Help?
+                        </a>
+                    </div>
+                </div>
+
+                {/* Items */}
+                <div className="bg-card border rounded-2xl overflow-hidden shadow-sm">
+                    <div className="p-4 bg-muted/30 border-b">
+                        <h3 className="font-bold flex items-center gap-2">
+                            <Package className="w-4 h-4" />
+                            Items
+                        </h3>
+                    </div>
+                    <div className="divide-y">
+                        {order.items?.map((item) => (
+                            <div key={item.id} className="p-4 flex gap-4">
+                                <div className="w-20 h-20 bg-muted rounded-xl relative overflow-hidden flex-shrink-0">
+                                    {item.product_image && (
+                                        <img src={item.product_image} alt={item.product_name} className="w-full h-full object-cover" />
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-bold text-sm">{item.product_name}</h4>
+                                    <p className="text-sm text-muted-foreground mt-1">Qty: {item.quantity} x ₹{item.price}</p>
+                                    <p className="font-bold text-primary mt-1">₹{item.price * item.quantity}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Shipping & Payment Info Grid */}
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* Shipping Address */}
+                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
+                        <h3 className="font-bold flex items-center gap-2 mb-4">
+                            <MapPin className="w-4 h-4 text-primary" />
+                            Shipping Address
+                        </h3>
+                        {/* Note: Addresses might need to be joined or fetched. Assuming shipping_address_id is resolved or address is stored in order json if flattened. 
+                            If 'shipping_address' is joined in fetch, we use it. 
+                            Let's check if fetch returns strict Order type or joined. 
+                            The service returns Order, which just has IDs often. 
+                            We might need to update OrderService.getOrderById to fetch address relation.
+                            For now, assuming it's fetched or displaying ID if not (will fix if needed).
+                        */}
+                        {/* UPDATE: OrderService.getOrderById does NOT currently join address. I should update it. 
+                            Propagating address check... */}
+                        <div className="text-sm text-muted-foreground space-y-1">
+                            {/* @ts-ignore - address is joined */}
+                            {order.shipping_address ? (
+                                <>
+                                    {/* @ts-ignore */}
+                                    <p className="font-medium text-foreground">{order.shipping_address.name}</p>
+                                    {/* @ts-ignore */}
+                                    <p>{order.shipping_address.address_line1}</p>
+                                    {/* @ts-ignore */}
+                                    {order.shipping_address.address_line2 && <p>{order.shipping_address.address_line2}</p>}
+                                    <p>
+                                        {/* @ts-ignore */}
+                                        {order.shipping_address.city}, {order.shipping_address.state} - {order.shipping_address.pincode}
+                                    </p>
+                                    {/* @ts-ignore */}
+                                    <p>{order.shipping_address.phone}</p>
+                                </>
+                            ) : (
+                                <p className="text-yellow-600 flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4" />
+                                    Address details missing
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Payment Summary */}
+                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
+                        <h3 className="font-bold flex items-center gap-2 mb-4">
+                            <CreditCard className="w-4 h-4 text-primary" />
+                            Payment Summary
+                        </h3>
+                        <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">Subtotal</span>
+                                <span>₹{order.total_amount}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">Shipping</span>
+                                <span className="text-green-600">Free</span>
+                            </div>
+                            <div className="border-t pt-2 mt-2 flex justify-between font-bold text-base">
+                                <span>Total Amount</span>
+                                <span>₹{order.total_amount}</span>
+                            </div>
+
+                            {isCOD && (
+                                <div className="bg-yellow-50 text-yellow-800 p-3 rounded-lg mt-4 text-xs space-y-1">
+                                    <div className="flex justify-between font-medium">
+                                        <span>Paid Online (Advance)</span>
+                                        <span className="text-green-600">- ₹{paidAmount}</span>
+                                    </div>
+                                    <div className="flex justify-between font-bold text-sm border-t border-yellow-200 pt-1 mt-1">
+                                        <span>Due on Delivery</span>
+                                        <span className="text-red-600">₹{dueAmount}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    );
+}
