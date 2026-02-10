@@ -100,6 +100,12 @@ export default function OrdersPage() {
                                 <div className="text-right">
                                     <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Total</p>
                                     <p className="font-bold text-lg">₹{order.total_amount}</p>
+                                    {order.payment_method === 'COD' && (
+                                        <div className="mt-1 text-xs text-right">
+                                            <p className="text-green-600 font-medium">Paid: ₹500</p>
+                                            <p className="text-red-600 font-bold">Due: ₹{order.total_amount - 500}</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

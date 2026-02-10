@@ -113,7 +113,8 @@ export const PaymentProcessor = {
                         selling_price: item.price,
                     })),
                     payment_method: order.payment_method === 'COD' ? 'COD' : 'Prepaid',
-                    sub_total: order.total_amount,
+                    // If COD, the collectible amount is Total - 500 (Prepayment)
+                    sub_total: order.payment_method === 'COD' ? (order.total_amount - 500) : order.total_amount,
                     length: 10,
                     breadth: 10,
                     height: 10,
