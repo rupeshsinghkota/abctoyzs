@@ -1,13 +1,41 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle, Home, ShoppingBag } from 'lucide-react';
-import { useEffect } from 'react';
+import { CheckCircle, Home, ShoppingBag, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { OrderService, Order } from '@/lib/services/orders';
+import { trackConversion } from '@/components/tracking/GoogleTracking';
 import confetti from 'canvas-confetti';
 
 export default function CheckoutSuccessPage() {
+    const searchParams = useSearchParams();
+    const oid = searchParams.get('oid');
+    const [order, setOrder] = useState<Order | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const loadOrder = async () => {
+            if (!oid) {
+                setLoading(false);
+                return;
+            }
+            try {
+                const orderData = await OrderService.getOrderById(oid);
+                if (orderData) {
+                    setOrder(orderData);
+                    // TRACK CONVERSION
+                    trackConversion(orderData.total_amount, orderData.id);
+                }
+            } catch (error) {
+                console.error("Failed to load order for tracking:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadOrder();
+
         // Trigger confetti animation
         const duration = 3 * 1000;
         const animationEnd = Date.now() + duration;
@@ -28,7 +56,7 @@ export default function CheckoutSuccessPage() {
         }, 250);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [oid]);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 pb-20 text-center">
@@ -38,7 +66,15 @@ export default function CheckoutSuccessPage() {
 
             <h1 className="text-3xl font-black font-heading mb-2">Order Confirmed!</h1>
             <p className="text-muted-foreground mb-8 max-w-xs mx-auto">
-                Thank you for your purchase. Your order #ABC-{Math.floor(Math.random() * 10000)} is being processed.
+                {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" /> Retrieving order details...
+                    </span>
+                ) : (
+                    <>
+                        Thank you for your purchase. Your order #{order?.id ? order.id.slice(0, 8).toUpperCase() : `ABC-${Math.floor(Math.random() * 10000)}`} is being processed.
+                    </>
+                )}
             </p>
 
             <div className="flex flex-col gap-3 w-full max-w-sm">
