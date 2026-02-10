@@ -26,9 +26,9 @@ export async function POST(req: Request) {
         }
 
         // 2. Process Successful Payment (Idempotent)
-        await PaymentProcessor.processPaymentSuccess(order_id, razorpay_payment_id);
+        const result = await PaymentProcessor.processPaymentSuccess(order_id, razorpay_payment_id);
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json(result);
     } catch (error: any) {
         console.error('[Razorpay Verify Error]:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });

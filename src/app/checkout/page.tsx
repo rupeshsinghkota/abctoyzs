@@ -126,6 +126,22 @@ export default function CheckoutPage() {
                         });
 
                         if (verifyRes.ok) {
+                            const result = await verifyRes.json();
+
+                            // Auto-login if new user credentials returned
+                            if (result.credentials) {
+                                try {
+                                    const supabase = createClient();
+                                    await supabase.auth.signInWithPassword({
+                                        email: result.credentials.email,
+                                        password: result.credentials.password
+                                    });
+                                } catch (loginError) {
+                                    console.error("Auto-login failed:", loginError);
+                                    // Don't block success page if login fails
+                                }
+                            }
+
                             clearCart();
                             router.push(`/checkout/success?oid=${orderData.order_id}`);
                         } else {
