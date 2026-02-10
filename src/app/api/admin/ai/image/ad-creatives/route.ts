@@ -62,63 +62,66 @@ export async function POST(req: Request) {
                 compositionDesc = "Cinematic wide-angle composition for Facebook Feed and Audience Network. Product positioned on the right side with generous negative space on the left for text overlay.";
             }
 
-            const prompt = `You are a World-Class Automotive Advertising Director at a top creative agency.
-Create a MASTERPIECE advertising image for a premium children's ride-on vehicle called "${productName}".
+            // Build a SHORT display name (strip brand prefix, keep model only)
+            const shortName = productName
+                .replace(/^(ABC\s*Toyz|Premium)\s*/i, '')
+                .replace(/\s*(Electric|Battery|Ride[- ]?On|Kids|Children'?s?)\s*/gi, ' ')
+                .trim();
 
-COMPOSITION DIRECTIVE:
-${compositionDesc}
+            // Build the price line
+            let priceText = `₹${numPrice.toLocaleString('en-IN')}`;
+            let priceSection = `PRICE TAG: Show "${priceText}" in large bold white text inside a dark rounded pill badge.`;
+            if (numMrp > numPrice) {
+                priceSection += `
+  Next to it show "₹${numMrp.toLocaleString('en-IN')}" in smaller grey text with a strikethrough line.
+  Above or near the price, add a RED circular starburst badge with "${discount}% OFF" in bold white text — like a retail sale sticker.`;
+            }
 
-PHOTOGRAPHIC STYLE (MANDATORY):
-- Camera: Shot on Canon EOS R5, 35mm lens, f/2.8 aperture
-- Lighting: Golden hour natural light with subtle rim lighting on the vehicle
-- Quality: Ultra-sharp, 8K photorealistic, hyper-detailed textures
-- Depth: Shallow depth of field with creamy bokeh background
-- Color: Rich, warm color palette with high dynamic range
-- Post: Professional color grading, subtle lens flare
+            const prompt = `Generate a professional e-commerce product advertisement image.
 
-SCENE & ENVIRONMENT:
-- Setting: Luxury modern home driveway, manicured lawn, or upscale park setting
-- Surface: Clean concrete, polished asphalt, or lush green grass
-- Background: Soft-focus upscale neighborhood, trees with golden light filtering through
-- Atmosphere: Aspirational, premium lifestyle, warm and inviting
+PRODUCT: "${shortName}" — a children's ride-on toy vehicle.
+Use the reference product photo provided to accurately depict the vehicle.
 
-HERO SUBJECT (THE VEHICLE):
-- The ride-on vehicle from the reference image — MUST MATCH EXACTLY
-- Perfect integration into the scene with correct shadows, reflections, and lighting
-- Glossy plastic finish catching natural light highlights
-- Chrome/metallic accents reflecting environment realistically
-- Wheels grounded naturally on the surface
+--- IMAGE LAYOUT (${format} — ${aspectRatio}) ---
 
-HUMAN ELEMENT:
-- A happy, photogenic child (age 3-7) naturally interacting with or riding the vehicle
-- Genuine joy and excitement on their face
-- Natural pose — not stiff or awkward
-- Appropriate clothing (casual premium — think Gap Kids or Zara Kids)
+The image has 3 visual layers from top to bottom:
 
-TYPOGRAPHY & BRANDING:
-- LOGO: Place the ABC Toyz logo (from the provided logo image) in the TOP-LEFT corner. Keep it small but clearly visible. White or light version on dark overlay.
-- HEADLINE: Product name "${productName}" displayed prominently in bold, clean sans-serif white text. This is the MAIN TEXT ELEMENT.
-- Price badge: Clean, modern "Only ₹${numPrice.toLocaleString('en-IN')}" in a sleek pill-shaped badge${numMrp > numPrice ? `
-- STRIKETHROUGH MRP: Show "₹${numMrp.toLocaleString('en-IN')}" with a strikethrough line next to the sale price, in smaller grey/muted text
-- DISCOUNT BADGE: A bold, eye-catching RED circular/burst badge showing "${discount}% OFF" — positioned near the price. Make it pop like a real retail sale sticker.
-- SALE RIBBON: A diagonal red ribbon or banner in the top-right corner saying "SALE" in bold white uppercase text. Classic retail urgency element.
-- SAVINGS TEXT: Small text below price: "Save ₹${savings.toLocaleString('en-IN')}" in green` : ''}
-${specLine ? `- SPEC STRIP: Show these key specs as small feature icons/badges beneath the headline:
-  ${specLine}
-  Use small pill-shaped badges with icons, arranged horizontally. Clean, modern, minimal design.` : ''}
-- Font: San-serif, bold, white text on a semi-transparent dark background
-- Position: Lower-right corner for Square, lower-center for Story, left side for Landscape
-- NO gibberish text, NO distorted letters — must be perfectly readable
+LAYER 1 — TOP BAR (10% height):
+- LEFT: ABC Toyz brand logo (use the provided logo image), small, clean
+${numMrp > numPrice ? `- RIGHT: Red diagonal "SALE" ribbon or small red badge` : '- RIGHT: Leave clean or add a subtle "NEW" badge if appropriate'}
 
-STRICT CONSTRAINTS (DO NOT VIOLATE):
-- PHOTOREALISTIC ONLY — absolutely no cartoon, illustration, or painterly style
-- NO distorted faces, extra limbs, or uncanny valley effects on the child
-- NO extra wheels, missing parts, or deformed vehicle components
-- NO cropping of the main vehicle — keep it FULLY visible in frame
-- NO cluttered or busy backgrounds — keep it clean and premium
-- NO watermarks other than subtle brand placement
+LAYER 2 — HERO ZONE (60% height):
+- Photorealistic scene: ${compositionDesc}
+- The ride-on vehicle on a clean, well-lit surface (driveway, park path, or studio)
+- A happy child (age 3-6) riding or playing with it
+- Golden hour lighting, shallow depth of field, aspirational lifestyle
+- Camera: 35mm, f/2.8, eye-level or slightly low angle
+- KEEP THIS AREA MOSTLY VISUAL — minimal to no text here
 
-VIBE: ${vibe || "Premium Luxury, Aspirational, Clean, Modern"}.`;
+LAYER 3 — BOTTOM INFO BAR (30% height):
+- Dark semi-transparent gradient overlay (black at 70-80% opacity)
+- All text goes HERE, neatly arranged:
+
+  LINE 1: "${shortName}" — product name in bold white sans-serif, 1 line max, medium size
+  LINE 2: ${priceSection}
+${specLine ? `  LINE 3: Spec highlights as a single row of small pill badges:\n  ${specLine}` : ''}
+${numMrp > numPrice ? `  LINE 4: "Save ₹${savings.toLocaleString('en-IN')}" in small green text` : ''}
+
+--- TEXT RULES ---
+- ALL text must be sharp, clean, and PERFECTLY READABLE — no blur, no distortion
+- Use only simple sans-serif font (like Helvetica or Arial)
+- Keep text SHORT — abbreviate if needed. Never let text wrap more than 1 line
+- Product name should be SHORT, not the full database name
+- NO random/gibberish characters anywhere
+
+--- PHOTO RULES ---
+- PHOTOREALISTIC only — NO cartoon, illustration, or painting style
+- Vehicle must match the reference image exactly (color, shape, design)
+- No extra wheels, deformed parts, or missing components
+- No distorted human faces or anatomy
+- Clean, uncluttered background
+
+VIBE: ${vibe || "Premium, Aspirational, Clean, Modern"}.`;
 
             // Build content parts
             const contents: any[] = [
