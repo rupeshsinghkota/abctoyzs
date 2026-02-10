@@ -11,8 +11,12 @@ export async function GET(request: NextRequest) {
       if (!str) return '';
       // Strip HTML tags
       const text = str.replace(/<[^>]*>/g, ' ');
+      // Remove emojis and special pictograms for Merchant Center compatibility
+      const noEmojis = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E6}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+      // Replace bullet points with hyphens for better compatibility
+      const standardText = noEmojis.replace(/•/g, '-');
       // Escape special chars
-      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').trim();
+      return standardText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').trim();
     };
 
     const cdata = (str: string) => `<![CDATA[${str}]]>`;
