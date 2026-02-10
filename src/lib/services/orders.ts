@@ -18,7 +18,6 @@ export type Order = {
     payment_method?: string;
     shiprocket_order_id?: string;
     payment_status?: string;
-    payment_status?: string;
     razorpay_order_id?: string;
     guest_email?: string;
     created_at: string;
