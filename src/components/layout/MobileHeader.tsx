@@ -56,7 +56,7 @@ export function MobileHeader() {
                         <Link href="/" onClick={() => setIsMenuOpen(false)}>
                             <img
                                 src="/logo_wide.png"
-                                alt="ABC TOYZ"
+                                alt="ABC Toyz"
                                 className="h-6 w-auto object-contain"
                             />
                         </Link>
@@ -253,7 +253,7 @@ export function MobileHeader() {
                         <Link href="/" className="flex items-center">
                             <img
                                 src="/logo_wide.png"
-                                alt="ABC TOYZ"
+                                alt="ABC Toyz"
                                 className="h-6 w-auto object-contain"
                             />
                         </Link>

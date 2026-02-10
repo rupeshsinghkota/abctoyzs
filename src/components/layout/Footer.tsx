@@ -72,7 +72,7 @@ export function Footer() {
                         <Link href="/" className="inline-block">
                             <img
                                 src="/logo_wide.png"
-                                alt="ABC TOYZ"
+                                alt="ABC Toyz"
                                 className="h-8 md:h-10 w-auto object-contain brightness-0 invert opacity-100"
                             />
                         </Link>

@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       locale: "en_IN",
       url: "https://abctoyz.in",
-      siteName: "abctoyz",
+      siteName: "ABC Toyz",
       title: config.defaultTitle,
       description: config.defaultDescription,
       images: [
@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
           url: config.ogImage,
           width: 1200,
           height: 630,
-          alt: "abctoyz Premium Ride-ons",
+          alt: "ABC Toyz Premium Ride-ons",
         },
       ],
     },
@@ -64,7 +64,10 @@ export async function generateMetadata(): Promise<Metadata> {
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: "abctoyz",
+      title: "ABC Toyz",
+    },
+    verification: {
+      google: "BNtsUa5qo3Ap8zwagw-7a84OvxouRy9JxlguB3G2_oI",
     },
   };
 }

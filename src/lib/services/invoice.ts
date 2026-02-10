@@ -10,7 +10,7 @@ export const InvoiceService = {
         doc.setFontSize(22);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(0, 0, 0);
-        doc.text('ABC TOYZ', 20, 25);
+        doc.text('ABC Toyz', 20, 25);
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');

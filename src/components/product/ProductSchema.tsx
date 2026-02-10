@@ -9,7 +9,7 @@ export function ProductSchema({ product }: { product: Product }) {
         "description": product.description,
         "brand": {
             "@type": "Brand",
-            "name": "ABC TOYZ"
+            "name": "ABC Toyz"
         },
         "offers": {
             "@type": "Offer",

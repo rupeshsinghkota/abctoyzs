@@ -157,7 +157,7 @@ export async function POST(req: Request) {
         }
         else {
             // STRATEGY: MAIN PRODUCT SCENIC (Default)
-            artistPrompt = `Commercial product photography of ${details} placed in ${generatedScene}. CRITICAL: Output image must be a strict Square (1:1) aspect ratio. The product is shown in a strict ${angle} identical to the input. You must PRESERVE the exact COLOR, shape, rims, headlights, and body lines of the original car. Do not "hallucinate" a new model or change the product's hue. Lighting is ${lighting}. The license plate reads 'ABC TOYZ'. The composition is clean and technically perfect, without floating watermarks or logos like [${removeList}]. 8k resolution.`;
+            artistPrompt = `Commercial product photography of ${details} placed in ${generatedScene}. CRITICAL: Output image must be a strict Square (1:1) aspect ratio. The product is shown in a strict ${angle} identical to the input. You must PRESERVE the exact COLOR, shape, rims, headlights, and body lines of the original car. Do not "hallucinate" a new model or change the product's hue. Lighting is ${lighting}. The license plate reads 'ABC Toyz'. The composition is clean and technically perfect, without floating watermarks or logos like [${removeList}, 'JN Creations']. 8k resolution.`;
         }
 
         console.log(`[AI] Stage 3: Artist executing prompt for [${analysisData.category}]...`);
@@ -181,7 +181,7 @@ export async function POST(req: Request) {
         ];
 
         if (logoBase64 && analysisData.category === "MAIN_PRODUCT") {
-            // Only add ABC TOYZ logo for main shots, not details/infographics (might clutter)
+            // Only add ABC Toyz logo for main shots, not details/infographics (might clutter)
             contentParts.push({ text: "Apply this logo to the image if suitable:" }, { inlineData: { data: logoBase64, mimeType: "image/png" } });
         }
 

@@ -17,7 +17,7 @@ export function DesktopHeader() {
                     <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
                         <img
                             src="/logo_wide.png"
-                            alt="ABC TOYZ"
+                            alt="ABC Toyz"
                             className="h-10 w-auto object-contain"
                         />
                     </Link>

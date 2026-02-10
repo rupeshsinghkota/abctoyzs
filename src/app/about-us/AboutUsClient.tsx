@@ -75,9 +75,6 @@ export default function AboutUsClient() {
                         </div>
                         <div className="space-y-6 text-zinc-600 leading-relaxed text-lg">
                             <p>
-                                Founded in New Delhi by <strong>Rupesh Singh</strong>, D2BCart emerged from a simple observation: the Indian market for children's ride-ons was fragmented between low-quality imports and prohibitively expensive luxury models.
-                            </p>
-                            <p>
                                 <strong>ABC Toyz</strong> was born as our answer to this challenge. We specialize in curating safety-certified, high-performance electric cars, bikes, and SUVs that don't just mimic real vehicles—they emulate their soul.
                             </p>
                             <p className="bg-zinc-100 p-6 rounded-2xl border-l-4 border-primary italic">

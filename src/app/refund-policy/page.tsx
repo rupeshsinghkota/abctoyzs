@@ -79,7 +79,7 @@ export default function RefundPolicy() {
                             <h2 className="text-2xl font-semibold text-zinc-800">1-Year Warranty Policy</h2>
                         </div>
                         <p className="text-zinc-600 leading-relaxed mb-4">
-                            Every electric ride-on toy purchased from ABC Toyz comes with a comprehensive <strong>1-Year Warranty</strong> on critical components to ensure peace of mind.
+                            Every electric ride-on toy purchased from <strong>ABC Toyz</strong> comes with a comprehensive <strong>1-Year Warranty</strong> on critical components to ensure peace of mind.
                         </p>
                         <div className="grid md:grid-cols-2 gap-4">
                             <div className="bg-green-50/50 border border-green-100 rounded-xl p-5">
