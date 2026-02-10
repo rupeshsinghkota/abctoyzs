@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { OrderService, Order } from '@/lib/services/orders';
 import { ArrowLeft, MapPin, Package, CreditCard, HelpCircle, Truck, XCircle, Loader2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
-import { toast } from 'sonner';
 
 export default function OrderDetailsPage({ params }: { params: { id: string } }) {
     const [order, setOrder] = useState<Order | null>(null);
@@ -21,14 +20,15 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         try {
             const data = await OrderService.getOrderById(params.id);
             if (!data) {
-                toast.error("Order not found");
+                // toast.error("Order not found");
+                console.error("Order not found");
                 router.push('/orders');
                 return;
             }
             setOrder(data);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to load order");
+            // toast.error("Failed to load order");
         } finally {
             setLoading(false);
         }

@@ -66,7 +66,6 @@ export const OrderService = {
         return order as Order & { shipping_address: any };
     },
 
-    return { ...order, items: items || [] } as Order;
 },
 
     // Create a real order from checkout
