@@ -3,7 +3,7 @@ import { Truck, Clock, ShieldCheck, MapPin } from "lucide-react";
 
 export const metadata: Metadata = {
     title: 'Shipping Policy | Delivery Timelines',
-    description: 'Information about shipping and delivery for ABC Toyz. We offer fast 24-48 hour dispatch and secure Pan-India delivery for all our ride-on toys.',
+    description: 'Information about shipping and delivery for ABC Toyz. We offer fast 0-1 day dispatch and secure Pan-India delivery for all our ride-on toys.',
 };
 
 export default function ShippingPolicy() {
@@ -20,7 +20,7 @@ export default function ShippingPolicy() {
                             <h2 className="text-2xl font-semibold text-zinc-800">Dispatch Timeline</h2>
                         </div>
                         <p className="text-zinc-600 leading-relaxed mb-4">
-                            We know you're excited to receive your order! Most orders are processed and dispatched within <strong>24-48 hours</strong> of payment verification.
+                            We know you're excited to receive your order! Most orders are processed and dispatched within <strong>0-1 day</strong> of payment verification.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
@@ -29,15 +29,11 @@ export default function ShippingPolicy() {
                             </div>
                             <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
                                 <p className="text-sm font-bold text-zinc-900 mb-1">Dispatch Time</p>
-                                <p className="text-zinc-600 text-sm">24-48 Hours</p>
+                                <p className="text-zinc-600 text-sm">0-1 Day</p>
                             </div>
                             <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-                                <p className="text-sm font-bold text-zinc-900 mb-1">Metro Cities</p>
-                                <p className="text-zinc-600 text-sm">3-5 days delivery</p>
-                            </div>
-                            <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-                                <p className="text-sm font-bold text-zinc-900 mb-1">Rest of India</p>
-                                <p className="text-zinc-600 text-sm">5-7 days delivery</p>
+                                <p className="text-sm font-bold text-zinc-900 mb-1">Transit Time</p>
+                                <p className="text-zinc-600 text-sm">1-4 days delivery</p>
                             </div>
                         </div>
                     </section>
