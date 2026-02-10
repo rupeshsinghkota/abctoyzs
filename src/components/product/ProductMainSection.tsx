@@ -291,9 +291,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 <div className="flex flex-col gap-0.5">
                                     <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
                                         <RotateCcw className="w-3.5 h-3.5" />
-                                        <span>Returns</span>
+                                        <span>Replacement</span>
                                     </div>
-                                    <p className="text-[9px] text-muted-foreground pl-5">7 Days Easy</p>
+                                    <p className="text-[9px] text-muted-foreground pl-5">10 Days Easy</p>
                                 </div>
                             </div>
                         </div>
