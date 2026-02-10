@@ -40,6 +40,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [brandingIndex, setBrandingIndex] = useState<number | null>(null);
     const [isBrandingAll, setIsBrandingAll] = useState(false);
     const [isGeneratingPosters, setIsGeneratingPosters] = useState(false);
+    const [isGeneratingAds, setIsGeneratingAds] = useState(false);
     const [generatedPosters, setGeneratedPosters] = useState<string[]>([]);
 
     // Magic Paste State
@@ -80,6 +81,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             action: '',
             comfort: '',
             durability: ''
+        },
+        ad_creatives: {
+            square: '',
+            story: '',
+            landscape: ''
         },
         specs: {
             battery: '',
@@ -137,6 +143,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     action: '',
                     comfort: '',
                     durability: ''
+                },
+                ad_creatives: data.ad_creatives || {
+                    square: '',
+                    story: '',
+                    landscape: ''
                 },
                 specs: {
                     battery: data.specs?.battery || '',
@@ -380,6 +391,51 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         }
     };
 
+    const generateAdCreatives = async () => {
+        if (!formData.name) {
+            alert('Product name is required');
+            return;
+        }
+        if (formData.images.length === 0 || !formData.images[0]) {
+            alert('Main product image is required');
+            return;
+        }
+
+        setIsGeneratingAds(true);
+        try {
+            const res = await fetch('/api/admin/ai/image/ad-creatives', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productName: formData.name,
+                    price: formData.base_price,
+                    originalImageUrl: formData.images[0],
+                    vibe: formData.prompt_notes // Use prompt notes as vibe? or maybe category
+                })
+            });
+
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+
+            setFormData(prev => ({
+                ...prev,
+                ad_creatives: {
+                    square: data.creatives.square,
+                    story: data.creatives.story,
+                    landscape: data.creatives.landscape
+                }
+            }));
+
+            alert('✨ Facebook Ads Generated Successfully!');
+
+        } catch (error: any) {
+            console.error('Ad Generation Failed:', error);
+            alert('Ad Generation Failed: ' + error.message);
+        } finally {
+            setIsGeneratingAds(false);
+        }
+    };
+
     // --- Intelligent Mapping Helpers ---
     const parseAgeGroup = (text?: string) => {
         if (!text) return '';
@@ -540,6 +596,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 net_weight: formData.net_weight,
                 gross_weight: formData.gross_weight,
                 marketing_suite: formData.marketing_suite,
+                ad_creatives: formData.ad_creatives,
                 specs: {
                     ...formData.specs,
                     seats: parseInt(formData.specs.seats) || 1
@@ -968,7 +1025,66 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                     )
                                                 ))}
                                             </div>
-                                        )}
+                                    </div>
+                                </div>
+
+                                {/* AI Ad Creatives Section */}
+                                <div className="pt-8 border-t border-dashed">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h3 className="text-lg font-bold flex items-center gap-2">
+                                                <Zap className="w-5 h-5 text-yellow-500" />
+                                                Facebook Ad Creatives
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground">Auto-generated for Feed, Stories, and Audience Network</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={generateAdCreatives}
+                                            disabled={isGeneratingAds}
+                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20 disabled:opacity-50"
+                                        >
+                                            {isGeneratingAds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                            Generate Ads
+                                        </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {/* Square (Feed) */}
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Feed (1:1)</label>
+                                            <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
+                                                {formData.ad_creatives?.square ? (
+                                                    <img src={formData.ad_creatives.square} className="w-full h-full object-cover" alt="Feed Ad" />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Story (9:16) */}
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Story (9:16)</label>
+                                            <div className="aspect-[9/16] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all w-2/3 mx-auto">
+                                                {formData.ad_creatives?.story ? (
+                                                    <img src={formData.ad_creatives.story} className="w-full h-full object-cover" alt="Story Ad" />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Landscape (Audience Network) */}
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Banner (1.91:1)</label>
+                                            <div className="aspect-[1.91/1] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
+                                                {formData.ad_creatives?.landscape ? (
+                                                    <img src={formData.ad_creatives.landscape} className="w-full h-full object-cover" alt="Banner Ad" />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 

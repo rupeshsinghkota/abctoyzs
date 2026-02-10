@@ -12,6 +12,11 @@ export interface Product {
     images: string[];
     tag?: string;
     banners?: string[]; // Marketing/Hero banners
+    ad_creatives?: {
+        square?: string;
+        story?: string;
+        landscape?: string;
+    };
     specs?: {
         battery: string;
         mobile_app: boolean;
@@ -375,8 +380,10 @@ function processProducts(data: any[]): Product[] {
             attributes: Array.isArray(item.attributes) ? item.attributes : [],
             variants: Array.isArray(item.variants) ? item.variants : [],
             meta_title: item.meta_title,
+            meta_title: item.meta_title,
             meta_description: item.meta_description,
-            marketing_suite: item.marketing_suite
+            marketing_suite: item.marketing_suite,
+            ad_creatives: item.ad_creatives
         };
 
         // Find matching static product to overlay data

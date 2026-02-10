@@ -29,11 +29,17 @@ export async function GET(request: NextRequest) {
             const isBaseInStock = (product as any).stock !== undefined ? (product as any).stock > 0 : true;
 
             // --- FACEBOOK SPECIFIC OPTIMIZATION ---
-            // 1. Image Strategy: Prioritize Lifestyle Banners
+            // 1. Image Strategy: Prioritize AI Square Ad -> Lifestyle Banner -> White Background
             // Facebook Ads perform better with "in-context" photos rather than white background.
-            const socialImage = (product.banners && product.banners.length > 0)
+            const socialImage = product.ad_creatives?.square || ((product.banners && product.banners.length > 0)
                 ? product.banners[0]
-                : product.image;
+                : product.image);
+
+            // Add Story Creative to additional images for automatic placement optimization
+            let additionalImages = [...(product.images || [])];
+            if (product.ad_creatives?.story) {
+                additionalImages.unshift(product.ad_creatives.story);
+            }
 
             // 2. Title Strategy: Clean Title
             // User requested to remove "Best Seller" or other tags from the title.
@@ -46,7 +52,7 @@ export async function GET(request: NextRequest) {
                 description: product.description || product.name,
                 link: `${baseUrl}/product/${product.slug}?utm_source=facebook&utm_medium=cpc&utm_campaign=feed`, // Added UTM tracking
                 image: socialImage,
-                additional_images: product.images || [],
+                additional_images: additionalImages,
                 brand: 'ABC Toyz',
                 condition: 'new',
                 availability: isBaseInStock ? 'in_stock' : 'out_of_stock',

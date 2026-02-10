@@ -33,6 +33,12 @@ export type Product = {
         comfort: string;
         durability: string;
     };
+    // AI Ad Assets
+    ad_creatives?: {
+        square: string;     // 1:1 for Feed
+        story: string;      // 9:16 for Reels/Stories
+        landscape: string;  // 1.91:1 for Audience Network
+    };
     // Variations
     attributes?: { name: string; options: string[] }[];
     variants?: any[]; // We'll type this more strictly if needed
