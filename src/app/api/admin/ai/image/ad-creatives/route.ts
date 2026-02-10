@@ -1,11 +1,11 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { BRAND_CONFIG } from "@/config/brand";
 import { createClient } from "@/lib/supabase/server";
 import fs from 'fs';
 import path from 'path';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export async function POST(req: Request) {
     try {
@@ -16,97 +16,130 @@ export async function POST(req: Request) {
         }
 
         const supabase = await createClient();
-        const model = genAI.getGenerativeModel({
-            model: "gemini-3-pro-image-preview",
-            safetySettings: [
-                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-            ]
-        });
 
         // 1. Prepare Inputs (Logo & Product Image)
         const logoPath = path.join(process.cwd(), 'public', BRAND_CONFIG.logoWide);
         const logoBuffer = fs.readFileSync(logoPath);
         const logoBase64 = logoBuffer.toString("base64");
 
-        let productBase64 = null;
+        let productBase64: string | null = null;
         if (originalImageUrl) {
             const prodRes = await fetch(originalImageUrl);
             const prodBuffer = await prodRes.arrayBuffer();
             productBase64 = Buffer.from(prodBuffer).toString("base64");
         }
 
-        // 2. Define Prompts for Each Aspect Ratio
-        // We define 3 separate generation tasks.
-
+        // 2. Define Ad Generation for Each Format
         const generateImage = async (format: 'SQUARE' | 'STORY' | 'LANDSCAPE') => {
-            let aspectRatioDesc = "";
-            let compositionDesc = "";
+            let aspectRatio: string;
+            let compositionDesc: string;
 
             if (format === 'SQUARE') {
-                aspectRatioDesc = "Square 1:1 Aspect Ratio (1080x1080)";
-                compositionDesc = "Centered composition, perfect for Instagram Feed. Product in center, text above or below.";
+                aspectRatio = "1:1";
+                compositionDesc = "Centered composition perfect for Instagram Feed and Facebook Ads. Product prominently in the center with text above or below.";
             } else if (format === 'STORY') {
-                aspectRatioDesc = "Vertical 9:16 Aspect Ratio (1080x1920)";
-                compositionDesc = "Tall full-screen composition. Product in lower-middle. Leave TOP 30% EMPTY for UI elements. Immersive floor/background.";
+                aspectRatio = "9:16";
+                compositionDesc = "Full-screen vertical composition for Instagram Stories and Reels. Product in the lower-middle third. Leave the TOP 30% clear for platform UI elements. Immersive environment extending to all edges.";
             } else { // LANDSCAPE
-                aspectRatioDesc = "Wide 1.91:1 Aspect Ratio (1200x628)";
-                compositionDesc = "Cinematic wide composition. Product on Right side, Negative space on Left for text overlay.";
+                aspectRatio = "16:9";
+                compositionDesc = "Cinematic wide-angle composition for Facebook Feed and Audience Network. Product positioned on the right side with generous negative space on the left for text overlay.";
             }
 
-            const prompt = `You are a World-Class Automotive Advertising Director. Create a Masterpiece Marketing Image for a Premium Ride-on Vehicle ("${productName}").
+            const prompt = `You are a World-Class Automotive Advertising Director at a top creative agency.
+Create a MASTERPIECE advertising image for a premium children's ride-on vehicle called "${productName}".
 
-            CORE INSTRUCTION:
-            Generate a **Photorealistic, High-Definition (8k), Cinematic** advertising image containing the provided product.
-            
-            FORMAT & COMPOSITION:
-            - **${aspectRatioDesc}**
-            - **${compositionDesc}**
-            - **Angle:** Dynamic Low-Angle or Eye-Level (Hero Shot).
-            - **Depth:** Shallow depth of field (Bokeh) to separate subject from background.
+COMPOSITION DIRECTIVE:
+${compositionDesc}
 
-            VISUAL STYLE (MANDATORY):
-            - **Lighting:** Golden Hour (Warm, Soft) OR Studio Box (Clean, High Contrast).
-            - **Quality:** Ray-traced, Octane Render style, Hyper-detailed textures (plastic gloss, rubber tires, metal chrome).
-            - **Atmosphere:** Aspirational, wealthy, premium lifestyle (e.g., Luxury Driveway, manicured lawn, modern park).
-            
-            ELEMENTS:
-            1. **HERO SUBJECT:** The vehicle from the input image. **MUST LOOK EXACTLY LIKE REFERENCE**. Match reflections and lighting to the scene.
-            2. **HUMAN ELEMENT:** A happy, diverse child (appropriate age) interacting naturally (driving, sitting, or standing proud). **Must look real, not uncanny.**
-            3. **TEXT OVERLAY:** A sleek, modern price tag/badge: "Only ₹${price}". **Clean typography, no gibberish.**
-            4. **BRANDING:** Subtle "ABC Toyz" watermark if it fits naturally.
+PHOTOGRAPHIC STYLE (MANDATORY):
+- Camera: Shot on Canon EOS R5, 35mm lens, f/2.8 aperture
+- Lighting: Golden hour natural light with subtle rim lighting on the vehicle
+- Quality: Ultra-sharp, 8K photorealistic, hyper-detailed textures
+- Depth: Shallow depth of field with creamy bokeh background
+- Color: Rich, warm color palette with high dynamic range
+- Post: Professional color grading, subtle lens flare
 
-            NEGATIVE CONSTRAINTS (DO NOT DO):
-            - NO Cartoonish or Illustrated look. MUST BE PHOTOREALISTIC.
-            - NO Distorted faces or extra limbs on the child.
-            - NO Extra wheels or deformed car parts.
-            - NO Cluttered text or messy backgrounds.
-            - NO cropping of the main vehicle (keep it fully in frame).
+SCENE & ENVIRONMENT:
+- Setting: Luxury modern home driveway, manicured lawn, or upscale park setting
+- Surface: Clean concrete, polished asphalt, or lush green grass
+- Background: Soft-focus upscale neighborhood, trees with golden light filtering through
+- Atmosphere: Aspirational, premium lifestyle, warm and inviting
 
-            VIBE OVERRIDE: ${vibe || "Premium Luxury, Clean, Minimalist"}.`;
+HERO SUBJECT (THE VEHICLE):
+- The ride-on vehicle from the reference image — MUST MATCH EXACTLY
+- Perfect integration into the scene with correct shadows, reflections, and lighting
+- Glossy plastic finish catching natural light highlights
+- Chrome/metallic accents reflecting environment realistically
+- Wheels grounded naturally on the surface
 
-            const inputs = [prompt, { inlineData: { data: logoBase64, mimeType: "image/png" } }];
+HUMAN ELEMENT:
+- A happy, photogenic child (age 3-7) naturally interacting with or riding the vehicle
+- Genuine joy and excitement on their face
+- Natural pose — not stiff or awkward
+- Appropriate clothing (casual premium — think Gap Kids or Zara Kids)
+
+TYPOGRAPHY & BRANDING:
+- Price badge: Clean, modern "Only ₹${price}" in a sleek pill-shaped badge
+- Font: San-serif, bold, white text on a semi-transparent dark background
+- Position: Lower-right corner for Square, lower-center for Story, left side for Landscape
+- NO gibberish text, NO distorted letters — must be perfectly readable
+
+STRICT CONSTRAINTS (DO NOT VIOLATE):
+- PHOTOREALISTIC ONLY — absolutely no cartoon, illustration, or painterly style
+- NO distorted faces, extra limbs, or uncanny valley effects on the child
+- NO extra wheels, missing parts, or deformed vehicle components
+- NO cropping of the main vehicle — keep it FULLY visible in frame
+- NO cluttered or busy backgrounds — keep it clean and premium
+- NO watermarks other than subtle brand placement
+
+VIBE: ${vibe || "Premium Luxury, Aspirational, Clean, Modern"}.`;
+
+            // Build content parts
+            const contents: any[] = [
+                { text: prompt },
+                { inlineData: { data: logoBase64, mimeType: "image/png" } }
+            ];
             if (productBase64) {
-                inputs.push({ inlineData: { data: productBase64, mimeType: "image/jpeg" } });
+                contents.push({ inlineData: { data: productBase64, mimeType: "image/jpeg" } });
             }
 
-            const result = await model.generateContent(inputs);
-            const response = await result.response;
+            // Use new SDK with ALL capabilities
+            const response = await ai.models.generateContent({
+                model: "gemini-2.0-flash-exp-image-generation",
+                contents: contents,
+                config: {
+                    responseModalities: ["Image"],
+                    imageConfig: {
+                        aspectRatio: aspectRatio as any,
+                    },
+                },
+            });
+
+            // Extract image from response
             const candidate = response.candidates?.[0];
-
-            if (!candidate?.content?.parts?.[0]?.inlineData) {
-                throw new Error(`Failed to generate ${format} image`);
+            if (!candidate?.content?.parts) {
+                throw new Error(`Failed to generate ${format} image — no candidates returned`);
             }
 
-            const imageBase64 = candidate.content.parts[0].inlineData.data;
-            const buffer = Buffer.from(imageBase64, 'base64');
-            const filename = `ad_creative_${format.toLowerCase()}_${Date.now()}.jpg`;
+            // Find the image part in the response
+            let imageData: string | null = null;
+            for (const part of candidate.content.parts) {
+                if (part.inlineData?.data) {
+                    imageData = part.inlineData.data;
+                    break;
+                }
+            }
+
+            if (!imageData) {
+                throw new Error(`Failed to generate ${format} image — no image data in response`);
+            }
+
+            const buffer = Buffer.from(imageData, 'base64');
+            const filename = `ad_creative_${format.toLowerCase()}_${Date.now()}.png`;
 
             const { error: uploadError } = await supabase.storage
                 .from('products')
-                .upload(filename, buffer, { contentType: 'image/jpeg' });
+                .upload(filename, buffer, { contentType: 'image/png' });
 
             if (uploadError) throw uploadError;
 
