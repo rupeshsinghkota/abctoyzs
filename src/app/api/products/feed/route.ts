@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
         price: `${product.mrp || product.price} INR`,
         sale_price: product.mrp && product.mrp > product.price ? `${product.price} INR` : undefined,
         shipping: { country: 'IN', service: 'Standard', price: '0 INR' },
-        google_category: 'Toys & Games > Toys > Riding Toys > Electric Riding Toys',
+        google_category: 'Toys & Games > Toys > Riding Toys',
         category: product.category,
         product_type: productType,
         age_group: googleAgeGroup,
