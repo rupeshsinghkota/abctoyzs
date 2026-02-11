@@ -97,12 +97,12 @@ export default function OrderDetailPage() {
                         <div className="flex items-center gap-3">
                             <h1 className="text-2xl font-bold tracking-tight">#{order.id.slice(0, 8).toUpperCase()}</h1>
                             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border capitalize ${order.payment_status === 'paid' ? 'bg-zinc-900 text-white border-zinc-900' :
-                                    'bg-amber-100 text-amber-700 border-amber-200'
+                                'bg-amber-100 text-amber-700 border-amber-200'
                                 }`}>
                                 {order.payment_status}
                             </span>
                             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border capitalize ${order.status === 'delivered' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                                    'bg-zinc-100 text-zinc-700 border-zinc-200'
+                                'bg-zinc-100 text-zinc-700 border-zinc-200'
                                 }`}>
                                 {order.status}
                             </span>
@@ -174,14 +174,29 @@ export default function OrderDetailPage() {
                                 <span className="text-muted-foreground">Shipping</span>
                                 <span>Free</span>
                             </div>
+
+                            {/* COD Breakdown */}
+                            {order.payment_method === 'COD' && (
+                                <>
+                                    <div className="flex justify-between text-sm text-emerald-600">
+                                        <span>Prepaid (Online)</span>
+                                        <span>- ₹500</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm font-medium border-t border-dashed pt-2 mt-1">
+                                        <span>To Collect (COD)</span>
+                                        <span>₹{(order.total_amount - 500).toLocaleString()}</span>
+                                    </div>
+                                </>
+                            )}
+
                             <div className="flex justify-between font-bold text-base pt-3 border-t">
-                                <span>Total</span>
+                                <span>Total Order Value</span>
                                 <span>₹{order.total_amount.toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between text-xs text-muted-foreground pt-1">
                                 <span>Paid by {order.payment_method}</span>
-                                {order.payment_method === 'COD' && order.payment_status !== 'paid' && (
-                                    <span className="text-rose-600 font-medium">Pending Collection</span>
+                                {order.payment_method === 'COD' && order.payment_status === 'partially_paid' && (
+                                    <span className="text-amber-600 font-medium ml-2">Prepaid ₹500 received</span>
                                 )}
                             </div>
                         </div>
@@ -229,8 +244,8 @@ export default function OrderDetailPage() {
                                             key={s}
                                             onClick={() => updateOrder({ status: s })}
                                             className={`flex-1 py-2 text-xs font-bold uppercase rounded-lg border transition-all ${order.status === s
-                                                    ? 'bg-zinc-900 text-white border-zinc-900'
-                                                    : 'bg-white text-zinc-600 hover:bg-zinc-50'
+                                                ? 'bg-zinc-900 text-white border-zinc-900'
+                                                : 'bg-white text-zinc-600 hover:bg-zinc-50'
                                                 }`}
                                         >
                                             {s}
