@@ -6,6 +6,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { z } from 'zod';
+
+const authSchema = z.object({
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
 interface AuthFormProps {
     view?: 'login' | 'signup';
@@ -30,13 +36,21 @@ export function AuthForm({ view = 'login' }: AuthFormProps) {
         setError(null);
         setMessage(null);
 
+        // Validation
+        const validation = authSchema.safeParse({ email, password });
+        if (!validation.success) {
+            setError(validation.error.issues[0].message);
+            setLoading(false);
+            return;
+        }
+
         try {
             if (mode === 'signup') {
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
-                        emailRedirectTo: `${location.origin}/auth/callback?next=${nextUrl}`,
+                        emailRedirectTo: `${location.origin}/auth/callback`, // Remove specific next param for generic signup, let callback handle defaults
                     },
                 });
                 if (error) throw error;
@@ -46,7 +60,13 @@ export function AuthForm({ view = 'login' }: AuthFormProps) {
                     email,
                     password,
                 });
-                if (error) throw error;
+                if (error) {
+                    // Friendly error message
+                    if (error.message.includes("Invalid login")) {
+                        throw new Error("Incorrect email or password");
+                    }
+                    throw error;
+                }
 
                 // Check if user is admin for auto-redirect
                 const { data: adminCheck } = await supabase
