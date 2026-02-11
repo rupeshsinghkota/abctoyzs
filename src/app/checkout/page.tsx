@@ -154,7 +154,8 @@ export default function CheckoutPage() {
                             }
 
                             clearCart();
-                            router.push(`/checkout/success?oid=${orderData.order_id}`);
+                            const successUrl = `/checkout/success?oid=${orderData.order_id}${result.isNewUser ? '&new_account=true' : ''}`;
+                            router.push(successUrl);
                         } else {
                             const errorData = await verifyRes.json();
                             console.error("Verification failed:", errorData);
