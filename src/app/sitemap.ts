@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { VEHICLE_CATEGORIES } from '@/lib/data';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://abctoyz.in';
@@ -14,16 +15,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         '/terms-of-service',
         '/refund-policy',
         '/shipping-policy',
-        '/category/cars',
-        '/category/bikes',
-        '/category/jeeps',
-        '/category/atvs',
-        '/category/scooters',
     ].map((route) => ({
         url: `${baseUrl}${route}`,
         lastModified: new Date(),
         changeFrequency: 'weekly' as const,
         priority: route === '' ? 1 : 0.8,
+    }));
+
+    // Category Pages
+    const categoryRoutes = VEHICLE_CATEGORIES.map((category) => ({
+        url: `${baseUrl}/category/${category.value}`,
+        lastModified: new Date(), // Categories update when products change, simpler to set to now
+        changeFrequency: 'daily' as const,
+        priority: 0.8,
     }));
 
     // Dynamic Product pages
@@ -38,5 +42,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
     }));
 
-    return [...routes, ...productRoutes];
+    return [...routes, ...categoryRoutes, ...productRoutes];
 }
