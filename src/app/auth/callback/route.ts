@@ -7,12 +7,19 @@ export async function GET(request: Request) {
     // if "next" is in param, use it as the redirect URL
     const next = searchParams.get('next') ?? '/profile'
 
+    console.log('[Auth Callback] Processing code:', code ? 'Code present' : 'No code');
+
     if (code) {
         const supabase = await createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
+
         if (!error) {
+            console.log('[Auth Callback] Session exchange successful');
             const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
             const isLocalEnv = process.env.NODE_ENV === 'development'
+
+            console.log('[Auth Callback] Redirecting to:', next);
+
             if (isLocalEnv) {
                 // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
                 return NextResponse.redirect(`${origin}${next}`)
@@ -21,9 +28,14 @@ export async function GET(request: Request) {
             } else {
                 return NextResponse.redirect(`${origin}${next}`)
             }
+        } else {
+            console.error('[Auth Callback] Error exchanging code:', error);
         }
+    } else {
+        console.warn('[Auth Callback] No code provided in URL');
     }
 
     // return the user to an error page with instructions
+    console.error('[Auth Callback] Redirecting to error page');
     return NextResponse.redirect(`${origin}/auth/auth-code-error`)
 }
