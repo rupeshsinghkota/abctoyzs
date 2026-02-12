@@ -149,6 +149,44 @@ export const products: Product[] = [
     },
     // ...
     {
+        id: '3',
+        name: 'Mercedes AMG G63 24V',
+        category: 'jeeps',
+        subCategory: 'Luxury',
+        price: 32000,
+        mrp: 45000,
+        rating: 4.9,
+        reviews: 210,
+        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&auto=format&fit=crop&q=60',
+        images: [
+            'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&auto=format&fit=crop&q=60'
+        ],
+        specs: { battery: '24V 14Ah', mobile_app: true, max_load: '50kg', speed: '5-8 km/h', charging_time: '6-8 Hours', run_time: '1-2 Hours' },
+        description: "The ultimate luxury SUV for kids. 6 wheels, 4 motors, and pure power.",
+        voltage: '24V',
+        ageGroup: '6-10',
+        slug: 'mercedes-amg-g63-6x6'
+    },
+    {
+        id: '4',
+        name: 'Maverick UTV Buggy',
+        category: 'utvs',
+        subCategory: 'Off-road',
+        price: 45000,
+        mrp: 55000,
+        rating: 4.7,
+        reviews: 34,
+        image: 'https://images.unsplash.com/photo-1570125909517-53cb21c89581?w=800&auto=format&fit=crop&q=60',
+        images: [
+            'https://images.unsplash.com/photo-1570125909517-53cb21c89581?w=800&auto=format&fit=crop&q=60'
+        ],
+        specs: { battery: '24V', mobile_app: false, max_load: '60kg', speed: '10 km/h', charging_time: '8-10 Hours', run_time: '1 Hour' },
+        description: "Built for rough terrain. The Maverick UTV is the beast of ride-ons.",
+        voltage: '24V',
+        ageGroup: '6-10',
+        slug: 'maverick-utv-buggy'
+    },
+    {
         id: '6',
         name: 'Drift Go-Kart Pro',
         category: 'gokarts',
