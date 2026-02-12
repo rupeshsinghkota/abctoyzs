@@ -617,7 +617,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         if (t.includes('1-3') || t.includes('toddler')) return '1-3';
         if (t.includes('3-6') || t.includes('preschool')) return '3-6';
         if (t.includes('6-10') || t.includes('6-12') || t.includes('big kid')) return '6-10';
-        if (t.includes('10+') || t.includes('teen') || t.includes('adult')) return '10+';
+        if (t.includes('10+') || t.includes('teen') || t.includes('adult')) return '10-plus';
         if (t.includes('1') || t.includes('2')) return '1-3';
         if (t.includes('3') || t.includes('4') || t.includes('5')) return '3-6';
         if (t.includes('7') || t.includes('8') || t.includes('9')) return '6-10';
@@ -941,7 +941,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Category <span className="text-red-500">*</span></label>
                                         <select
@@ -951,6 +951,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
                                         >
                                             {VEHICLE_CATEGORIES.map(cat => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 uppercase tracking-wider text-muted-foreground">Age Group <span className="text-red-500">*</span></label>
+                                        <select
+                                            required
+                                            value={formData.age_group}
+                                            onChange={(e) => setFormData({ ...formData, age_group: e.target.value })}
+                                            className="w-full px-4 py-3 bg-background border-2 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
+                                        >
+                                            <option value="">Select Age Group</option>
+                                            {AGE_CATEGORIES.map(age => <option key={age.value} value={age.value}>{age.label}</option>)}
                                         </select>
                                     </div>
                                     <div>
