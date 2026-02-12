@@ -339,9 +339,12 @@ export function normalizeAgeGroup(input: string | undefined): '1-3' | '3-6' | '6
     if (normalized === '10+') return '10-plus';
 
     // Fuzzy mapping for legacy or alternative formats
+    // Handle specific ranges first to avoid partial matches on single digits
+    if (['6-12', '8-12', '5-8', '5-10'].some(k => normalized.includes(k))) return '6-10';
+
     if (['1', '2', '3', 'toddler', '1-3 years'].some(k => normalized.includes(k) && !normalized.includes('10'))) return '1-3';
     if (['4', '5', '3-5', '3-6 years', 'preschool'].some(k => normalized.includes(k))) return '3-6';
-    if (['6', '7', '8', '9', '5-8', '6-12', 'school', 'kid'].some(k => normalized.includes(k) && !normalized.includes('10'))) return '6-10';
+    if (['6', '7', '8', '9', 'school', 'kid'].some(k => normalized.includes(k) && !normalized.includes('10'))) return '6-10';
     if (['10', '11', '12', 'teen', 'adult', 'big'].some(k => normalized.includes(k))) return '10-plus';
 
     // Fallback based on simple parsing if possible, otherwise return input as is (or undefined to be safe)
