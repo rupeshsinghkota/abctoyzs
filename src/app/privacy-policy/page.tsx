@@ -2,10 +2,25 @@ import { Metadata } from 'next';
 import Link from "next/link";
 import { Shield, Lock, Eye, Bell } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: 'Privacy Policy | Data Protection',
-    description: 'Our commitment to protecting your privacy at ABC Toyz. Learn how we collect, use, and safeguard your personal information.',
-};
+import { SettingsService } from '@/lib/services/settings';
+
+export async function generateMetadata(): Promise<Metadata> {
+    const globalSEO = await SettingsService.getSEOConfig();
+    const pageSEO = await SettingsService.getSegmentSEO('page_privacy-policy');
+
+    const title = pageSEO.defaultTitle || globalSEO.defaultTitle;
+    const description = pageSEO.defaultDescription || globalSEO.defaultDescription;
+
+    return {
+        title: title,
+        description: description,
+        openGraph: {
+            title: title,
+            description: description,
+            images: globalSEO.ogImage ? [{ url: globalSEO.ogImage }] : [],
+        }
+    };
+}
 
 export default function PrivacyPolicy() {
     return (

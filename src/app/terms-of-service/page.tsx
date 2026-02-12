@@ -2,10 +2,25 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Scale, Shield, FileText, Globe } from 'lucide-react';
 
-export const metadata: Metadata = {
-    title: 'Terms of Service | Rules & Regulations',
-    description: 'Read the terms and conditions for using ABC Toyz. Our policies ensure a fair and safe shopping experience for all our customers.',
-};
+import { SettingsService } from '@/lib/services/settings';
+
+export async function generateMetadata(): Promise<Metadata> {
+    const globalSEO = await SettingsService.getSEOConfig();
+    const pageSEO = await SettingsService.getSegmentSEO('page_terms-of-service');
+
+    const title = pageSEO.defaultTitle || globalSEO.defaultTitle;
+    const description = pageSEO.defaultDescription || globalSEO.defaultDescription;
+
+    return {
+        title: title,
+        description: description,
+        openGraph: {
+            title: title,
+            description: description,
+            images: globalSEO.ogImage ? [{ url: globalSEO.ogImage }] : [],
+        }
+    };
+}
 
 export default function TermsOfService() {
     return (

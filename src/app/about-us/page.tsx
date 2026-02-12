@@ -1,14 +1,25 @@
 import { Metadata } from 'next';
 import AboutUsClient from './AboutUsClient';
 
-export const metadata: Metadata = {
-    title: 'About Us | Our Story & Mission',
-    description: 'Learn about ABC Toyz (A Brand of D2BCart), India\'s premium ride-on toy store. Our mission is to provide safe, high-quality electric cars and bikes for your children.',
-    openGraph: {
-        title: 'About ABC Toyz - Premium Kids Ride-ons',
-        description: 'Fueling the next generation of adventures with safety-certified ride-on toys by D2BCart.',
-    }
-};
+import { SettingsService } from '@/lib/services/settings';
+
+export async function generateMetadata(): Promise<Metadata> {
+    const globalSEO = await SettingsService.getSEOConfig();
+    const pageSEO = await SettingsService.getSegmentSEO('page_about-us');
+
+    const title = pageSEO.defaultTitle || globalSEO.defaultTitle;
+    const description = pageSEO.defaultDescription || globalSEO.defaultDescription;
+
+    return {
+        title: title,
+        description: description,
+        openGraph: {
+            title: title,
+            description: description,
+            images: globalSEO.ogImage ? [{ url: globalSEO.ogImage }] : [],
+        }
+    };
+}
 
 export default function AboutUsPage() {
     return <AboutUsClient />;

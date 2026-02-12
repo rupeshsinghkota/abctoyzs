@@ -1,14 +1,25 @@
 import { Metadata } from 'next';
 import ContactUsClient from './ContactUsClient';
 
-export const metadata: Metadata = {
-    title: 'Contact Us | Customer Support & Showroom',
-    description: 'Get in touch with ABC Toyz for inquiries regarding our premium ride-on cars, bikes, and jeeps. Visit our showroom in Jhandewalan Market, Delhi.',
-    openGraph: {
-        title: 'Contact ABC Toyz - Customer Support',
-        description: 'Have a question? Our support team is here to help you with your kids\' premium ride-on toys.',
-    }
-};
+import { SettingsService } from '@/lib/services/settings';
+
+export async function generateMetadata(): Promise<Metadata> {
+    const globalSEO = await SettingsService.getSEOConfig();
+    const pageSEO = await SettingsService.getSegmentSEO('page_contact-us');
+
+    const title = pageSEO.defaultTitle || globalSEO.defaultTitle;
+    const description = pageSEO.defaultDescription || globalSEO.defaultDescription;
+
+    return {
+        title: title,
+        description: description,
+        openGraph: {
+            title: title,
+            description: description,
+            images: globalSEO.ogImage ? [{ url: globalSEO.ogImage }] : [],
+        }
+    };
+}
 
 export default function ContactUsPage() {
     return <ContactUsClient />;

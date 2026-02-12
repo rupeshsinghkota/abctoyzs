@@ -15,10 +15,21 @@ import {
     User,
     Zap,
     Home,
-    Sparkles
+    Sparkles,
+    FileText
 } from 'lucide-react';
 
-type Tab = 'global' | 'home' | 'categories' | 'age' | 'power';
+const STATIC_PAGES = [
+    { label: 'About Us', value: 'about-us' },
+    { label: 'Contact Us', value: 'contact-us' },
+    { label: 'Privacy Policy', value: 'privacy-policy' },
+    { label: 'Terms of Service', value: 'terms-of-service' },
+    { label: 'Shipping Policy', value: 'shipping-policy' },
+    { label: 'Refund Policy', value: 'refund-policy' },
+    { label: 'Track Order', value: 'track-order' },
+];
+
+type Tab = 'global' | 'home' | 'categories' | 'age' | 'power' | 'pages';
 
 export default function SEOAdminPage() {
     const [activeTab, setActiveTab] = useState<Tab>('global');
@@ -43,7 +54,9 @@ export default function SEOAdminPage() {
                 // Age Groups
                 ...AGE_CATEGORIES.map(c => SettingsService.getSegmentSEO(`age_${c.value}`)),
                 // Power
-                ...POWER_CATEGORIES.map(c => SettingsService.getSegmentSEO(`power_${c.value}`))
+                ...POWER_CATEGORIES.map(c => SettingsService.getSegmentSEO(`power_${c.value}`)),
+                // Static Pages
+                ...STATIC_PAGES.map(c => SettingsService.getSegmentSEO(`page_${c.value}`))
             ]);
 
             setConfig(global);
@@ -64,6 +77,11 @@ export default function SEOAdminPage() {
 
             POWER_CATEGORIES.forEach((c, i) => {
                 segmentMap[`power_${c.value}`] = segments[offset + i];
+            });
+            offset += POWER_CATEGORIES.length;
+
+            STATIC_PAGES.forEach((c, i) => {
+                segmentMap[`page_${c.value}`] = segments[offset + i];
             });
 
             setSegmentConfig(segmentMap);
@@ -122,6 +140,7 @@ export default function SEOAdminPage() {
     const navTabs = [
         { id: 'global', label: 'Global Defaults', icon: Globe },
         { id: 'home', label: 'Homepage', icon: Home },
+        { id: 'pages', label: 'Static Pages', icon: FileText },
         { id: 'categories', label: 'Categories', icon: Layers },
         { id: 'age', label: 'Age Groups', icon: User },
         { id: 'power', label: 'Power Levels', icon: Zap },
@@ -254,6 +273,26 @@ export default function SEOAdminPage() {
                                 onChange={(updates) => updateSegment('homepage', updates)}
                             />
                         </div>
+                    </div>
+                )}
+
+                {activeTab === 'pages' && (
+                    <div className="space-y-6">
+                        {STATIC_PAGES.map(page => (
+                            <div key={page.value} className="bg-card border rounded-3xl p-6 md:p-8 shadow-sm">
+                                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                                    <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs">
+                                        <FileText className="w-4 h-4" />
+                                    </span>
+                                    {page.label} Page SEO
+                                </h3>
+                                <SEOFields
+                                    segment={`page_${page.value}`}
+                                    config={segmentConfig[`page_${page.value}`] || {}}
+                                    onChange={(updates) => updateSegment(`page_${page.value}`, updates)}
+                                />
+                            </div>
+                        ))}
                     </div>
                 )}
 

@@ -1,10 +1,25 @@
 import { Metadata } from 'next';
 import { Truck, Clock, ShieldCheck, MapPin } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: 'Shipping Policy | Delivery Timelines',
-    description: 'Information about shipping and delivery for ABC Toyz. We offer fast 0-1 day dispatch and secure Pan-India delivery for all our ride-on toys.',
-};
+import { SettingsService } from '@/lib/services/settings';
+
+export async function generateMetadata(): Promise<Metadata> {
+    const globalSEO = await SettingsService.getSEOConfig();
+    const pageSEO = await SettingsService.getSegmentSEO('page_shipping-policy');
+
+    const title = pageSEO.defaultTitle || globalSEO.defaultTitle;
+    const description = pageSEO.defaultDescription || globalSEO.defaultDescription;
+
+    return {
+        title: title,
+        description: description,
+        openGraph: {
+            title: title,
+            description: description,
+            images: globalSEO.ogImage ? [{ url: globalSEO.ogImage }] : [],
+        }
+    };
+}
 
 export default function ShippingPolicy() {
     return (

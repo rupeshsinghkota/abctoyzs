@@ -2,10 +2,25 @@ import { Metadata } from 'next';
 import Link from "next/link";
 import { RefreshCcw, AlertCircle, Video, CheckCircle2, ShieldCheck } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: 'Refund & Warranty Policy | 1-Year Protection',
-    description: 'Check our hassle-free 10-day replacement policy. Learn about our unboxing video requirement and how to file a claim.',
-};
+import { SettingsService } from '@/lib/services/settings';
+
+export async function generateMetadata(): Promise<Metadata> {
+    const globalSEO = await SettingsService.getSEOConfig();
+    const pageSEO = await SettingsService.getSegmentSEO('page_refund-policy');
+
+    const title = pageSEO.defaultTitle || globalSEO.defaultTitle;
+    const description = pageSEO.defaultDescription || globalSEO.defaultDescription;
+
+    return {
+        title: title,
+        description: description,
+        openGraph: {
+            title: title,
+            description: description,
+            images: globalSEO.ogImage ? [{ url: globalSEO.ogImage }] : [],
+        }
+    };
+}
 
 export default function RefundPolicy() {
     return (
