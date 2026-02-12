@@ -96,7 +96,8 @@ export const POWER_CATEGORIES = [
 export const AGE_CATEGORIES = [
     { label: 'Toddlers (1-3)', value: '1-3' },
     { label: 'Preschool (3-6)', value: '3-6' },
-    { label: 'Big Kids (6-12)', value: '6-12' },
+    { label: 'Kids (6-10)', value: '6-10' },
+    { label: 'Teens (10+)', value: '10+' },
 ];
 
 import { createClient } from "@/lib/supabase/client";

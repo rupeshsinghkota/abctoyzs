@@ -23,12 +23,12 @@ const VOLTAGE_OPTIONS: FilterOption[] = [
     { label: '48V', value: '48V' },
 ];
 
-const AGE_OPTIONS: FilterOption[] = [
-    { label: '1-3 Years', value: '1-3' },
-    { label: '3-6 Years', value: '3-6' },
-    { label: '6-10 Years', value: '6-10' },
-    { label: '10+ Years', value: '10+' },
-];
+import { AGE_CATEGORIES } from '@/lib/data';
+
+const AGE_OPTIONS: FilterOption[] = AGE_CATEGORIES.map(cat => ({
+    label: cat.label,
+    value: cat.value
+}));
 
 const SEATS_OPTIONS: FilterOption[] = [
     { label: '1 Seat', value: '1' },
