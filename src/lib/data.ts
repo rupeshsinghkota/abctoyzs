@@ -41,7 +41,7 @@ export interface Product {
     net_weight?: string;
     gross_weight?: string;
     voltage?: '12V' | '24V' | '36V' | '48V';
-    ageGroup?: '1-3' | '3-6' | '6-10' | '10+';
+    ageGroup?: '1-3' | '3-6' | '6-10' | '10-plus';
     subCategory?: string;
     is_new?: boolean;
     is_featured?: boolean;
@@ -97,7 +97,7 @@ export const AGE_CATEGORIES = [
     { label: 'Toddlers (1-3)', value: '1-3' },
     { label: 'Preschool (3-6)', value: '3-6' },
     { label: 'Kids (6-10)', value: '6-10' },
-    { label: 'Teens (10+)', value: '10+' },
+    { label: 'Teens (10+)', value: '10-plus' },
 ];
 
 import { createClient } from "@/lib/supabase/client";
@@ -164,7 +164,7 @@ export const products: Product[] = [
         specs: { battery: '24V', mobile_app: false, max_load: '45kg', speed: '12 km/h', charging_time: '8-10 Hours', run_time: '40-60 Mins' },
         description: "For the young racer. Special drift wheels for sliding action.",
         voltage: '24V',
-        ageGroup: '10+',
+        ageGroup: '10-plus',
         slug: 'drift-go-kart-pro'
     }
 ];

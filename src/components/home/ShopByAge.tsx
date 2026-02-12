@@ -6,7 +6,7 @@ const ageGroups = [
     { label: "1-3 Years", range: "Toddlers", href: "/category/age/1-3", image: "/images/shop-by/age-toddler.png" },
     { label: "3-6 Years", range: "Preschoolers", href: "/category/age/3-6", image: "/images/shop-by/age-preschool.png" },
     { label: "6-10 Years", range: "Kids", href: "/category/age/6-10", image: "/images/shop-by/age-kids.png" },
-    { label: "10+ Years", range: "Teens", href: "/category/age/10+", image: "/images/shop-by/age-bigkids.png" }
+    { label: "10+ Years", range: "Teens", href: "/category/age/10-plus", image: "/images/shop-by/age-bigkids.png" }
 ];
 
 export function ShopByAge() {
