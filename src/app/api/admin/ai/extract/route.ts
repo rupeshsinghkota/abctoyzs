@@ -73,7 +73,7 @@ export async function POST(req: Request) {
                - **meta_description:** High-conversion meta description (155-160 chars).
 
             5. **MAPPING:**
-               - **age_group:** Map strictly to: "1-3", "3-6", "6-12", or "10+".
+               - **age_group:** Map strictly to: "1-3", "3-6", "6-10", or "10+".
 
             6. **MARKETING SUITE:**
                - Generate 3 punchy, high-end headlines (under 5 words each).
