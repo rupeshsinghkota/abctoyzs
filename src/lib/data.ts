@@ -144,67 +144,10 @@ export const products: Product[] = [
         specs: { battery: '12V 10Ah', mobile_app: false, max_load: '35kg', speed: '3-6 km/h', charging_time: '8-12 Hours', run_time: '45-90 Mins' },
         description: "Conquer the backyard with this rugged Jeep style ride-on.",
         voltage: '12V',
-        ageGroup: '3-6',
+        ageGroup: '1-3',
         slug: 'jeep-wrangler-rubicon-style'
     },
-    {
-        id: '3',
-        name: 'Ducati Panigale V4 Replica',
-        category: 'bikes',
-        subCategory: 'Sport Bike',
-        price: 12999,
-        mrp: 17999,
-        rating: 4.9,
-        reviews: 45,
-        image: 'https://images.unsplash.com/photo-1558981408-db0ecd8a1ee4?w=800&auto=format&fit=crop&q=60',
-        images: [
-            'https://images.unsplash.com/photo-1558981408-db0ecd8a1ee4?w=800&auto=format&fit=crop&q=60'
-        ],
-        specs: { battery: '12V 4.5Ah', mobile_app: false, max_load: '25kg', speed: '3-5 km/h', charging_time: '6-8 Hours', run_time: '45-60 Mins' },
-        description: "For the speed enthusiasts! This Ducati replica features hand throttle acceleration.",
-        voltage: '12V',
-        ageGroup: '3-6',
-        slug: 'ducati-panigale-v4-replica'
-    },
-    {
-        id: '4',
-        name: 'Mercedes AMG G63 24V',
-        category: 'cars',
-        subCategory: 'Luxury',
-        price: 34999,
-        mrp: 48999,
-        rating: 4.7,
-        reviews: 210,
-        image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop&q=60',
-        images: [
-            'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop&q=60'
-        ],
-        specs: { battery: '24V 7Ah', mobile_app: true, max_load: '50kg', speed: '6-8 km/h', charging_time: '10-14 Hours', run_time: '60-120 Mins' },
-        description: "Luxury meets play. The G63 AMG ride-on is a showstopper with painted finish.",
-        voltage: '24V',
-        ageGroup: '6-10',
-        slug: 'mercedes-amg-g63-24v'
-    },
-    {
-        id: '5',
-        name: 'Maverick UTV Buggy',
-        category: 'utvs',
-        subCategory: 'Buggy',
-        price: 45000,
-        mrp: 62999,
-        rating: 4.9,
-        reviews: 12,
-        image: 'https://images.unsplash.com/photo-1583578768565-385d56b0051e?w=800&auto=format&fit=crop&q=60',
-        images: [
-            'https://images.unsplash.com/photo-1583578768565-385d56b0051e?w=800&auto=format&fit=crop&q=60'
-        ],
-        tag: 'Beast Mode',
-        specs: { battery: '24V 14Ah', mobile_app: true, max_load: '60kg', speed: '10-15 km/h', charging_time: '12-16 Hours', run_time: '90-150 Mins' },
-        description: "The ultimate off-road machine for kids. 2-seater, 4x4 drive.",
-        voltage: '24V',
-        ageGroup: '6-10',
-        slug: 'maverick-utv-buggy'
-    },
+    // ...
     {
         id: '6',
         name: 'Drift Go-Kart Pro',
@@ -221,7 +164,7 @@ export const products: Product[] = [
         specs: { battery: '24V', mobile_app: false, max_load: '45kg', speed: '12 km/h', charging_time: '8-10 Hours', run_time: '40-60 Mins' },
         description: "For the young racer. Special drift wheels for sliding action.",
         voltage: '24V',
-        ageGroup: '6-10',
+        ageGroup: '10+',
         slug: 'drift-go-kart-pro'
     }
 ];
