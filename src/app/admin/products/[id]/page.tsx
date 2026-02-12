@@ -10,7 +10,7 @@ import {
     Package, DollarSign, Hash, Layers, Split, Check,
     Upload, Sparkles, Edit, ChevronLeft, ChevronRight
 } from 'lucide-react';
-import { VEHICLE_CATEGORIES, AGE_CATEGORIES } from '@/lib/data';
+import { VEHICLE_CATEGORIES, AGE_CATEGORIES, normalizeAgeGroup } from '@/lib/data';
 
 interface Attribute {
     name: string;
@@ -684,7 +684,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     run_time: data.specs?.run_time || ''
                 },
                 voltage: parseVoltage(data.specs?.battery) || prev.voltage,
-                age_group: data.age_group || parseAgeGroup(data.specs?.suitable_age) || prev.age_group
+                age_group: normalizeAgeGroup(data.age_group) || normalizeAgeGroup(parseAgeGroup(data.specs?.suitable_age)) || prev.age_group
             }));
 
             alert('✨ Data Extracted & Form Filled!');

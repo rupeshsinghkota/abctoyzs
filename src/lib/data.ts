@@ -326,21 +326,23 @@ export async function searchProducts(query: string): Promise<Product[]> {
 }
 
 // Helper to normalize age groups from DB or other sources
-function normalizeAgeGroup(input: string | undefined): '1-3' | '3-6' | '6-10' | '10+' | undefined {
+export function normalizeAgeGroup(input: string | undefined): '1-3' | '3-6' | '6-10' | '10-plus' | undefined {
     if (!input) return undefined;
 
     const normalized = input.trim().toLowerCase();
 
     // Direct matches
-    if (normalized === '1-3' || normalized === '3-6' || normalized === '6-10' || normalized === '10+') {
+    if (normalized === '1-3' || normalized === '3-6' || normalized === '6-10' || normalized === '10-plus') {
         return normalized as any;
     }
+    // Handle "10+" explicitly
+    if (normalized === '10+') return '10-plus';
 
     // Fuzzy mapping for legacy or alternative formats
     if (['1', '2', '3', 'toddler', '1-3 years'].some(k => normalized.includes(k) && !normalized.includes('10'))) return '1-3';
     if (['4', '5', '3-5', '3-6 years', 'preschool'].some(k => normalized.includes(k))) return '3-6';
     if (['6', '7', '8', '9', '5-8', '6-12', 'school', 'kid'].some(k => normalized.includes(k) && !normalized.includes('10'))) return '6-10';
-    if (['10', '11', '12', 'teen', 'adult', 'big'].some(k => normalized.includes(k))) return '10+';
+    if (['10', '11', '12', 'teen', 'adult', 'big'].some(k => normalized.includes(k))) return '10-plus';
 
     // Fallback based on simple parsing if possible, otherwise return input as is (or undefined to be safe)
     return undefined;
