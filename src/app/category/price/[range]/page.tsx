@@ -1,10 +1,8 @@
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { SlidersHorizontal } from 'lucide-react';
 import { Metadata } from 'next';
-import { SettingsService } from '@/lib/services/settings';
-import { createClient } from '@/lib/supabase/server';
+import { ProductFilters } from '@/components/shop/ProductFilters';
 
 export const revalidate = 300;
 
@@ -18,6 +16,7 @@ interface PriceCategoryPageProps {
     params: Promise<{
         range: string;
     }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export async function generateMetadata({ params }: PriceCategoryPageProps): Promise<Metadata> {
@@ -32,8 +31,9 @@ export async function generateMetadata({ params }: PriceCategoryPageProps): Prom
     };
 }
 
-export default async function PriceCategoryPage({ params }: PriceCategoryPageProps) {
+export default async function PriceCategoryPage({ params, searchParams }: PriceCategoryPageProps) {
     const { range } = await params;
+    const resolvedSearchParams = await searchParams;
 
     const rangeInfo = PRICE_RANGES.find(c => c.value === range);
     if (!rangeInfo) notFound();
@@ -41,7 +41,7 @@ export default async function PriceCategoryPage({ params }: PriceCategoryPagePro
     const products = await fetchProducts();
 
     // Filter based on range
-    const filteredProducts = products.filter(p => {
+    let filteredProducts = products.filter(p => {
         const price = p.price;
         if (range === 'under-10k') return price < 10000;
         if (range === '10k-20k') return price >= 10000 && price <= 20000;
@@ -49,17 +49,35 @@ export default async function PriceCategoryPage({ params }: PriceCategoryPagePro
         return false;
     });
 
+    // Apply Additional Filters
+    const voltage = resolvedSearchParams.voltage ? (resolvedSearchParams.voltage as string).split(',') : [];
+    const age = resolvedSearchParams.age ? (resolvedSearchParams.age as string).split(',') : [];
+    const seats = resolvedSearchParams.seats ? (resolvedSearchParams.seats as string).split(',') : [];
+
+    filteredProducts = filteredProducts.filter(p => {
+        // Voltage
+        if (voltage.length > 0 && (!p.voltage || !voltage.includes(p.voltage))) return false;
+
+        // Age
+        if (age.length > 0 && (!p.ageGroup || !age.includes(p.ageGroup))) return false;
+
+        // Seats
+        if (seats.length > 0) {
+            const productSeats = p.specs?.seats?.toString();
+            if (!productSeats || !seats.includes(productSeats)) return false;
+        }
+
+        return true;
+    });
+
     return (
         <div className="min-h-screen pb-20">
-            <div className="bg-background border-b px-4 py-3 flex items-center justify-between">
+            <div className="bg-background border-b px-4 py-3 flex items-center justify-between sticky top-0 z-10">
                 <div>
                     <h1 className="text-xl font-bold font-heading">Budget: {rangeInfo.label}</h1>
                     <p className="text-xs text-muted-foreground">{filteredProducts.length} Products Found</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-1.5 bg-muted rounded-full text-sm font-medium hover:bg-muted/80">
-                    <SlidersHorizontal className="w-4 h-4" />
-                    Filters
-                </button>
+                <ProductFilters hiddenFilters={['price']} />
             </div>
 
             {filteredProducts.length > 0 ? (
@@ -68,7 +86,7 @@ export default async function PriceCategoryPage({ params }: PriceCategoryPagePro
                 </div>
             ) : (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <p className="text-lg font-medium text-muted-foreground">No products found in this range.</p>
+                    <p className="text-lg font-medium text-muted-foreground">No products found in this range with selected filters.</p>
                 </div>
             )}
         </div>

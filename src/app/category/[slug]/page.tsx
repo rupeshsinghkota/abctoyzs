@@ -1,9 +1,11 @@
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { fetchProducts } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { SlidersHorizontal } from 'lucide-react';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Metadata } from 'next';
+import { ProductFilters } from '@/components/shop/ProductFilters';
+import { SettingsService } from '@/lib/services/settings';
+import { createClient } from '@/lib/supabase/server';
 
 export const revalidate = 300; // Revalidate every 5 minutes
 
@@ -11,10 +13,8 @@ interface CategoryPageProps {
     params: Promise<{
         slug: string;
     }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
-
-import { SettingsService } from '@/lib/services/settings';
-import { createClient } from '@/lib/supabase/server';
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
     const { slug } = await params;
@@ -33,8 +33,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
     const { slug } = await params;
+    const resolvedSearchParams = await searchParams;
 
     const allProducts = await fetchProducts();
 
@@ -42,6 +43,32 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     if (slug !== 'new' && slug !== 'all') {
         categoryProducts = allProducts.filter(p => p.category === slug);
     }
+
+    // Apply Filters
+    const minPrice = resolvedSearchParams.minPrice ? Number(resolvedSearchParams.minPrice) : 0;
+    const maxPrice = resolvedSearchParams.maxPrice ? Number(resolvedSearchParams.maxPrice) : 100000;
+    const voltage = resolvedSearchParams.voltage ? (resolvedSearchParams.voltage as string).split(',') : [];
+    const age = resolvedSearchParams.age ? (resolvedSearchParams.age as string).split(',') : [];
+    const seats = resolvedSearchParams.seats ? (resolvedSearchParams.seats as string).split(',') : [];
+
+    categoryProducts = categoryProducts.filter(p => {
+        // Price
+        if (p.price < minPrice || p.price > maxPrice) return false;
+
+        // Voltage
+        if (voltage.length > 0 && (!p.voltage || !voltage.includes(p.voltage))) return false;
+
+        // Age
+        if (age.length > 0 && (!p.ageGroup || !age.includes(p.ageGroup))) return false;
+
+        // Seats (checking specs.seats)
+        if (seats.length > 0) {
+            const productSeats = p.specs?.seats?.toString();
+            if (!productSeats || !seats.includes(productSeats)) return false;
+        }
+
+        return true;
+    });
 
     const title = slug.charAt(0).toUpperCase() + slug.slice(1);
 
@@ -58,19 +85,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             </div>
 
             {/* Category Header */}
-            <div className="bg-background border-b px-4 py-3 flex items-center justify-between">
+            <div className="bg-background border-b px-4 py-3 flex items-center justify-between sticky top-0 z-10">
                 <h1 className="text-xl font-bold font-heading">{title} Collection</h1>
-                <button className="flex items-center gap-2 px-4 py-1.5 bg-muted rounded-full text-sm font-medium hover:bg-muted/80">
-                    <SlidersHorizontal className="w-4 h-4" />
-                    Filters
-                </button>
+                <ProductFilters />
             </div>
 
             {categoryProducts.length > 0 ? (
                 <ProductGrid products={categoryProducts} />
             ) : (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <p className="text-lg font-medium text-muted-foreground">No products found for this category.</p>
+                    <p className="text-lg font-medium text-muted-foreground">No products found for this category with selected filters.</p>
                 </div>
             )}
         </div>

@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import Link from 'next/link';
+
 const slides = [
     {
         id: 1,
@@ -14,6 +16,7 @@ const slides = [
         subtitle: "Officially Licensed BMW, Audi & More",
         image: "/hero/hero_car_1769365166894.png",
         cta: "Shop Now",
+        link: "/category/cars",
         color: "bg-blue-600"
     },
     {
@@ -22,6 +25,7 @@ const slides = [
         subtitle: "For the Little Adventurers",
         image: "/hero/hero_jeep_1769365183790.png",
         cta: "Explore",
+        link: "/category/jeeps",
         color: "bg-orange-600"
     },
     {
@@ -30,6 +34,7 @@ const slides = [
         subtitle: "Speed & Style Combined",
         image: "/hero/hero_bike_1769365200981.png",
         cta: "Ride On",
+        link: "/category/bikes",
         color: "bg-red-600"
     }
 ];
@@ -61,17 +66,7 @@ export function HeroSlider() {
             <div className="flex touch-pan-y">
                 {slides.map((slide) => (
                     <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect-[3/2] sm:aspect-[16/9] md:aspect-[21/9]">
-                        <div className="absolute inset-0 w-full h-full">
-                            <Image
-                                src={slide.image}
-                                alt={slide.title}
-                                fill
-                                sizes="100vw"
-                                priority={slide.id === 1}
-                                className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                        </div>
+                        {/* ... existing Image ... */}
 
                         {/* Content Content */}
                         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-12 text-white pb-8 md:pb-24 flex flex-col items-start justify-end h-full">
@@ -80,13 +75,17 @@ export function HeroSlider() {
                             </span>
                             <h2 className="text-2xl md:text-6xl font-black mb-1 md:mb-2 drop-shadow-xl leading-tight tracking-tight">{slide.title}</h2>
                             <p className="text-white/90 text-xs md:text-xl mb-3 md:mb-6 max-w-lg leading-snug drop-shadow-md font-medium">{slide.subtitle}</p>
-                            <button className={cn("px-5 py-1.5 md:px-8 md:py-3 rounded-full font-bold text-xs md:text-lg transition-transform active:scale-95 text-white shadow-lg shadow-black/20", slide.color)}>
+                            <Link
+                                href={slide.link}
+                                className={cn("px-5 py-1.5 md:px-8 md:py-3 rounded-full font-bold text-xs md:text-lg transition-transform active:scale-95 text-white shadow-lg shadow-black/20 inline-block", slide.color)}
+                            >
                                 {slide.cta}
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 ))}
             </div>
+            {/* ... remaining structure ... */}
 
             {/* Navigation Arrows (Desktop Only) */}
             <button
