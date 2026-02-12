@@ -44,6 +44,8 @@ export function HeroSlider() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     const [scrollSnaps, setScrollSnaps] = React.useState<number[]>([]);
 
+    // ... existing hooks and useEffect ...
+
     const scrollPrev = React.useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
     const scrollNext = React.useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
     const scrollTo = React.useCallback((index: number) => emblaApi && emblaApi.scrollTo(index), [emblaApi]);
@@ -67,6 +69,17 @@ export function HeroSlider() {
                 {slides.map((slide) => (
                     <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect-[3/2] sm:aspect-[16/9] md:aspect-[21/9]">
                         {/* ... existing Image ... */}
+                        <div className="absolute inset-0 w-full h-full">
+                            <Image
+                                src={slide.image}
+                                alt={slide.title}
+                                fill
+                                sizes="100vw"
+                                priority={slide.id === 1}
+                                className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                        </div>
 
                         {/* Content Content */}
                         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-12 text-white pb-8 md:pb-24 flex flex-col items-start justify-end h-full">
@@ -77,7 +90,7 @@ export function HeroSlider() {
                             <p className="text-white/90 text-xs md:text-xl mb-3 md:mb-6 max-w-lg leading-snug drop-shadow-md font-medium">{slide.subtitle}</p>
                             <Link
                                 href={slide.link}
-                                className={cn("px-5 py-1.5 md:px-8 md:py-3 rounded-full font-bold text-xs md:text-lg transition-transform active:scale-95 text-white shadow-lg shadow-black/20 inline-block", slide.color)}
+                                className={cn("inline-block px-5 py-1.5 md:px-8 md:py-3 rounded-full font-bold text-xs md:text-lg transition-transform active:scale-95 text-center text-white shadow-lg shadow-black/20", slide.color)}
                             >
                                 {slide.cta}
                             </Link>
