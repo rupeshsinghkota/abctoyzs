@@ -63,12 +63,12 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [config.ogImage],
     },
     icons: {
-      icon: "/icon.png",
-      shortcut: "/icon.png",
-      apple: "/icon.png",
+      icon: "/brand-icon.png",
+      shortcut: "/brand-icon.png",
+      apple: "/brand-icon.png",
       other: {
         rel: "apple-touch-icon-precomposed",
-        url: "/icon.png",
+        url: "/brand-icon.png",
       },
     },
     manifest: "/manifest.json",
