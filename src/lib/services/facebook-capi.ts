@@ -96,8 +96,10 @@ export const FacebookCapi = {
 
             if (!response.ok) {
                 console.error('[FacebookCapi] Error sending event:', JSON.stringify(result));
+                console.error('[FacebookCapi] Payload was:', JSON.stringify(payload, null, 2));
             } else {
                 console.log(`[FacebookCapi] Event ${eventData.eventName} sent successfully. Event ID: ${eventData.eventId}`);
+                // console.log('[FacebookCapi] Payload sent:', JSON.stringify(payload)); // Uncomment for deep debugging
             }
         } catch (error) {
             console.error('[FacebookCapi] Network error sending event:', error);

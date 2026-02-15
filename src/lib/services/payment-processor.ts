@@ -173,6 +173,8 @@ export const PaymentProcessor = {
             const [firstName, ...lastNameParts] = fullName.split(' ');
             const lastName = lastNameParts.join(' ');
 
+            console.log('[PaymentProcessor] Preparing CAPI Event. Email:', userEmail, 'Phone:', order.shipping_address.phone, 'Name:', fullName);
+
             await FacebookCapi.trackEvent({
                 eventName: 'Purchase',
                 eventId: order.id, // Deduplication ID (Matches internal Order ID)
@@ -188,8 +190,6 @@ export const PaymentProcessor = {
                     state: order.shipping_address.state,
                     zip: order.shipping_address.pincode,
                     country: 'in', // Normalized to lowercase ISO 2-letter
-                    // client_ip_address: req.ip, // Not easily available in this service context, omitted for now
-                    // client_user_agent: req.headers['user-agent'], // Same
                 },
                 customData: {
                     currency: 'INR',

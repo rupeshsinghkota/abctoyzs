@@ -162,7 +162,7 @@ export default function CheckoutPage() {
                         } else {
                             const errorData = await verifyRes.json();
                             console.error("Verification failed:", errorData);
-                            alert("Payment verification failed. Please contact support.");
+                            alert(`Payment verification failed: ${errorData.error || 'Unknown Error'}`);
                             setLoading(false);
                         }
                     } catch (error) {
