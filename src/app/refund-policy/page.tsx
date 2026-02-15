@@ -121,7 +121,7 @@ export default function RefundPolicy() {
                         <h2 className="text-2xl font-semibold text-zinc-800 mb-4">Contact for Claims</h2>
                         <p className="text-zinc-600 leading-relaxed">
                             Email: <Link href="mailto:support@abctoyz.in" className="text-primary hover:underline">support@abctoyz.in</Link><br />
-                            WhatsApp: +91 80004 21913
+                            WhatsApp: +91 82392 69217
                         </p>
                     </section>
                 </div>

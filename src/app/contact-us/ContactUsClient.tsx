@@ -69,7 +69,7 @@ export default function ContactUsClient() {
                                 <InfoItem
                                     icon={<Phone className="w-5 h-5" />}
                                     title="Direct Hotline"
-                                    detail="+91 80004 21913"
+                                    detail="+91 82392 69217"
                                     sub="Call or WhatsApp for Instant Help"
                                 />
                             </div>
@@ -81,7 +81,7 @@ export default function ContactUsClient() {
                                 Our WhatsApp support is active 10 hours a day for live video calls, assembly guidance, and order tracking.
                             </p>
                             <a
-                                href="https://wa.me/918000421913"
+                                href="https://wa.me/918239269217"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white w-full py-4 rounded-xl font-bold transition-all justify-center shadow-lg shadow-green-900/20"

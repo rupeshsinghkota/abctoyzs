@@ -163,7 +163,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-white font-medium text-sm">Phone Support</p>
-                                    <p className="text-sm mt-1">+91 80004 21913</p>
+                                    <p className="text-sm mt-1">+91 82392 69217</p>
                                     <p className="text-xs text-zinc-500 mt-0.5">Mon-Sat, 9am - 7pm</p>
                                 </div>
                             </li>

@@ -43,7 +43,7 @@ export default function Sitemap() {
             icon: <Mail className="w-5 h-5 text-orange-500" />,
             links: [
                 { label: "Contact Form", href: "/contact-us" },
-                { label: "WhatsApp Support", href: "https://wa.me/918000421913" },
+                { label: "WhatsApp Support", href: "https://wa.me/918239269217" },
                 { label: "My Account", href: "/profile" },
                 { label: "My Orders", href: "/orders" },
             ]
