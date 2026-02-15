@@ -25,8 +25,20 @@ function SuccessContent() {
                 const orderData = await OrderService.getOrderById(oid);
                 if (orderData) {
                     setOrder(orderData);
-                    // TRACK CONVERSION
+                    // TRACK CONVERSION - GOOGLE
                     trackConversion(orderData.total_amount, orderData.id);
+
+                    // TRACK CONVERSION - FACEBOOK PIXEL (Client Side Fallback/Duplicate)
+                    if (typeof window !== "undefined" && (window as any).fbq) {
+                        (window as any).fbq('track', 'Purchase', {
+                            currency: "INR",
+                            value: orderData.total_amount,
+                            content_ids: orderData.items?.map((item: any) => item.product_id) || [],
+                            content_type: 'product',
+                            order_id: orderData.id // For Deduplication with CAPI
+                        });
+                        console.log('[Facebook Pixel] Purchase event fired for:', orderData.id);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to load order for tracking:", error);
