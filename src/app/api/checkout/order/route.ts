@@ -14,7 +14,9 @@ export async function POST(req: Request) {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
-        const { items, total_amount, shipping_address_id, payment_method } = await req.json();
+        const { items, total_amount, shipping_address_id, payment_method, guest_email } = await req.json();
+
+        console.log('[CreateOrder] Received payload:', { itemsCount: items?.length, total_amount, shipping_address_id, payment_method, guest_email });
 
         if (!items || !total_amount || !shipping_address_id) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
                 payment_status: 'pending',
                 status: 'processing',
                 payment_method: payment_method || 'PREPAID', // Default to PREPAID if not specified
-                guest_email: (await req.json()).guest_email // Extract guest_email
+                guest_email: guest_email // Extract guest_email
             })
             .select()
             .single();
