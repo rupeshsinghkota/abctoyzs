@@ -7,16 +7,37 @@ import { FacebookCapi } from '@/lib/services/facebook-capi';
 export const PaymentProcessor = {
     async processPaymentSuccess(orderId: string, paymentId: string) {
         // 1. Fetch order details using Admin Client (Bypass RLS)
-        const { data: order, error: orderFetchError } = await supabaseAdmin
+        // 1. Fetch order details using Admin Client (Bypass RLS)
+        // We fetch separately to avoid issues with Supabase relationship definitions
+        const { data: orderBase, error: orderFetchError } = await supabaseAdmin
             .from('orders')
-            .select('*, shipping_address:addresses(*), items:order_items(*)')
+            .select('*')
             .eq('id', orderId)
             .single();
 
-        if (orderFetchError || !order) {
+        if (orderFetchError || !orderBase) {
             console.error('[PaymentProcessor] Order Fetch Error:', orderFetchError);
-            throw new Error("Order not found");
+            throw new Error(`Order not found: ${orderFetchError?.message || 'Unknown error'}`);
         }
+
+        // Fetch related data manually
+        const { data: shippingAddress } = await supabaseAdmin
+            .from('addresses')
+            .select('*')
+            .eq('id', orderBase.shipping_address_id)
+            .single();
+
+        const { data: items } = await supabaseAdmin
+            .from('order_items')
+            .select('*')
+            .eq('order_id', orderId);
+
+        // Combine into a single object for the rest of the logic
+        const order = {
+            ...orderBase,
+            shipping_address: shippingAddress || {}, // Fallback if address missing
+            items: items || []
+        };
 
         // Idempotency check
         if (order.status !== 'processing' && order.payment_status === 'paid') {
