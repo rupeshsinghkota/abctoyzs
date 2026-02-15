@@ -27,21 +27,43 @@ export async function POST(req: Request) {
         const razorpayAmount = payment_method === 'COD' ? 500 : total_amount;
 
         // 1. Create a "pending" order in database
-        const { data: order, error: orderError } = await supabase
-            .from('orders')
-            .insert({
-                user_id: user?.id || null,
-                total_amount: total_amount,
-                shipping_address_id: shipping_address_id,
-                payment_status: 'pending',
-                status: 'processing',
-                payment_method: payment_method || 'PREPAID', // Default to PREPAID if not specified
-                guest_email: guest_email // Extract guest_email
-            })
-            .select()
-            .single();
+        let order;
+        try {
+            const { data, error } = await supabase
+                .from('orders')
+                .insert({
+                    user_id: user?.id || null,
+                    total_amount: total_amount,
+                    shipping_address_id: shipping_address_id,
+                    payment_status: 'pending',
+                    status: 'processing',
+                    payment_method: payment_method || 'PREPAID',
+                    guest_email: guest_email
+                })
+                .select()
+                .single();
 
-        if (orderError) throw orderError;
+            if (error) throw error;
+            order = data;
+        } catch (err: any) {
+            console.error('[CreateOrder] First attempt failed (likely missing guest_email column):', err.message);
+            // Fallback: Try without guest_email
+            const { data, error } = await supabase
+                .from('orders')
+                .insert({
+                    user_id: user?.id || null,
+                    total_amount: total_amount,
+                    shipping_address_id: shipping_address_id,
+                    payment_status: 'pending',
+                    status: 'processing',
+                    payment_method: payment_method || 'PREPAID'
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+            order = data;
+        }
 
         // 2. Create Order Items
         const itemsToInsert = items.map((item: any) => ({
