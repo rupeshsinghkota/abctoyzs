@@ -33,6 +33,24 @@ function SuccessContent() {
 
                     // TRACK CONVERSION - FACEBOOK PIXEL (Full Data)
                     if (typeof window !== "undefined" && (window as any).fbq) {
+                        // Attempt to enhance match quality by re-initializing with user data
+                        // standard fbq('init', id, userData)
+                        const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
+                        if (pixelId) {
+                            const userData = {
+                                em: orderData.shipping_address?.email || (orderData as any).user?.email || (orderData as any).guest_email || undefined,
+                                ph: orderData.shipping_address?.phone || undefined,
+                                fn: orderData.shipping_address?.name?.split(' ')[0] || undefined,
+                                ln: orderData.shipping_address?.name?.split(' ').slice(1).join(' ') || undefined,
+                                ct: orderData.shipping_address?.city || undefined,
+                                st: orderData.shipping_address?.state || undefined,
+                                zp: orderData.shipping_address?.pincode || undefined,
+                                country: 'in'
+                            };
+                            console.log('[Facebook Pixel] Updating user data for matching:', userData);
+                            (window as any).fbq('init', pixelId, userData);
+                        }
+
                         (window as any).fbq('track', 'Purchase', {
                             currency: "INR",
                             value: orderData.total_amount,
