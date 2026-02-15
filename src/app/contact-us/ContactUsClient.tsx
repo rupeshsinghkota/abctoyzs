@@ -41,7 +41,7 @@ export default function ContactUsClient() {
                         <span className="text-primary italic">Conversation.</span>
                     </h1>
                     <p className="text-zinc-500 text-lg md:text-xl leading-relaxed">
-                        Whether you're looking for your child's first electric supercar or need technical support for an existing ride-on, our D2BCart concierge team is ready to assist.
+                        Whether you're looking for your child's first electric supercar or need technical support for an existing ride-on, our concierge team is ready to assist.
                     </p>
                 </div>
 
@@ -58,7 +58,7 @@ export default function ContactUsClient() {
                                     icon={<MapPin className="w-5 h-5" />}
                                     title="Showroom & HQ"
                                     detail="Jhandewalan Toy Market, Near Videocon Tower, New Delhi - 110055"
-                                    sub="A Brand of D2BCart"
+                                    sub=""
                                 />
                                 <InfoItem
                                     icon={<Clock className="w-5 h-5" />}
@@ -179,12 +179,12 @@ export default function ContactUsClient() {
                         <RegistryItem
                             icon={<User className="w-6 h-6" />}
                             label="Legal Entity"
-                            value="D2BCart"
+                            value="ABC Toyz"
                         />
                         <RegistryItem
                             icon={<ShieldCheck className="w-6 h-6" />}
-                            label="Merchant Head"
-                            value="Rupesh Singh"
+                            label="Proprietor"
+                            value="Chandan Kumar"
                         />
                         <RegistryItem
                             icon={<MapPin className="w-6 h-6" />}

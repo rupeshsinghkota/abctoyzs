@@ -18,14 +18,14 @@ export default function AboutUsClient() {
                         <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-700">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-bold text-xs uppercase tracking-widest">
                                 <Sparkles className="w-4 h-4" />
-                                A Brand of D2BCart
+                                Premium Electric Ride-ons
                             </div>
                             <h1 className="text-5xl lg:text-8xl font-black text-zinc-900 leading-[0.85] tracking-tighter">
                                 Excellence in <br />
                                 <span className="text-primary italic">Every Mile.</span>
                             </h1>
                             <p className="text-zinc-500 text-lg md:text-xl leading-relaxed max-w-xl">
-                                Welcome to <strong>ABC Toyz</strong>, India's most trusted destination for premium children's ride-on vehicles. As a proud enterprise of <strong>D2BCart</strong>, we bridge the gap between world-class engineering and pure childhood wonder.
+                                Welcome to <strong>ABC Toyz</strong>, India's most trusted destination for premium children's ride-on vehicles. We bridge the gap between world-class engineering and pure childhood wonder.
                             </p>
                             <div className="flex flex-wrap gap-4">
                                 <Link href="/category/all" className="bg-zinc-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-200">
@@ -40,7 +40,7 @@ export default function AboutUsClient() {
                             <div className="aspect-square rounded-[4rem] bg-zinc-100 overflow-hidden relative shadow-2xl shadow-zinc-200 group">
                                 <img
                                     src="/logo_wide.png"
-                                    alt="ABC Toyz x D2BCart"
+                                    alt="ABC Toyz"
                                     className="w-full h-full object-contain p-24 brightness-0 opacity-10 group-hover:scale-110 transition-transform duration-1000"
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center p-12">
@@ -65,12 +65,12 @@ export default function AboutUsClient() {
                 </div>
             </div>
 
-            {/* The D2BCart Legacy Section */}
+            {/* The ABC Toyz Philosophy Section */}
             <div className="container max-w-6xl mx-auto px-6 py-32">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
                     <div className="space-y-10">
                         <div className="space-y-4">
-                            <h2 className="text-4xl lg:text-5xl font-black text-zinc-900 tracking-tight">The D2BCart Philosophy</h2>
+                            <h2 className="text-4xl lg:text-5xl font-black text-zinc-900 tracking-tight">The ABC Toyz Philosophy</h2>
                             <div className="w-24 h-2 bg-primary rounded-full" />
                         </div>
                         <div className="space-y-6 text-zinc-600 leading-relaxed text-lg">
@@ -113,7 +113,7 @@ export default function AboutUsClient() {
                 <div className="container max-w-6xl mx-auto px-6 relative z-10">
                     <div className="text-center mb-24">
                         <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight mb-6">The Gold Standard Process</h2>
-                        <p className="text-zinc-500 text-lg max-w-2xl mx-auto italic">How D2BCart ensures every ABC Toyz vehicle is showroom-ready.</p>
+                        <p className="text-zinc-500 text-lg max-w-2xl mx-auto italic">How we ensure every ABC Toyz vehicle is showroom-ready.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
@@ -162,7 +162,7 @@ export default function AboutUsClient() {
                     <TimelineItem
                         year="2024"
                         title="The Founding"
-                        desc="D2BCart launches in New Delhi with its flagship showroom at Jhandewalan Toy Market."
+                        desc="ABC Toyz launches in New Delhi with its flagship showroom at Jhandewalan Toy Market."
                         align="left"
                     />
                     <TimelineItem
@@ -217,15 +217,15 @@ export default function AboutUsClient() {
                             <div className="space-y-4">
                                 <div>
                                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Legal Trading Name</p>
-                                    <p className="font-bold text-zinc-900 text-lg">D2BCart</p>
+                                    <p className="font-bold text-zinc-900 text-lg">ABC Toyz</p>
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Brand Identity</p>
                                     <p className="font-bold text-zinc-900 text-lg">ABC Toyz</p>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Founder & Merchant</p>
-                                    <p className="font-bold text-zinc-900 text-lg">Rupesh Singh</p>
+                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Proprietor</p>
+                                    <p className="font-bold text-zinc-900 text-lg">Chandan Kumar</p>
                                 </div>
                             </div>
                             <div className="space-y-4">

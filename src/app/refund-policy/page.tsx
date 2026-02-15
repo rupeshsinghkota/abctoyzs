@@ -48,7 +48,7 @@ export default function RefundPolicy() {
                             <h2 className="text-2xl font-semibold text-zinc-800">10-Day Replacement Policy</h2>
                         </div>
                         <p className="text-zinc-600 leading-relaxed mb-4">
-                            At <strong>ABC Toyz</strong> (A Brand of <strong>D2BCart</strong>), we want you and your little ones to be thrilled with your purchase. We offer a <strong>10-day replacement window</strong> for any items received with manufacturing defects or shipping damage.
+                            At <strong>ABC Toyz</strong>, we want you and your little ones to be thrilled with your purchase. We offer a <strong>10-day replacement window</strong> for any items received with manufacturing defects or shipping damage.
                         </p>
                         <ul className="list-disc pl-6 space-y-2 text-zinc-600">
                             <li>Replacements are only available for defective/damaged products.</li>

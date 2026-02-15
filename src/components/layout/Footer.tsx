@@ -221,7 +221,7 @@ export function Footer() {
                 </div>
 
                 <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
-                    <p>&copy; {new Date().getFullYear()} ABC Toyz (A Brand of D2BCart). All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} ABC Toyz. All rights reserved.</p>
                     <div className="flex gap-6">
                         <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
                         <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>

@@ -127,7 +127,7 @@ export const InvoiceService = {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(150);
         doc.text('Thank you for shopping with ABC Toyz!', pageWidth / 2, footerY + 10, { align: 'center' });
-        doc.text('D2BCart Logistics | New Delhi, India | support@abctoyz.com', pageWidth / 2, footerY + 15, { align: 'center' });
+        doc.text('ABC Toyz Logistics | New Delhi, India | support@abctoyz.com', pageWidth / 2, footerY + 15, { align: 'center' });
         doc.text('This is a computer-generated invoice and does not require a physical signature.', pageWidth / 2, footerY + 20, { align: 'center' });
 
         // Save the PDF
