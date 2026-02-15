@@ -12,42 +12,61 @@ import confetti from 'canvas-confetti';
 function SuccessContent() {
     const searchParams = useSearchParams();
     const oid = searchParams.get('oid');
+    const amountParam = searchParams.get('amount');
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadOrder = async () => {
+        const loadOrderAndTrack = async () => {
             if (!oid) {
                 setLoading(false);
                 return;
             }
+
+            let orderData = null;
             try {
-                const orderData = await OrderService.getOrderById(oid);
+                orderData = await OrderService.getOrderById(oid);
                 if (orderData) {
                     setOrder(orderData);
                     // TRACK CONVERSION - GOOGLE
                     trackConversion(orderData.total_amount, orderData.id);
 
-                    // TRACK CONVERSION - FACEBOOK PIXEL (Client Side Fallback/Duplicate)
+                    // TRACK CONVERSION - FACEBOOK PIXEL (Full Data)
                     if (typeof window !== "undefined" && (window as any).fbq) {
                         (window as any).fbq('track', 'Purchase', {
                             currency: "INR",
                             value: orderData.total_amount,
                             content_ids: orderData.items?.map((item: any) => item.product_id) || [],
                             content_type: 'product',
-                            order_id: orderData.id // For Deduplication with CAPI
+                            order_id: orderData.id
                         });
-                        console.log('[Facebook Pixel] Purchase event fired for:', orderData.id);
+                        console.log('[Facebook Pixel] Purchase event fired (Full Data) for:', orderData.id);
                     }
                 }
             } catch (error) {
                 console.error("Failed to load order for tracking:", error);
+
+                // FALLBACK TRACKING (If DB Fetch Fails)
+                if (amountParam) {
+                    const fallbackAmount = parseFloat(amountParam);
+                    trackConversion(fallbackAmount, oid);
+
+                    if (typeof window !== "undefined" && (window as any).fbq) {
+                        (window as any).fbq('track', 'Purchase', {
+                            currency: "INR",
+                            value: fallbackAmount,
+                            content_type: 'product',
+                            order_id: oid
+                        });
+                        console.log('[Facebook Pixel] Purchase event fired (Fallback Data) for:', oid);
+                    }
+                }
             } finally {
                 setLoading(false);
             }
         };
 
-        loadOrder();
+        loadOrderAndTrack();
 
         // Trigger confetti animation
         const duration = 3 * 1000;

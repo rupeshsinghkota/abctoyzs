@@ -157,7 +157,9 @@ export default function CheckoutPage() {
                             }
 
                             clearCart();
-                            const successUrl = `/checkout/success?oid=${orderData.order_id}${result.isNewUser ? '&new_account=true' : ''}`;
+                            // Pass amount in INR (orderData.amount is in paise)
+                            const amountInr = orderData.amount / 100;
+                            const successUrl = `/checkout/success?oid=${orderData.order_id}&amount=${amountInr}${result.isNewUser ? '&new_account=true' : ''}`;
                             router.push(successUrl);
                         } else {
                             const errorData = await verifyRes.json();
