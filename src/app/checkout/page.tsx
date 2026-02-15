@@ -110,7 +110,10 @@ export default function CheckoutPage() {
                 })
             });
 
-            if (!orderRes.ok) throw new Error("Failed to create order");
+            if (!orderRes.ok) {
+                const errorData = await orderRes.json().catch(() => ({}));
+                throw new Error(errorData.error || `Server Error: ${orderRes.status}`);
+            }
             const orderData = await orderRes.json();
 
             // 2. Trigger Razorpay
