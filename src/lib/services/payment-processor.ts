@@ -77,15 +77,28 @@ export const PaymentProcessor = {
 
         // 4. Upsert Profile
         if (userId) {
-            await supabaseAdmin
-                .from('profiles')
-                .upsert({
-                    id: userId,
-                    full_name: order.shipping_address.name,
-                    phone: order.shipping_address.phone,
-                    email: userEmail,
-                    is_guest: false
-                }, { onConflict: 'id' });
+            try {
+                await supabaseAdmin
+                    .from('profiles')
+                    .upsert({
+                        id: userId,
+                        full_name: order.shipping_address.name,
+                        phone: order.shipping_address.phone,
+                        email: userEmail,
+                        is_guest: false
+                    }, { onConflict: 'id' });
+            } catch (profileError: any) {
+                console.error('[PaymentProcessor] Profile update failed (likely missing email column), retrying without email:', profileError.message);
+                // Fallback: Try without email
+                await supabaseAdmin
+                    .from('profiles')
+                    .upsert({
+                        id: userId,
+                        full_name: order.shipping_address.name,
+                        phone: order.shipping_address.phone,
+                        is_guest: false
+                    }, { onConflict: 'id' });
+            }
         }
 
         // 5. Sync to Shiprocket using Admin Client (for reading updated order if needed, or just proceed)
