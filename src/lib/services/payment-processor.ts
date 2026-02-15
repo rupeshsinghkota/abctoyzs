@@ -2,6 +2,7 @@
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { ShiprocketService } from '@/lib/services/shiprocket';
 import crypto from 'crypto';
+import { FacebookCapi } from '@/lib/services/facebook-capi';
 
 export const PaymentProcessor = {
     async processPaymentSuccess(orderId: string, paymentId: string) {
@@ -129,6 +130,47 @@ export const PaymentProcessor = {
             }
         } catch (shipError) {
             console.error('[PaymentProcessor] Shiprocket Sync Error:', shipError);
+        }
+
+        // 6. Send Purchase Event to Facebook Conversions API (CAPI)
+        try {
+            // Reconstruct full name parts
+            const fullName = order.shipping_address.name || '';
+            const [firstName, ...lastNameParts] = fullName.split(' ');
+            const lastName = lastNameParts.join(' ');
+
+            await FacebookCapi.trackEvent({
+                eventName: 'Purchase',
+                eventId: order.id, // Deduplication ID (Matches internal Order ID)
+                eventTime: Math.floor(Date.now() / 1000),
+                actionSource: 'website',
+                eventSourceUrl: `https://abctoyz.in/checkout/success?orderId=${order.id}`,
+                userData: {
+                    email: userEmail,
+                    phone: order.shipping_address.phone,
+                    first_name: firstName,
+                    last_name: lastName,
+                    city: order.shipping_address.city,
+                    state: order.shipping_address.state,
+                    zip: order.shipping_address.pincode,
+                    country: 'in', // Normalized to lowercase ISO 2-letter
+                    // client_ip_address: req.ip, // Not easily available in this service context, omitted for now
+                    // client_user_agent: req.headers['user-agent'], // Same
+                },
+                customData: {
+                    currency: 'INR',
+                    value: order.total_amount,
+                    order_id: order.id,
+                    content_type: 'product',
+                    contents: order.items.map((item: any) => ({
+                        id: String(item.product_id), // Must match Catalog ID
+                        quantity: item.quantity
+                    }))
+                }
+            });
+        } catch (capiError) {
+            console.error('[PaymentProcessor] CAPI Error:', capiError);
+            // Don't fail the whole payment process just because CAPI failed
         }
 
         // Return credentials only if it's a new user (for auto-login)

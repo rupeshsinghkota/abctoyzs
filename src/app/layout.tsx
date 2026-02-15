@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 import Script from "next/script";
 import { Suspense } from "react";
 import GoogleTracking from "@/components/tracking/GoogleTracking";
+import FacebookPixel from "@/components/tracking/FacebookPixel";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -103,6 +104,7 @@ export default function RootLayout({
       >
         <Suspense fallback={null}>
           <GoogleTracking />
+          <FacebookPixel />
         </Suspense>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"

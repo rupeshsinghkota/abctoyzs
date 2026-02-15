@@ -11,6 +11,7 @@ import { ProductGrid } from '@/components/shop/ProductGrid';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { Metadata } from 'next';
 import { MarketingHero } from '@/components/product/MarketingHero';
+import TrackProductView from '@/components/tracking/TrackProductView';
 
 interface PageProps {
     params: Promise<{
@@ -152,6 +153,7 @@ export default async function ProductPage({ params }: PageProps) {
         <div className="min-h-screen bg-background md:pb-0">
             {/* ... (schema and breadcrumb unchanged) */}
             <ProductSchema product={product} />
+            <TrackProductView product={product} />
 
             <div className="container mx-auto px-4 py-2 md:py-6 overflow-hidden">
                 <nav className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground overflow-x-auto no-scrollbar whitespace-nowrap pb-1">

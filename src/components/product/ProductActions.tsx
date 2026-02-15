@@ -6,6 +6,7 @@ import { useStore } from '@/store/useStore';
 import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
+import { trackFbEvent } from '@/components/tracking/FacebookPixel';
 
 interface ProductActionsProps {
     product: Product;
@@ -70,6 +71,15 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             image: finalImage,
             quantity: quantity,
             attributes: selectedAttributes
+        });
+
+        // Track Facebook AddToCart
+        trackFbEvent('AddToCart', {
+            content_name: finalName,
+            content_ids: [currentVariant?.id || product.id],
+            content_type: 'product',
+            value: finalPrice * quantity,
+            currency: 'INR',
         });
 
         setAdded(true);
