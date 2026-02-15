@@ -20,6 +20,7 @@ export type Profile = {
     full_name: string | null;
     phone: string | null;
     avatar_url: string | null;
+    email?: string;
 };
 
 export const ProfileService = {
@@ -34,7 +35,8 @@ export const ProfileService = {
             .eq('id', user.id)
             .single();
 
-        return data as Profile;
+        // Ensure we return the auth email if profile email is missing
+        return { ...data, email: data?.email || user.email } as Profile;
     },
 
     async updateProfile(updates: Partial<Profile>) {
