@@ -80,12 +80,13 @@ export async function POST(req: Request) {
 
         console.log(`[Context] Trying phone variations:`, phoneVariations);
 
-        // First, find addresses with this phone number
+        // First, find addresses with this phone number (include name)
         let matchingAddresses = null;
+        let customerName = null;
         for (const phonePattern of phoneVariations) {
             const { data, error: addrError } = await supabase
                 .from('addresses')
-                .select('id')
+                .select('id, name')
                 .ilike('phone', `%${phonePattern}%`);
 
             if (addrError) {
@@ -96,6 +97,7 @@ export async function POST(req: Request) {
             if (data && data.length > 0) {
                 console.log(`[Context] Found ${data.length} addresses with pattern: ${phonePattern}`);
                 matchingAddresses = data;
+                customerName = data[0].name; // Get name from first matching address
                 break; // Stop on first match
             }
         }
@@ -167,6 +169,7 @@ export async function POST(req: Request) {
         // Build RICH context with full customer data
         let userContext = `
 # USER CONTEXT
+- Customer Name: ${customerName || 'Customer'}
 - Phone Number: ${sender}
 - Authentication: WhatsApp User (Mobile Verified)
 `;
