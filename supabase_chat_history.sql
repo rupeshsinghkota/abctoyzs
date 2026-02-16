@@ -6,9 +6,11 @@ CREATE TABLE IF NOT EXISTS whatsapp_conversations (
     phone_number text NOT NULL,
     role text NOT NULL CHECK (role IN ('user', 'model')),
     message text NOT NULL,
-    created_at timestamptz DEFAULT now(),
-    INDEX idx_phone_created (phone_number, created_at DESC)
+    created_at timestamptz DEFAULT now()
 );
+
+-- Create index for fast lookups
+CREATE INDEX IF NOT EXISTS idx_phone_created ON whatsapp_conversations (phone_number, created_at DESC);
 
 -- Enable Row Level Security
 ALTER TABLE whatsapp_conversations ENABLE ROW LEVEL SECURITY;
