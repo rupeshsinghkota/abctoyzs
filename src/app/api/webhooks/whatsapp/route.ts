@@ -6,26 +6,33 @@ import { createClient as createServerClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        console.log("Incoming WhatsApp Webhook:", JSON.stringify(body, null, 2));
+        const rawBody = await req.text();
+        console.log("Incoming WhatsApp Webhook Raw:", rawBody);
 
-        // robust extraction for MSG91 webhook payload
-        // Structure usually:
-        // { "sender": "919876543210", "message": "Hello", "type": "text", ... }
-        // OR an array
-
-        let sender = "";
-        let messageText = "";
-
-        if (Array.isArray(body)) {
-            // Handle array if multiple messages come at once
-            const msg = body[0];
-            sender = msg.sender || msg.from;
-            messageText = msg.message || msg.text?.body || "";
-        } else {
-            sender = body.sender || body.from; // 'sender' is common for MSG91
-            messageText = body.message || body.text?.body || "";
+        let body: any = {};
+        try {
+            body = JSON.parse(rawBody);
+        } catch (e) {
+            console.warn("Failed to parse JSON body, trying URLSearchParams");
+            try {
+                const params = new URLSearchParams(rawBody);
+                const entries: any = {};
+                for (const [key, value] of params) {
+                    entries[key] = value;
+                }
+                body = entries;
+            } catch (formError) {
+                console.error("Failed to parse as form data");
+            }
         }
+
+        // Wrapper for Array handling
+        const payload = Array.isArray(body) ? body[0] : body;
+
+        // Extract fields
+        let sender = payload.sender || payload.from || payload.mobile || "";
+        let messageText = payload.message || payload.text?.body || payload.content || "";
+
 
         if (!sender || !messageText) {
             console.warn("Invalid Webhook Payload: Missing sender or message");
