@@ -71,15 +71,35 @@ export async function POST(req: Request) {
         // Check if a user exists with this phone number (search in addresses linked to orders)
         console.log(`[Context] Fetching orders for phone: ${sender}`);
 
-        // First, find addresses with this phone number
-        const { data: matchingAddresses, error: addrError } = await supabase
-            .from('addresses')
-            .select('id')
-            .ilike('phone', `%${sender}%`);
+        // Try multiple phone number variations for better matching
+        const phoneVariations = [
+            sender,                                    // 918239269217
+            sender.substring(2),                       // 8239269217 (without 91)
+            sender.substring(0, 2) + ' ' + sender.substring(2), // 91 8239269217
+        ];
 
-        if (addrError) {
-            console.error(`[Context] Address lookup error:`, addrError);
+        console.log(`[Context] Trying phone variations:`, phoneVariations);
+
+        // First, find addresses with this phone number
+        let matchingAddresses = null;
+        for (const phonePattern of phoneVariations) {
+            const { data, error: addrError } = await supabase
+                .from('addresses')
+                .select('id')
+                .ilike('phone', `%${phonePattern}%`);
+
+            if (addrError) {
+                console.error(`[Context] Address lookup error for ${phonePattern}:`, addrError);
+                continue;
+            }
+
+            if (data && data.length > 0) {
+                console.log(`[Context] Found ${data.length} addresses with pattern: ${phonePattern}`);
+                matchingAddresses = data;
+                break; // Stop on first match
+            }
         }
+
 
         let recentOrders = null;
         let orderError = null;
