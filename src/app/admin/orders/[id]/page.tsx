@@ -387,7 +387,6 @@ export default function OrderDetailPage() {
                                             </div>
                                         </div>
                                     </div>
-                                </>
                             ) : (
                                 <p className="text-sm text-muted-foreground">No address details</p>
                             )}
