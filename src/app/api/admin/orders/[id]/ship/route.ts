@@ -9,22 +9,19 @@ export async function POST(
     try {
         const { id: orderId } = await params;
 
-        // Fetch full order details
+        // Fetch order
         const { data: order, error: orderError } = await supabaseAdmin
             .from('orders')
-            .select(`
-                *,
-                items:order_items(*),
-                shipping_address:addresses(*)
-            `)
+            .select('*')
             .eq('id', orderId)
             .single();
 
         if (orderError || !order) {
+            console.error('[Ship API] Order error:', orderError);
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
-        // Check if already shipped to Shiprocket
+        // Check if already shipped
         if (order.shiprocket_order_id) {
             return NextResponse.json({
                 error: 'Order already synced to Shiprocket',
@@ -32,23 +29,46 @@ export async function POST(
             }, { status: 400 });
         }
 
+        // Fetch shipping address
+        const { data: address, error: addressError } = await supabaseAdmin
+            .from('addresses')
+            .select('*')
+            .eq('id', order.shipping_address_id)
+            .single();
+
+        if (addressError || !address) {
+            console.error('[Ship API] Address error:', addressError);
+            return NextResponse.json({ error: 'Shipping address not found' }, { status: 404 });
+        }
+
+        // Fetch order items
+        const { data: items, error: itemsError } = await supabaseAdmin
+            .from('order_items')
+            .select('*')
+            .eq('order_id', orderId);
+
+        if (itemsError || !items || items.length === 0) {
+            console.error('[Ship API] Items error:', itemsError);
+            return NextResponse.json({ error: 'Order items not found' }, { status: 404 });
+        }
+
         // Prepare Shiprocket order
         const shiprocketOrder = {
             order_id: order.id,
             order_date: new Date().toISOString(),
             pickup_location: "Jhandewalan",
-            billing_customer_name: order.shipping_address.name,
+            billing_customer_name: address.name,
             billing_last_name: "",
-            billing_address: order.shipping_address.address_line1,
-            billing_address_2: order.shipping_address.address_line2 || "",
-            billing_city: order.shipping_address.city,
-            billing_pincode: order.shipping_address.pincode,
-            billing_state: order.shipping_address.state,
+            billing_address: address.address_line1,
+            billing_address_2: address.address_line2 || "",
+            billing_city: address.city,
+            billing_pincode: address.pincode,
+            billing_state: address.state,
             billing_country: "India",
-            billing_email: order.shipping_address.email || order.guest_email || "noreply@abctoyz.in",
-            billing_phone: order.shipping_address.phone,
+            billing_email: address.email || order.guest_email || "noreply@abctoyz.in",
+            billing_phone: address.phone,
             shipping_is_billing: true,
-            order_items: order.items.map((item: any) => ({
+            order_items: items.map((item: any) => ({
                 name: item.product_name,
                 sku: `SKU-${item.product_id}`,
                 units: item.quantity,
@@ -63,7 +83,9 @@ export async function POST(
         };
 
         // Create order in Shiprocket
+        console.log('[Ship API] Creating Shiprocket order:', shiprocketOrder);
         const shiprocketRes = await ShiprocketService.createOrder(shiprocketOrder);
+        console.log('[Ship API] Shiprocket response:', shiprocketRes);
 
         // Update order with Shiprocket ID
         await supabaseAdmin
