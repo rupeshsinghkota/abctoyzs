@@ -196,13 +196,14 @@ export const AuraService = {
             ${context}
             
             # CONTEXTUAL INTELLIGENCE
-            - The User Context contains Order IDs (if any exist for this customer).
-            - **ONLY call \`check_order_status\` if the user explicitly asks about their order** (e.g., "check my order", "where is my order", "order status").
+            - The User Context contains FULL order details (items, status, tracking, payment info).
+            - **You have ALL the information you need to answer questions about orders WITHOUT calling tools.**
+            - ONLY call \`check_order_status\` if you need to refresh/verify real-time tracking updates.
+            - For simple order questions ("What did I order?", "Where is my order?"), use the context directly.
             - **DO NOT call tools for simple greetings** like "Hi", "Hello", "How are you". Just respond warmly.
-            - If the user asks "check my order" (singular) and you see order IDs in context, use the most recent one.
-            - If the user asks "check my orders" (plural), call \`check_order_status\` for each ID in parallel.
-            - When showing products from \`query_inventory\`, format them as a clean numbered list, not JSON.
+            - When showing products from \`query_inventory\`, format them as a clean numbered list with images if available.
             `;
+
 
 
             const genAI = getGemini();

@@ -108,39 +108,88 @@ export async function POST(req: Request) {
             const addressIds = matchingAddresses.map(a => a.id);
             console.log(`[Context] Found ${addressIds.length} matching addresses`);
 
-            // Then fetch orders with those address IDs
+            // Fetch orders with FULL details
             const result = await supabase
                 .from('orders')
                 .select(`
                     id, 
-                    status, 
+                    status,
+                    payment_status,
                     total_amount, 
-                    created_at
+                    created_at,
+                    tracking_id,
+                    shipping_carrier,
+                    payment_method,
+                    user_id
                 `)
                 .in('shipping_address_id', addressIds)
                 .order('created_at', { ascending: false })
-                .limit(3);
+                .limit(5);
 
             recentOrders = result.data;
             orderError = result.error;
+
+            // Fetch order items for all orders
+            if (recentOrders && recentOrders.length > 0) {
+                const orderIds = recentOrders.map(o => o.id);
+                const { data: allItems } = await supabase
+                    .from('order_items')
+                    .select('order_id, product_name, quantity, price')
+                    .in('order_id', orderIds);
+
+                // Attach items to each order
+                recentOrders = recentOrders.map(order => ({
+                    ...order,
+                    items: allItems?.filter(item => item.order_id === order.id) || []
+                }));
+            }
+
+            // Fetch customer profile if user_id exists
+            if (recentOrders && recentOrders.length > 0 && recentOrders[0].user_id) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('full_name, email, phone')
+                    .eq('id', recentOrders[0].user_id)
+                    .single();
+
+                if (profile) {
+                    console.log(`[Context] Found customer profile:`, profile);
+                }
+            }
         }
 
         if (orderError) {
             console.error(`[Context] Order fetch error:`, orderError);
         } else {
             console.log(`[Context] Found ${recentOrders?.length || 0} orders for ${sender}`);
-
         }
 
+        // Build RICH context with full customer data
         let userContext = `
 # USER CONTEXT
 - Phone Number: ${sender}
 - Authentication: WhatsApp User (Mobile Verified)
-${recentOrders && recentOrders.length > 0 ? `- Recent Orders (Use these IDs for tool calls):
-${recentOrders.map((o: any) => `  * Order ID: ${o.id} (Amount: ₹${o.total_amount}, Date: ${new Date(o.created_at).toLocaleDateString()})`).join('\n')}` : "- No recent orders found linked to this phone."}
 `;
 
-        console.log("[Context] User context built:", userContext);
+        if (recentOrders && recentOrders.length > 0) {
+            userContext += `\n## CUSTOMER ORDERS (Full Details)\n`;
+            recentOrders.forEach((order: any) => {
+                const itemsList = order.items.map((i: any) => `${i.quantity}x ${i.product_name} (₹${i.price})`).join(', ');
+                userContext += `
+### Order #${order.id}
+- Date: ${new Date(order.created_at).toLocaleDateString()}
+- Items: ${itemsList || 'N/A'}
+- Total: ₹${order.total_amount}
+- Status: ${order.status}
+- Payment: ${order.payment_status} (${order.payment_method})
+${order.tracking_id ? `- Tracking: ${order.shipping_carrier || 'Courier'} - ${order.tracking_id}` : ''}
+`;
+            });
+        } else {
+            userContext += `\n- No order history found for this number.\n`;
+        }
+
+        console.log("[Context] Rich user context built");
 
 
         // 2. Generate Response
