@@ -14,8 +14,14 @@ function getSupabase() {
     return createClient(supabaseUrl, supabaseKey);
 }
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+
+// Helper to get Gemini Client
+function getGemini() {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("Missing GEMINI_API_KEY");
+    return new GoogleGenerativeAI(apiKey);
+}
 
 const SYSTEM_INSTRUCTION = `
 # ROLE
@@ -183,6 +189,7 @@ export const AuraService = {
             - NEVER guess the status or items. CALL THE TOOL.
             `;
 
+            const genAI = getGemini();
             const model = genAI.getGenerativeModel({
                 model: "gemini-2.0-flash",
                 systemInstruction: SYSTEM_INSTRUCTION + contextInstruction,

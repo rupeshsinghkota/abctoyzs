@@ -6,8 +6,10 @@ export const WhatsAppService = {
      * @param text Message content
      */
     async sendMessage(to: string, text: string) {
+
         const apiKey = process.env.MSG91_AUTH_KEY;
-        const sender = process.env.MSG91_SENDER_NUMBER || "918239269217"; // Integrated number
+        // Support both env var names, default to the known correct number
+        const sender = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "917557777987";
 
         if (!apiKey || !sender) {
             console.error("Missing MSG91 Configuration");
