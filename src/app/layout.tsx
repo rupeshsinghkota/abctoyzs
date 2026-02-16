@@ -88,7 +88,7 @@ export const viewport = {
   themeColor: "#f97316",
 };
 
-import { AuraChat } from "@/components/ui/AuraChat";
+
 
 export default function RootLayout({
   children,
@@ -119,7 +119,6 @@ export default function RootLayout({
         <Footer />
         <BottomNav />
         <WhatsAppButton />
-        <AuraChat />
         <BackToTop />
       </body>
     </html>
