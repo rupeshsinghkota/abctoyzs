@@ -88,13 +88,18 @@ export async function POST(
         // Create order in Shiprocket
         console.log('[Ship API] Creating Shiprocket order:', shiprocketOrder);
         const shiprocketRes = await ShiprocketService.createOrder(shiprocketOrder);
-        console.log('[Ship API] Shiprocket response:', shiprocketRes);
+        console.log('[Ship API] Shiprocket full response:', JSON.stringify(shiprocketRes, null, 2));
 
-        // Extract shipment_id from response
-        const shipmentId = shiprocketRes.shipment_id || null;
+        // Extract shipment_id from response - Shiprocket returns it in shipments array
+        const shipmentId = shiprocketRes.shipments?.[0]?.id || shiprocketRes.shipment_id || null;
+        console.log('[Ship API] Extracted shipment_id:', shipmentId);
+
+        if (!shipmentId) {
+            console.error('[Ship API] Warning: No shipment_id in response');
+        }
 
         // Update order with Shiprocket ID and shipment ID
-        await supabaseAdmin
+        const updateResult = await supabaseAdmin
             .from('orders')
             .update({
                 shiprocket_order_id: shiprocketRes.order_id,
@@ -103,6 +108,8 @@ export async function POST(
                 updated_at: new Date().toISOString()
             })
             .eq('id', order.id);
+
+        console.log('[Ship API] Database update result:', updateResult);
 
         return NextResponse.json({
             success: true,
