@@ -69,18 +69,25 @@ export async function POST(req: Request) {
         const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
 
         // Check if a user exists with this phone number (in 'addresses' link)
-        const { data: recentOrders } = await supabase
+        console.log(`[Context] Fetching orders for phone: ${sender}`);
+
+        const { data: recentOrders, error: orderError } = await supabase
             .from('orders')
             .select(`
                 id, 
                 status, 
                 total_amount, 
-                created_at,
-                shipping_address:addresses!inner(phone)
+                created_at
             `)
-            .ilike('addresses.phone', `%${sender}%`)
+            .or(`customer_phone.ilike.%${sender}%,shipping_phone.ilike.%${sender}%`)
             .order('created_at', { ascending: false })
             .limit(3);
+
+        if (orderError) {
+            console.error(`[Context] Order fetch error:`, orderError);
+        } else {
+            console.log(`[Context] Found ${recentOrders?.length || 0} orders for ${sender}`);
+        }
 
         let userContext = `
 # USER CONTEXT
@@ -90,7 +97,8 @@ ${recentOrders && recentOrders.length > 0 ? `- Recent Orders (Use these IDs for 
 ${recentOrders.map((o: any) => `  * Order ID: ${o.id} (Amount: ₹${o.total_amount}, Date: ${new Date(o.created_at).toLocaleDateString()})`).join('\n')}` : "- No recent orders found linked to this phone."}
 `;
 
-        console.log("Aura WhatsApp Context:", userContext);
+        console.log("[Context] User context built:", userContext);
+
 
         // 2. Generate Response
         // Pass a dummy history for now, or implement history storage (e.g., in Redis/DB)
