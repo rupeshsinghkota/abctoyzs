@@ -60,6 +60,8 @@ export const OrderService = {
     },
 
     async getOrderById(id: string) {
+        if (!id || id === 'undefined' || id === 'null') return null;
+
         const supabase = createClient();
 
         // 1. Fetch the order details
@@ -82,7 +84,7 @@ export const OrderService = {
 
         // 3. Fetch the address manually if shipping_address_id exists
         let shipping_address = null;
-        if (order.shipping_address_id) {
+        if (order.shipping_address_id && order.shipping_address_id !== 'undefined') {
             const { data: address, error: addressError } = await supabase
                 .from('addresses')
                 .select('*')
