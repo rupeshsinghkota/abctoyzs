@@ -147,21 +147,21 @@ Use the reference photo provided for the vehicle.
 --- IMAGE LAYOUT (${format}) ---
 
 ${activeStyle === 'Poster' ? `POSTER LAYOUT:
-- TOP: Small brand logo top-left.
+- TOP: Small brand logo in top-left corner (sized to ~5% of width).
 - MIDDLE: Emotional lifestyle hero scene.
 - BOTTOM: Headline + Price + Specs on a soft dark gradient overlay.` : `MINIMAL LAYOUT:
-- Clean 3-layer system with logo strip, hero zone, and information bar.`}
+- Clean 3-layer system with a SUBTLE logo strip at the top, hero zone in the middle, and information bar at the bottom.`}
 
 --- CONTENT DIRECTIVES ---
 
 LAYER 1 — TOP STRIP:
-- Logo: ABC Toyz brand logo in the top-left corner.
-${numMrp > numPrice ? `- Sale: Small red "SALE" ribbon in top-right.` : ''}
+- Logo: ABC Toyz brand logo in the top-left corner. SCALE: Keep the logo small and elegant, do not let it dominate the design.
+${numMrp > numPrice ? `- Sale: Tiny red "SALE" ribbon in top-right.` : ''}
 
 LAYER 2 — HERO ZONE:
 - Photorealistic scene: ${compositionDesc}
 - ${scenePrompt}
-- The ride-on vehicle integrated perfectly.
+- The ride-on vehicle integrated perfectly. IMPORTANT: Show the WHOLE vehicle. It must be prominent, fully centered, and NO parts of the vehicle should be cropped or cut off by the edges of the image.
 - HUMAN ELEMENT: ${audiencePrompt}
 ${activeScene === 'Birthday Celebration' ? '- Add colorful balloons and confetti for a festive look.' : ''}
 

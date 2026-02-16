@@ -111,21 +111,24 @@ export async function GET(request: NextRequest) {
                 const variantAdData = (variant as any).ad_creatives;
                 const variantAdSets = Array.isArray(variantAdData) ? variantAdData : (variantAdData ? [variantAdData] : []);
 
-                const variantFirstSquare = variantAdSets.length > 0 ? variantAdSets[0].square : null;
-                // CRITICAL: Variants should fall back to product.image (ORIGINAL), not socialImage (which might be a Main Ad Poster with wrong color)
+                // INHERITANCE: If variant has no creatives, use base product creatives
+                const effectiveAdSets = variantAdSets.length > 0 ? variantAdSets : adSets;
+
+                const variantFirstSquare = effectiveAdSets.length > 0 ? effectiveAdSets[0].square : null;
+                // CRITICAL: Variants should fall back to product.image (ORIGINAL), not socialImage
                 const variantImage = variantFirstSquare || variant.image || product.image;
 
-                // Collect variant-specific AI images, grouping squares first
+                // Collect AI images from effective sets
                 let variantSquares: string[] = [];
                 let variantOthers: string[] = [];
 
-                variantAdSets.forEach(set => {
+                effectiveAdSets.forEach(set => {
                     if (set.square && set.square !== variantImage) variantSquares.push(set.square);
                     if (set.story) variantOthers.push(set.story);
                     if (set.landscape) variantOthers.push(set.landscape);
                 });
 
-                // Priority: Variant Squares -> Variant Story/Landscape -> Base Product Assets
+                // Priority: Squares -> Story/Landscape -> Base Product Assets
                 let variantAdditionalImages = [...variantSquares, ...variantOthers, ...(product.images || []).filter(img => img !== variantImage)];
 
                 return {
@@ -133,7 +136,7 @@ export async function GET(request: NextRequest) {
                     id: variant.id,
                     item_group_id: product.id,
                     title: variantTitle,
-                    link: variantLink, // Use specific variant link
+                    link: variantLink,
                     image: variantImage,
                     additional_images: variantAdditionalImages,
                     availability: isVariantInStock ? 'in_stock' : 'out_of_stock',
