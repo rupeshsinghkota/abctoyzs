@@ -180,9 +180,19 @@ ${recentOrders.map(o => `  * Order ID: ${o.id} (Status: ${o.status}, Amount: ₹
             userContext = "\n# USER CONTEXT\n- Authentication: Guest (Not Logged In)";
         }
 
+        console.log("Aura Context:", userContext); // Debug log
+
+        const contextInstruction = `
+        ${userContext}
+        
+        # CONTEXTUAL INTELLIGENCE
+        - If the user asks "check my order" or "status of my order" and there are 'Recent Orders' in the USER CONTEXT, **automatically use the most recent Order ID** for the \`check_order_status\` tool. Do NOT ask for the ID again.
+        - Only ask for an Order ID if the user is a Guest or if they have no recent orders.
+        `;
+
         const model = genAI.getGenerativeModel({
             model: "gemini-2.0-flash", // Using a faster model for chat
-            systemInstruction: SYSTEM_INSTRUCTION + userContext, // Inject context
+            systemInstruction: SYSTEM_INSTRUCTION + contextInstruction, // Inject context
             tools: tools as any
         });
 
