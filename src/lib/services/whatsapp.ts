@@ -19,12 +19,8 @@ export const WhatsAppService = {
         const payload = {
             integrated_number: sender,
             content_type: "text",
-            payload: {
-                text: text
-            },
-            recipient: {
-                number: to
-            }
+            text: text,
+            recipient_number: to
         };
 
         try {
