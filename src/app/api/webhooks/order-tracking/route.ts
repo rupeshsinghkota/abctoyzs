@@ -100,16 +100,30 @@ export async function POST(req: NextRequest) {
                     const { WhatsAppService } = await import('@/lib/services/whatsapp');
 
                     const trackingLink = tracking_url || `https://shiprocket.co/tracking/${awb}`;
-                    const message = `🚚 *Great News!* Your order has been shipped!\n\n` +
-                        `📦 *Order ID:* ${order.id}\n` +
-                        `🚛 *Courier:* ${courier_name}\n` +
-                        `📝 *AWB:* ${awb}\n` +
-                        `📍 *Track Order:* ${trackingLink}\n\n` +
-                        `${etd ? `📅 *Expected Delivery:* ${etd}\n\n` : ''}` +
-                        `Thank you for shopping with us! 🎉`;
 
-                    await WhatsAppService.sendMessage(address.phone, message);
-                    console.log('[Shiprocket Webhook] Tracking notification sent to:', address.phone);
+                    // Use Template if ID is configured, otherwise fallback to text
+                    const templateId = process.env.MSG91_SHIPPED_TEMPLATE_ID;
+
+                    if (templateId) {
+                        await WhatsAppService.sendTemplateMessage(address.phone, templateId, {
+                            "1": address.name || "Customer",
+                            "2": order.id,
+                            "3": courier_name || "Courier",
+                            "4": trackingLink
+                        });
+                        console.log('[Shiprocket Webhook] Template tracking notification sent to:', address.phone);
+                    } else {
+                        const message = `🚚 *Great News!* Your order has been shipped!\n\n` +
+                            `📦 *Order ID:* ${order.id}\n` +
+                            `🚛 *Courier:* ${courier_name}\n` +
+                            `📝 *AWB:* ${awb}\n` +
+                            `📍 *Track Order:* ${trackingLink}\n\n` +
+                            `${etd ? `📅 *Expected Delivery:* ${etd}\n\n` : ''}` +
+                            `Thank you for shopping with us! 🎉`;
+
+                        await WhatsAppService.sendMessage(address.phone, message);
+                        console.log('[Shiprocket Webhook] Text tracking notification sent to:', address.phone);
+                    }
                 }
             } catch (whatsappError) {
                 console.error('[Shiprocket Webhook] WhatsApp notification error:', whatsappError);

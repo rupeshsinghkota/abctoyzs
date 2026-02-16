@@ -51,6 +51,57 @@ export const WhatsAppService = {
     },
 
     /**
+     * Sends a WhatsApp template message via MSG91 API.
+     * @param to Recipient phone number (with country code)
+     * @param templateId The MSG91 Template ID (Flow ID)
+     * @param variables Object containing template variables { "1": "Value", "2": "Value" }
+     */
+    async sendTemplateMessage(to: string, templateId: string, variables: Record<string, string>) {
+        const apiKey = process.env.MSG91_AUTH_KEY;
+        const sender = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "918239269217";
+
+        if (!apiKey || !sender) {
+            console.error("Missing MSG91 Configuration");
+            return;
+        }
+
+        const url = "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/";
+
+        const payload = {
+            integrated_number: sender,
+            content_type: "template",
+            template_id: templateId,
+            recipient_number: to,
+            variables: variables
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "authkey": apiKey,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`MSG91 Template Error (${response.status}):`, errorText);
+                throw new Error(`Failed to send template message: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log("MSG91 Template Response:", data);
+            return data;
+
+        } catch (error) {
+            console.error("WhatsApp Template Service Error:", error);
+        }
+    },
+
+    /**
      * Sends a WhatsApp media message (image) with caption via MSG91 API.
      * @param to Recipient phone number (with country code)
      * @param imageUrl Public URL of the image
