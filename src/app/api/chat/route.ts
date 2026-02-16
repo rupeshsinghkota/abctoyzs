@@ -109,18 +109,31 @@ async function query_inventory({ category, search_term }: { category?: string, s
 }
 
 async function check_order_status({ order_id }: { order_id: string }) {
-    const { data, error } = await supabase
+    // 1. Fetch Order Details
+    const { data: order, error } = await supabase
         .from('orders')
-        .select('status, tracking_id, shipping_carrier')
+        .select('status, tracking_id, shipping_carrier, total_amount, created_at')
         .eq('id', order_id)
         .single();
 
     if (error) return "Order not found. Please check the ID.";
 
-    let statusMsg = `Status: ${data.status}.`;
-    if (data.tracking_id) {
-        statusMsg += ` Tracking: ${data.shipping_carrier} - ${data.tracking_id}`;
+    // 2. Fetch Order Items for context
+    const { data: items } = await supabase
+        .from('order_items')
+        .select('product_name, quantity')
+        .eq('order_id', order_id);
+
+    const itemSummary = items && items.length > 0
+        ? items.map(i => `${i.quantity}x ${i.product_name}`).join(', ')
+        : 'items';
+
+    let statusMsg = `Order for ${itemSummary} (Total: ₹${order.total_amount}) is currently ${order.status}.`;
+
+    if (order.tracking_id) {
+        statusMsg += ` Tracking: ${order.shipping_carrier || 'Courier'} - ${order.tracking_id}`;
     }
+
     return statusMsg;
 }
 
