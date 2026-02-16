@@ -46,6 +46,10 @@ export default function ShippingModal({ orderId, shiprocketOrderId, onClose, onS
             const courierList = data.couriers?.available_courier_companies || data.couriers || [];
             console.log('[ShippingModal] Extracted couriers:', courierList);
             setCouriers(courierList);
+
+            if (courierList.length === 0) {
+                console.warn('[ShippingModal] No couriers found in response');
+            }
         } catch (error: any) {
             console.error('[ShippingModal] Load error:', error);
             alert(`Failed to load courier options: ${error.message}`);
