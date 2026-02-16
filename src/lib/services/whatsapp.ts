@@ -1,22 +1,19 @@
 
+
 export const WhatsAppService = {
     /**
-     * Sends a WhatsApp message via MSG91 API.
+     * Sends a WhatsApp text message via MSG91 API.
      * @param to Recipient phone number (with country code)
      * @param text Message content
      */
     async sendMessage(to: string, text: string) {
         const apiKey = process.env.MSG91_AUTH_KEY;
-        // Support both env var names, default to the known correct number
         const sender = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "918239269217";
 
         if (!apiKey || !sender) {
             console.error("Missing MSG91 Configuration");
             return;
         }
-
-
-
 
         const url = "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/";
 
@@ -50,7 +47,58 @@ export const WhatsAppService = {
 
         } catch (error) {
             console.error("WhatsApp Service Error:", error);
-            // Don't throw here to avoid crashing the webhook loop, just log
+        }
+    },
+
+    /**
+     * Sends a WhatsApp media message (image) with caption via MSG91 API.
+     * @param to Recipient phone number (with country code)
+     * @param imageUrl Public URL of the image
+     * @param caption Optional caption for the image
+     */
+    async sendMediaMessage(to: string, imageUrl: string, caption: string = "") {
+        const apiKey = process.env.MSG91_AUTH_KEY;
+        const sender = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "918239269217";
+
+        if (!apiKey || !sender) {
+            console.error("Missing MSG91 Configuration");
+            return;
+        }
+
+        const url = "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/";
+
+        const payload = {
+            integrated_number: sender,
+            content_type: "media",
+            type: "image",
+            recipient_number: to,
+            url: imageUrl,
+            caption: caption
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "authkey": apiKey,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`MSG91 Media Error (${response.status}):`, errorText);
+                throw new Error(`Failed to send media message: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log("MSG91 Media Response:", data);
+            return data;
+
+        } catch (error) {
+            console.error("WhatsApp Media Service Error:", error);
         }
     }
 };

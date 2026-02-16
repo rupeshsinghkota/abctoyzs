@@ -68,25 +68,48 @@ export async function POST(req: Request) {
         const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
         const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
 
-        // Check if a user exists with this phone number (in 'addresses' link)
+        // Check if a user exists with this phone number (search in addresses linked to orders)
         console.log(`[Context] Fetching orders for phone: ${sender}`);
 
-        const { data: recentOrders, error: orderError } = await supabase
-            .from('orders')
-            .select(`
-                id, 
-                status, 
-                total_amount, 
-                created_at
-            `)
-            .or(`customer_phone.ilike.%${sender}%,shipping_phone.ilike.%${sender}%`)
-            .order('created_at', { ascending: false })
-            .limit(3);
+        // First, find addresses with this phone number
+        const { data: matchingAddresses, error: addrError } = await supabase
+            .from('addresses')
+            .select('id')
+            .ilike('phone', `%${sender}%`);
+
+        if (addrError) {
+            console.error(`[Context] Address lookup error:`, addrError);
+        }
+
+        let recentOrders = null;
+        let orderError = null;
+
+        if (matchingAddresses && matchingAddresses.length > 0) {
+            const addressIds = matchingAddresses.map(a => a.id);
+            console.log(`[Context] Found ${addressIds.length} matching addresses`);
+
+            // Then fetch orders with those address IDs
+            const result = await supabase
+                .from('orders')
+                .select(`
+                    id, 
+                    status, 
+                    total_amount, 
+                    created_at
+                `)
+                .in('shipping_address_id', addressIds)
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            recentOrders = result.data;
+            orderError = result.error;
+        }
 
         if (orderError) {
             console.error(`[Context] Order fetch error:`, orderError);
         } else {
             console.log(`[Context] Found ${recentOrders?.length || 0} orders for ${sender}`);
+
         }
 
         let userContext = `

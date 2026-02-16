@@ -111,7 +111,7 @@ const tools = [
 
 async function query_inventory({ category, search_term }: { category?: string, search_term?: string }) {
     const supabase = getSupabase();
-    let query = supabase.from('products').select('name, price:base_price, stock, category');
+    let query = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
 
     if (category) {
         query = query.ilike('category', `%${category}%`);
@@ -127,7 +127,14 @@ async function query_inventory({ category, search_term }: { category?: string, s
     if (error) return `Error checking inventory: ${error.message}`;
     if (!data || data.length === 0) return "No stock found matching your criteria.";
 
-    return JSON.stringify(data.map(p => `${p.name}: ₹${p.price} (${p.stock} in stock)`));
+    // Return structured data for AI to process
+    return JSON.stringify(data.map(p => ({
+        name: p.name,
+        price: p.price,
+        stock: p.stock,
+        image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
+        url: `https://abctoyz.in/products/${p.slug}`
+    })));
 }
 
 async function check_order_status({ order_id }: { order_id: string }) {
