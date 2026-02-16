@@ -119,5 +119,144 @@ export const ShiprocketService = {
             console.error('[Shiprocket Serviceability Service Error]:', error);
             throw error;
         }
+    },
+
+    // Get available courier companies for a Shiprocket order
+    async getAvailableCouriers(shiprocketOrderId: string) {
+        try {
+            const token = await this.authenticate();
+            const response = await fetch(`https://apiv2.shiprocket.in/v1/external/courier/assign/awb`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    shipment_id: shiprocketOrderId
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('[Shiprocket Get Couriers Error]:', error);
+                throw new Error('Failed to fetch courier options');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('[Shiprocket Get Couriers Service Error]:', error);
+            throw error;
+        }
+    },
+
+    // Assign courier to shipment (generates AWB)
+    async assignCourier(shipmentId: string, courierId: number) {
+        try {
+            const token = await this.authenticate();
+            const response = await fetch(`https://apiv2.shiprocket.in/v1/external/courier/assign/awb`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    shipment_id: shipmentId,
+                    courier_id: courierId
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('[Shiprocket Assign Courier Error]:', error);
+                throw new Error('Failed to assign courier');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('[Shiprocket Assign Courier Service Error]:', error);
+            throw error;
+        }
+    },
+
+    // Cancel shipment
+    async cancelShipment(orderId: string) {
+        try {
+            const token = await this.authenticate();
+            const response = await fetch(`https://apiv2.shiprocket.in/v1/external/orders/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    ids: [orderId]
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('[Shiprocket Cancel Error]:', error);
+                throw new Error('Failed to cancel shipment');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('[Shiprocket Cancel Service Error]:', error);
+            throw error;
+        }
+    },
+
+    // Schedule pickup
+    async schedulePickup(shipmentId: string, pickupDate: string) {
+        try {
+            const token = await this.authenticate();
+            const response = await fetch(`https://apiv2.shiprocket.in/v1/external/courier/generate/pickup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    shipment_id: [shipmentId],
+                    pickup_date: pickupDate
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('[Shiprocket Schedule Pickup Error]:', error);
+                throw new Error('Failed to schedule pickup');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('[Shiprocket Schedule Pickup Service Error]:', error);
+            throw error;
+        }
+    },
+
+    // Get shipment details
+    async getShipmentDetails(shiprocketOrderId: string) {
+        try {
+            const token = await this.authenticate();
+            const response = await fetch(`https://apiv2.shiprocket.in/v1/external/orders/show/${shiprocketOrderId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('[Shiprocket Get Shipment Error]:', error);
+                throw new Error('Failed to get shipment details');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('[Shiprocket Get Shipment Service Error]:', error);
+            throw error;
+        }
     }
 };

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import ShippingModal from './ShippingModal';
 
 type Order = {
     id: string;
@@ -20,6 +21,11 @@ type Order = {
     shipping_carrier?: string;
     tracking_id?: string;
     shiprocket_order_id?: string;
+    shipment_id?: string;
+    awb?: string;
+    courier_id?: number;
+    courier_name?: string;
+    pickup_scheduled_date?: string;
     admin_notes?: string;
     created_at: string;
     razorpay_order_id?: string;
@@ -43,6 +49,7 @@ export default function OrderDetailPage() {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [showShippingModal, setShowShippingModal] = useState(false);
 
     useEffect(() => {
         loadOrder();
@@ -106,11 +113,38 @@ export default function OrderDetailPage() {
 
             const { shiprocket_order_id } = await response.json();
             setOrder({ ...order, shiprocket_order_id, shipping_carrier: 'Shiprocket' });
-            alert('✅ Order shipped to Shiprocket successfully!');
+
+            // Open modal for courier selection
+            setShowShippingModal(true);
             await loadOrder(); // Reload to get latest data
         } catch (error: any) {
             console.error('Ship error:', error);
             alert(`Failed to ship: ${error.message}`);
+        } finally {
+            setUpdating(false);
+        }
+    }
+
+    async function cancelShipment() {
+        if (!order || !order.shiprocket_order_id) return;
+        if (!confirm('Are you sure you want to cancel this shipment?')) return;
+
+        setUpdating(true);
+        try {
+            const response = await fetch(`/api/admin/orders/${order.id}/ship/cancel`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                const { error } = await response.json();
+                throw new Error(error || 'Failed to cancel shipment');
+            }
+
+            alert('✅ Shipment cancelled successfully!');
+            await loadOrder();
+        } catch (error: any) {
+            console.error('Cancel error:', error);
+            alert(`Failed to cancel: ${error.message}`);
         } finally {
             setUpdating(false);
         }
@@ -312,9 +346,50 @@ export default function OrderDetailPage() {
                             ) : null}
 
                             {order.shiprocket_order_id && (
-                                <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg text-xs font-medium flex items-center gap-2">
-                                    <Package className="w-4 h-4" />
-                                    Linked to Shiprocket ID: {order.shiprocket_order_id}
+                                <div className="space-y-3">
+                                    <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Package className="w-4 h-4" />
+                                            <span>Shiprocket ID: {order.shiprocket_order_id}</span>
+                                        </div>
+                                        {order.awb && (
+                                            <span className="text-xs bg-blue-100 px-2 py-1 rounded">AWB: {order.awb}</span>
+                                        )}
+                                    </div>
+
+                                    {order.courier_name && (
+                                        <div className="text-sm text-gray-600 flex items-center gap-2">
+                                            <Truck className="w-4 h-4" />
+                                            Courier: <span className="font-semibold">{order.courier_name}</span>
+                                        </div>
+                                    )}
+
+                                    {order.pickup_scheduled_date && (
+                                        <div className="text-sm text-gray-600 flex items-center gap-2">
+                                            <Calendar className="w-4 h-4" />
+                                            Pickup: <span className="font-semibold">{new Date(order.pickup_scheduled_date).toLocaleDateString()}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Action Buttons */}
+                                    <div className="flex gap-2 pt-2">
+                                        {!order.awb && (
+                                            <button
+                                                onClick={() => setShowShippingModal(true)}
+                                                disabled={updating}
+                                                className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-semibold rounded-lg transition-colors"
+                                            >
+                                                Assign Courier
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={cancelShipment}
+                                            disabled={updating || order.status === 'cancelled'}
+                                            className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white text-sm font-semibold rounded-lg transition-colors"
+                                        >
+                                            Cancel Shipment
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -389,6 +464,19 @@ export default function OrderDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Shipping Modal */}
+            {showShippingModal && order?.shiprocket_order_id && (
+                <ShippingModal
+                    orderId={order.id}
+                    shiprocketOrderId={order.shiprocket_order_id}
+                    onClose={() => setShowShippingModal(false)}
+                    onSuccess={() => {
+                        setShowShippingModal(false);
+                        loadOrder();
+                    }}
+                />
+            )}
         </div>
     );
 }
