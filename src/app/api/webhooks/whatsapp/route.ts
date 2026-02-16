@@ -36,12 +36,34 @@ export async function POST(req: Request) {
 
 
         if (!sender || !messageText) {
-            console.warn("Invalid Webhook Payload: Missing sender or message");
-            return NextResponse.json({ status: "ignored", reason: "missing_fields" });
+            console.log("[WhatsApp] Ignored: Missing sender or message.");
+            return NextResponse.json({ status: "ignored" });
         }
 
-        // Clean sender number (remove + or spaces)
+        // Normalize sender (remove non-digits)
         sender = sender.replace(/\D/g, "");
+
+        console.log(`[WhatsApp] Processing message from ${sender}: "${messageText}"`);
+
+        // DEDUPLICATION: Check if we processed this exact message recently (within 2 minutes)
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+        const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
+
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+        const { data: recentMessages } = await supabase
+            .from('whatsapp_conversations')
+            .select('message, created_at')
+            .eq('phone_number', sender)
+            .eq('role', 'user')
+            .eq('message', messageText)
+            .gte('created_at', twoMinutesAgo)
+            .limit(1);
+
+        if (recentMessages && recentMessages.length > 0) {
+            console.log(`[WhatsApp] DUPLICATE detected: Same message already processed at ${recentMessages[0].created_at}`);
+            return NextResponse.json({ status: "duplicate" });
+        }
 
         // 🛑 MULTI-TENANT FILTER: Ignore messages NOT meant for AbcToyz
         // AbcToyz Number: 918239269217
@@ -247,4 +269,3 @@ ${order.tracking_id ? `- Tracking: ${order.shipping_carrier || 'Courier'} - ${or
 export async function GET(req: Request) {
     return NextResponse.json({ status: "Webhook Active", timestamp: new Date().toISOString() });
 }
-
