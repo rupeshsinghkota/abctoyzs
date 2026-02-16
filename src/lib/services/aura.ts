@@ -197,11 +197,26 @@ export const AuraService = {
             ${context}
             
             # CRITICAL: USE CONTEXT FIRST, TOOLS SECOND
-            - The User Context above contains COMPLETE order details: items, quantities, prices, status, tracking, payment info.
+            - The User Context above contains COMPLETE order details: Order IDs, items, quantities, prices, status, tracking, payment info.
+            - **NEVER ask the user for an Order ID.** You already have all Order IDs in the context above (marked with "← USE THIS ID").
             - **NEVER call tools if the answer is already in the User Context above.**
-            - Example: User asks "What did I order?" → Answer from context directly. DO NOT call check_order_status.
-            - Example: User asks "Where is my order?" → Check if tracking info exists in context. If yes, answer directly.
-            - **ONLY call \`check_order_status\` if:** User explicitly asks to "refresh" or "update" status AND you need real-time tracking.
+            
+            ## When User Asks About Delivery/Shipment:
+            1. Identify which order they're asking about (match product name to items in context)
+            2. Find the Order ID for that product
+            3. Check if "Delivery" field has tracking info
+            4. If tracking exists: Provide tracking number and carrier
+            5. If "Tracking not yet assigned": Tell them order is still processing, no tracking yet
+            6. **DO NOT ask for Order ID** - you already know it!
+            
+            ## Examples:
+            - User: "When will 6V scooter reach me?" 
+              → Find order with "6V Scooter" in items → Use that Order ID → Check tracking → Answer directly
+            - User: "Where is my Jeep?" 
+              → Find order with "Jeep" in items → Use that Order ID → Check tracking → Answer directly
+            
+            ## Tool Usage:
+            - **ONLY call \`check_order_status\` if:** User explicitly says "refresh" or "update" AND you need real-time tracking.
             - **ONLY call \`query_inventory\` if:** User asks about products NOT in their order history.
             - For greetings ("Hi", "Hello"), respond warmly WITHOUT any tool calls.
             `;

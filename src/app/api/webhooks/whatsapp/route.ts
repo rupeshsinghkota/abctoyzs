@@ -188,16 +188,23 @@ export async function POST(req: Request) {
 
         if (recentOrders && recentOrders.length > 0) {
             userContext += `\n## CUSTOMER ORDERS (Full Details)\n`;
+            userContext += `**IMPORTANT: These are the customer's Order IDs. Use them directly when customer asks about shipment/delivery.**\n\n`;
+
             recentOrders.forEach((order: any) => {
                 const itemsList = order.items.map((i: any) => `${i.quantity}x ${i.product_name} (₹${i.price})`).join(', ');
+                const deliveryInfo = order.tracking_id
+                    ? `Tracking: ${order.shipping_carrier || 'Courier'} - ${order.tracking_id}`
+                    : 'Tracking not yet assigned. Still in processing.';
+
                 userContext += `
 ### Order #${order.id}
+- **Order ID:** ${order.id} ← USE THIS ID
 - Date: ${new Date(order.created_at).toLocaleDateString()}
 - Items: ${itemsList || 'N/A'}
 - Total: ₹${order.total_amount}
 - Status: ${order.status}
 - Payment: ${order.payment_status} (${order.payment_method})
-${order.tracking_id ? `- Tracking: ${order.shipping_carrier || 'Courier'} - ${order.tracking_id}` : ''}
+- Delivery: ${deliveryInfo}
 `;
             });
         } else {
