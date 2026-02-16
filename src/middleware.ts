@@ -8,6 +8,11 @@ export async function middleware(request: NextRequest) {
         },
     })
 
+    // Skip middleware for webhooks
+    if (request.nextUrl.pathname.startsWith('/api/webhooks')) {
+        return response
+    }
+
     // Refresh the session if it exists
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
