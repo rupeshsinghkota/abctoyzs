@@ -9,7 +9,7 @@ import Link from 'next/link';
 export default function OrderDetailsPage({ params }: { params: { id: string } }) {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
-    const [cancelling, setCancelling] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -20,15 +20,13 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         try {
             const data = await OrderService.getOrderById(params.id);
             if (!data) {
-                // toast.error("Order not found");
-                console.error("Order not found");
-                router.push('/orders');
+                setError("Order not found");
                 return;
             }
             setOrder(data);
-        } catch (error) {
-            console.error(error);
-            // toast.error("Failed to load order");
+        } catch (error: any) {
+            console.error("Order load error:", error);
+            setError(error.message || "Failed to load order");
         } finally {
             setLoading(false);
         }
@@ -38,6 +36,23 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+                <XCircle className="w-12 h-12 text-destructive mb-4" />
+                <h1 className="text-xl font-bold mb-2">Something went wrong</h1>
+                <p className="text-muted-foreground mb-6">{error}</p>
+                <Link
+                    href="/orders"
+                    className="px-6 py-2 bg-primary text-primary-foreground rounded-full font-bold hover:bg-primary/90 transition-colors flex items-center gap-2"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Orders
+                </Link>
             </div>
         );
     }

@@ -62,17 +62,25 @@ export const OrderService = {
     async getOrderById(id: string) {
         const supabase = createClient();
 
-        // 1. Fetch the order first
+        // 1. Fetch the order details
         const { data: order, error } = await supabase
             .from('orders')
-            .select('*, items:order_items(*)')
+            .select('*')
             .eq('id', id)
             .single();
 
         if (error) throw error;
         if (!order) return null;
 
-        // 2. Fetch the address manually if shipping_address_id exists
+        // 2. Fetch items for this order
+        const { data: items, error: itemsError } = await supabase
+            .from('order_items')
+            .select('*')
+            .eq('order_id', id);
+
+        if (itemsError) console.error("Error fetching items:", itemsError);
+
+        // 3. Fetch the address manually if shipping_address_id exists
         let shipping_address = null;
         if (order.shipping_address_id) {
             const { data: address, error: addressError } = await supabase
@@ -86,7 +94,11 @@ export const OrderService = {
             }
         }
 
-        return { ...order, shipping_address } as Order & { shipping_address: any };
+        return {
+            ...order,
+            items: items || [],
+            shipping_address
+        } as Order & { shipping_address: any };
     },
 
     // Create a real order from checkout
