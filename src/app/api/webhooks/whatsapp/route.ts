@@ -36,16 +36,17 @@ export async function POST(req: Request) {
         sender = sender.replace(/\D/g, "");
 
         // 🛑 MULTI-TENANT FILTER: Ignore messages NOT meant for AbcToyz
-        // MSG91 broadcasts to all webhooks. We must only process our own number.
-        const ABCTOYZ_NUMBER = "918239269217";
-        let receiver = body.receiver || body.integratedNumber || body.integrated_number || "";
+        // AbcToyz Number: 918239269217
+        const TARGET_NUMBER = "8239269217"; // Core number
+        let rawReceiver = body.receiver || body.integratedNumber || body.integrated_number || "";
+        const cleanReceiver = typeof rawReceiver === 'string' ? rawReceiver.replace(/\D/g, "") : "";
 
-        // If receiver is present and DOES NOT MATCH our number, ignore it.
-        // (Be careful: If receiver is empty/undefined, we might want to proceed or log warning, but validation below handles it)
-        if (receiver && receiver !== ABCTOYZ_NUMBER) {
-            console.log(`[WhatsApp Webhook] 🛑 Ignoring message for ${receiver}. I am AbcToyz (${ABCTOYZ_NUMBER}).`);
+        // If receiver is present and DOES NOT contain our core number, ignore it.
+        if (cleanReceiver && !cleanReceiver.includes(TARGET_NUMBER)) {
+            console.log(`[WhatsApp Webhook] 🛑 Ignoring message for ${rawReceiver} (Clean: ${cleanReceiver}). I am AbcToyz.`);
             return NextResponse.json({ status: "ignored_cross_tenant" });
         }
+
 
 
         // 1. Get User Context (Try to find user by phone number)
