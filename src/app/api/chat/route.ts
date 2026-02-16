@@ -139,6 +139,8 @@ async function notify_chandan({ reason, customer_phone }: { reason: string, cust
     return "HANDOVER_TRIGGERED";
 }
 
+import { createClient as createServerClient } from "@/lib/supabase/server";
+
 export async function POST(req: Request) {
     if (!process.env.GEMINI_API_KEY) {
         console.error("Missing GEMINI_API_KEY");
@@ -152,9 +154,35 @@ export async function POST(req: Request) {
     try {
         const { message, history } = await req.json();
 
+        // 1. Get User Context
+        const supabaseServer = await createServerClient();
+        const { data: { user } } = await supabaseServer.auth.getUser();
+
+        let userContext = "";
+
+        if (user) {
+            // Fetch recent orders for context using the server client (which has user context)
+            const { data: recentOrders } = await supabaseServer
+                .from('orders')
+                .select('id, status, total_amount, created_at')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            userContext = `
+# USER CONTEXT
+- User ID: ${user.id}
+- Authentication: Logged In
+${recentOrders && recentOrders.length > 0 ? `- Recent Orders:
+${recentOrders.map(o => `  * Order ID: ${o.id} (Status: ${o.status}, Amount: ₹${o.total_amount})`).join('\n')}` : "- No recent orders found."}
+`;
+        } else {
+            userContext = "\n# USER CONTEXT\n- Authentication: Guest (Not Logged In)";
+        }
+
         const model = genAI.getGenerativeModel({
             model: "gemini-2.0-flash", // Using a faster model for chat
-            systemInstruction: SYSTEM_INSTRUCTION,
+            systemInstruction: SYSTEM_INSTRUCTION + userContext, // Inject context
             tools: tools as any
         });
 
