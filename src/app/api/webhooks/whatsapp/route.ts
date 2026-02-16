@@ -30,8 +30,9 @@ export async function POST(req: Request) {
         const payload = Array.isArray(body) ? body[0] : body;
 
         // Extract fields
-        let sender = payload.sender || payload.from || payload.mobile || "";
-        let messageText = payload.message || payload.text?.body || payload.content || "";
+        let sender = payload.sender || payload.from || payload.mobile || payload.customerNumber || "";
+        let messageText = payload.message || payload.text?.body || payload.content || payload.text || "";
+
 
 
         if (!sender || !messageText) {
