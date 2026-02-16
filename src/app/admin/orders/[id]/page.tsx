@@ -351,7 +351,7 @@ export default function OrderDetailPage() {
                         </div>
                         <div className="p-6 space-y-4">
                             {order.shipping_address ? (
-                                <>
+                                {order.shipping_address ? (
                                     <div className="flex items-center gap-3 text-sm">
                                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
                                             {order.shipping_address.name[0]}
