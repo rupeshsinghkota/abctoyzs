@@ -42,8 +42,8 @@ export default function ShippingModal({ orderId, shiprocketOrderId, onClose, onS
             const data = await response.json();
             console.log('[ShippingModal] Received courier data:', data);
 
-            // Shiprocket returns couriers in data.couriers or data.couriers.available_courier_companies
-            const courierList = data.couriers?.available_courier_companies || data.couriers || [];
+            // Shiprocket response: {data: {available_courier_companies: [...]}}
+            const courierList = data.data?.available_courier_companies || data.available_courier_companies || data.couriers?.available_courier_companies || data.couriers || [];
             console.log('[ShippingModal] Extracted couriers:', courierList);
             setCouriers(courierList);
 
