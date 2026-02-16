@@ -52,17 +52,8 @@ export async function POST(
             return NextResponse.json({ error: 'Order items not found' }, { status: 404 });
         }
 
-        // Fetch available pickup locations from Shiprocket
-        let pickupLocation = "Primary"; // Default fallback
-        try {
-            const locations = await ShiprocketService.getPickupLocations();
-            if (locations && locations.length > 0) {
-                pickupLocation = locations[0].pickup_location; // Use first available location
-                console.log('[Ship API] Using pickup location:', pickupLocation);
-            }
-        } catch (locError) {
-            console.warn('[Ship API] Could not fetch pickup locations, using default:', locError);
-        }
+        // Use configured pickup location (Jhandewalan, New Delhi)
+        const pickupLocation = "Jhandewalan"; // As configured in Shiprocket
 
         // Prepare Shiprocket order
         const shiprocketOrder = {
@@ -99,11 +90,15 @@ export async function POST(
         const shiprocketRes = await ShiprocketService.createOrder(shiprocketOrder);
         console.log('[Ship API] Shiprocket response:', shiprocketRes);
 
-        // Update order with Shiprocket ID
+        // Extract shipment_id from response
+        const shipmentId = shiprocketRes.shipment_id || null;
+
+        // Update order with Shiprocket ID and shipment ID
         await supabaseAdmin
             .from('orders')
             .update({
                 shiprocket_order_id: shiprocketRes.order_id,
+                shipment_id: shipmentId,
                 shipping_carrier: 'Shiprocket',
                 updated_at: new Date().toISOString()
             })
@@ -112,6 +107,7 @@ export async function POST(
         return NextResponse.json({
             success: true,
             shiprocket_order_id: shiprocketRes.order_id,
+            shipment_id: shipmentId,
             data: shiprocketRes
         });
 

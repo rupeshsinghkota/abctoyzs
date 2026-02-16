@@ -34,13 +34,16 @@ export default function ShippingModal({ orderId, shiprocketOrderId, onClose, onS
     async function loadCouriers() {
         setLoading(true);
         try {
-            const response = await fetch(`/api/admin/orders/${shiprocketOrderId}/ship/couriers`);
-            if (!response.ok) throw new Error('Failed to load couriers');
+            const response = await fetch(`/api/admin/orders/${orderId}/ship/couriers`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to load couriers');
+            }
             const { couriers } = await response.json();
             setCouriers(couriers.available_courier_companies || []);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('Failed to load courier options');
+            alert(`Failed to load courier options: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -50,7 +53,7 @@ export default function ShippingModal({ orderId, shiprocketOrderId, onClose, onS
         if (!selectedCourier) return;
         setLoading(true);
         try {
-            const response = await fetch(`/api/admin/orders/${shiprocketOrderId}/ship/couriers`, {
+            const response = await fetch(`/api/admin/orders/${orderId}/ship/couriers`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ courier_id: selectedCourier.courier_id })
@@ -128,8 +131,8 @@ export default function ShippingModal({ orderId, shiprocketOrderId, onClose, onS
                                             key={courier.courier_id}
                                             onClick={() => setSelectedCourier(courier)}
                                             className={`w-full p-4 border-2 rounded-lg text-left transition-all hover:shadow-md ${selectedCourier?.courier_id === courier.courier_id
-                                                    ? 'border-blue-600 bg-blue-50'
-                                                    : 'border-gray-200 hover:border-gray-300'
+                                                ? 'border-blue-600 bg-blue-50'
+                                                : 'border-gray-200 hover:border-gray-300'
                                                 }`}
                                         >
                                             <div className="flex justify-between items-start mb-2">
