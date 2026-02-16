@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export type Product = {
     id: string;
@@ -261,7 +262,7 @@ export const AdminService = {
     },
 
     async updateOrderStatus(orderId: string, status: string) {
-        const supabase = createClient();
+        const supabase = supabaseAdmin; // Use admin client to bypass RLS
         const { error } = await supabase
             .from('orders')
             .update({ status, updated_at: new Date().toISOString() })
@@ -271,7 +272,7 @@ export const AdminService = {
     },
 
     async updateOrder(orderId: string, updates: any) {
-        const supabase = createClient();
+        const supabase = supabaseAdmin; // Use admin client to bypass RLS
         const { data, error } = await supabase
             .from('orders')
             .update({ ...updates, updated_at: new Date().toISOString() })
