@@ -96,3 +96,9 @@ ${recentOrders.map((o: any) => `  * Order ID: ${o.id} (Amount: ₹${o.total_amou
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+
+
+export async function GET(req: Request) {
+    return NextResponse.json({ status: "Webhook Active", timestamp: new Date().toISOString() });
+}
+
