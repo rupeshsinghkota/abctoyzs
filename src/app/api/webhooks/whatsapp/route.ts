@@ -195,14 +195,44 @@ ${order.tracking_id ? `- Tracking: ${order.shipping_carrier || 'Courier'} - ${or
         console.log("[Context] Rich user context built");
 
 
-        // 2. Generate Response
-        // Pass a dummy history for now, or implement history storage (e.g., in Redis/DB)
-        const history: any[] = [];
+        // 2. Fetch Conversation History (Last 10 messages for context)
+        const { data: conversationHistory } = await supabase
+            .from('whatsapp_conversations')
+            .select('role, message, created_at')
+            .eq('phone_number', sender)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        // Reverse to get chronological order (oldest first)
+        const history = conversationHistory ? conversationHistory.reverse().map(msg => ({
+            role: msg.role, // 'user' or 'model'
+            parts: [{ text: msg.message }]
+        })) : [];
+
+        console.log(`[Context] Loaded ${history.length} messages from conversation history`);
+
+        // 3. Generate Response
         const response = await AuraService.generateResponse(messageText, history, userContext);
 
-        // 3. Send Reply
+        // 4. Save User Message to History
+        await supabase.from('whatsapp_conversations').insert({
+            phone_number: sender,
+            role: 'user',
+            message: messageText,
+            created_at: new Date().toISOString()
+        });
+
+        // 5. Send Reply
         if (response.text) {
             await WhatsAppService.sendMessage(sender, response.text);
+
+            // 6. Save AI Response to History
+            await supabase.from('whatsapp_conversations').insert({
+                phone_number: sender,
+                role: 'model',
+                message: response.text,
+                created_at: new Date().toISOString()
+            });
         }
 
         return NextResponse.json({ status: "success" });
