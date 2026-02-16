@@ -1,12 +1,15 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Supabase Client (Admin context)
-// Note: We use a service role key here because this runs server-side
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Helper to get Supabase Client
+function getSupabase() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    if (!supabaseUrl || !supabaseKey) {
+        throw new Error("Supabase credentials missing");
+    }
+    return createClient(supabaseUrl, supabaseKey);
+}
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -91,6 +94,7 @@ const tools = [
 // --- Tool Implementations ---
 
 async function query_inventory({ category, search_term }: { category?: string, search_term?: string }) {
+    const supabase = getSupabase();
     let query = supabase.from('products').select('name, price:base_price, stock, category');
 
     if (category) {
@@ -111,6 +115,7 @@ async function query_inventory({ category, search_term }: { category?: string, s
 }
 
 async function check_order_status({ order_id }: { order_id: string }) {
+    const supabase = getSupabase();
     // 1. Fetch Order Details
     const { data: order, error } = await supabase
         .from('orders')
