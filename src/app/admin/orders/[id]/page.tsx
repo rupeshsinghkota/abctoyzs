@@ -396,18 +396,7 @@ export default function OrderDetailPage() {
                 </div>
             </div>
 
-            {/* Shipping Modal */}
-            {showShippingModal && order?.shiprocket_order_id && (
-                <ShippingModal
-                    orderId={order.id}
-                    shiprocketOrderId={order.shiprocket_order_id}
-                    onClose={() => setShowShippingModal(false)}
-                    onSuccess={() => {
-                        setShowShippingModal(false);
-                        loadOrder();
-                    }}
-                />
-            )}
         </div>
+        </div >
     );
 }
