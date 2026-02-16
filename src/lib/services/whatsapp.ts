@@ -151,5 +151,61 @@ export const WhatsAppService = {
         } catch (error) {
             console.error("WhatsApp Media Service Error:", error);
         }
+    },
+
+    /**
+     * Sends a WhatsApp template message with a media header (e.g. image) via MSG91 API.
+     * @param to Recipient phone number (with country code)
+     * @param templateId The MSG91 Template ID (Flow ID)
+     * @param mediaUrl URL of the image to be used as header
+     * @param variables Object containing template variables { "1": "Value", "2": "Value" }
+     */
+    async sendMediaTemplateMessage(to: string, templateId: string, mediaUrl: string, variables: Record<string, string>) {
+        const apiKey = process.env.MSG91_AUTH_KEY;
+        const sender = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "918239269217";
+
+        if (!apiKey || !sender) {
+            console.error("Missing MSG91 Configuration");
+            return;
+        }
+
+        const url = "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/";
+
+        const payload = {
+            integrated_number: sender,
+            content_type: "template",
+            template_id: templateId,
+            recipient_number: to,
+            header: {
+                type: "image",
+                url: mediaUrl
+            },
+            variables: variables
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "authkey": apiKey,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`MSG91 Media Template Error (${response.status}):`, errorText);
+                throw new Error(`Failed to send media template message: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log("MSG91 Media Template Response:", data);
+            return data;
+
+        } catch (error) {
+            console.error("WhatsApp Media Template Service Error:", error);
+        }
     }
 };

@@ -219,6 +219,42 @@ export const PaymentProcessor = {
             // Don't fail the whole payment process just because CAPI failed
         }
 
+        // 7. Send WhatsApp Order Received Notification (Media Template)
+        try {
+            if (order.shipping_address.phone) {
+                const { WhatsAppService } = await import('@/lib/services/whatsapp');
+                const templateId = process.env.MSG91_ORDER_RECEIVED_TEMPLATE_ID || 'order_received';
+
+                // Fetch first item's image for the media template
+                let imageUrl = 'https://abctoyz.in/logo.png'; // Fallback
+                if (order.items.length > 0) {
+                    const { data: product } = await supabaseAdmin
+                        .from('products')
+                        .select('image')
+                        .eq('id', order.items[0].product_id)
+                        .single();
+
+                    if (product?.image) {
+                        imageUrl = product.image;
+                    }
+                }
+
+                await WhatsAppService.sendMediaTemplateMessage(
+                    order.shipping_address.phone,
+                    templateId,
+                    imageUrl,
+                    {
+                        "1": order.shipping_address.name || "Customer",
+                        "2": order.id,
+                        "3": String(order.total_amount)
+                    }
+                );
+                console.log('[PaymentProcessor] WhatsApp Order Received notification sent to:', order.shipping_address.phone);
+            }
+        } catch (waError) {
+            console.error('[PaymentProcessor] WhatsApp Notification Error:', waError);
+        }
+
         // Return credentials only if it's a new user (for auto-login)
         return {
             success: true,
