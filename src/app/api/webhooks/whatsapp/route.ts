@@ -36,14 +36,22 @@ export async function POST(req: Request) {
         sender = sender.replace(/\D/g, "");
 
         // 1. Get User Context (Try to find user by phone number)
-        const supabase = await createServerClient();
+        // Use direct client to avoid cookie issues and leverage known working keys
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+        const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
 
-        // Check if a user exists with this phone number (in 'profiles' or 'users' table if you have one linked to phone)
-        // For now, we'll try to find an order with this phone number to guess context
+        // Check if a user exists with this phone number (in 'addresses' link)
         const { data: recentOrders } = await supabase
             .from('orders')
-            .select('id, status, total_amount, created_at')
-            .eq('shipping_phone', sender) // Assuming 'shipping_phone' in orders table matches
+            .select(`
+                id, 
+                status, 
+                total_amount, 
+                created_at,
+                shipping_address:addresses!inner(phone)
+            `)
+            .ilike('addresses.phone', `%${sender}%`)
             .order('created_at', { ascending: false })
             .limit(3);
 
@@ -52,7 +60,7 @@ export async function POST(req: Request) {
 - Phone Number: ${sender}
 - Authentication: WhatsApp User (Mobile Verified)
 ${recentOrders && recentOrders.length > 0 ? `- Recent Orders (Use these IDs for tool calls):
-${recentOrders.map(o => `  * Order ID: ${o.id} (Amount: ₹${o.total_amount}, Date: ${new Date(o.created_at).toLocaleDateString()})`).join('\n')}` : "- No recent orders found linked to this phone."}
+${recentOrders.map((o: any) => `  * Order ID: ${o.id} (Amount: ₹${o.total_amount}, Date: ${new Date(o.created_at).toLocaleDateString()})`).join('\n')}` : "- No recent orders found linked to this phone."}
 `;
 
         console.log("Aura WhatsApp Context:", userContext);
