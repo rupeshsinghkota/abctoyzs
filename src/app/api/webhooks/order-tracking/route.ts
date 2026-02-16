@@ -4,7 +4,14 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 // Shiprocket Webhook Handler
 export async function POST(req: NextRequest) {
     try {
-        const payload = await req.json();
+        let payload;
+        try {
+            payload = await req.json();
+        } catch (e) {
+            console.log('[Shiprocket Webhook] Received empty or non-JSON payload, returning 200 for validation.');
+            return NextResponse.json({ success: true, message: 'Endpoint validated' });
+        }
+
         console.log('[Shiprocket Webhook] Received:', JSON.stringify(payload, null, 2));
 
         // Extract event data
@@ -20,8 +27,8 @@ export async function POST(req: NextRequest) {
         } = payload;
 
         if (!order_id) {
-            console.error('[Shiprocket Webhook] Missing order_id in payload');
-            return NextResponse.json({ error: 'Missing order_id' }, { status: 400 });
+            console.log('[Shiprocket Webhook] No order_id in payload, likely a test ping.');
+            return NextResponse.json({ success: true, message: 'Test ping received' });
         }
 
         // Find order by shiprocket_order_id
@@ -32,8 +39,12 @@ export async function POST(req: NextRequest) {
             .single();
 
         if (orderError || !order) {
-            console.error('[Shiprocket Webhook] Order not found:', order_id, orderError);
-            return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+            console.warn('[Shiprocket Webhook] Order not found for ID:', order_id);
+            // Return 200 even if order not found to satisfy Shiprocket validation
+            return NextResponse.json({
+                success: true,
+                message: 'Webhook received but order not found in our system'
+            });
         }
 
         console.log('[Shiprocket Webhook] Found order:', order.id);
