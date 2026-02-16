@@ -128,7 +128,7 @@ export const PaymentProcessor = {
                 const shiprocketOrder = {
                     order_id: order.id,
                     order_date: new Date().toISOString(),
-                    pickup_location: "warehouse", // Central Delhi location
+                    pickup_location: "Jhandewalan", // Postcode: 110055
                     billing_customer_name: order.shipping_address.name,
                     billing_last_name: "",
                     billing_address: order.shipping_address.address_line1,

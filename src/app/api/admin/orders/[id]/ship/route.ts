@@ -52,8 +52,7 @@ export async function POST(
             return NextResponse.json({ error: 'Order items not found' }, { status: 404 });
         }
 
-        // Use configured pickup location - "warehouse" in Central Delhi
-        const pickupLocation = "warehouse"; // Matches Shiprocket account (phone: 9155149597)
+        const pickupLocation = "Jhandewalan"; // Matches Shiprocket account nickname
 
         // Prepare Shiprocket order
         const shiprocketOrder = {
