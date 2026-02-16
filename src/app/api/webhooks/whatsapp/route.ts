@@ -74,21 +74,11 @@ export async function POST(req: Request) {
         // If receiver is present and DOES NOT contain our core number, ignore it.
         if (cleanReceiver && !cleanReceiver.includes(TARGET_NUMBER)) {
             console.log(`[WhatsApp Webhook] 🛑 Ignoring message for ${rawReceiver} (Clean: ${cleanReceiver}). I am AbcToyz.`);
-            return NextResponse.json({ status: "ignored_cross_tenant" });
+            return NextResponse.json({ status: "ignored", reason: "wrong_number" });
         }
 
-
-
-
-
-
-
-
-        // 1. Get User Context (Try to find user by phone number)
-        // Use direct client to avoid cookie issues and leverage known working keys
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-        const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
+        // 1. Build Context (Customer Info + Orders)
+        // (Supabase client already initialized above for deduplication)
 
         // Check if a user exists with this phone number (search in addresses linked to orders)
         console.log(`[Context] Fetching orders for phone: ${sender}`);
