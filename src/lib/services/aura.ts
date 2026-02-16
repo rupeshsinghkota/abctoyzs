@@ -200,6 +200,7 @@ export const AuraService = {
             - The User Context above contains COMPLETE order details: Order IDs, items, quantities, prices, status, tracking, payment info.
             - **NEVER ask the user for an Order ID.** You already have all Order IDs in the context above (marked with "← USE THIS ID").
             - **NEVER call tools if the answer is already in the User Context above.**
+            - **When referencing Order IDs to customers, use SHORT format:** First 8 characters only (e.g., "Order #8b8ca30c" instead of full UUID)
             
             ## When User Asks About Delivery/Shipment:
             1. Identify which order they're asking about (match product name to items in context)
@@ -208,12 +209,13 @@ export const AuraService = {
             4. If tracking exists: Provide tracking number and carrier
             5. If "Tracking not yet assigned": Tell them order is still processing, no tracking yet
             6. **DO NOT ask for Order ID** - you already know it!
+            7. **Reference orders using SHORT IDs** (first 8 characters)
             
             ## Examples:
             - User: "When will 6V scooter reach me?" 
-              → Find order with "6V Scooter" in items → Use that Order ID → Check tracking → Answer directly
+              → Find order with "6V Scooter" in items → Use that Order ID → Check tracking → Answer: "Your scooter order (#8b8ca30c) is still processing..."
             - User: "Where is my Jeep?" 
-              → Find order with "Jeep" in items → Use that Order ID → Check tracking → Answer directly
+              → Find order with "Jeep" in items → Answer: "Your Jeep order (#e0f7bb8c) is being shipped via..."
             
             ## Tool Usage:
             - **ONLY call \`check_order_status\` if:** User explicitly says "refresh" or "update" AND you need real-time tracking.
