@@ -45,7 +45,11 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
                 <XCircle className="w-12 h-12 text-destructive mb-4" />
                 <h1 className="text-xl font-bold mb-2">Something went wrong</h1>
-                <p className="text-muted-foreground mb-6">{error}</p>
+                <p className="text-muted-foreground mb-2">{error}</p>
+                <div className="bg-muted p-2 rounded text-xs font-mono mb-6 text-left max-w-sm overflow-auto">
+                    <p>Order ID: {params.id}</p>
+                    <p>Time: {new Date().toISOString()}</p>
+                </div>
                 <Link
                     href="/orders"
                     className="px-6 py-2 bg-primary text-primary-foreground rounded-full font-bold hover:bg-primary/90 transition-colors flex items-center gap-2"
