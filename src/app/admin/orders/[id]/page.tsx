@@ -324,25 +324,27 @@ export default function OrderDetailPage() {
                                 </div>
                             </div>
 
-                            {/* Shiprocket Shipping Button */}
+                            {/* Shiprocket Shipping Section */}
                             {!order.shiprocket_order_id ? (
-                                <button
-                                    onClick={shipToShiprocket}
-                                    disabled={updating}
-                                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
-                                >
-                                    {updating ? (
-                                        <>
-                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                            Shipping to Shiprocket...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Truck className="w-4 h-4" />
-                                            Ship with Shiprocket
-                                        </>
-                                    )}
-                                </button>
+                                <div className="pt-4 border-t">
+                                    <button
+                                        onClick={shipToShiprocket}
+                                        disabled={updating}
+                                        className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        {updating ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                Creating Shiprocket Order...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Truck className="w-4 h-4" />
+                                                Ship with Shiprocket
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             ) : null}
 
                             {order.shiprocket_order_id && (
