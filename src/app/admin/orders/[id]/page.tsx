@@ -71,9 +71,20 @@ export default function OrderDetailPage() {
         if (!order) return;
         setUpdating(true);
         try {
-            await AdminService.updateOrder(order.id, updates);
+            const response = await fetch(`/api/admin/orders/${order.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update order');
+            }
+
+            const { data } = await response.json();
             setOrder({ ...order, ...updates });
         } catch (error) {
+            console.error('Update error:', error);
             alert('Failed to update order');
         } finally {
             setUpdating(false);
