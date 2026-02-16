@@ -140,6 +140,15 @@ async function notify_chandan({ reason, customer_phone }: { reason: string, cust
 }
 
 export async function POST(req: Request) {
+    if (!process.env.GEMINI_API_KEY) {
+        console.error("Missing GEMINI_API_KEY");
+        return NextResponse.json({ error: "Server Configuration Error: Missing AI Credentials" }, { status: 500 });
+    }
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        console.error("Missing SUPABASE_SERVICE_ROLE_KEY");
+        return NextResponse.json({ error: "Server Configuration Error: Missing Database Credentials" }, { status: 500 });
+    }
+
     try {
         const { message, history } = await req.json();
 
@@ -190,8 +199,11 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ response: response.text() });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Chat Error:", error);
-        return NextResponse.json({ error: "Failed to process message" }, { status: 500 });
+        return NextResponse.json({
+            error: error.message || "Failed to process message",
+            details: error.toString()
+        }, { status: 500 });
     }
 }

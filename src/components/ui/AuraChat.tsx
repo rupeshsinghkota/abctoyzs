@@ -54,7 +54,8 @@ export function AuraChat() {
 
             if (data.error) {
                 console.error(data.error);
-                setMessages(prev => [...prev, { role: "model", text: "I'm having trouble accessing the database right now. Please try again." }]);
+                // Show actual error for debugging
+                setMessages(prev => [...prev, { role: "model", text: `Error: ${data.error}` }]);
             } else {
                 setMessages(prev => [...prev, { role: "model", text: data.response }]);
                 if (data.handover) {
@@ -113,8 +114,8 @@ export function AuraChat() {
                             >
                                 <div
                                     className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${msg.role === "user"
-                                            ? "bg-zinc-900 text-white rounded-tr-none"
-                                            : "bg-white border shadow-sm rounded-tl-none text-zinc-800"
+                                        ? "bg-zinc-900 text-white rounded-tr-none"
+                                        : "bg-white border shadow-sm rounded-tl-none text-zinc-800"
                                         }`}
                                 >
                                     {msg.text}
