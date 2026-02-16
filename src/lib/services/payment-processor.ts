@@ -122,13 +122,13 @@ export const PaymentProcessor = {
             }
         }
 
-        // 5. Sync to Shiprocket using Admin Client (for reading updated order if needed, or just proceed)
+        // 5. Sync to Shiprocket - Auto-create order after payment success
         try {
             if (!order.shiprocket_order_id) {
                 const shiprocketOrder = {
                     order_id: order.id,
                     order_date: new Date().toISOString(),
-                    pickup_location: "Jhandewalan",
+                    pickup_location: "warehouse", // Central Delhi location
                     billing_customer_name: order.shipping_address.name,
                     billing_last_name: "",
                     billing_address: order.shipping_address.address_line1,
@@ -149,21 +149,33 @@ export const PaymentProcessor = {
                     payment_method: order.payment_method === 'COD' ? 'COD' : 'Prepaid',
                     // If COD, the collectible amount is Total - 500 (Prepayment)
                     sub_total: order.payment_method === 'COD' ? (order.total_amount - 500) : order.total_amount,
-                    length: 10,
-                    breadth: 10,
-                    height: 10,
-                    weight: 1.0,
+                    length: 100,   // Realistic toy dimensions (cm)
+                    breadth: 60,
+                    height: 50,
+                    weight: 10.0,  // kg
                 };
 
+                console.log('[PaymentProcessor] Creating Shiprocket order:', shiprocketOrder);
                 const shiprocketRes = await ShiprocketService.createOrder(shiprocketOrder);
+                console.log('[PaymentProcessor] Shiprocket response:', shiprocketRes);
+
+                // Extract shipment_id from response
+                const shipmentId = shiprocketRes.shipments?.[0]?.id || shiprocketRes.shipment_id || null;
 
                 await supabaseAdmin
                     .from('orders')
-                    .update({ shiprocket_order_id: shiprocketRes.order_id })
+                    .update({
+                        shiprocket_order_id: shiprocketRes.order_id,
+                        shipment_id: shipmentId,
+                        shipping_carrier: 'Shiprocket'
+                    })
                     .eq('id', order.id);
+
+                console.log('[PaymentProcessor] Order synced to Shiprocket successfully');
             }
         } catch (shipError) {
             console.error('[PaymentProcessor] Shiprocket Sync Error:', shipError);
+            // Don't fail payment if Shiprocket sync fails
         }
 
         // 6. Send Purchase Event to Facebook Conversions API (CAPI)
