@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import ShippingModal from './ShippingModal';
+// ShippingModal removed - orders auto-sync to Shiprocket on payment
 
 type Order = {
     id: string;
@@ -49,7 +49,7 @@ export default function OrderDetailPage() {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
-    const [showShippingModal, setShowShippingModal] = useState(false);
+    // Modal removed - simplified workflow
 
     useEffect(() => {
         loadOrder();
@@ -98,57 +98,7 @@ export default function OrderDetailPage() {
         }
     }
 
-    async function shipToShiprocket() {
-        if (!order || order.shiprocket_order_id) return;
-        setUpdating(true);
-        try {
-            const response = await fetch(`/api/admin/orders/${order.id}/ship`, {
-                method: 'POST'
-            });
-
-            if (!response.ok) {
-                const { error } = await response.json();
-                throw new Error(error || 'Failed to ship order');
-            }
-
-            const { shiprocket_order_id } = await response.json();
-            setOrder({ ...order, shiprocket_order_id, shipping_carrier: 'Shiprocket' });
-
-            // Open modal for courier selection
-            setShowShippingModal(true);
-            await loadOrder(); // Reload to get latest data
-        } catch (error: any) {
-            console.error('Ship error:', error);
-            alert(`Failed to ship: ${error.message}`);
-        } finally {
-            setUpdating(false);
-        }
-    }
-
-    async function cancelShipment() {
-        if (!order || !order.shiprocket_order_id) return;
-        if (!confirm('Are you sure you want to cancel this shipment?')) return;
-
-        setUpdating(true);
-        try {
-            const response = await fetch(`/api/admin/orders/${order.id}/ship/cancel`, {
-                method: 'POST'
-            });
-
-            if (!response.ok) {
-                const { error } = await response.json();
-                throw new Error(error || 'Failed to cancel shipment');
-            }
-
-            alert('✅ Shipment cancelled successfully!');
-            await loadOrder();
-        } catch (error: any) {
-            console.error('Cancel error:', error);
-            alert(`Failed to cancel: ${error.message}`);
-        } finally {
-            setUpdating(false);
-        }
-    }
+    // Manual shipping functions removed - orders auto-sync on payment
 
     if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>;
     if (!order) return <div className="p-8 text-center">Order not found</div>;
@@ -324,73 +274,52 @@ export default function OrderDetailPage() {
                                 </div>
                             </div>
 
-                            {/* Shiprocket Shipping Section */}
-                            {!order.shiprocket_order_id ? (
+                            {/* Shiprocket Tracking Info */}
+                            {order.shiprocket_order_id ? (
                                 <div className="pt-4 border-t">
-                                    <button
-                                        onClick={shipToShiprocket}
-                                        disabled={updating}
-                                        className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
-                                    >
-                                        {updating ? (
-                                            <>
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                Creating Shiprocket Order...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Truck className="w-4 h-4" />
-                                                Ship with Shiprocket
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            ) : null}
-
-                            {order.shiprocket_order_id && (
-                                <div className="space-y-3">
-                                    <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <Package className="w-4 h-4" />
-                                            <span>Shiprocket ID: {order.shiprocket_order_id}</span>
+                                    <div className="bg-blue-50 rounded-lg p-4">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Package className="w-5 h-5 text-blue-600" />
+                                            <h4 className="font-semibold text-blue-900">Shiprocket Tracking</h4>
                                         </div>
-                                        {order.awb && (
-                                            <span className="text-xs bg-blue-100 px-2 py-1 rounded">AWB: {order.awb}</span>
-                                        )}
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-gray-600">Order ID:</span>
+                                                <a
+                                                    href={`https://app.shiprocket.in/seller/orders/details/${order.shiprocket_order_id}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:underline font-medium"
+                                                >
+                                                    {order.shiprocket_order_id}
+                                                </a>
+                                            </div>
+                                            {order.awb && (
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-gray-600">AWB:</span>
+                                                    <span className="font-medium">{order.awb}</span>
+                                                </div>
+                                            )}
+                                            {order.courier_name && (
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-gray-600">Courier:</span>
+                                                    <span className="font-medium">{order.courier_name}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="mt-3 pt-3 border-t border-blue-200">
+                                            <p className="text-xs text-blue-700">
+                                                💡 Manage courier selection and tracking in Shiprocket dashboard
+                                            </p>
+                                        </div>
                                     </div>
-
-                                    {order.courier_name && (
-                                        <div className="text-sm text-gray-600 flex items-center gap-2">
-                                            <Truck className="w-4 h-4" />
-                                            Courier: <span className="font-semibold">{order.courier_name}</span>
-                                        </div>
-                                    )}
-
-                                    {order.pickup_scheduled_date && (
-                                        <div className="text-sm text-gray-600 flex items-center gap-2">
-                                            <Calendar className="w-4 h-4" />
-                                            Pickup: <span className="font-semibold">{new Date(order.pickup_scheduled_date).toLocaleDateString()}</span>
-                                        </div>
-                                    )}
-
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-2 pt-2">
-                                        {!order.awb && (
-                                            <button
-                                                onClick={() => setShowShippingModal(true)}
-                                                disabled={updating}
-                                                className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-semibold rounded-lg transition-colors"
-                                            >
-                                                Assign Courier
-                                            </button>
-                                        )}
-                                        <button
-                                            onClick={cancelShipment}
-                                            disabled={updating || order.status === 'cancelled'}
-                                            className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white text-sm font-semibold rounded-lg transition-colors"
-                                        >
-                                            Cancel Shipment
-                                        </button>
+                                </div>
+                            ) : (
+                                <div className="pt-4 border-t">
+                                    <div className="bg-yellow-50 rounded-lg p-3">
+                                        <p className="text-sm text-yellow-800">
+                                            ℹ️ Order will automatically sync to Shiprocket once payment is confirmed
+                                        </p>
                                     </div>
                                 </div>
                             )}
