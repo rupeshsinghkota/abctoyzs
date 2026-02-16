@@ -39,10 +39,15 @@ export default function ShippingModal({ orderId, shiprocketOrderId, onClose, onS
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to load couriers');
             }
-            const { couriers } = await response.json();
-            setCouriers(couriers.available_courier_companies || []);
+            const data = await response.json();
+            console.log('[ShippingModal] Received courier data:', data);
+
+            // Shiprocket returns couriers in data.couriers or data.couriers.available_courier_companies
+            const courierList = data.couriers?.available_courier_companies || data.couriers || [];
+            console.log('[ShippingModal] Extracted couriers:', courierList);
+            setCouriers(courierList);
         } catch (error: any) {
-            console.error(error);
+            console.error('[ShippingModal] Load error:', error);
             alert(`Failed to load courier options: ${error.message}`);
         } finally {
             setLoading(false);
