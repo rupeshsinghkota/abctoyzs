@@ -196,13 +196,14 @@ export const AuraService = {
             const contextInstruction = `
             ${context}
             
-            # CONTEXTUAL INTELLIGENCE
-            - The User Context contains FULL order details (items, status, tracking, payment info).
-            - **You have ALL the information you need to answer questions about orders WITHOUT calling tools.**
-            - ONLY call \`check_order_status\` if you need to refresh/verify real-time tracking updates.
-            - For simple order questions ("What did I order?", "Where is my order?"), use the context directly.
-            - **DO NOT call tools for simple greetings** like "Hi", "Hello", "How are you". Just respond warmly.
-            - When showing products from \`query_inventory\`, format them as a clean numbered list with images if available.
+            # CRITICAL: USE CONTEXT FIRST, TOOLS SECOND
+            - The User Context above contains COMPLETE order details: items, quantities, prices, status, tracking, payment info.
+            - **NEVER call tools if the answer is already in the User Context above.**
+            - Example: User asks "What did I order?" → Answer from context directly. DO NOT call check_order_status.
+            - Example: User asks "Where is my order?" → Check if tracking info exists in context. If yes, answer directly.
+            - **ONLY call \`check_order_status\` if:** User explicitly asks to "refresh" or "update" status AND you need real-time tracking.
+            - **ONLY call \`query_inventory\` if:** User asks about products NOT in their order history.
+            - For greetings ("Hi", "Hello"), respond warmly WITHOUT any tool calls.
             `;
 
 
