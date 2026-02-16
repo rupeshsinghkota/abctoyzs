@@ -208,24 +208,55 @@ export const AdminService = {
     async getAllOrders() {
         const supabase = createClient();
 
-        // Get all orders with address information
+        // 1. Get all orders
         const { data: orders, error } = await supabase
             .from('orders')
-            .select('*, shipping_address:addresses(*)')
+            .select('*')
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        if (!orders) return [];
+        if (!orders || orders.length === 0) return [];
 
         const orderIds = orders.map(o => o.id);
+
+        // 2. Fetch Items
         const { data: items } = await supabase
             .from('order_items')
             .select('*')
             .in('order_id', orderIds);
 
+        // 3. Fetch Addresses (Manually map since we removed the join)
+        // We need to fetch addresses where id is in the list of orders' shipping_address_id
+        // But wait, the order table usually has a shipping_address column which is JSON? 
+        // OR it has a shipping_address_id FK?
+        // In the previous code: .select('*, shipping_address:addresses(*)') implies a relationship.
+        // Let's assume it's an FK.
+
+        // Let's collect all address IDs
+        // Note: Check if 'shipping_address_id' exists on order. 
+        // Based on previous files, 'orders' table schema was not fully visible but 'OrderService' used 'shipping_address_id'.
+
+        // Optimization: Fetch all addresses for these orders.
+        // There is no easy "where id in (select address_id from orders...)" in one client call easily without join.
+        // So we fetch all relevant addresses.
+
+        const addressIds = orders
+            .map(o => o.shipping_address_id) // Assuming this column exists
+            .filter(id => id); // Filter nulls
+
+        let addresses: any[] = [];
+        if (addressIds.length > 0) {
+            const { data: addrData } = await supabase
+                .from('addresses')
+                .select('*')
+                .in('id', addressIds);
+            addresses = addrData || [];
+        }
+
         return orders.map(order => ({
             ...order,
-            items: items?.filter(item => item.order_id === order.id) || []
+            items: items?.filter(item => item.order_id === order.id) || [],
+            shipping_address: addresses.find(a => a.id === order.shipping_address_id) || null
         }));
     },
 
