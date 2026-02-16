@@ -51,16 +51,13 @@ export async function POST(req: Request) {
 
         // If receiver is present and DOES NOT contain our core number, ignore it.
         if (cleanReceiver && !cleanReceiver.includes(TARGET_NUMBER)) {
-            console.log(`[WhatsApp Webhook] 🛑 WOULD BLOCK message for ${rawReceiver} (Clean: ${cleanReceiver}). But proceeding for DEBUG.`);
-            // return NextResponse.json({ status: "ignored_cross_tenant" }); // DISABLED FOR DEBUGGING
+            console.log(`[WhatsApp Webhook] 🛑 Ignoring message for ${rawReceiver} (Clean: ${cleanReceiver}). I am AbcToyz.`);
+            return NextResponse.json({ status: "ignored_cross_tenant" });
         }
 
-        // DEBUG COMMAND
-        if (messageText.toLowerCase().trim() === "debug") {
-            const debugMsg = `DEBUG INFO:\nSender: ${sender}\nReceiver: ${rawReceiver}\nBodyKeys: ${Object.keys(body).join(",")}`;
-            await WhatsAppService.sendMessage(sender, debugMsg);
-            return NextResponse.json({ status: "debug_replied" });
-        }
+
+
+
 
 
 
