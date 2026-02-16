@@ -91,6 +91,31 @@ export default function OrderDetailPage() {
         }
     }
 
+    async function shipToShiprocket() {
+        if (!order || order.shiprocket_order_id) return;
+        setUpdating(true);
+        try {
+            const response = await fetch(`/api/admin/orders/${order.id}/ship`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                const { error } = await response.json();
+                throw new Error(error || 'Failed to ship order');
+            }
+
+            const { shiprocket_order_id } = await response.json();
+            setOrder({ ...order, shiprocket_order_id, shipping_carrier: 'Shiprocket' });
+            alert('✅ Order shipped to Shiprocket successfully!');
+            await loadOrder(); // Reload to get latest data
+        } catch (error: any) {
+            console.error('Ship error:', error);
+            alert(`Failed to ship: ${error.message}`);
+        } finally {
+            setUpdating(false);
+        }
+    }
+
     if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>;
     if (!order) return <div className="p-8 text-center">Order not found</div>;
 
@@ -264,6 +289,28 @@ export default function OrderDetailPage() {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Shiprocket Shipping Button */}
+                            {!order.shiprocket_order_id ? (
+                                <button
+                                    onClick={shipToShiprocket}
+                                    disabled={updating}
+                                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {updating ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            Shipping to Shiprocket...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Truck className="w-4 h-4" />
+                                            Ship with Shiprocket
+                                        </>
+                                    )}
+                                </button>
+                            ) : null}
+
                             {order.shiprocket_order_id && (
                                 <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg text-xs font-medium flex items-center gap-2">
                                     <Package className="w-4 h-4" />
