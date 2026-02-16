@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { OrderService, Order } from '@/lib/services/orders';
 import { ArrowLeft, MapPin, Package, CreditCard, HelpCircle, Truck, XCircle, Loader2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
-export default function OrderDetailsPage({ params }: { params: { id: string } }) {
+export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -14,11 +15,11 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
 
     useEffect(() => {
         loadOrder();
-    }, [params.id]);
+    }, [id]);
 
     async function loadOrder() {
         try {
-            const data = await OrderService.getOrderById(params.id);
+            const data = await OrderService.getOrderById(id);
             if (!data) {
                 setError("Order not found");
                 return;
@@ -47,7 +48,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 <h1 className="text-xl font-bold mb-2">Something went wrong</h1>
                 <p className="text-muted-foreground mb-2">{error}</p>
                 <div className="bg-muted p-2 rounded text-xs font-mono mb-6 text-left max-w-sm overflow-auto">
-                    <p>Order ID: {params.id}</p>
+                    <p>Order ID: {id}</p>
                     <p>Time: {new Date().toISOString()}</p>
                 </div>
                 <Link
