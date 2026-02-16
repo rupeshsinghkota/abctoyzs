@@ -23,9 +23,11 @@ export async function GET(
         }
 
         console.log('[Couriers API] Fetching couriers for shipment:', order.shipment_id);
-        const couriers = await ShiprocketService.getAvailableCouriers(order.shipment_id);
+        const shiprocketResponse = await ShiprocketService.getAvailableCouriers(order.shipment_id);
+        console.log('[Couriers API] Shiprocket raw response:', JSON.stringify(shiprocketResponse, null, 2));
 
-        return NextResponse.json({ couriers: couriers.data });
+        // Return the entire response so frontend can parse it
+        return NextResponse.json(shiprocketResponse);
     } catch (error: any) {
         console.error('[Admin API] Get couriers error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
