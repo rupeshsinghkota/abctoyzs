@@ -204,33 +204,46 @@ ${recentOrders.map(o => `  * Order ID: ${o.id} (Status: ${o.status}, Amount: ₹
         const response = await result.response;
 
         // Check for function calls
-        const call = response.functionCalls();
-        if (call && call.length > 0) {
-            const functionCall = call[0];
-            const { name, args } = functionCall;
+        const calls = response.functionCalls();
+        if (calls && calls.length > 0) {
 
-            let functionResponse;
+            // Execute ALL function calls
+            const functionResponses = await Promise.all(calls.map(async (call) => {
+                const { name, args } = call;
+                let functionResponse;
 
-            if (name === "query_inventory") functionResponse = await query_inventory(args as any);
-            else if (name === "check_order_status") functionResponse = await check_order_status(args as any);
-            else if (name === "shipping_calculator") functionResponse = await shipping_calculator(args as any);
-            else if (name === "notify_chandan") {
-                await notify_chandan(args as any);
+                if (name === "query_inventory") functionResponse = await query_inventory(args as any);
+                else if (name === "check_order_status") functionResponse = await check_order_status(args as any);
+                else if (name === "shipping_calculator") functionResponse = await shipping_calculator(args as any);
+                else if (name === "notify_chandan") {
+                    await notify_chandan(args as any);
+                    return {
+                        functionResponse: {
+                            name: name,
+                            response: { content: { response: "I've notified our team. Someone will contact you shortly.", handover: true } }
+                        }
+                    };
+                }
+
+                return {
+                    functionResponse: {
+                        name: name,
+                        response: { name: name, content: functionResponse }
+                    }
+                };
+            }));
+
+            // Check if any response triggered a handover
+            const handoverResponse = functionResponses.find(r => (r.functionResponse.response.content as any)?.handover);
+            if (handoverResponse) {
                 return NextResponse.json({
                     response: "I've notified our team. Someone will contact you shortly.",
                     handover: true
                 });
             }
 
-            // Feed the function response back to the model
-            const result2 = await chat.sendMessage([
-                {
-                    functionResponse: {
-                        name: name,
-                        response: { content: functionResponse }
-                    }
-                }
-            ]);
+            // Feed ALL function responses back to the model
+            const result2 = await chat.sendMessage(functionResponses);
             const response2 = await result2.response;
             return NextResponse.json({ response: response2.text() });
         }
