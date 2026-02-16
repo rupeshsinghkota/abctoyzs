@@ -186,8 +186,9 @@ ${recentOrders.map(o => `  * Order ID: ${o.id} (Status: ${o.status}, Amount: ₹
         ${userContext}
         
         # CONTEXTUAL INTELLIGENCE
-        - If the user asks "check my order" or "status of my order" and there are 'Recent Orders' in the USER CONTEXT, **automatically use the most recent Order ID** for the \`check_order_status\` tool. Do NOT ask for the ID again.
-        - Only ask for an Order ID if the user is a Guest or if they have no recent orders.
+        - If the user asks "check my order" (singular) and there are 'Recent Orders', use the **most recent Order ID**.
+        - If the user asks "check my orders" (plural) or "all orders", generate multiple \`check_order_status\` calls for **each** Order ID listed in the USER CONTEXT.
+        - Use the specific Order ID from context, do NOT ask the user for it.
         `;
 
         const model = genAI.getGenerativeModel({
