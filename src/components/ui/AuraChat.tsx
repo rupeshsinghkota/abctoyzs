@@ -36,10 +36,13 @@ export function AuraChat() {
 
         try {
             // Prepare history for API (excluding the last user message we just added locally)
-            const history = messages.map(m => ({
-                role: m.role,
-                parts: [{ text: m.text }]
-            }));
+            // Also exclude the very first message if it's the model's welcome message to avoid "First content should be user" error
+            const history = messages
+                .filter((_, index) => index > 0) // Skip the first message (welcome)
+                .map(m => ({
+                    role: m.role,
+                    parts: [{ text: m.text }]
+                }));
 
             const res = await fetch("/api/chat", {
                 method: "POST",
