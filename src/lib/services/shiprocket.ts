@@ -19,6 +19,31 @@ export const ShiprocketService = {
         return data.token;
     },
 
+    async getPickupLocations() {
+        try {
+            const token = await this.authenticate();
+            const response = await fetch('https://apiv2.shiprocket.in/v1/external/settings/company/pickup', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('[Shiprocket Get Pickup Locations Error]:', error);
+                throw new Error('Failed to fetch pickup locations');
+            }
+
+            const data = await response.json();
+            return data.data?.shipping_address || [];
+        } catch (error) {
+            console.error('[Shiprocket Get Pickup Locations Service Error]:', error);
+            throw error;
+        }
+    },
+
     async createOrder(orderData: any) {
         try {
             const token = await this.authenticate();

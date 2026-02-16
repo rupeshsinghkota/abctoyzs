@@ -52,11 +52,23 @@ export async function POST(
             return NextResponse.json({ error: 'Order items not found' }, { status: 404 });
         }
 
+        // Fetch available pickup locations from Shiprocket
+        let pickupLocation = "Primary"; // Default fallback
+        try {
+            const locations = await ShiprocketService.getPickupLocations();
+            if (locations && locations.length > 0) {
+                pickupLocation = locations[0].pickup_location; // Use first available location
+                console.log('[Ship API] Using pickup location:', pickupLocation);
+            }
+        } catch (locError) {
+            console.warn('[Ship API] Could not fetch pickup locations, using default:', locError);
+        }
+
         // Prepare Shiprocket order
         const shiprocketOrder = {
             order_id: order.id,
             order_date: new Date().toISOString(),
-            pickup_location: "Jhandewalan",
+            pickup_location: pickupLocation,
             billing_customer_name: address.name,
             billing_last_name: "",
             billing_address: address.address_line1,
