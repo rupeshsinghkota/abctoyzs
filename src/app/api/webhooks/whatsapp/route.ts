@@ -35,10 +35,23 @@ export async function POST(req: Request) {
         // Clean sender number (remove + or spaces)
         sender = sender.replace(/\D/g, "");
 
+        // 🛑 MULTI-TENANT FILTER: Ignore messages NOT meant for AbcToyz
+        // MSG91 broadcasts to all webhooks. We must only process our own number.
+        const ABCTOYZ_NUMBER = "918239269217";
+        let receiver = body.receiver || body.integratedNumber || body.integrated_number || "";
+
+        // If receiver is present and DOES NOT MATCH our number, ignore it.
+        // (Be careful: If receiver is empty/undefined, we might want to proceed or log warning, but validation below handles it)
+        if (receiver && receiver !== ABCTOYZ_NUMBER) {
+            console.log(`[WhatsApp Webhook] 🛑 Ignoring message for ${receiver}. I am AbcToyz (${ABCTOYZ_NUMBER}).`);
+            return NextResponse.json({ status: "ignored_cross_tenant" });
+        }
+
+
         // 1. Get User Context (Try to find user by phone number)
         // Use direct client to avoid cookie issues and leverage known working keys
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
         const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
 
         // Check if a user exists with this phone number (in 'addresses' link)
