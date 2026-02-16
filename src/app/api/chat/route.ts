@@ -186,8 +186,8 @@ export async function POST(req: Request) {
 # USER CONTEXT
 - User ID: ${user.id}
 - Authentication: Logged In
-${recentOrders && recentOrders.length > 0 ? `- Recent Orders:
-${recentOrders.map(o => `  * Order ID: ${o.id} (Status: ${o.status}, Amount: ₹${o.total_amount})`).join('\n')}` : "- No recent orders found."}
+${recentOrders && recentOrders.length > 0 ? `- Recent Orders (Use these IDs for tool calls):
+${recentOrders.map(o => `  * Order ID: ${o.id} (Amount: ₹${o.total_amount}, Date: ${new Date(o.created_at).toLocaleDateString()})`).join('\n')}` : "- No recent orders found."}
 `;
         } else {
             userContext = "\n# USER CONTEXT\n- Authentication: Guest (Not Logged In)";
@@ -199,9 +199,11 @@ ${recentOrders.map(o => `  * Order ID: ${o.id} (Status: ${o.status}, Amount: ₹
         ${userContext}
         
         # CONTEXTUAL INTELLIGENCE
-        - If the user asks "check my order" (singular) and there are 'Recent Orders', use the **most recent Order ID**.
-        - If the user asks "check my orders" (plural) or "all orders", generate multiple \`check_order_status\` calls for **each** Order ID listed in the USER CONTEXT.
-        - Use the specific Order ID from context, do NOT ask the user for it.
+        - **CRITICAL:** The User Context only contains Order IDs. It does NOT have current status or item details.
+        - You **MUST** call \`check_order_status\` to answer ANY question about an order.
+        - If the user asks "check my order" (singular), use the most recent Order ID from context.
+        - If the user asks "check my orders" (plural), generate parallel calls for all IDs.
+        - NEVER guess the status or items. CALL THE TOOL.
         `;
 
         const model = genAI.getGenerativeModel({
