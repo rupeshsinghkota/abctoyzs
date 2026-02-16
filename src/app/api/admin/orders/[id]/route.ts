@@ -3,10 +3,10 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const orderId = params.id;
+        const { id: orderId } = await params;
         const updates = await req.json();
 
         // Update order using admin client to bypass RLS
