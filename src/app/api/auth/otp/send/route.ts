@@ -41,8 +41,11 @@ export async function POST(request: Request) {
 
         // Use branded Authentication Template
         // The MSG91 'auth_abctoyz' template expects variable {{1}} for the OTP
+        // We also send 'otp' and 'code' to be safe against different template configs
         waResponse = await WhatsAppService.sendTemplateMessage(cleanPhone, templateId, {
-            "1": otpCode
+            "1": otpCode,
+            "otp": otpCode,
+            "code": otpCode
         });
 
         if (!waResponse) {
