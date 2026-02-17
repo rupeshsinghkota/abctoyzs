@@ -68,10 +68,33 @@ export const WhatsAppService = {
         const url = "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/";
 
         // Convert flat variables object { "1": "val" } to Meta components structure
-        const parameters = Object.keys(variables).map(key => ({
-            type: "text",
-            text: variables[key]
-        }));
+        const components: any[] = [
+            {
+                type: "body",
+                parameters: Object.keys(variables).map(key => ({
+                    type: "text",
+                    text: variables[key]
+                }))
+            }
+        ];
+
+        // If template has OTP/Url button (detected by variable "1" being present and assumed to be OTP)
+        // AND it's likely an auth template.
+        // For safety, we can check if templateId contains 'auth' or just try to add it if "1" is present.
+        // Given the error "Button ... requires parameter", we MUST add it for this template.
+        if (variables["1"]) {
+            components.push({
+                type: "button",
+                sub_type: "url",
+                index: "0",
+                parameters: [
+                    {
+                        type: "text",
+                        text: variables["1"]
+                    }
+                ]
+            });
+        }
 
         const payload = {
             integrated_number: sender,
@@ -86,12 +109,7 @@ export const WhatsAppService = {
                         code: "en",
                         policy: "deterministic"
                     },
-                    components: [
-                        {
-                            type: "body",
-                            parameters: parameters
-                        }
-                    ]
+                    components: components
                 }
             }
         };
