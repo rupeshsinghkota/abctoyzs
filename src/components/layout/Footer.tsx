@@ -155,7 +155,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-white font-medium text-sm">Headquarters</p>
-                                    <p className="text-sm mt-1">Jhandewalan Toy Market, Near Videocon Tower,<br />New Delhi - 110055</p>
+                                    <p className="text-sm mt-1">Shop No 123A, Jhandewalan Toy Market,<br />Near Videocon Tower, New Delhi - 110055</p>
                                 </div>
                             </li>
                             <li className="flex items-start gap-4">

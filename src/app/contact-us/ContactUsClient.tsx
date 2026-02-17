@@ -76,7 +76,7 @@ export default function ContactUsClient() {
                                 <InfoItem
                                     icon={<MapPin className="w-5 h-5" />}
                                     title="Showroom & HQ"
-                                    detail="Jhandewalan Toy Market, Near Videocon Tower, New Delhi - 110055"
+                                    detail="Shop No 123A, Jhandewalan Toy Market, Near Videocon Tower, New Delhi - 110055"
                                     sub=""
                                 />
                                 <InfoItem

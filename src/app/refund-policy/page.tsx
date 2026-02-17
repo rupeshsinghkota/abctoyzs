@@ -179,7 +179,7 @@ export default function RefundPolicy() {
                         <p className="text-zinc-600 leading-relaxed">
                             Email: <Link href="mailto:support@abctoyz.in" className="text-primary hover:underline">support@abctoyz.in</Link><br />
                             WhatsApp: +91 82392 69217<br />
-                            Address: Jhandewalan Toy Market, Near Videocon Tower, New Delhi - 110055
+                            Address: Shop No 123A, Jhandewalan Toy Market, Near Videocon Tower, New Delhi - 110055
                         </p>
                     </section>
                 </div>

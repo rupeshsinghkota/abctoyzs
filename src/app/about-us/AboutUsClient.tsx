@@ -231,7 +231,7 @@ export default function AboutUsClient() {
                             <div className="space-y-4">
                                 <div>
                                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Headquarters</p>
-                                    <p className="font-bold text-zinc-900 text-lg">Jhandewalan Toy Market, New Delhi</p>
+                                    <p className="font-bold text-zinc-900 text-lg">Shop No 123A, Jhandewalan Toy Market, New Delhi</p>
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Core Mission</p>
