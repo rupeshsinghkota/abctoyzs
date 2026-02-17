@@ -130,10 +130,15 @@ export async function POST(request: Request) {
         // 6. Cleanup OTP
         await supabaseAdmin.from('otp_verifications').delete().eq('phone', cleanPhone);
 
+        // 7. Check if we need more details (Onboarding)
+        // If it's a placeholder email, we need a real one.
+        const requireOnboarding = loginEmail.endsWith('@abctoyz.in');
+
         return NextResponse.json({
             success: true,
             session_link: callbackUrl,
-            user: user
+            user: user,
+            require_onboarding: requireOnboarding
         });
 
     } catch (error: any) {

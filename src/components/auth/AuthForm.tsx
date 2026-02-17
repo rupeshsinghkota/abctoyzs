@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, AlertCircle, Phone, ArrowRight, MessageSquare, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type AuthStep = 'phone' | 'otp' | 'loading' | 'success';
+type AuthStep = 'phone' | 'otp' | 'onboarding' | 'loading' | 'success';
 
 export function AuthForm() {
     const [step, setStep] = useState<AuthStep>('phone');
@@ -15,6 +15,12 @@ export function AuthForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [resendTimer, setResendTimer] = useState(0);
+
+    // Onboarding state
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [userId, setUserId] = useState<string | null>(null);
+    const [sessionLink, setSessionLink] = useState<string | null>(null);
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -77,11 +83,56 @@ export function AuthForm() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Invalid code');
 
-            // 1. Redirect to the session link (magic link) to set cookies
+            // 1. Check if onboarding is required
+            if (data.require_onboarding) {
+                setUserId(data.user.id);
+                setSessionLink(data.session_link);
+                setStep('onboarding');
+                setLoading(false);
+                return;
+            }
+
+            // 2. Otherwise, redirect to the session link (magic link) to set cookies
             if (data.session_link) {
                 window.location.href = data.session_link;
             } else {
-                // Fallback: Refresh and redirect
+                router.refresh();
+                router.push(nextUrl);
+            }
+        } catch (err: any) {
+            setError(err.message);
+            setLoading(false);
+        }
+    };
+
+    const handleCompleteOnboarding = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!fullName || !email) {
+            setError('Please provide your name and email');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const res = await fetch('/api/auth/profile/update-auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    fullName,
+                    email
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to update profile');
+
+            // Now that profile is updated, use the original session link to log in
+            if (sessionLink) {
+                window.location.href = sessionLink;
+            } else {
                 router.refresh();
                 router.push(nextUrl);
             }
@@ -218,7 +269,53 @@ export function AuthForm() {
                         </form>
                     )}
 
-                    {/* Step 2: OTP Input */}
+                    {/* Step 3: Onboarding (New User Details) */}
+                    {step === 'onboarding' && (
+                        <form onSubmit={handleCompleteOnboarding} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-black text-zinc-900">Welcome to ABC Toyz!</h3>
+                                <p className="text-sm text-zinc-500 font-medium">Please enter your details to complete your profile.</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Full Name</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full bg-zinc-50 border border-zinc-100 rounded-[1.5rem] px-6 py-5 text-base font-black text-zinc-800 focus:bg-white focus:ring-[6px] focus:ring-primary/5 focus:border-primary transition-all placeholder:text-zinc-300 outline-none"
+                                        placeholder="John Doe"
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Email Address</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        className="w-full bg-zinc-50 border border-zinc-100 rounded-[1.5rem] px-6 py-5 text-base font-black text-zinc-800 focus:bg-white focus:ring-[6px] focus:ring-primary/5 focus:border-primary transition-all placeholder:text-zinc-300 outline-none"
+                                        placeholder="john@example.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading || !fullName || !email}
+                                className="w-full bg-zinc-900 text-white h-16 rounded-[1.5rem] font-black text-base shadow-xl hover:bg-zinc-800 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                            >
+                                {loading ? (
+                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                ) : (
+                                    "Complete Sign Up"
+                                )}
+                            </button>
+                        </form>
+                    )}
                     {step === 'otp' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="flex justify-between gap-2">
