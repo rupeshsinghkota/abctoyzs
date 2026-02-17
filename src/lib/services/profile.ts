@@ -79,20 +79,17 @@ export const ProfileService = {
                 .eq('user_id', user.id);
         }
 
-        // We aren't saving 'email' to address table yet unless column exists.
-        // But for the frontend state to work, we return it.
-        // Let's assume we pass it through.
-        const { email, ...dbAddress } = address;
+        // We pass email to DB now (assuming migration applied)
+        // const { email, ...dbAddress } = address;
 
         const { data, error } = await supabase
             .from('addresses')
-            .insert({ ...dbAddress, user_id: user?.id || null })
+            .insert({ ...address, user_id: user?.id || null })
             .select()
             .single();
 
         if (error) throw error;
-        // Return with email so frontend can use it immediately for the order call
-        return { ...data, email } as Address;
+        return data as Address;
     },
 
     async deleteAddress(id: string) {

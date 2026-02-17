@@ -26,6 +26,7 @@ export default function CheckoutPage() {
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [profile, setProfile] = useState<any>(null);
+    const [guestEmail, setGuestEmail] = useState<string>("");
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
     const [showAddrForm, setShowAddrForm] = useState(false);
 
@@ -54,7 +55,7 @@ export default function CheckoutPage() {
         loadCheckoutData();
     }, []);
 
-    const refreshAddresses = async (newId?: string) => {
+    const refreshAddresses = async (addrOrId?: any) => {
         try {
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
@@ -62,17 +63,32 @@ export default function CheckoutPage() {
             if (user) {
                 const addrList = await ProfileService.getAddresses();
                 setAddresses(addrList);
-            } else if (newId) {
-                // For guest, we fetch just the ONE address we created
-                const { data } = await supabase
-                    .from('addresses')
-                    .select('*')
-                    .eq('id', newId)
-                    .single();
-                if (data) setAddresses([data]);
+                // If it was an object, select it
+                if (typeof addrOrId === 'object' && addrOrId.id) {
+                    setSelectedAddressId(addrOrId.id);
+                } else if (typeof addrOrId === 'string') {
+                    setSelectedAddressId(addrOrId);
+                }
+            } else {
+                // GUEST: Handle new address
+                let newId = typeof addrOrId === 'string' ? addrOrId : addrOrId?.id;
+
+                // If we got an object with email (from addAddress), save it!
+                if (typeof addrOrId === 'object' && addrOrId.email) {
+                    setGuestEmail(addrOrId.email);
+                }
+
+                if (newId) {
+                    const { data } = await supabase
+                        .from('addresses')
+                        .select('*')
+                        .eq('id', newId)
+                        .single();
+                    if (data) setAddresses([data]);
+                    setSelectedAddressId(newId);
+                }
             }
 
-            if (newId) setSelectedAddressId(newId);
             setShowAddrForm(false);
         } catch (error) {
             console.error("Failed to refresh addresses:", error);
@@ -106,7 +122,8 @@ export default function CheckoutPage() {
                     // If user is guest, they MUST have just entered an address.
                     // Wait, if they select an existing address (cookie based guest?), they might not have email.
                     // Let's rely on finding the email in the address object (if we update addAddress to save it) OR profile.
-                    guest_email: addresses.find(a => a.id === selectedAddressId)?.email || profile?.email || "guest@example.com"
+                    // Priority: 1. Profile Email (LoggedIn), 2. Guest Email (from state), 3. Address Email (if somehow there), 4. Fallback
+                    guest_email: profile?.email || guestEmail || addresses.find(a => a.id === selectedAddressId)?.email || "guest@example.com"
                 })
             });
 
@@ -391,7 +408,7 @@ export default function CheckoutPage() {
     );
 }
 
-function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: () => void, onSuccess: (id?: string) => void, showCancel: boolean }) {
+function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: () => void, onSuccess: (addr: any) => void, showCancel: boolean }) {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -410,7 +427,8 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: ()
         setLoading(true);
         try {
             const newAddr = await ProfileService.addAddress(formData);
-            onSuccess(newAddr.id);
+            // newAddr has the email because we returned it in ProfileService (even if not in DB yet)
+            onSuccess(newAddr);
         } catch (error) {
             console.error("Failed to add address:", error);
             alert("Failed to save address. Please check all fields.");
