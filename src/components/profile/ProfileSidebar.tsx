@@ -2,20 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User, Package, MapPin, LogOut, LayoutDashboard, ChevronRight, HelpCircle } from 'lucide-react';
+import { User, Package, MapPin, LogOut, LayoutDashboard, ChevronRight, HelpCircle, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export function ProfileSidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const supabase = createClient();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    // Listen for custom toggle event from headers
     useEffect(() => {
+        setMounted(true);
         const handleToggle = () => setIsDrawerOpen(prev => !prev);
         window.addEventListener('toggle-profile-menu', handleToggle);
         return () => window.removeEventListener('toggle-profile-menu', handleToggle);
@@ -31,7 +33,7 @@ export function ProfileSidebar() {
         if (isDrawerOpen) {
             document.body.style.overflow = 'hidden';
         } else {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = '';
         }
     }, [isDrawerOpen]);
 
@@ -49,58 +51,12 @@ export function ProfileSidebar() {
         router.push('/login');
     };
 
-    return (
-        <>
-            {/* Desktop View: Traditional Sidebar */}
-            <div className="hidden md:block w-64 flex-shrink-0 sticky top-24">
-                <div className="bg-white border border-zinc-100 rounded-3xl p-6 shadow-xl shadow-zinc-200/50">
-                    <div className="flex items-center gap-4 mb-8 px-2">
-                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shadow-inner">
-                            <User className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-[10px] text-zinc-400 uppercase font-black tracking-[0.2em]">Hello,</p>
-                            <p className="font-black text-zinc-900">Customer</p>
-                        </div>
-                    </div>
+    const MobileDrawer = () => {
+        if (!mounted) return null;
 
-                    <nav className="space-y-1.5">
-                        {menuItems.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = pathname === item.href;
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={cn(
-                                        "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all",
-                                        isActive
-                                            ? "bg-zinc-900 text-white shadow-xl shadow-zinc-900/10 active:scale-[0.98]"
-                                            : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
-                                    )}
-                                >
-                                    <Icon className="w-4 h-4" />
-                                    <span className="text-sm font-black tracking-tight">{item.label}</span>
-                                </Link>
-                            );
-                        })}
-
-                        <div className="pt-4 mt-6 border-t border-zinc-100">
-                            <button
-                                onClick={handleLogout}
-                                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-all text-left group"
-                            >
-                                <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                                <span className="text-sm font-black tracking-tight">Log Out</span>
-                            </button>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-
-            {/* Mobile View: Sliding Drawer */}
+        return createPortal(
             <div className={cn(
-                "fixed inset-0 z-[100] md:hidden transition-all duration-500",
+                "fixed inset-0 z-[1000] md:hidden transition-all duration-500",
                 isDrawerOpen ? "visible" : "invisible"
             )}>
                 {/* Backdrop */}
@@ -114,22 +70,32 @@ export function ProfileSidebar() {
 
                 {/* Drawer Content */}
                 <div className={cn(
-                    "absolute top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-zinc-50 shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col",
+                    "absolute top-0 left-0 bottom-0 z-[1001] w-[85%] max-w-[320px] bg-zinc-50 shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col",
                     isDrawerOpen ? "translate-x-0" : "-translate-x-full"
                 )}>
                     {/* Drawer Header */}
                     <div className="bg-[#0A0A0A] p-8 pb-12 relative overflow-hidden">
                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-[60px] rounded-full" />
-                        <div className="relative z-10">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center text-white border border-white/5 mb-4 shadow-xl">
+
+                        <div className="relative z-10 flex items-start justify-between">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center text-white border border-white/5 shadow-xl">
                                 <User className="w-6 h-6" strokeWidth={1.5} />
                             </div>
+                            <button
+                                onClick={() => setIsDrawerOpen(false)}
+                                className="p-2 text-zinc-500 hover:text-white transition-colors"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="mt-4 relative z-10">
                             <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Explorer</p>
                             <h2 className="text-xl font-black text-white tracking-tight">Garage Menu</h2>
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 space-y-6 -mt-6 relative z-10">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-6 -mt-6 relative z-10 pb-20">
                         <div className="bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden shadow-xl shadow-zinc-200/40">
                             {menuItems.map((item, index) => {
                                 const Icon = item.icon;
@@ -197,11 +163,65 @@ export function ProfileSidebar() {
                         </div>
                     </div>
 
-                    <div className="p-8 text-center border-t border-zinc-100 bg-white">
+                    <div className="p-8 text-center border-t border-zinc-100 bg-white mt-auto">
                         <p className="text-[9px] font-black text-zinc-300 uppercase tracking-widest">Abc Toyz Garage v2.0</p>
                     </div>
                 </div>
+            </div>,
+            document.body
+        );
+    };
+
+    return (
+        <>
+            {/* Desktop View: Traditional Sidebar */}
+            <div className="hidden md:block w-64 flex-shrink-0 sticky top-24">
+                <div className="bg-white border border-zinc-100 rounded-3xl p-6 shadow-xl shadow-zinc-200/50">
+                    <div className="flex items-center gap-4 mb-8 px-2">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shadow-inner">
+                            <User className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] text-zinc-400 uppercase font-black tracking-[0.2em]">Hello,</p>
+                            <p className="font-black text-zinc-900">Customer</p>
+                        </div>
+                    </div>
+
+                    <nav className="space-y-1.5">
+                        {menuItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = pathname === item.href;
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all",
+                                        isActive
+                                            ? "bg-zinc-900 text-white shadow-xl shadow-zinc-900/10 active:scale-[0.98]"
+                                            : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
+                                    )}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    <span className="text-sm font-black tracking-tight">{item.label}</span>
+                                </Link>
+                            );
+                        })}
+
+                        <div className="pt-4 mt-6 border-t border-zinc-100">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-all text-left group"
+                            >
+                                <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                                <span className="text-sm font-black tracking-tight">Log Out</span>
+                            </button>
+                        </div>
+                    </nav>
+                </div>
             </div>
+
+            <MobileDrawer />
         </>
     );
 }
