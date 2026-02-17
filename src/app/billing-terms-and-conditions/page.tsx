@@ -34,8 +34,14 @@ export default function BillingTerms() {
                             <h2 className="text-2xl font-semibold text-zinc-800">Secure Payment Processing</h2>
                         </div>
                         <p className="text-zinc-600 leading-relaxed mb-6">
-                            Your security is our top priority. All transactions on <strong>abcToyz</strong> are processed through secure, encrypted payment gateways. We use <strong>SSL (Secure Sockets Layer)</strong> technology to ensure that your personal and payment information is kept safe and private.
+                            Your security is our top priority. All transactions on <strong>abcToyz</strong> are processed through secure, encrypted payment gateways provided by <strong>Razorpay</strong>. We use <strong>SSL (Secure Sockets Layer)</strong> technology to ensure that your personal and payment information is kept safe and private.
                         </p>
+                        <div className="bg-green-50/50 border border-green-100 rounded-lg p-4 flex items-start gap-3">
+                            <Lock className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />
+                            <p className="text-sm text-green-800">
+                                <strong>Data Security Guarantee:</strong> We do not store your credit card or banking details on our servers. All sensitive payment data is handled directly by our PCI-DSS compliant payment partner.
+                            </p>
+                        </div>
                     </section>
 
                     <section className="mb-12">
@@ -85,7 +91,7 @@ export default function BillingTerms() {
                         </div>
                     </section>
 
-                    <section className="mb-12 border-t border-zinc-100 pt-10">
+                    <section className="mb-12">
                         <div className="flex items-center gap-3 mb-6">
                             <CheckCircle2 className="w-6 h-6 text-primary" />
                             <h2 className="text-2xl font-semibold text-zinc-800">Pricing & Taxes</h2>
@@ -93,6 +99,19 @@ export default function BillingTerms() {
                         <p className="text-zinc-600 leading-relaxed">
                             All prices listed on our website are inclusive of GST. There are no hidden charges. The total price you see at checkout is the final price you pay.
                         </p>
+                    </section>
+
+                    <section className="pt-10 border-t border-zinc-100">
+                        <h2 className="text-xl font-bold text-zinc-900 mb-4">Billing Inquiries</h2>
+                        <p className="text-zinc-600 mb-4">
+                            For any queries related to billing, payments, or refunds, please contact our support team.
+                        </p>
+                        <div className="bg-zinc-50 rounded-xl p-6 border border-zinc-100 space-y-2">
+                            <p className="font-bold text-zinc-900">ABC Toyz</p>
+                            <p className="text-sm text-zinc-600">Shop No 123A, Jhandewalan Toy Market, Near Videocon Tower, New Delhi - 110055</p>
+                            <p className="text-sm text-zinc-600">Email: <a href="mailto:support@abctoyz.in" className="text-primary hover:underline">support@abctoyz.in</a></p>
+                            <p className="text-sm text-zinc-600">Phone: +91 82392 69217</p>
+                        </div>
                     </section>
                 </div>
             </div>
