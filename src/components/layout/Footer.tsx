@@ -129,7 +129,7 @@ export function Footer() {
                             <li><FooterLink href="/category/jeeps">Jeeps & SUVs</FooterLink></li>
                             <li><FooterLink href="/category/atvs">ATVs & Buggies</FooterLink></li>
                             <li><FooterLink href="/category/scooters">Electric Scooters</FooterLink></li>
-                            <li><FooterLink href="/category/parts">Spare Parts & Batteries</FooterLink></li>
+
                         </ul>
                     </FooterSection>
 

@@ -25,7 +25,7 @@ export default function Sitemap() {
                 { label: "Jeeps & SUVs", href: "/category/jeeps" },
                 { label: "ATVs & Buggies", href: "/category/atvs" },
                 { label: "Electric Scooters", href: "/category/scooters" },
-                { label: "Spare Parts", href: "/category/parts" },
+
             ]
         },
         {

@@ -30,7 +30,7 @@ const categories = [
     { id: 'utvs', name: 'UTVs', image: '/categories/cat_utv_1769364600471.png', color: 'from-orange-500 to-red-600', link: '/category/utvs' },
     { id: 'gokarts', name: 'Go-Karts', image: '/categories/cat_gokart_1769364617852.png', color: 'from-yellow-500 to-amber-600', link: '/category/gokarts' },
     { id: 'scooters', name: 'Scooters', image: '/categories/cat_scooter_1769364639228.png', color: 'from-cyan-500 to-blue-600', link: '/category/scooters' },
-    { id: 'parts', name: 'Parts', image: '/categories/cat_parts_1769364655385.png', color: 'from-zinc-500 to-slate-600', link: '/category/parts' },
+
 ];
 
 export function Stories() {
