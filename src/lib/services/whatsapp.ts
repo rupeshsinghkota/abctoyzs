@@ -67,10 +67,17 @@ export const WhatsAppService = {
 
         const url = "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/";
 
+        // Convert flat variables object { "1": "val" } to Meta components structure
+        const parameters = Object.keys(variables).map(key => ({
+            type: "text",
+            text: variables[key]
+        }));
+
         const payload = {
             integrated_number: sender,
             content_type: "template",
             payload: {
+                messaging_product: "whatsapp",
                 to: to,
                 type: "template",
                 template: {
@@ -79,7 +86,12 @@ export const WhatsAppService = {
                         code: "en",
                         policy: "deterministic"
                     },
-                    variables: variables
+                    components: [
+                        {
+                            type: "body",
+                            parameters: parameters
+                        }
+                    ]
                 }
             }
         };
