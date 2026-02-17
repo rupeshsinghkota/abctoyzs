@@ -8,8 +8,13 @@ import { cn } from "@/lib/utils";
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data";
 import { useAdmin } from "@/hooks/useAdmin";
 
+import { useStore } from "@/store/useStore";
+
 export function MobileHeader() {
     const { isAdmin } = useAdmin();
+    const cart = useStore((state) => state.cart);
+    const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -267,6 +272,11 @@ export function MobileHeader() {
 
                         <Link href="/cart" className="p-2 hover:bg-secondary/50 rounded-full transition-colors text-foreground/70 hover:text-foreground relative">
                             <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
+                            {cartItemCount > 0 && (
+                                <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center rounded-full ring-2 ring-background">
+                                    {cartItemCount}
+                                </span>
+                            )}
                         </Link>
                     </div>
                 </div>

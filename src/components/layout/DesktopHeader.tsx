@@ -5,8 +5,13 @@ import { Search, ShoppingBag, User, ChevronDown, Lock } from "lucide-react";
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data";
 import { useAdmin } from "@/hooks/useAdmin";
 
+import { useStore } from "@/store/useStore";
+
 export function DesktopHeader() {
     const { isAdmin } = useAdmin();
+    const cart = useStore((state) => state.cart);
+    const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+
     return (
         <div className="w-full shadow-sm">
             {/* Top Bar: Logo, Search, Actions */}
@@ -51,9 +56,11 @@ export function DesktopHeader() {
                         <Link href="/cart" className="flex items-center gap-2 p-2 hover:bg-secondary/50 rounded-full transition-colors text-foreground/70 hover:text-foreground group">
                             <div className="w-9 h-9 rounded-full bg-secondary/50 flex items-center justify-center relative">
                                 <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
-                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center rounded-full ring-2 ring-background">
-                                    0
-                                </span>
+                                {cartItemCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center rounded-full ring-2 ring-background">
+                                        {cartItemCount}
+                                    </span>
+                                )}
                             </div>
                         </Link>
                     </div>
