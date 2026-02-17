@@ -46,15 +46,17 @@ export default function AddressesPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background pb-24">
-            <div className="bg-primary/5 py-12 mb-8">
-                <div className="max-w-6xl mx-auto px-4">
-                    <h1 className="text-3xl font-bold font-heading">Addresses</h1>
-                    <p className="text-muted-foreground mt-2">Manage your shipping addresses for checkout.</p>
+        <div className="min-h-screen bg-zinc-50/50 pb-24">
+            {/* Premium Compact Header */}
+            <div className="bg-zinc-900 pt-16 pb-24 -mb-12 relative overflow-hidden">
+                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay" />
+                <div className="max-w-6xl mx-auto px-6 relative z-10">
+                    <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">Addresses</h1>
+                    <p className="text-zinc-400 font-bold mt-2 text-sm md:text-base">Manage your shipping addresses</p>
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-8">
+            <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-8 relative z-20">
                 <ProfileSidebar />
 
                 <div className="flex-1">

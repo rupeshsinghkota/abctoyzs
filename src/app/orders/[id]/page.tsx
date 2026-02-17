@@ -72,21 +72,24 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     const trackingLink = order.shiprocket_order_id ? `#` : null; // Replace with actual tracking URL pattern if known
 
     return (
-        <div className="min-h-screen pb-24 bg-background">
-            {/* Header */}
-            <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b px-4 py-4 flex items-center gap-4">
-                <Link href="/orders" className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors">
-                    <ArrowLeft className="w-5 h-5" />
-                </Link>
-                <div>
-                    <h1 className="text-lg font-bold">Order #{order.id.slice(0, 8)}</h1>
-                    <p className="text-xs text-muted-foreground">
-                        Placed on {new Date(order.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                    </p>
+        <div className="min-h-screen pb-24 bg-zinc-50/50">
+            {/* Premium Compact Header with Back Button */}
+            <div className="bg-zinc-900 pt-8 pb-16 -mb-8 relative overflow-hidden">
+                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay" />
+                <div className="max-w-3xl mx-auto px-6 relative z-10 flex items-center gap-4">
+                    <Link href="/orders" className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10 backdrop-blur-sm group">
+                        <ArrowLeft className="w-5 h-5 text-white group-hover:-translate-x-1 transition-transform" />
+                    </Link>
+                    <div>
+                        <h1 className="text-xl md:text-2xl font-black text-white tracking-tight">Order #{order.id.slice(0, 8)}</h1>
+                        <p className="text-zinc-400 font-bold text-xs uppercase tracking-widest mt-0.5">
+                            {new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <div className="max-w-3xl mx-auto p-4 space-y-6">
+            <div className="max-w-3xl mx-auto p-4 space-y-6 relative z-20">
 
                 {/* Status Card */}
                 <div className="bg-card border rounded-2xl p-6 shadow-sm">

@@ -29,27 +29,29 @@ export default async function ProfilePage() {
         .single();
 
     return (
-        <div className="min-h-screen bg-background pb-24">
-            <div className="bg-primary/5 py-12 mb-8">
-                <div className="max-w-6xl mx-auto px-4">
-                    <h1 className="text-3xl font-bold font-heading">My Account</h1>
-                    <p className="text-muted-foreground mt-2">Manage your orders, addresses, and details.</p>
+        <div className="min-h-screen bg-zinc-50/50 pb-24">
+            {/* Premium Compact Header */}
+            <div className="bg-zinc-900 pt-16 pb-24 -mb-12 relative overflow-hidden">
+                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay" />
+                <div className="max-w-6xl mx-auto px-6 relative z-10">
+                    <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">My Profile</h1>
+                    <p className="text-zinc-400 font-bold mt-2 text-sm md:text-base">Manage your orders and account settings</p>
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-8">
+            <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-8 relative z-20">
                 <ProfileSidebar />
 
                 <div className="flex-1 space-y-6">
-                    {/* Welcome Card */}
-                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                <UserIcon className="w-8 h-8" />
+                    {/* Welcome Card - Modernized */}
+                    <div className="bg-white border border-zinc-100 rounded-[2rem] p-8 shadow-xl shadow-zinc-200/50 group transition-all">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                            <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shadow-inner group-hover:scale-105 transition-transform">
+                                <UserIcon className="w-10 h-10" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold">Welcome back!</h2>
-                                <p className="text-muted-foreground">{user.email}</p>
+                                <h2 className="text-2xl font-black text-zinc-900 tracking-tight">Active Session</h2>
+                                <p className="text-zinc-500 font-bold mt-1">{user.email}</p>
                             </div>
                         </div>
                     </div>
