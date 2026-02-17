@@ -73,7 +73,10 @@ export default function TermsOfService() {
                     <section className="mb-10 border-t border-zinc-100 pt-10">
                         <h2 className="text-2xl font-semibold text-zinc-800 mb-4">Questions?</h2>
                         <p className="text-zinc-600 leading-relaxed">
-                            If you have any questions about these Terms, please contact us at <Link href="mailto:support@abctoyz.in" className="text-primary hover:underline">support@abctoyz.in</Link>.
+                            If you have any questions about these Terms, please contact us at <Link href="mailto:support@abctoyz.in" className="text-primary hover:underline">support@abctoyz.in</Link> or via mail at:<br /><br />
+                            <strong>ABC Toyz</strong><br />
+                            Shop No 123A, Jhandewalan Toy Market,<br />
+                            Near Videocon Tower, New Delhi - 110055
                         </p>
                     </section>
                 </div>
