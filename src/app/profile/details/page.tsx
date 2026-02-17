@@ -52,8 +52,8 @@ export default function AccountDetailsPage() {
             </div>
 
             {/* Mobile Header: App Bar style */}
-            <div className="md:hidden bg-zinc-900 pt-8 pb-12 px-4 relative overflow-hidden">
-                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay" />
+            <div className="md:hidden bg-[#0A0A0A] pt-10 pb-12 px-4 relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-[60px] rounded-full" />
                 <div className="relative z-10 flex items-center gap-4 pt-4">
                     <Link href="/profile" className="p-2.5 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10 backdrop-blur-sm">
                         <ArrowLeft className="w-5 h-5 text-white" />

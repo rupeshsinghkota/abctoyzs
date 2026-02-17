@@ -74,7 +74,7 @@ export function ProfileSidebar() {
             </div>
 
             {/* Mobile View: High-Fidelity App Menu */}
-            <div className="md:hidden space-y-4">
+            <div className="md:hidden space-y-5">
                 <div className="bg-white border border-zinc-100 rounded-[2rem] overflow-hidden shadow-2xl shadow-zinc-200/60 transition-transform">
                     {menuItems.map((item, index) => {
                         const Icon = item.icon;
@@ -84,17 +84,17 @@ export function ProfileSidebar() {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    "flex items-center justify-between px-6 py-3.5 transition-all active:bg-zinc-50 relative",
+                                    "flex items-center justify-between px-6 py-4.5 transition-all active:scale-[0.98] relative",
                                     index !== menuItems.length - 1 && "border-b border-zinc-50",
                                     isActive && "bg-zinc-50/50"
                                 )}
                             >
                                 <div className="flex items-center gap-4">
                                     <div className={cn(
-                                        "w-10 h-10 rounded-2xl flex items-center justify-center transition-colors",
-                                        isActive ? "bg-primary/10 text-primary" : "bg-zinc-50 text-zinc-400"
+                                        "w-11 h-11 rounded-2xl flex items-center justify-center transition-all",
+                                        isActive ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-zinc-50 text-zinc-400"
                                     )}>
-                                        <Icon className="w-5 h-5" />
+                                        <Icon className="w-[22px] h-[22px]" strokeWidth={1.5} />
                                     </div>
                                     <span className={cn(
                                         "text-[15px] font-black tracking-tight",
@@ -112,17 +112,17 @@ export function ProfileSidebar() {
                     })}
                 </div>
 
-                {/* Support & Exit Group */}
-                <div className="bg-white border border-zinc-100 rounded-[2rem] overflow-hidden shadow-xl shadow-zinc-200/40">
+                {/* Support & Exit Group: Glassmorphism */}
+                <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-[2.5rem] overflow-hidden shadow-xl shadow-zinc-200/30">
                     <a
                         href="https://wa.me/918239269217"
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-between px-6 py-3.5 transition-all active:bg-zinc-50 border-b border-zinc-50"
+                        className="flex items-center justify-between px-6 py-4.5 transition-all active:bg-white/50 border-b border-white/20"
                     >
                         <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
-                                <HelpCircle className="w-5 h-5" />
+                            <div className="w-11 h-11 rounded-2xl bg-green-500/10 text-green-600 flex items-center justify-center border border-green-500/10">
+                                <HelpCircle className="w-[22px] h-[22px]" strokeWidth={1.5} />
                             </div>
                             <span className="text-[15px] font-black tracking-tight text-zinc-900">Support & Help</span>
                         </div>
@@ -131,11 +131,11 @@ export function ProfileSidebar() {
 
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-between px-6 py-3.5 transition-all active:bg-red-50"
+                        className="w-full flex items-center justify-between px-6 py-4.5 transition-all active:bg-red-50/50"
                     >
                         <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center">
-                                <LogOut className="w-5 h-5" />
+                            <div className="w-11 h-11 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center border border-red-500/10">
+                                <LogOut className="w-[22px] h-[22px]" strokeWidth={1.5} />
                             </div>
                             <span className="text-[15px] font-black tracking-tight text-red-500">Sign Out</span>
                         </div>
