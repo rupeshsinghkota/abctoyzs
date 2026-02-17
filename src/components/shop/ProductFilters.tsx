@@ -1,4 +1,6 @@
-'use client';
+"use client";
+
+import { useBackToClose } from '@/hooks/useBackToClose';
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
@@ -42,6 +44,7 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
     const searchParams = useSearchParams();
 
     const [isOpen, setIsOpen] = useState(false);
+    useBackToClose(isOpen, () => setIsOpen(false));
 
     // State for filters
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);

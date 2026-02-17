@@ -9,6 +9,7 @@ import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data
 import { useAdmin } from "@/hooks/useAdmin";
 
 import { useStore } from "@/store/useStore";
+import { useBackToClose } from "@/hooks/useBackToClose";
 
 export function MobileHeader() {
     const { isAdmin } = useAdmin();
@@ -17,6 +18,8 @@ export function MobileHeader() {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+
+    useBackToClose(isMenuOpen, () => setIsMenuOpen(false));
 
     // Accordion state
     const [openSection, setOpenSection] = useState<string | null>("vehicles");

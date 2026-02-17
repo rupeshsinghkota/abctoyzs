@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useBackToClose } from '@/hooks/useBackToClose';
 
 export function ProfileSidebar() {
     const pathname = usePathname();
@@ -15,6 +16,8 @@ export function ProfileSidebar() {
     const supabase = createClient();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+
+    useBackToClose(isDrawerOpen, () => setIsDrawerOpen(false));
 
     useEffect(() => {
         setMounted(true);
