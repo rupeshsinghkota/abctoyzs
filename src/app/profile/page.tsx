@@ -32,7 +32,7 @@ export default async function ProfilePage() {
             </div>
 
             {/* Mobile Header: Profile Summary Card */}
-            <div className="md:hidden bg-zinc-900 pt-8 pb-16 px-6 relative overflow-hidden">
+            <div className="md:hidden bg-zinc-900 pt-6 pb-10 px-6 relative overflow-hidden">
                 <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-zinc-50/50 to-transparent" />
                 <div className="relative z-10 flex items-center gap-4 pt-4">
                     <div className="w-16 h-16 rounded-3xl bg-primary flex items-center justify-center text-white shadow-2xl shadow-primary/40 border-2 border-white/20">

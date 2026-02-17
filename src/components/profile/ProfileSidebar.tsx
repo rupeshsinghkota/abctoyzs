@@ -74,7 +74,7 @@ export function ProfileSidebar() {
             </div>
 
             {/* Mobile View: High-Fidelity App Menu */}
-            <div className="md:hidden space-y-6">
+            <div className="md:hidden space-y-4">
                 <div className="bg-white border border-zinc-100 rounded-[2rem] overflow-hidden shadow-2xl shadow-zinc-200/60 transition-transform">
                     {menuItems.map((item, index) => {
                         const Icon = item.icon;
@@ -84,7 +84,7 @@ export function ProfileSidebar() {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    "flex items-center justify-between px-6 py-5 transition-all active:bg-zinc-50 relative",
+                                    "flex items-center justify-between px-6 py-3.5 transition-all active:bg-zinc-50 relative",
                                     index !== menuItems.length - 1 && "border-b border-zinc-50",
                                     isActive && "bg-zinc-50/50"
                                 )}
@@ -118,7 +118,7 @@ export function ProfileSidebar() {
                         href="https://wa.me/918239269217"
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-between px-6 py-5 transition-all active:bg-zinc-50 border-b border-zinc-50"
+                        className="flex items-center justify-between px-6 py-3.5 transition-all active:bg-zinc-50 border-b border-zinc-50"
                     >
                         <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
@@ -131,7 +131,7 @@ export function ProfileSidebar() {
 
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-between px-6 py-5 transition-all active:bg-red-50"
+                        className="w-full flex items-center justify-between px-6 py-3.5 transition-all active:bg-red-50"
                     >
                         <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center">
