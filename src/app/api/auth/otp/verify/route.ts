@@ -44,19 +44,21 @@ export async function POST(request: Request) {
         let user;
 
         // 3. Check public.profiles for ANY match (10 or 12 digits)
-        const { data: existingProfile, error: profileSearchError } = await supabaseAdmin
+        const { data: allProfiles, error: profileSearchError } = await supabaseAdmin
             .from('profiles')
-            .select('id, email, phone')
-            .or(`phone.eq.${phone10},phone.eq.${phone12},phone.eq.${cleanPhone}`)
-            .order('created_at', { ascending: true }) // Take the oldest one first
-            .limit(1)
-            .single();
+            .select('id, email, phone, created_at')
+            .or(`phone.eq.${phone10},phone.eq.${phone12},phone.eq.${cleanPhone}`);
 
-        if (existingProfile) {
-            // User exists! Get their Auth details
-            const { data: { user: authUser }, error: getAuthError } = await supabaseAdmin.auth.admin.getUserById(existingProfile.id);
-            if (!getAuthError && authUser) {
-                user = authUser;
+        if (allProfiles && allProfiles.length > 0) {
+            // Prioritize: 1. Account with a real email (not @abctoyz.in), 2. Oldest account
+            const prioritizedProfile = allProfiles.find(p => p.email && !p.email.endsWith('@abctoyz.in')) ||
+                allProfiles.sort((a, b) => (a.created_at < b.created_at ? -1 : 1))[0];
+
+            if (prioritizedProfile) {
+                const { data: { user: authUser }, error: getAuthError } = await supabaseAdmin.auth.admin.getUserById(prioritizedProfile.id);
+                if (!getAuthError && authUser) {
+                    user = authUser;
+                }
             }
         }
 
