@@ -41,7 +41,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     const allProducts = await fetchProducts();
 
     let categoryProducts = allProducts;
-    if (slug !== 'new' && slug !== 'all') {
+    if (slug === 'new') {
+        categoryProducts = allProducts.filter(p => p.is_new || p.tag === 'New');
+    } else if (slug !== 'all') {
         categoryProducts = allProducts.filter(p => p.category === slug);
     }
 

@@ -14,7 +14,7 @@ const categories = [
     // Age Categories
     { id: 'toddlers', name: 'Toddlers', image: '/categories/age_toddler.png', color: 'from-pink-400 to-rose-500', link: '/category/age/1-3' },
     { id: 'kids', name: 'Kids', image: '/categories/age_kid.png', color: 'from-blue-400 to-cyan-500', link: '/category/age/3-6' },
-    { id: 'teens', name: 'Teens', image: '/categories/age_teen.png', color: 'from-amber-400 to-orange-500', link: '/category/age/6-12' },
+    { id: 'teens', name: 'Teens', image: '/categories/age_teen.png', color: 'from-amber-400 to-orange-500', link: '/category/age/6-10' },
 
     // Power Categories
     { id: '12v', name: '12V Power', image: '/categories/power_12v.png', color: 'from-yellow-400 to-orange-500', link: '/category/power/12v' },
