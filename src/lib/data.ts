@@ -263,7 +263,23 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
             return processProducts(products); // Return all static products
         }
 
-        return processProducts(data);
+        // Process DB products
+        const processedDBProducts = processProducts(data);
+
+        // If we fetched ALL products (no slug), we should merge with static data to ensure catalog is full
+        if (!slug) {
+            const dbIds = new Set(processedDBProducts.map(p => p.id));
+            const dbSlugs = new Set(processedDBProducts.map(p => p.slug));
+
+            const missingStaticProducts = products.filter(p =>
+                !dbIds.has(p.id) && !dbSlugs.has(p.slug)
+            );
+
+            console.log(`[fetchProducts] Merged ${processedDBProducts.length} DB products with ${missingStaticProducts.length} static products.`);
+            return [...processedDBProducts, ...missingStaticProducts];
+        }
+
+        return processedDBProducts;
 
     } catch (e) {
         console.error("fetchProducts error:", e);

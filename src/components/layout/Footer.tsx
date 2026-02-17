@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 
 export function Footer() {
     const pathname = usePathname();
-    const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+    const [openSections, setOpenSections] = useState<Record<string, boolean>>({ support: true });
     const [email, setEmail] = useState("");
     const [subscribing, setSubscribing] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -139,7 +139,7 @@ export function Footer() {
                             <li><FooterLink href="/track-order">Track My Order</FooterLink></li>
                             <li><FooterLink href="/shipping-policy">Shipping & Delivery</FooterLink></li>
                             <li><FooterLink href="/refund-policy">Returns & Refunds</FooterLink></li>
-                            <li><FooterLink href="/refund-policy">Warranty Policy</FooterLink></li>
+                            <li><FooterLink href="/warranty-policy">Warranty Policy</FooterLink></li>
                             <li><FooterLink href="/billing-terms-and-conditions">Billing Terms & Conditions</FooterLink></li>
                             <li><FooterLink href="/about-us">About Us</FooterLink></li>
                             <li><FooterLink href="/contact-us">Contact Us</FooterLink></li>
