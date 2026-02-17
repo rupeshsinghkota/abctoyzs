@@ -26,15 +26,24 @@ export async function POST(request: Request) {
             userId,
             {
                 email: email,
-                user_metadata: { full_name: fullName },
-                email_confirm: true // Since we trust our verification flow for now
+                user_metadata: {
+                    full_name: fullName,
+                    email_verified: true,
+                    phone_verified: true
+                },
+                email_confirm: true
             }
         );
 
         if (authError) {
             console.error('[UPDATE AUTH] Auth update error:', authError);
-            // We don't fail the whole request if only auth metadata fails, 
-            // as the public profile is more important for the app logic.
+            // If email already exists, we should probably tell the user
+            if (authError.message.toLowerCase().includes('already exists') || authError.message.toLowerCase().includes('unique')) {
+                return NextResponse.json({
+                    error: 'This email is already registered with another account. Please use a different email or contact support.'
+                }, { status: 400 });
+            }
+            // Other auth errors are logged but we might continue if the profile update was critical
         }
 
         return NextResponse.json({ success: true, message: 'Profile updated successfully' });

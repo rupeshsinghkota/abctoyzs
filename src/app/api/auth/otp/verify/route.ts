@@ -50,15 +50,30 @@ export async function POST(request: Request) {
             .or(`phone.eq.${phone10},phone.eq.${phone12},phone.eq.${cleanPhone}`);
 
         if (allProfiles && allProfiles.length > 0) {
-            // Prioritize: 1. Account with a real email (not @abctoyz.in), 2. Oldest account
-            const prioritizedProfile = allProfiles.find(p => p.email && !p.email.endsWith('@abctoyz.in')) ||
-                allProfiles.sort((a, b) => (a.created_at < b.created_at ? -1 : 1))[0];
+            // Fetch Auth details for all candidate profiles to find the most "real" one
+            const authUsersPromises = allProfiles.map(p => supabaseAdmin.auth.admin.getUserById(p.id));
+            const authResults = await Promise.all(authUsersPromises);
 
-            if (prioritizedProfile) {
-                const { data: { user: authUser }, error: getAuthError } = await supabaseAdmin.auth.admin.getUserById(prioritizedProfile.id);
-                if (!getAuthError && authUser) {
-                    user = authUser;
-                }
+            const candidates = allProfiles.map((p, i) => ({
+                profile: p,
+                authUser: authResults[i].data?.user
+            })).filter(c => c.authUser);
+
+            // Prioritize: 
+            // 1. Account with a real email in Auth OR Profile
+            // 2. Account with any email
+            // 3. Oldest account
+            const winner = candidates.find(c =>
+                (c.authUser?.email && !c.authUser.email.endsWith('@abctoyz.in')) ||
+                (c.profile.email && !c.profile.email.endsWith('@abctoyz.in'))
+            ) || candidates.sort((a, b) => {
+                const dateA = new Date(a.profile.created_at || 0).getTime();
+                const dateB = new Date(b.profile.created_at || 0).getTime();
+                return dateA - dateB;
+            })[0];
+
+            if (winner) {
+                user = winner.authUser;
             }
         }
 
