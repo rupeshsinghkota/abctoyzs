@@ -10,12 +10,14 @@ export async function POST(request: Request) {
         }
 
         const cleanPhone = phone.replace(/\D/g, '');
+        const phone10 = cleanPhone.length > 10 ? cleanPhone.slice(-10) : cleanPhone;
+        const phone12 = `91${phone10}`;
 
         // 1. Verify OTP from database
         const { data: verification, error: fetchError } = await supabaseAdmin
             .from('otp_verifications')
             .select('*')
-            .eq('phone', cleanPhone)
+            .or(`phone.eq.${cleanPhone},phone.eq.${phone10},phone.eq.${phone12}`)
             .eq('otp_code', code)
             .single();
 
@@ -38,14 +40,16 @@ export async function POST(request: Request) {
         // We should ensure it has leading + for Supabase Auth consistency if possible, 
         // but here we'll stick to what we have.
 
-        const emailPlaceholder = `${cleanPhone}@abctoyz.in`;
+        const emailPlaceholder = `${phone12}@abctoyz.in`;
         let user;
 
-        // 1. Check public.profiles first to see if this phone is already linked to an existing account (email or guest)
+        // 3. Check public.profiles for ANY match (10 or 12 digits)
         const { data: existingProfile, error: profileSearchError } = await supabaseAdmin
             .from('profiles')
-            .select('id, email')
-            .eq('phone', cleanPhone)
+            .select('id, email, phone')
+            .or(`phone.eq.${phone10},phone.eq.${phone12},phone.eq.${cleanPhone}`)
+            .order('created_at', { ascending: true }) // Take the oldest one first
+            .limit(1)
             .single();
 
         if (existingProfile) {
@@ -57,10 +61,16 @@ export async function POST(request: Request) {
         }
 
         if (!user) {
-            // 2. Fallback: Search all auth users by phone
+            // 4. Fallback: Search all auth users by phone variants
             const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
             if (!listError) {
-                user = users.find(u => u.phone === cleanPhone || u.email === emailPlaceholder || u.user_metadata?.phone === cleanPhone);
+                user = users.find(u =>
+                    u.phone === phone12 ||
+                    u.phone === phone10 ||
+                    u.user_metadata?.phone === phone12 ||
+                    u.user_metadata?.phone === phone10 ||
+                    u.email === emailPlaceholder
+                );
             }
         }
 
