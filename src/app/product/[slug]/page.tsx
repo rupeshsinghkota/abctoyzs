@@ -201,7 +201,8 @@ export default async function ProductPage({ params }: PageProps) {
                                 additionalInfo={{
                                     "Voltage": product.voltage,
                                     "Recommended Age": product.ageGroup,
-                                    "Category": product.category?.charAt(0).toUpperCase() + product.category?.slice(1)
+                                    "Category": product.category?.charAt(0).toUpperCase() + product.category?.slice(1),
+                                    "Safety": "BIS Safety Standard Approved"
                                 }}
                             />
                         </div>

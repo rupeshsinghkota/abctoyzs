@@ -212,6 +212,46 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 </span>
                             </div>
 
+                            {/* GMC Trust Bar - Strategic Placement */}
+                            <div className="grid grid-cols-2 gap-2 bg-zinc-50/50 p-3 rounded-2xl border border-zinc-100">
+                                <div className="flex items-start gap-2">
+                                    <div className="w-5 h-5 bg-white rounded-md shadow-sm border border-zinc-100 flex items-center justify-center shrink-0">
+                                        <Truck className="w-3 h-3 text-primary" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">Fast Dispatch</span>
+                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">Ships in 24-48h</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                    <div className="w-5 h-5 bg-white rounded-md shadow-sm border border-zinc-100 flex items-center justify-center shrink-0">
+                                        <ShieldCheck className="w-3 h-3 text-primary" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">1-Year Warranty</span>
+                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">Battery & Motor</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-2 mt-1">
+                                    <div className="w-5 h-5 bg-white rounded-md shadow-sm border border-zinc-100 flex items-center justify-center shrink-0">
+                                        <CheckCircle2 className="w-3 h-3 text-primary" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">Certified Safety</span>
+                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">BIS Approved Toyz</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-2 mt-1">
+                                    <div className="w-5 h-5 bg-white rounded-md shadow-sm border border-zinc-100 flex items-center justify-center shrink-0">
+                                        <RotateCcw className="w-3 h-3 text-primary" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">Easy Replace</span>
+                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">10-Day Window</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Pincode Check Widget */}
                             <div className="bg-zinc-50 border border-zinc-100 rounded-2xl p-4 space-y-3">
                                 <div className="flex items-center justify-between">
