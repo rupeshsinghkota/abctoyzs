@@ -70,9 +70,18 @@ export const WhatsAppService = {
         const payload = {
             integrated_number: sender,
             content_type: "template",
-            template_id: templateId,
-            recipient_number: to,
-            variables: variables
+            payload: {
+                to: to,
+                type: "template",
+                template: {
+                    name: templateId,
+                    language: {
+                        code: "en",
+                        policy: "deterministic"
+                    },
+                    variables: variables
+                }
+            }
         };
 
         try {
