@@ -1,5 +1,5 @@
 import { ProductGrid } from '@/components/shop/ProductGrid';
-import { fetchProducts } from '@/lib/data';
+import { fetchProducts, VEHICLE_CATEGORIES } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Metadata } from 'next';
@@ -19,17 +19,25 @@ interface CategoryPageProps {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
     const { slug } = await params;
-    const title = slug.charAt(0).toUpperCase() + slug.slice(1);
+    const categoryInfo = VEHICLE_CATEGORIES.find(c => c.value === slug);
+    const title = categoryInfo?.label || slug.charAt(0).toUpperCase() + slug.slice(1);
 
     const supabase = await createClient();
     const segment = await SettingsService.getSegmentSEO(`cat_${slug}`, supabase);
 
+    const baseTitle = segment.defaultTitle || `Buy ${title} for Kids in India | Premium Electric Ride-ons`;
+    const baseDesc = segment.defaultDescription || `Shop the best electric ${title.toLowerCase()} for kids at ABC Toyz. Top-rated battery operated ride-on vehicles with warranty and fast shipping across India.`;
+
     return {
-        title: segment.defaultTitle || `${title} Collection`,
-        description: segment.defaultDescription || `Explore our premium collection of ${title.toLowerCase()} ride-on toys. Quality, safety, and fun guaranteed for kids in India.`,
+        title: baseTitle,
+        description: baseDesc,
         openGraph: {
-            title: segment.defaultTitle || `${title} - Premium Ride-ons | abctoyz`,
-            description: segment.defaultDescription || `Shop the best ${title.toLowerCase()} for kids. High performance, durable builds, and fast shipping.`,
+            title: baseTitle,
+            description: baseDesc,
+            type: 'website',
+        },
+        alternates: {
+            canonical: `https://abctoyz.in/category/${slug}`,
         }
     };
 }
