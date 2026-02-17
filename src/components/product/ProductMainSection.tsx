@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { ImageGallery } from '@/components/product/ImageGallery';
 import { ProductActions } from '@/components/product/ProductActions';
-import { Star, Truck, ShieldCheck, CheckCircle2, RotateCcw, MapPin } from 'lucide-react';
+import { Star, Truck, ShieldCheck, CheckCircle2, RotateCcw, MapPin, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
@@ -238,7 +238,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">Certified Safety</span>
-                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">BIS Approved Toyz</span>
+                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">ISI Standard Approved</span>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-2 mt-1">
@@ -251,6 +251,24 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     </div>
                                 </div>
                             </div>
+
+                            {/* EMI Info Widget */}
+                            {product.price >= 5000 && (
+                                <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
+                                            <Wallet className="w-5 h-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.1em]">Payment Planning</p>
+                                            <p className="text-xs font-bold text-zinc-900">EMI available from <span className="text-primary font-black">₹{Math.round(product.price / 12).toLocaleString()}/mo</span></p>
+                                        </div>
+                                    </div>
+                                    <div className="text-[10px] font-black text-zinc-400 bg-white px-2 py-1 rounded-md border border-zinc-100">
+                                        RAZORPAY
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Pincode Check Widget */}
                             <div className="bg-zinc-50 border border-zinc-100 rounded-2xl p-4 space-y-3">

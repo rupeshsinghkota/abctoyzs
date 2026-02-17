@@ -45,6 +45,7 @@ export interface Product {
     subCategory?: string;
     is_new?: boolean;
     is_featured?: boolean;
+    stock?: number;
 
     // SEO
     meta_title?: string;
@@ -370,9 +371,9 @@ function processProducts(data: any[]): Product[] {
             images: Array.isArray(item.images) ? item.images : [],
             description: item.description || '',
             banners: Array.isArray(item.banners) ? item.banners : [],
-            // Correctly map the boolean flags
             is_new: !!item.is_new,
             is_featured: !!item.is_featured,
+            stock: Number(item.stock) || 12,
             tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
             specs: item.specs || {},
             voltage: item.voltage,
