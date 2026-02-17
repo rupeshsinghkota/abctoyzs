@@ -39,15 +39,33 @@ export async function POST(request: Request) {
         // but here we'll stick to what we have.
 
         const emailPlaceholder = `${cleanPhone}@abctoyz.in`;
+        let user;
 
-        // Attempt to find user by phone in auth metadata or email placeholder
-        const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-        if (listError) throw listError;
+        // 1. Check public.profiles first to see if this phone is already linked to an existing account (email or guest)
+        const { data: existingProfile, error: profileSearchError } = await supabaseAdmin
+            .from('profiles')
+            .select('id, email')
+            .eq('phone', cleanPhone)
+            .single();
 
-        let user = users.find(u => u.phone === cleanPhone || u.email === emailPlaceholder || u.user_metadata?.phone === cleanPhone);
+        if (existingProfile) {
+            // User exists! Get their Auth details
+            const { data: { user: authUser }, error: getAuthError } = await supabaseAdmin.auth.admin.getUserById(existingProfile.id);
+            if (!getAuthError && authUser) {
+                user = authUser;
+            }
+        }
 
         if (!user) {
-            // Create New User in Auth
+            // 2. Fallback: Search all auth users by phone
+            const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+            if (!listError) {
+                user = users.find(u => u.phone === cleanPhone || u.email === emailPlaceholder || u.user_metadata?.phone === cleanPhone);
+            }
+        }
+
+        if (!user) {
+            // 3. Create New User in Auth if absolutely not found
             const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
                 email: emailPlaceholder,
                 phone: cleanPhone,
@@ -64,6 +82,9 @@ export async function POST(request: Request) {
             user = newUser.user;
         }
 
+        // Use the user's actual email for the link generation
+        const loginEmail = user.email || emailPlaceholder;
+
         // 4. Ensure Profile exists in public.profiles
         const { error: profileError } = await supabaseAdmin
             .from('profiles')
@@ -71,7 +92,7 @@ export async function POST(request: Request) {
                 id: user.id,
                 phone: cleanPhone,
                 full_name: user.user_metadata?.full_name || 'Customer',
-                email: emailPlaceholder,
+                email: loginEmail,
                 is_guest: false
             }, { onConflict: 'id' });
 
@@ -86,7 +107,7 @@ export async function POST(request: Request) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://abctoyz.in';
         const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
             type: 'magiclink',
-            email: emailPlaceholder
+            email: loginEmail
         });
 
         if (linkError) throw linkError;
