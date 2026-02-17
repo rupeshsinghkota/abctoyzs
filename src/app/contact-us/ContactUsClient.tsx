@@ -37,7 +37,7 @@ export default function ContactUsClient() {
             }
 
             alert("Thank you for your message! Our concierge team will get back to you within 24 hours.");
-            setFormData({ name: "", email: "", subject: "", message: "" });
+            setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
         } catch (error: any) {
             console.error('[Contact Error]:', error);
             alert(error.message || "Failed to send message. Please try again or contact us via WhatsApp.");
