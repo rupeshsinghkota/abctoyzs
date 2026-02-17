@@ -140,6 +140,7 @@ export function Footer() {
                             <li><FooterLink href="/shipping-policy">Shipping & Delivery</FooterLink></li>
                             <li><FooterLink href="/refund-policy">Returns & Refunds</FooterLink></li>
                             <li><FooterLink href="/refund-policy">Warranty Policy</FooterLink></li>
+                            <li><FooterLink href="/billing-terms-and-conditions">Billing Terms & Conditions</FooterLink></li>
                             <li><FooterLink href="/about-us">About Us</FooterLink></li>
                             <li><FooterLink href="/contact-us">Contact Us</FooterLink></li>
                         </ul>
@@ -222,9 +223,12 @@ export function Footer() {
 
                 <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
                     <p>&copy; {new Date().getFullYear()} ABC Toyz. All rights reserved.</p>
-                    <div className="flex gap-6">
+                    <div className="flex flex-wrap gap-x-6 gap-y-2">
                         <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
                         <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
+                        <Link href="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link>
+                        <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
+                        <Link href="/billing-terms-and-conditions" className="hover:text-white transition-colors">Billing Terms</Link>
                         <Link href="/site-map" className="hover:text-white transition-colors">Sitemap</Link>
                     </div>
                 </div>

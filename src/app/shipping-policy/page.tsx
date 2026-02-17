@@ -77,6 +77,10 @@ export default function ShippingPolicy() {
                                     <span className="text-zinc-400">Remote Zones</span>
                                     <span className="font-bold">5 - 7 Days</span>
                                 </div>
+                                <div className="flex justify-between border-b border-zinc-800 pb-2 col-span-full pt-2">
+                                    <span className="text-zinc-400">Service Area</span>
+                                    <span className="text-primary font-bold">India Only</span>
+                                </div>
                             </div>
                         </div>
                     </section>

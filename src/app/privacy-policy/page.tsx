@@ -85,6 +85,16 @@ export default function PrivacyPolicy() {
                         </ul>
                     </section>
 
+                    <section className="mb-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Lock className="w-6 h-6 text-primary" />
+                            <h2 className="text-2xl font-semibold text-zinc-800">Your Privacy Rights</h2>
+                        </div>
+                        <p className="text-zinc-600 leading-relaxed mb-4">
+                            We value your trust above all else. <strong>We do not sell, rent, or trade your personal information</strong> to third parties for marketing purposes. Your data is used solely to provide and improve our services.
+                        </p>
+                    </section>
+
                     <section className="mb-10 border-t border-zinc-100 pt-10">
                         <h2 className="text-2xl font-semibold text-zinc-800 mb-4">Contact Us</h2>
                         <p className="text-zinc-600 leading-relaxed">

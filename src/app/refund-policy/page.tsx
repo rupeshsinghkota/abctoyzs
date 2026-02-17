@@ -53,6 +53,8 @@ export default function RefundPolicy() {
                         <ul className="list-disc pl-6 space-y-2 text-zinc-600">
                             <li>Replacements are only available for defective/damaged products.</li>
                             <li>Returns for "change of mind" are not accepted due to the high shipping costs of large items.</li>
+                            <li><strong>Free Reverse Pickup:</strong> We arrange and pay for the return shipping of all approved claims.</li>
+                            <li><strong>No Restocking Fees:</strong> There are zero fees associated with returning a defective item.</li>
                             <li>The item must be in its original packaging with all accessories included.</li>
                         </ul>
                     </section>
