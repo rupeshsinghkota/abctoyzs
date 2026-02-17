@@ -345,5 +345,30 @@ export const AdminService = {
             totalRevenue,
             totalSubscribers: subscriberCount || 0
         };
+    },
+
+    // Inquiries
+    async getInquiries() {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('contact_inquiries')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    },
+
+    async updateInquiryStatus(id: string, status: string) {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('contact_inquiries')
+            .update({ status, updated_at: new Date().toISOString() })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
     }
 };

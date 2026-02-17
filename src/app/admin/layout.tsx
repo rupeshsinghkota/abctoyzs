@@ -38,6 +38,7 @@ export default async function AdminLayout({
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
+        { icon: LayoutDashboard, label: 'Inquiries', href: '/admin/inquiries' },
         { icon: Package, label: 'Products', href: '/admin/products' },
         { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
         { icon: Users, label: 'Customers', href: '/admin/customers' },
