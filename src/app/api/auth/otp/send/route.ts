@@ -10,8 +10,15 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Phone number is required' }, { status: 400 });
         }
 
-        // 1. Clean phone number (remove +, spaces, etc. but keep leading 91 if it's there)
+        // 1. Clean phone number
         let cleanPhone = phone.replace(/\D/g, '');
+
+        // Handle leading 0 (common in India, e.g. 0987...)
+        if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
+            cleanPhone = cleanPhone.substring(1);
+        }
+
+        // Ensure India country code
         if (cleanPhone.length === 10) {
             cleanPhone = '91' + cleanPhone;
         }
@@ -43,10 +50,9 @@ export async function POST(request: Request) {
         console.log(`[OTP SEND] Attempting to send OTP to ${cleanPhone} using template: ${templateId}`);
 
         // Use branded Authentication Template
-        // We also send 'otp' to be safe (common variable name)
+        // The MSG91 'auth_abctoyz' template expects variable {{1}} for the OTP
         waResponse = await WhatsAppService.sendTemplateMessage(cleanPhone, templateId, {
-            "1": otpCode,
-            "otp": otpCode
+            "1": otpCode
         });
 
         if (!waResponse) {
