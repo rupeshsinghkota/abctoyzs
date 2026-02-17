@@ -13,7 +13,7 @@ export default function Sitemap() {
                 { label: "Home", href: "/" },
                 { label: "About Us", href: "/about-us" },
                 { label: "Contact Us", href: "/contact-us" },
-                { label: "Sitemap", href: "/sitemap" },
+                { label: "Sitemap", href: "/site-map" },
             ]
         },
         {
