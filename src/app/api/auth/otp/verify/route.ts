@@ -74,7 +74,7 @@ export async function POST(request: Request) {
             if (winner) {
                 user = winner.authUser;
                 // If the Auth user email is different from our placeholder, update loginEmail
-                if (user.email && !user.email.endsWith('@abctoyz.in')) {
+                if (user && user.email && !user.email.endsWith('@abctoyz.in')) {
                     // This is our master email
                 }
             }
@@ -109,6 +109,10 @@ export async function POST(request: Request) {
             });
             if (createError) throw createError;
             user = newUser.user;
+        }
+
+        if (!user) {
+            throw new Error('User resolution failed');
         }
 
         // Final Resolution: Determine the authoritative email for this session
