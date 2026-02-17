@@ -182,7 +182,7 @@ export function Footer() {
                 </div>
 
                 {/* Trust Indicators Ribbon */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-8 border-y border-zinc-900 mb-12">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-8 border-y border-zinc-900 mb-8">
                     <div className="flex items-center gap-3 px-4">
                         <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-primary shrink-0">
                             <Shield className="w-5 h-5" />
@@ -218,6 +218,23 @@ export function Footer() {
                             <p className="text-white font-bold text-xs uppercase tracking-wider">10-Day Replacement</p>
                             <p className="text-[10px] text-zinc-500">For Defects/Damage</p>
                         </div>
+                    </div>
+                </div>
+
+                {/* Partner Badges */}
+                <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-500 mb-12">
+                    <div className="flex flex-col items-center gap-1">
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Our Logistics Partners</span>
+                        <div className="flex gap-6 items-center">
+                            <span className="text-white font-black text-sm tracking-tighter">BLUEDART</span>
+                            <span className="text-white font-black text-sm tracking-tighter">DELHIVERY</span>
+                            <span className="text-white font-black text-sm tracking-tighter">XPRESSBEES</span>
+                        </div>
+                    </div>
+                    <div className="h-8 w-px bg-zinc-800 hidden md:block" />
+                    <div className="flex flex-col items-center gap-1">
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Secure Payments by</span>
+                        <span className="text-[#3395FF] font-black text-sm tracking-tighter italic">Razorpay</span>
                     </div>
                 </div>
 

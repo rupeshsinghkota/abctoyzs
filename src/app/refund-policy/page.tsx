@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from "next/link";
-import { RefreshCcw, AlertCircle, Video, CheckCircle2, ShieldCheck } from "lucide-react";
+import { RefreshCcw, AlertCircle, Video, CheckCircle2, ShieldCheck, Clock } from "lucide-react";
 
 import { SettingsService } from '@/lib/services/settings';
 
@@ -56,6 +56,21 @@ export default function RefundPolicy() {
                             <li><strong>Free Reverse Pickup:</strong> We arrange and pay for the return shipping of all approved claims.</li>
                             <li><strong>No Restocking Fees:</strong> There are zero fees associated with returning a defective item.</li>
                             <li>The item must be in its original packaging with all accessories included.</li>
+                        </ul>
+                    </section>
+
+                    <section className="mb-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Clock className="w-6 h-6 text-primary" />
+                            <h2 className="text-2xl font-semibold text-zinc-800">Order Cancellation Policy</h2>
+                        </div>
+                        <p className="text-zinc-600 leading-relaxed mb-4">
+                            We understand that plans can change. You can cancel your order under the following conditions:
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2 text-zinc-600">
+                            <li><strong>Pre-Dispatch:</strong> Full refund is initiated if the order is cancelled before it leaves our facility (within 24 hours of order).</li>
+                            <li><strong>In-Transit:</strong> If an order is cancelled while in transit, the forward and reverse shipping charges will be deducted from the refund amount.</li>
+                            <li><strong>COD Advance:</strong> The ₹500 COD advance is non-refundable if the order is refused at the doorstep for reasons other than damage.</li>
                         </ul>
                     </section>
 
