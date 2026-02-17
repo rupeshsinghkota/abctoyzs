@@ -3,6 +3,7 @@ create table if not exists contact_inquiries (
   id uuid default gen_random_uuid() primary key,
   name text not null,
   email text not null,
+  phone text, -- WhatsApp number for leads
   subject text not null,
   message text not null,
   status text default 'pending', -- pending, contacted, resolved

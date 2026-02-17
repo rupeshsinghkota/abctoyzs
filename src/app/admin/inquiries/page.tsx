@@ -91,8 +91,8 @@ export default function InquiriesPage() {
                             key={f}
                             onClick={() => setFilter(f)}
                             className={`px-4 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${filter === f
-                                    ? "bg-primary text-white shadow-sm"
-                                    : "text-muted-foreground hover:bg-muted"
+                                ? "bg-primary text-white shadow-sm"
+                                : "text-muted-foreground hover:bg-muted"
                                 }`}
                         >
                             {f}
@@ -113,8 +113,8 @@ export default function InquiriesPage() {
                                 <div className="flex-1 space-y-4">
                                     <div className="flex items-start justify-between lg:justify-start lg:gap-4">
                                         <div className={`p-3 rounded-2xl ${inquiry.status === 'resolved' ? 'bg-green-50 text-green-600' :
-                                                inquiry.status === 'contacted' ? 'bg-blue-50 text-blue-600' :
-                                                    'bg-amber-50 text-amber-600'
+                                            inquiry.status === 'contacted' ? 'bg-blue-50 text-blue-600' :
+                                                'bg-amber-50 text-amber-600'
                                             }`}>
                                             {inquiry.status === 'resolved' ? <CheckCircle2 className="w-6 h-6" /> :
                                                 inquiry.status === 'contacted' ? <MessageSquare className="w-6 h-6" /> :
@@ -127,6 +127,11 @@ export default function InquiriesPage() {
                                                     <Mail className="w-3 h-3" /> {inquiry.name}
                                                 </span>
                                                 <span>{inquiry.email}</span>
+                                                {inquiry.phone && (
+                                                    <span className="flex items-center gap-1.5 font-bold text-green-600">
+                                                        <MessageSquare className="w-3 h-3" /> {inquiry.phone}
+                                                    </span>
+                                                )}
                                                 <span>{format(new Date(inquiry.created_at), "MMM d, yyyy • h:mm a")}</span>
                                             </div>
                                         </div>
@@ -147,6 +152,16 @@ export default function InquiriesPage() {
                                         <option value="contacted">Mark Contacted</option>
                                         <option value="resolved">Mark Resolved</option>
                                     </select>
+                                    {inquiry.phone && (
+                                        <a
+                                            href={`https://wa.me/${inquiry.phone.replace(/[^0-9]/g, '')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-600 transition-all text-center"
+                                        >
+                                            Chat on WhatsApp
+                                        </a>
+                                    )}
                                     <a
                                         href={`mailto:${inquiry.email}`}
                                         className="flex items-center justify-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-zinc-800 transition-all text-center"

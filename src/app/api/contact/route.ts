@@ -4,7 +4,7 @@ import { ContactService } from '@/lib/services/contact';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, email, subject, message } = body;
+        const { name, email, phone, subject, message } = body;
 
         if (!name || !email || !subject || !message) {
             return NextResponse.json(
@@ -16,6 +16,7 @@ export async function POST(request: Request) {
         const result = await ContactService.submitInquiry({
             name,
             email,
+            phone,
             subject,
             message
         });

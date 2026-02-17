@@ -11,6 +11,7 @@ export default function ContactUsClient() {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
+        phone: "",
         subject: "",
         message: "",
     });
@@ -144,6 +145,16 @@ export default function ContactUsClient() {
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             />
                                         </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-zinc-400 uppercase tracking-widest ml-1">WhatsApp Number (Optional)</label>
+                                        <input
+                                            type="tel"
+                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium"
+                                            placeholder="+91 80000 00000"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-zinc-400 uppercase tracking-widest ml-1">Inquiry Type</label>

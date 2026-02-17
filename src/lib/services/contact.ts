@@ -3,7 +3,7 @@ import { WhatsAppService } from './whatsapp';
 import { EmailService } from './email';
 
 export const ContactService = {
-    async submitInquiry(data: { name: string; email: string; subject: string; message: string }) {
+    async submitInquiry(data: { name: string; email: string; phone?: string; subject: string; message: string }) {
         const supabase = await createClient();
 
         console.log('[ContactService] Submitting inquiry:', data);
@@ -14,6 +14,7 @@ export const ContactService = {
                 {
                     name: data.name,
                     email: data.email,
+                    phone: data.phone,
                     subject: data.subject,
                     message: data.message,
                 }
@@ -29,7 +30,7 @@ export const ContactService = {
         // Notify Admin via WhatsApp (Optional/If configured)
         try {
             const adminPhone = process.env.ADMIN_WHATSAPP_NUMBER || "918239269217";
-            const adminText = `🆕 *New Contact Inquiry* on abcToyz\n\n*Name:* ${data.name}\n*Email:* ${data.email}\n*Subject:* ${data.subject}\n*Message:* ${data.message}`;
+            const adminText = `🆕 *New Contact Inquiry* on abcToyz\n\n*Name:* ${data.name}\n*Email:* ${data.email}${data.phone ? `\n*WhatsApp:* ${data.phone}` : ''}\n*Subject:* ${data.subject}\n*Message:* ${data.message}`;
             await WhatsAppService.sendMessage(adminPhone, adminText);
         } catch (wsError) {
             console.error('[ContactService] WhatsApp notification failed:', wsError);
