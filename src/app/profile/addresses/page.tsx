@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ProfileService, Address } from '@/lib/services/profile';
-import { Plus, MapPin, Trash2, Loader2, Home, Phone } from 'lucide-react';
+import { Plus, MapPin, Trash2, Loader2, Home, Phone, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
@@ -47,8 +47,8 @@ export default function AddressesPage() {
 
     return (
         <div className="min-h-screen bg-zinc-50/50 pb-24">
-            {/* Premium Compact Header */}
-            <div className="bg-zinc-900 pt-16 pb-24 -mb-12 relative overflow-hidden">
+            {/* App-Style Minimal Header (Hidden on Mobile) */}
+            <div className="hidden md:block bg-zinc-900 pt-16 pb-24 -mb-12 relative overflow-hidden">
                 <div className="absolute inset-0 bg-primary/20 mix-blend-overlay" />
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">Addresses</h1>
@@ -56,7 +56,21 @@ export default function AddressesPage() {
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-8 relative z-20">
+            {/* Mobile Header: App Bar style */}
+            <div className="md:hidden bg-zinc-900 pt-8 pb-12 px-4 relative overflow-hidden">
+                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay" />
+                <div className="relative z-10 flex items-center gap-4 pt-4">
+                    <Link href="/profile" className="p-2.5 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10 backdrop-blur-sm">
+                        <ArrowLeft className="w-5 h-5 text-white" />
+                    </Link>
+                    <div>
+                        <h1 className="text-xl font-black text-white tracking-tight">Addresses</h1>
+                        <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-widest mt-0.5">Shipping Directory</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-8 relative z-20 -mt-6 md:mt-0">
                 <ProfileSidebar />
 
                 <div className="flex-1">

@@ -34,19 +34,21 @@ export async function POST(request: Request) {
         }
 
         // 4. Send via WhatsApp (MSG91)
-        const templateId = process.env.MSG91_OTP_TEMPLATE_ID;
+        const templateId = process.env.MSG91_OTP_TEMPLATE_ID || 'auth_abctoyz';
         let waResponse;
 
-        if (templateId) {
-            // Use specialized Authentication Template
-            // Assuming your template uses {{1}} for the OTP code
-            waResponse = await WhatsAppService.sendTemplateMessage(cleanPhone, templateId, {
-                "1": otpCode
-            });
-        } else {
-            // Fallback to plain text (Not recommended for production)
-            const message = `🗝️ *ABC Toyz Verification*\n\nYour login code is: *${otpCode}*\n\nThis code is valid for 5 minutes. Please do not share it with anyone.`;
-            waResponse = await WhatsAppService.sendMessage(cleanPhone, message);
+        console.log(`[OTP SEND] Attempting to send OTP to ${cleanPhone} using template: ${templateId}`);
+
+        // Use branded Authentication Template
+        // The MSG91 'auth_abctoyz' template expects variable {{1}} for the OTP
+        waResponse = await WhatsAppService.sendTemplateMessage(cleanPhone, templateId, {
+            "1": otpCode
+        });
+
+        if (!waResponse) {
+            console.error('[OTP SEND] WhatsApp delivery failed. Falling back to plain text (caution).');
+            const fallbackMessage = `🗝️ *ABC Toyz Verification*\n\nYour login code is: *${otpCode}*\n\nThis code is valid for 5 minutes.`;
+            waResponse = await WhatsAppService.sendMessage(cleanPhone, fallbackMessage);
         }
 
         if (!waResponse) {
