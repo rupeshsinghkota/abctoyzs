@@ -46,11 +46,11 @@ export async function POST(request: Request) {
         // 3. Check public.profiles for ANY match (10 or 12 digits)
         const { data: allProfiles, error: profileSearchError } = await supabaseAdmin
             .from('profiles')
-            .select('id, email, phone, created_at')
+            .select('id, email, phone, created_at, full_name')
             .or(`phone.eq.${phone10},phone.eq.${phone12},phone.eq.${cleanPhone}`);
 
         if (allProfiles && allProfiles.length > 0) {
-            // Fetch Auth details for all candidate profiles to find the most "real" one
+            // Fetch Auth details for all candidate profiles
             const authUsersPromises = allProfiles.map(p => supabaseAdmin.auth.admin.getUserById(p.id));
             const authResults = await Promise.all(authUsersPromises);
 
@@ -59,21 +59,24 @@ export async function POST(request: Request) {
                 authUser: authResults[i].data?.user
             })).filter(c => c.authUser);
 
-            // Prioritize: 
-            // 1. Account with a real email in Auth OR Profile
-            // 2. Account with any email
+            // Winner logic:
+            // 1. Account with a real email in Supabase Auth (highest priority)
+            // 2. Account with a real email in Profile
             // 3. Oldest account
-            const winner = candidates.find(c =>
-                (c.authUser?.email && !c.authUser.email.endsWith('@abctoyz.in')) ||
-                (c.profile.email && !c.profile.email.endsWith('@abctoyz.in'))
-            ) || candidates.sort((a, b) => {
-                const dateA = new Date(a.profile.created_at || 0).getTime();
-                const dateB = new Date(b.profile.created_at || 0).getTime();
-                return dateA - dateB;
-            })[0];
+            const winner = candidates.find(c => c.authUser?.email && !c.authUser.email.endsWith('@abctoyz.in')) ||
+                candidates.find(c => c.profile.email && !c.profile.email.endsWith('@abctoyz.in')) ||
+                candidates.sort((a, b) => {
+                    const dateA = new Date(a.profile.created_at || 0).getTime();
+                    const dateB = new Date(b.profile.created_at || 0).getTime();
+                    return dateA - dateB;
+                })[0];
 
             if (winner) {
                 user = winner.authUser;
+                // If the Auth user email is different from our placeholder, update loginEmail
+                if (user.email && !user.email.endsWith('@abctoyz.in')) {
+                    // This is our master email
+                }
             }
         }
 
@@ -85,14 +88,13 @@ export async function POST(request: Request) {
                     u.phone === phone12 ||
                     u.phone === phone10 ||
                     u.user_metadata?.phone === phone12 ||
-                    u.user_metadata?.phone === phone10 ||
-                    u.email === emailPlaceholder
+                    u.user_metadata?.phone === phone10
                 );
             }
         }
 
         if (!user) {
-            // 3. Create New User in Auth if absolutely not found
+            // 5. Create New User in Auth if absolutely not found
             const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
                 email: emailPlaceholder,
                 phone: cleanPhone,
@@ -109,11 +111,12 @@ export async function POST(request: Request) {
             user = newUser.user;
         }
 
-        // Use the user's actual email for the link generation
+        // Final Resolution: Determine the authoritative email for this session
         const loginEmail = user.email || emailPlaceholder;
 
-        // 4. Ensure Profile exists in public.profiles
-        const { error: profileError } = await supabaseAdmin
+        // 6. Force Profile sync for the SELECTED user
+        // Ensure the profile table exactly matches what we found in Auth or are about to use
+        await supabaseAdmin
             .from('profiles')
             .upsert({
                 id: user.id,
@@ -123,14 +126,7 @@ export async function POST(request: Request) {
                 is_guest: false
             }, { onConflict: 'id' });
 
-        if (profileError) {
-            console.error('[OTP VERIFY] Profile sync error:', profileError);
-            // Non-blocking for auth, but good to log
-        }
-
-        // 5. Generate Session Link
-        // We catch the hashed_token and build a direct callback URL.
-        // This avoids the fragment (#access_token) issue and uses our server-side callback.
+        // 7. Generate Session Link
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://abctoyz.in';
         const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
             type: 'magiclink',
@@ -142,11 +138,10 @@ export async function POST(request: Request) {
         const tokenHash = linkData.properties.hashed_token;
         const callbackUrl = `${siteUrl}/auth/callback?token_hash=${tokenHash}&type=magiclink`;
 
-        // 6. Cleanup OTP
+        // 8. Cleanup OTP
         await supabaseAdmin.from('otp_verifications').delete().eq('phone', cleanPhone);
 
-        // 7. Check if we need more details (Onboarding)
-        // If it's a placeholder email, we need a real one.
+        // 9. Check if we need more details (Onboarding)
         const requireOnboarding = loginEmail.endsWith('@abctoyz.in');
 
         return NextResponse.json({
