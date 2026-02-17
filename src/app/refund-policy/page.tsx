@@ -80,12 +80,52 @@ export default function RefundPolicy() {
 
                     <section className="mb-10">
                         <div className="flex items-center gap-3 mb-4">
-                            <CheckCircle2 className="w-6 h-6 text-primary" />
-                            <h2 className="text-2xl font-semibold text-zinc-800">Refund Process</h2>
+                            <RefreshCcw className="w-6 h-6 text-primary" />
+                            <h2 className="text-2xl font-semibold text-zinc-800">Return & Replacement Process</h2>
                         </div>
-                        <p className="text-zinc-600 leading-relaxed mb-4">
-                            If a replacement is not available, a refund will be processed to your original payment method within <strong>5-7 business days</strong> after the returned item passes our quality check.
+                        <p className="text-zinc-600 leading-relaxed mb-6">
+                            We provide a seamless replacement process for defective or damaged items. Since our products are large and heavy, we manage the reverse logistics carefully.
                         </p>
+
+                        <div className="space-y-6">
+                            {[
+                                { step: "01", title: "Submit Request", desc: "Email support@abctoyz.in within 48h of delivery with your unboxing video." },
+                                { step: "02", title: "Approval", desc: "Our technicians review the footage (usually within 24 hours)." },
+                                { step: "03", title: "Reverse Pickup", desc: "We arrange a free pickup from your address once approved." },
+                                { step: "04", title: "Quality Check", desc: "The item is inspected at our hub for the reported defect." },
+                                { step: "05", title: "Resolution", desc: "A fresh replacement is dispatched, or a full refund is initiated." }
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex gap-4">
+                                    <div className="text-primary font-black text-xl opacity-20">{item.step}</div>
+                                    <div>
+                                        <h4 className="font-bold text-zinc-900">{item.title}</h4>
+                                        <p className="text-sm text-zinc-500">{item.desc}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section className="mb-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <CheckCircle2 className="w-6 h-6 text-primary" />
+                            <h2 className="text-2xl font-semibold text-zinc-800">Refund Timelines</h2>
+                        </div>
+                        <div className="bg-zinc-50 p-6 rounded-2xl border border-zinc-100">
+                            <p className="text-zinc-600 leading-relaxed">
+                                If a replacement is not available or you are eligible for a refund, the amount will be credited back to your original payment method.
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                                <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-zinc-100">
+                                    <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Processing Time</span>
+                                    <span className="text-sm font-bold text-zinc-900">2-3 Days</span>
+                                </div>
+                                <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-zinc-100">
+                                    <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Bank Credit</span>
+                                    <span className="text-sm font-bold text-zinc-900">5-7 Business Days</span>
+                                </div>
+                            </div>
+                        </div>
                     </section>
 
                     <section className="mb-10">
