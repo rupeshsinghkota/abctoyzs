@@ -400,6 +400,9 @@ export default function CheckoutPage() {
                                 <ShieldCheck className="w-3 h-3 text-green-600" />
                                 100% Secure Checkout with Razorpay
                             </p>
+                            <p className="text-[10px] text-center text-muted-foreground mt-2 px-4">
+                                By placing this order, you agree to our <Link href="/terms-of-service" className="underline hover:text-primary">Terms of Service</Link> and <Link href="/privacy-policy" className="underline hover:text-primary">Privacy Policy</Link>.
+                            </p>
                         </div>
                     </div>
                 </div>

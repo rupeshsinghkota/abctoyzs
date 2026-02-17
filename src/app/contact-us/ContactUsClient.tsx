@@ -225,6 +225,11 @@ export default function ContactUsClient() {
                             label="Support SLA"
                             value="24h Guaranteed"
                         />
+                        <RegistryItem
+                            icon={<ShieldCheck className="w-6 h-6" />}
+                            label="GSTIN"
+                            value="Pending"
+                        />
                     </div>
                 </div>
 
