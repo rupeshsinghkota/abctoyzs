@@ -47,11 +47,16 @@ export async function POST(request: Request) {
         let user = users.find(u => u.phone === cleanPhone || u.email === emailPlaceholder || u.user_metadata?.phone === cleanPhone);
 
         if (!user) {
-            // Create New User
+            // Create New User in Auth
             const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
                 email: emailPlaceholder,
                 phone: cleanPhone,
-                user_metadata: { phone: cleanPhone, full_name: 'Customer' },
+                user_metadata: {
+                    phone: cleanPhone,
+                    full_name: 'Customer',
+                    email_verified: true,
+                    phone_verified: true
+                },
                 email_confirm: true,
                 phone_confirm: true
             });
@@ -59,48 +64,41 @@ export async function POST(request: Request) {
             user = newUser.user;
         }
 
-        // 4. Generate Session
-        // Since we are in an API route, we can't easily "log in" the user for the browser here directly 
-        // via setSession (which usually happens on client).
-        // But we can return the user data and potentially a magic link or just handle the login on the client
-        // after verification.
+        // 4. Ensure Profile exists in public.profiles
+        const { error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .upsert({
+                id: user.id,
+                phone: cleanPhone,
+                full_name: user.user_metadata?.full_name || 'Customer',
+                email: emailPlaceholder,
+                is_guest: false
+            }, { onConflict: 'id' });
 
-        // Actually, Supabase has signInWithOtp but it expects SMS. 
-        // Since we verified custom, we can create a custom session or just return success and handle
-        // client-side "login" by storing the phone in local storage and using it for subsequent requests
-        // OR we can use admin.generateLink but that's for email usually.
+        if (profileError) {
+            console.error('[OTP VERIFY] Profile sync error:', profileError);
+            // Non-blocking for auth, but good to log
+        }
 
-        // BETTER APPROACH: Use Supabase's admin.createSession or just use a secret password?
-        // Let's use a secret password for phone-based users (hashed phone or something)
-        // Actually, let's just use `supabaseAdmin.auth.admin.generateLink` for 'magiclink'? 
-        // No, let's use `supabaseAdmin.auth.admin.updateUserById` to set a random password and return it? No.
-
-        // Let's use `supabaseAdmin.auth.admin.createSession` if available (it's not).
-
-        // OK, let's use the standard way: 
-        // 1. We create the user with a known (to us) password if they are new.
-        // 2. Or we return a "one-time-login-token" if we can.
-
-        // Alternative: Return success and have the client use a "master key" or just trust our API?
-        // Modern approach: Use `supabase.auth.signInWithOtp` on the client, BUT we already sent the OTP.
-
-        // Let's do this: 
-        // In the verify API, if successful, we return a short-lived token or just the user data.
-        // Actually, let's use `supabaseAdmin.auth.admin.generateLink` with type 'signup' or 'magiclink'.
-
+        // 5. Generate Session Link
+        // We use the auth/callback route to ensure cookies are set server-side
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://abctoyz.in';
         const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
             type: 'magiclink',
-            email: emailPlaceholder
+            email: emailPlaceholder,
+            options: {
+                redirectTo: `${siteUrl}/auth/callback`
+            }
         });
 
         if (linkError) throw linkError;
 
-        // 5. Cleanup OTP
+        // 6. Cleanup OTP
         await supabaseAdmin.from('otp_verifications').delete().eq('phone', cleanPhone);
 
         return NextResponse.json({
             success: true,
-            session_link: linkData.properties.action_link, // The client can use this to sign in
+            session_link: linkData.properties.action_link,
             user: user
         });
 
