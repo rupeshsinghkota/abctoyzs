@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { Truck, Clock, ShieldCheck, MapPin, CheckCircle2 } from "lucide-react";
+import { Truck, Clock, ShieldCheck, MapPin, CheckCircle2, CreditCard, Zap, Banknote } from "lucide-react";
 
 import { SettingsService } from '@/lib/services/settings';
 
@@ -93,6 +93,38 @@ export default function ShippingPolicy() {
                             <CheckCircle2 className="w-4 h-4" />
                             Free Standard Shipping on All Orders
                         </p>
+                    </section>
+
+                    <section className="mb-12">
+                        <div className="flex items-center gap-3 mb-6">
+                            <CreditCard className="w-6 h-6 text-primary" />
+                            <h2 className="text-2xl font-semibold text-zinc-800">Payment Methods</h2>
+                        </div>
+                        <p className="text-zinc-600 leading-relaxed mb-6">
+                            We offer flexible payment options to ensure a secure and convenient shopping experience. You can choose from the following methods at checkout:
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="p-6 rounded-2xl border border-zinc-100 bg-white shadow-sm hover:border-primary/20 transition-all">
+                                <h3 className="font-bold text-zinc-900 mb-2 flex items-center gap-2">
+                                    <Zap className="w-4 h-4 text-primary" />
+                                    Full Prepayment
+                                </h3>
+                                <p className="text-sm text-zinc-500 leading-relaxed">
+                                    Pay the full amount online using UPI, Cards, or Netbanking. Orders with full prepayment are prioritized for faster dispatch and delivery.
+                                </p>
+                            </div>
+
+                            <div className="p-6 rounded-2xl border border-zinc-100 bg-white shadow-sm hover:border-primary/20 transition-all">
+                                <h3 className="font-bold text-zinc-900 mb-2 flex items-center gap-2">
+                                    <Banknote className="w-4 h-4 text-primary" />
+                                    COD (with Advance)
+                                </h3>
+                                <p className="text-sm text-zinc-500 leading-relaxed">
+                                    For large items, we offer Cash on Delivery with a <strong>₹500 prepayment</strong>. The remaining balance is payable in cash at the time of delivery.
+                                </p>
+                            </div>
+                        </div>
                     </section>
 
                     <section className="mb-12 border-t border-zinc-100 pt-10">
