@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ProfileService, Address } from '@/lib/services/profile';
-import { Plus, MapPin, Trash2, Loader2, Home, Phone, ArrowLeft } from 'lucide-react';
+import { Plus, MapPin, Trash2, Loader2, Home, Phone, ArrowLeft, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
@@ -59,15 +59,31 @@ export default function AddressesPage() {
             {/* Mobile Header: App Bar style */}
             <div className="md:hidden bg-[#0A0A0A] pt-10 pb-12 px-4 relative overflow-hidden">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-[60px] rounded-full" />
-                <div className="relative z-10 flex items-center gap-4 pt-4">
-                    <Link href="/profile" className="p-2.5 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10 backdrop-blur-sm">
-                        <ArrowLeft className="w-5 h-5 text-white" />
-                    </Link>
-                    <div>
-                        <h1 className="text-xl font-black text-white tracking-tight">Addresses</h1>
-                        <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-widest mt-0.5">Shipping Directory</p>
+                <div className="relative z-10 flex items-center justify-between pt-4">
+                    <div className="flex items-center gap-4">
+                        <Link href="/profile" className="p-2.5 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10 backdrop-blur-sm">
+                            <ArrowLeft className="w-5 h-5 text-white" />
+                        </Link>
+                        <div>
+                            <h1 className="text-xl font-black text-white tracking-tight">Addresses</h1>
+                            <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-widest mt-0.5">Delivery Zones</p>
+                        </div>
                     </div>
+
+                    <button
+                        id="address-menu-toggle"
+                        className="p-2.5 bg-white/10 rounded-2xl border border-white/10 text-white active:scale-95 transition-transform"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </button>
                 </div>
+
+                <script dangerouslySetInnerHTML={{
+                    __html: `
+                    document.getElementById('address-menu-toggle')?.addEventListener('click', () => {
+                        window.dispatchEvent(new CustomEvent('toggle-profile-menu'));
+                    });
+                `}} />
             </div>
 
             <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-8 relative z-20 -mt-6 md:mt-0">

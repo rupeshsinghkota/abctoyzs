@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { Package, MapPin, User as UserIcon, ShieldCheck, ChevronRight } from 'lucide-react';
+import { Package, MapPin, User as UserIcon, ShieldCheck, ChevronRight, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
 
@@ -11,6 +11,9 @@ export default async function ProfilePage() {
     if (!user) {
         redirect('/login?next=/profile');
     }
+
+    // Trigger for profile menu
+    const menuTrigger = `window.dispatchEvent(new CustomEvent('toggle-profile-menu'))`;
 
     // Fetch recent order with items for thumbnail
     const { data: recentOrders } = await supabase
@@ -57,22 +60,38 @@ export default async function ProfilePage() {
                 <div className="absolute -top-10 -right-10 w-48 h-48 bg-primary/20 blur-[60px] rounded-full animate-pulse" />
                 <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
 
-                <div className="relative z-10 flex items-center gap-5 pt-4">
-                    <div className="relative">
-                        <div className="w-16 h-16 rounded-[2rem] bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center text-white border border-white/5 shadow-2xl">
-                            <UserIcon className="w-7 h-7" strokeWidth={1.5} />
+                <div className="relative z-10 flex items-center justify-between pt-4">
+                    <div className="flex items-center gap-5">
+                        <div className="relative">
+                            <div className="w-16 h-16 rounded-[2rem] bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center text-white border border-white/5 shadow-2xl">
+                                <UserIcon className="w-7 h-7" strokeWidth={1.5} />
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary border-4 border-[#0A0A0A] flex items-center justify-center">
+                                <ShieldCheck className="w-3 h-3 text-white" />
+                            </div>
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary border-4 border-[#0A0A0A] flex items-center justify-center">
-                            <ShieldCheck className="w-3 h-3 text-white" />
+                        <div>
+                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] mb-0.5">Premium Member</p>
+                            <h2 className="text-2xl font-black text-white tracking-tight leading-tight">
+                                {user.email?.split('@')[0] || 'Explorer'}
+                            </h2>
                         </div>
                     </div>
-                    <div>
-                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] mb-0.5">Premium Member</p>
-                        <h2 className="text-2xl font-black text-white tracking-tight leading-tight">
-                            {user.email?.split('@')[0] || 'Explorer'}
-                        </h2>
-                    </div>
+
+                    <button
+                        id="profile-menu-toggle"
+                        className="p-3 bg-white/5 rounded-2xl border border-white/10 text-white active:scale-95 transition-transform"
+                    >
+                        <Menu className="w-6 h-6" />
+                    </button>
                 </div>
+
+                <script dangerouslySetInnerHTML={{
+                    __html: `
+                    document.getElementById('profile-menu-toggle')?.addEventListener('click', () => {
+                        window.dispatchEvent(new CustomEvent('toggle-profile-menu'));
+                    });
+                `}} />
             </div>
 
             <div className="max-w-6xl mx-auto px-4 md:px-6 flex flex-col md:flex-row gap-8 relative z-20 -mt-10 md:mt-0">
