@@ -11,7 +11,10 @@ export async function POST(request: Request) {
         }
 
         // 1. Clean phone number (remove +, spaces, etc. but keep leading 91 if it's there)
-        const cleanPhone = phone.replace(/\D/g, '');
+        let cleanPhone = phone.replace(/\D/g, '');
+        if (cleanPhone.length === 10) {
+            cleanPhone = '91' + cleanPhone;
+        }
 
         // 2. Generate 6-digit OTP
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -40,12 +43,10 @@ export async function POST(request: Request) {
         console.log(`[OTP SEND] Attempting to send OTP to ${cleanPhone} using template: ${templateId}`);
 
         // Use branded Authentication Template
-        // The MSG91 'auth_abctoyz' template expects variable {{1}} for the OTP
-        // We also send 'otp' and 'code' to be safe against different template configs
+        // We also send 'otp' to be safe (common variable name)
         waResponse = await WhatsAppService.sendTemplateMessage(cleanPhone, templateId, {
             "1": otpCode,
-            "otp": otpCode,
-            "code": otpCode
+            "otp": otpCode
         });
 
         if (!waResponse) {
