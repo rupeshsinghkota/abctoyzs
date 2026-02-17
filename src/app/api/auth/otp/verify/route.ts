@@ -81,24 +81,25 @@ export async function POST(request: Request) {
         }
 
         // 5. Generate Session Link
-        // We use the auth/callback route to ensure cookies are set server-side
+        // We catch the hashed_token and build a direct callback URL.
+        // This avoids the fragment (#access_token) issue and uses our server-side callback.
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://abctoyz.in';
         const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
             type: 'magiclink',
-            email: emailPlaceholder,
-            options: {
-                redirectTo: `${siteUrl}/auth/callback`
-            }
+            email: emailPlaceholder
         });
 
         if (linkError) throw linkError;
+
+        const tokenHash = linkData.properties.hashed_token;
+        const callbackUrl = `${siteUrl}/auth/callback?token_hash=${tokenHash}&type=magiclink`;
 
         // 6. Cleanup OTP
         await supabaseAdmin.from('otp_verifications').delete().eq('phone', cleanPhone);
 
         return NextResponse.json({
             success: true,
-            session_link: linkData.properties.action_link,
+            session_link: callbackUrl,
             user: user
         });
 
