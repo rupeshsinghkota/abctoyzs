@@ -20,11 +20,29 @@ export default function ContactUsClient() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        alert("Thank you for your message! Our concierge team will get back to you within 24 hours.");
-        setFormData({ name: "", email: "", subject: "", message: "" });
-        setIsSubmitting(false);
+
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to submit inquiry');
+            }
+
+            alert("Thank you for your message! Our concierge team will get back to you within 24 hours.");
+            setFormData({ name: "", email: "", subject: "", message: "" });
+        } catch (error: any) {
+            console.error('[Contact Error]:', error);
+            alert(error.message || "Failed to send message. Please try again or contact us via WhatsApp.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
