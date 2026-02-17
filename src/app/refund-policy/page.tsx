@@ -28,7 +28,7 @@ export default function RefundPolicy() {
             <div className="container max-w-4xl mx-auto px-6">
                 <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-zinc-100">
                     <h1 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-8">Refund & Warranty Policy</h1>
-                    <p className="text-zinc-500 mb-8 italic">Last updated: February 5, 2024</p>
+                    <p className="text-zinc-500 mb-8 italic">Last updated: February 17, 2026</p>
 
                     <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 mb-10">
                         <div className="flex items-start gap-4">

@@ -27,7 +27,7 @@ export default function ShippingPolicy() {
             <div className="container max-w-4xl mx-auto px-6">
                 <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-zinc-100">
                     <h1 className="text-4xl font-bold text-zinc-900 mb-8 tracking-tight">Shipping Policy</h1>
-                    <p className="text-zinc-500 mb-10 italic">Last updated: February 5, 2024</p>
+                    <p className="text-zinc-500 mb-10 italic">Last updated: February 17, 2026</p>
 
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-6">
