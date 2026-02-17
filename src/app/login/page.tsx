@@ -14,9 +14,9 @@ function AuthFormFallback() {
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen pt-20 pb-20 flex items-center justify-center bg-muted/20 px-4">
+        <div className="min-h-screen py-10 md:py-20 flex items-center justify-center bg-zinc-50/50 px-4">
             <Suspense fallback={<AuthFormFallback />}>
-                <AuthForm view="login" />
+                <AuthForm />
             </Suspense>
         </div>
     );
