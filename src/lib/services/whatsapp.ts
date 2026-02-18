@@ -210,16 +210,43 @@ export const WhatsAppService = {
 
         const url = "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/";
 
+        const components: any[] = [
+            {
+                type: "header",
+                parameters: [
+                    {
+                        type: "image",
+                        image: {
+                            link: mediaUrl
+                        }
+                    }
+                ]
+            },
+            {
+                type: "body",
+                parameters: Object.keys(variables).map(key => ({
+                    type: "text",
+                    text: variables[key]
+                }))
+            }
+        ];
+
         const payload = {
             integrated_number: sender,
             content_type: "template",
-            template_id: templateId,
-            recipient_number: to,
-            header: {
-                type: "image",
-                url: mediaUrl
-            },
-            variables: variables
+            payload: {
+                messaging_product: "whatsapp",
+                to: to,
+                type: "template",
+                template: {
+                    name: templateId,
+                    language: {
+                        code: "en",
+                        policy: "deterministic"
+                    },
+                    components: components
+                }
+            }
         };
 
         try {

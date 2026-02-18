@@ -101,7 +101,8 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
                             cart_summary: cart.map(item => ({
                                 name: item.name,
                                 quantity: item.quantity,
-                                price: item.price
+                                price: item.price,
+                                image: item.image
                             }))
                         })
                     });
