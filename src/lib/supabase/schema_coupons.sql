@@ -23,7 +23,7 @@ ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Admins have full access to coupons" 
 ON coupons FOR ALL 
 TO authenticated 
-USING (auth.jwt() ->> 'email' IN (SELECT email FROM profiles WHERE is_admin = true));
+USING (EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid()));
 
 -- Public Policy (Read-only for validation)
 CREATE POLICY "Anyone can view active coupons for validation" 
