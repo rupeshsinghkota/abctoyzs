@@ -20,12 +20,14 @@ CREATE TABLE IF NOT EXISTS coupons (
 ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
 
 -- Admin Policy (Full Access)
+DROP POLICY IF EXISTS "Admins have full access to coupons" ON coupons;
 CREATE POLICY "Admins have full access to coupons" 
 ON coupons FOR ALL 
 TO authenticated 
 USING (EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid()));
 
 -- Public Policy (Read-only for validation)
+DROP POLICY IF EXISTS "Anyone can view active coupons for validation" ON coupons;
 CREATE POLICY "Anyone can view active coupons for validation" 
 ON coupons FOR SELECT 
 TO anon, authenticated 
