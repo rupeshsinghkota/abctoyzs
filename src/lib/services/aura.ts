@@ -117,24 +117,33 @@ async function query_inventory({ category, search_term }: { category?: string, s
     if (category) {
         query = query.ilike('category', `%${category}%`);
     }
+
     if (search_term) {
-        query = query.ilike('name', `%${search_term}%`);
+        // IMPROVED MATCHING: Split search term into words and search for items containing all significant words
+        const words = search_term.split(/\s+/).filter(word => word.length > 2);
+        if (words.length > 0) {
+            words.forEach(word => {
+                query = query.ilike('name', `%${word}%`);
+            });
+        } else {
+            query = query.ilike('name', `%${search_term}%`);
+        }
     }
 
-    // Limit to available stock unless specific search
-    query = query.gt('stock', 0).limit(5);
+    // REMOVED: .gt('stock', 0) - Allow AI to see out of stock items to inform customer accurately
+    query = query.limit(10);
 
     const { data, error } = await query;
     if (error) return `Error checking inventory: ${error.message}`;
-    if (!data || data.length === 0) return "No stock found matching your criteria.";
+    if (!data || data.length === 0) return "I couldn't find any products matching those details. Could you describe it differently?";
 
     // Return structured data for AI to process
     return JSON.stringify(data.map(p => ({
         name: p.name,
         price: p.price,
-        stock: p.stock,
+        stock: p.stock > 0 ? p.stock : "Out of Stock",
         image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-        url: `https://abctoyz.in/products/${p.slug}`
+        url: `https://abctoyz.in/product/${p.slug}`
     })));
 }
 
