@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
-        const { items, total_amount, shipping_address_id, payment_method, guest_email } = await req.json();
+        const { items, total_amount, discount_amount, coupon_code, shipping_address_id, payment_method, guest_email } = await req.json();
 
         console.log('[CreateOrder] Received payload:', { itemsCount: items?.length, total_amount, shipping_address_id, payment_method, guest_email });
 
@@ -34,6 +34,8 @@ export async function POST(req: Request) {
                 .insert({
                     user_id: user?.id || null,
                     total_amount: total_amount,
+                    discount_amount: discount_amount || 0,
+                    coupon_code: coupon_code || null,
                     shipping_address_id: shipping_address_id,
                     payment_status: 'pending',
                     status: 'processing',

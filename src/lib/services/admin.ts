@@ -55,6 +55,20 @@ export type Product = {
     // Variations
     attributes?: { name: string; options: string[] }[];
     variants?: any[]; // We'll type this more strictly if needed
+    updated_at: string;
+};
+
+export type Coupon = {
+    id: string;
+    code: string;
+    discount_type: 'PERCENTAGE' | 'FIXED';
+    discount_value: number;
+    min_order_amount?: number;
+    max_discount?: number;
+    expires_at?: string;
+    usage_limit?: number;
+    used_count: number;
+    is_active: boolean;
     created_at: string;
     updated_at: string;
 };
@@ -370,5 +384,52 @@ export const AdminService = {
 
         if (error) throw error;
         return data;
+    },
+
+    // Coupons
+    async getCoupons() {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('coupons')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data as Coupon[];
+    },
+
+    async createCoupon(coupon: Partial<Coupon>) {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('coupons')
+            .insert({ ...coupon, code: coupon.code?.toUpperCase() })
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data as Coupon;
+    },
+
+    async updateCoupon(id: string, updates: Partial<Coupon>) {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('coupons')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data as Coupon;
+    },
+
+    async deleteCoupon(id: string) {
+        const supabase = createClient();
+        const { error } = await supabase
+            .from('coupons')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
     }
 };

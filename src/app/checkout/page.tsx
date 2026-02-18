@@ -9,7 +9,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
     ArrowLeft, MapPin, Plus, Check, Truck, CreditCard,
-    Banknote, Loader2, ShieldCheck, Package, ChevronRight
+    Banknote, Loader2, ShieldCheck, Package, ChevronRight,
+    Ticket, X
 } from 'lucide-react';
 
 
@@ -27,12 +28,17 @@ export default function CheckoutPage() {
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [profile, setProfile] = useState<any>(null);
     const [guestEmail, setGuestEmail] = useState<string>("");
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+    const [couponError, setCouponError] = useState<string | null>(null);
+    const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
     const [showAddrForm, setShowAddrForm] = useState(false);
 
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0;
-    const total = subtotal + shipping;
+    const discount = appliedCoupon ? appliedCoupon.discount : 0;
+    const total = subtotal + shipping - discount;
 
     useEffect(() => {
         const loadCheckoutData = async () => {
@@ -110,6 +116,8 @@ export default function CheckoutPage() {
                 body: JSON.stringify({
                     items: cart,
                     total_amount: total,
+                    discount_amount: discount,
+                    coupon_code: appliedCoupon?.code,
                     shipping_address_id: selectedAddressId,
                     payment_method: paymentMethod,
                     // Priority: 1. Profile Email (LoggedIn), 2. Address Email (if saved), 3. Guest Form Email (if just typed)
@@ -208,6 +216,31 @@ export default function CheckoutPage() {
             alert(`Failed: ${error.message}`);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleApplyCoupon = async () => {
+        if (!couponCode.trim()) return;
+        setIsApplyingCoupon(true);
+        setCouponError(null);
+        try {
+            const res = await fetch('/api/coupons/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: couponCode, amount: subtotal })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setAppliedCoupon(data);
+                setCouponCode('');
+            } else {
+                setCouponError(data.error || 'Invalid coupon');
+                setAppliedCoupon(null);
+            }
+        } catch (error) {
+            setCouponError('Failed to validate coupon');
+        } finally {
+            setIsApplyingCoupon(false);
         }
     };
 
@@ -376,6 +409,14 @@ export default function CheckoutPage() {
                             subtotal={subtotal}
                             total={total}
                             shipping={shipping}
+                            discount={discount}
+                            couponCode={couponCode}
+                            setCouponCode={setCouponCode}
+                            onApplyCoupon={handleApplyCoupon}
+                            appliedCoupon={appliedCoupon}
+                            setAppliedCoupon={setAppliedCoupon}
+                            loading={isApplyingCoupon}
+                            error={couponError}
                         />
 
                         <div className="sticky bottom-0 lg:static p-4 lg:p-0 bg-background lg:bg-transparent border-t lg:border-t-0 -mx-4 lg:mx-0 shadow-lg lg:shadow-none">
@@ -439,7 +480,6 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: ()
             setLoading(false);
         }
     };
-
     return (
         <form onSubmit={handleSubmit} className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="grid grid-cols-2 gap-4">
@@ -573,7 +613,20 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: ()
     );
 }
 
-function OrderSummaryCard({ cart, subtotal, total, shipping }: { cart: any[], subtotal: number, total: number, shipping: number }) {
+function OrderSummaryCard({
+    cart,
+    subtotal,
+    total,
+    shipping,
+    discount,
+    couponCode,
+    setCouponCode,
+    onApplyCoupon,
+    appliedCoupon,
+    setAppliedCoupon,
+    loading,
+    error
+}: any) {
     return (
         <div className="bg-card border rounded-2xl overflow-hidden shadow-sm">
             <div className="p-4 border-b bg-muted/30 flex items-center gap-3">
@@ -585,7 +638,7 @@ function OrderSummaryCard({ cart, subtotal, total, shipping }: { cart: any[], su
 
             <div className="p-4 space-y-4">
                 <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                    {cart.map((item) => (
+                    {cart.map((item: any) => (
                         <div key={item.id} className="flex gap-4 mb-4 last:mb-0">
                             <div className="w-16 h-16 bg-muted rounded-xl overflow-hidden flex-shrink-0 border">
                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -601,6 +654,52 @@ function OrderSummaryCard({ cart, subtotal, total, shipping }: { cart: any[], su
                     ))}
                 </div>
 
+                {/* Coupon Input */}
+                <div className="pt-2">
+                    {appliedCoupon ? (
+                        <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-xl animate-in zoom-in-95 duration-200">
+                            <div className="flex items-center gap-2">
+                                <Ticket className="w-4 h-4 text-green-600" />
+                                <div>
+                                    <p className="text-[10px] font-bold text-green-700 uppercase leading-none">Coupon Applied</p>
+                                    <p className="font-bold text-sm text-green-900">{appliedCoupon.code}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setAppliedCoupon(null)}
+                                className="p-1 hover:bg-green-100 rounded-lg transition-colors"
+                            >
+                                <X className="w-4 h-4 text-green-600" />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Coupon code"
+                                    className="flex-1 p-3 rounded-xl border bg-background text-sm font-bold uppercase focus:ring-2 focus:ring-primary/20 outline-none"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value)}
+                                // onKeyDown disabled to avoid form submit issues, use button
+                                />
+                                <button
+                                    onClick={onApplyCoupon}
+                                    disabled={loading || !couponCode.trim()}
+                                    className="px-4 py-3 bg-zinc-900 text-white font-bold rounded-xl text-xs hover:bg-primary transition-all active:scale-95 disabled:opacity-50"
+                                >
+                                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+                                </button>
+                            </div>
+                            {error && (
+                                <p className="text-[10px] text-red-500 font-bold ml-1 animate-in slide-in-from-top-1">
+                                    {error}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </div>
+
                 <div className="border-t pt-4 space-y-2 text-sm lg:text-base">
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Subtotal</span>
@@ -612,6 +711,12 @@ function OrderSummaryCard({ cart, subtotal, total, shipping }: { cart: any[], su
                             {shipping === 0 ? "Free" : `₹${shipping}`}
                         </span>
                     </div>
+                    {discount > 0 && (
+                        <div className="flex justify-between text-green-600 font-bold animate-in fade-in duration-300">
+                            <span>Coupon Discount</span>
+                            <span>-₹{discount.toLocaleString()}</span>
+                        </div>
+                    )}
                     <div className="flex justify-between text-xl font-black pt-3 border-t">
                         <span>Total</span>
                         <span className="text-primary">₹{total.toLocaleString()}</span>
