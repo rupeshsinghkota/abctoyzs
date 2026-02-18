@@ -3,21 +3,45 @@
 import { useState, useEffect } from "react";
 import { X, MessageCircle, Gift, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 export function PromotionalPopup() {
     const [isVisible, setIsVisible] = useState(false);
     const [shouldRender, setShouldRender] = useState(false);
 
+    const [isSupressed, setIsSupressed] = useState(true); // Default to suppressed
+
     useEffect(() => {
-        // Check if user has already seen/closed the popup, is logged in, or engaged
-        const hasSeenPopup = sessionStorage.getItem("hasSeenPromoPopup");
-        const hasEngaged = localStorage.getItem("hasEngagedWhatsApp");
-        const isLead = localStorage.getItem("isLeadCaptured");
+        const checkSuppression = async () => {
+            // 1. Fast checks (local storage)
+            const hasSeenPopup = sessionStorage.getItem("hasSeenPromoPopup");
+            const hasEngaged = localStorage.getItem("hasEngagedWhatsApp");
+            const isLead = localStorage.getItem("isLeadCaptured");
 
-        // Simple check for Supabase session cookie (not perfect but good for client-side quick check)
-        const isLoggedIn = document.cookie.includes("sb-access-token");
+            if (hasSeenPopup || hasEngaged || isLead) {
+                setIsSupressed(true);
+                return;
+            }
 
-        if (hasSeenPopup || hasEngaged || isLead || isLoggedIn) return;
+            // 2. Auth check (Supabase)
+            const supabase = createClient();
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                sessionStorage.setItem("hasSeenPromoPopup", "true");
+                setIsSupressed(true);
+                return;
+            }
+
+            // 3. Not suppressed
+            setIsSupressed(false);
+        };
+
+        checkSuppression();
+    }, []);
+
+    useEffect(() => {
+        if (isSupressed) return;
 
         const handleExitIntent = (e: MouseEvent) => {
             // Trigger if mouse leaves from the top of the viewport
@@ -27,7 +51,7 @@ export function PromotionalPopup() {
             }
         };
 
-        // Fallback for mobile: Show after 30 seconds if no exit intent (since mobile has no mouse)
+        // Fallback for mobile: Show after 30 seconds if no exit intent
         const mobileTimer = setTimeout(() => {
             if (window.innerWidth < 768 && !sessionStorage.getItem("hasSeenPromoPopup")) {
                 setShouldRender(true);
@@ -41,7 +65,7 @@ export function PromotionalPopup() {
             document.removeEventListener("mouseleave", handleExitIntent);
             clearTimeout(mobileTimer);
         };
-    }, []);
+    }, [isSupressed]);
 
     const handleClose = () => {
         setIsVisible(false);

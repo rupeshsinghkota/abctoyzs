@@ -12,8 +12,7 @@ import {
     Banknote, Loader2, ShieldCheck, Package, ChevronRight,
     Ticket, X
 } from 'lucide-react';
-import { FastCheckoutOverlay } from '@/components/checkout/FastCheckoutOverlay';
-
+import { CheckoutAuth } from '@/components/checkout/CheckoutAuth';
 
 declare global {
     interface Window {
@@ -35,22 +34,29 @@ export default function CheckoutPage() {
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
     const [showAddrForm, setShowAddrForm] = useState(false);
-    const [showFastCheckout, setShowFastCheckout] = useState(false);
+
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+    const [session, setSession] = useState<any>(null);
 
     useEffect(() => {
-        // Trigger Fast Checkout for clean sessions (guests)
-        const isAuth = document.cookie.includes("sb-access-token") || document.cookie.includes("known_user=true");
-        if (!isAuth && !sessionStorage.getItem("fastCheckoutDismissed")) {
-            // Slight delay for UX
-            setTimeout(() => setShowFastCheckout(true), 2000);
-        }
+        const initAuth = async () => {
+            const supabase = createClient();
+            const { data: { session: currentSession } } = await supabase.auth.getSession();
+            setSession(currentSession);
+            setIsCheckingAuth(false);
+
+            // Mark as known user if session exists
+            if (currentSession) {
+                document.cookie = "known_user=true; path=/; max-age=31536000";
+            }
+        };
+        initAuth();
     }, []);
 
-    const handleFastCheckoutVerify = (user: any) => {
-        setShowFastCheckout(false);
-        // Set cookie to remember them
-        document.cookie = "known_user=true; path=/; max-age=31536000";
-        // Potentially pre-fill address form with phone if we could pass it
+    const handleAuthenticated = (newSession: any) => {
+        setSession(newSession);
+        // We can reload or just let the session handle it
+        window.location.reload();
     };
 
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -262,15 +268,48 @@ export default function CheckoutPage() {
         }
     };
 
-    if (cart.length === 0) {
+    if (cart.length === 0 && !loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
-                <Package className="w-16 h-16 text-muted-foreground mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
-                <p className="text-muted-foreground mb-6">Add items to cart before checkout</p>
-                <Link href="/" className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-full">
+            <div className="min-h-screen pt-24 pb-12 px-4 flex flex-col items-center justify-center bg-gray-50">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                    <Package className="w-8 h-8 text-gray-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+                <p className="text-gray-500 mb-8 max-w-xs text-center">Add some awesome toys to your cart to proceed with checkout.</p>
+                <Link
+                    href="/"
+                    className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                >
                     Continue Shopping
                 </Link>
+            </div>
+        );
+    }
+
+    if (isCheckingAuth) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                    <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Securing Session...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!session) {
+        return (
+            <div className="min-h-screen pt-24 pb-12 bg-gray-50">
+                <div className="container mx-auto">
+                    <Link
+                        href="/cart"
+                        className="flex items-center gap-2 text-gray-400 hover:text-primary mb-8 ml-4 transition-colors font-bold text-xs uppercase tracking-widest"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Modify Cart
+                    </Link>
+                    <CheckoutAuth onAuthenticated={handleAuthenticated} />
+                </div>
             </div>
         );
     }
@@ -466,15 +505,6 @@ export default function CheckoutPage() {
                         </div>
                     </div>
                 </div>
-                {showFastCheckout && (
-                    <FastCheckoutOverlay
-                        onVerified={handleFastCheckoutVerify}
-                        onClose={() => {
-                            setShowFastCheckout(false);
-                            sessionStorage.setItem("fastCheckoutDismissed", "true");
-                        }}
-                    />
-                )}
             </main>
         </div>
     );
