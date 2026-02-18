@@ -112,30 +112,46 @@ const tools = [
 
 async function query_inventory({ category, search_term }: { category?: string, search_term?: string }) {
     const supabase = getSupabase();
-    let query = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
-
-    if (category) {
-        query = query.ilike('category', `%${category}%`);
-    }
+    let data: any[] | null = null;
 
     if (search_term) {
-        // IMPROVED MATCHING: Split search term into words and search for items containing all significant words
-        const words = search_term.split(/\s+/).filter(word => word.length > 2);
+        // CLEANING: Remove generic brand words that clutter search
+        const cleanTerm = search_term.replace(/ABC Toyz|abctoyz\.in|Premium|Adventure!|!/gi, '').trim();
+        const words = cleanTerm.split(/\s+/).filter(word => word.length >= 2);
+
         if (words.length > 0) {
+            // STAGE 1: Precise Match (Contains ALL significant words)
+            let q1 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
+            if (category) q1 = q1.ilike('category', `%${category}%`);
             words.forEach(word => {
-                query = query.ilike('name', `%${word}%`);
+                q1 = q1.ilike('name', `%${word}%`);
             });
-        } else {
-            query = query.ilike('name', `%${search_term}%`);
+            const { data: d1 } = await q1.limit(10);
+
+            if (d1 && d1.length > 0) {
+                data = d1;
+            } else {
+                // STAGE 2: Broad Match (Contains ANY significant word)
+                let q2 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
+                if (category) q2 = q2.ilike('category', `%${category}%`);
+                const orString = words.map(w => `name.ilike.%${w}%`).join(',');
+                const { data: d2 } = await q2.or(orString).order('stock', { ascending: false }).limit(10);
+                data = d2;
+            }
         }
     }
 
-    // REMOVED: .gt('stock', 0) - Allow AI to see out of stock items to inform customer accurately
-    query = query.limit(10);
+    // Default: Just fetch by category if no search term or search failed
+    if (!data || data.length === 0) {
+        let q3 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
+        if (category) q3 = q3.ilike('category', `%${category}%`);
+        const { data: d3 } = await q3.order('stock', { ascending: false }).limit(10);
+        data = d3;
+    }
 
-    const { data, error } = await query;
-    if (error) return `Error checking inventory: ${error.message}`;
-    if (!data || data.length === 0) return "I couldn't find any products matching those details. Could you describe it differently?";
+    if (!data || data.length === 0) {
+        return "I couldn't find any products matching those details. Could you describe it differently?";
+    }
 
     // Return structured data for AI to process
     return JSON.stringify(data.map(p => ({
