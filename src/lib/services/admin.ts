@@ -275,6 +275,13 @@ export const AdminService = {
         }));
     },
 
+    async getOrderById(id: string) {
+        const response = await fetch(`/api/admin/orders/${id}`);
+        if (!response.ok) throw new Error('Failed to fetch order');
+        const { data } = await response.json();
+        return data;
+    },
+
     async updateOrderStatus(orderId: string, status: string) {
         const supabase = supabaseAdmin; // Use admin client to bypass RLS
         const { error } = await supabase

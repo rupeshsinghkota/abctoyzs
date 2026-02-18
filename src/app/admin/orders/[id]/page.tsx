@@ -57,16 +57,8 @@ export default function OrderDetailPage() {
 
     async function loadOrder() {
         try {
-            // We reuse the list fetch or fetch single if available.
-            // Since getAllOrders fetches everything, let's optimize later.
-            // For now, we fetch all and find (or better, add getOrderById to AdminService if missing).
-            // Actually, we should fetch single. Let's assume AdminService has getOrderById or we use getAllOrders logic.
-            // Checking existing code, AdminService.getAllOrders is what we used.
-            // Let's stick to getAllOrders for now to be safe, or add a single fetch if we can.
-            // Ideally: const data = await AdminService.getOrderById(orderId);
-            const allOrders = await AdminService.getAllOrders();
-            const found = allOrders.find((o: any) => o.id === orderId);
-            setOrder(found || null);
+            const data = await AdminService.getOrderById(orderId);
+            setOrder(data);
         } catch (error) {
             console.error(error);
         } finally {

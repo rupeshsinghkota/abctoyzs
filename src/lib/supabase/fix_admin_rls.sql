@@ -1,19 +1,43 @@
--- Fix for Admin Visibility
--- We previously enabled RLS but forgot to allow admins to "see" themselves in the table.
 
--- 1. Check if policy exists (to be safe), then drop it to recreate or just create if not exists
-drop policy if exists "Admins can read own entry" on public.admins;
+-- Fix RLS for Admins on Addresses and Orders
 
--- 2. Create the policy
--- This allows a user to query the 'admins' table ONLY if they are looking for their own user_id.
-create policy "Admins can read own entry"
-  on public.admins
-  for select
-  using (auth.uid() = user_id);
+-- 1. Addresses
+DROP POLICY IF EXISTS "Admins can view all addresses" ON addresses;
+CREATE POLICY "Admins can view all addresses"
+  ON addresses FOR SELECT
+  USING (
+    EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid())
+  );
 
--- 3. Also allow them to insert (just in case)
-drop policy if exists "Admins can insert themselves" on public.admins;
-create policy "Admins can insert themselves"
-  on public.admins
-  for insert
-  with check (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Admins can update all addresses" ON addresses;
+CREATE POLICY "Admins can update all addresses"
+  ON addresses FOR ALL
+  USING (
+    EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid())
+  );
+
+-- 2. Orders (Ensure Admins can see all, though currently 'true' is risky)
+DROP POLICY IF EXISTS "Admins can view all orders" ON orders;
+CREATE POLICY "Admins can view all orders"
+  ON orders FOR SELECT
+  USING (
+    EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid())
+  );
+
+-- 3. Order Items
+DROP POLICY IF EXISTS "Admins can view all order items" ON order_items;
+CREATE POLICY "Admins can view all order items"
+  ON order_items FOR SELECT
+  USING (
+    EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid())
+  );
+
+-- 4. Profiles
+DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
+CREATE POLICY "Admins can view all profiles"
+  ON profiles FOR SELECT
+  USING (
+    EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid())
+  );
+
+NOTIFY pgrst, 'reload schema';

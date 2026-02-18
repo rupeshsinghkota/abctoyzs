@@ -513,10 +513,13 @@ export default function CheckoutPage() {
                                     </>
                                 ) : (
                                     <>
-                                        {paymentMethod === 'COD' && codSettings?.cod_mode === 'partial'
-                                            ? `Pay ₹${calculateCodAdvance(total, codSettings).advance} Advance`
-                                            : `Pay ₹${total.toLocaleString()}`
-                                        }
+                                        {paymentMethod === 'COD' ? (
+                                            codSettings?.cod_mode === 'partial'
+                                                ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
+                                                : "Place Order (Cash on Delivery)"
+                                        ) : (
+                                            `Pay ₹${total.toLocaleString()} Now`
+                                        )}
                                         <ChevronRight className="w-5 h-5" />
                                     </>
                                 )}
