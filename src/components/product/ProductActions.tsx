@@ -7,6 +7,7 @@ import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 import { trackFbEvent } from '@/components/tracking/FacebookPixel';
+import { StockUrgency } from './StockUrgency';
 
 interface ProductActionsProps {
     product: Product;
@@ -238,6 +239,11 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     </div>
                 </div>
             ))}
+
+            {/* Scarcity / Stock Alert */}
+            <div className="pt-2">
+                <StockUrgency stock={displayStock} />
+            </div>
 
             {/* Actions: Single Row (High Density) */}
             <div className="space-y-3 pt-1">
