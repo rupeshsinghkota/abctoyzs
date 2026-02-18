@@ -299,6 +299,7 @@ export default function CheckoutPage() {
                                         onCancel={() => setShowAddrForm(false)}
                                         onSuccess={refreshAddresses}
                                         showCancel={addresses.length > 0}
+                                        cart={cart}
                                     />
                                 ) : addresses.length === 0 ? (
                                     <div className="text-center py-8 bg-muted/20 rounded-xl border border-dashed">
@@ -452,7 +453,7 @@ export default function CheckoutPage() {
     );
 }
 
-function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: () => void, onSuccess: (addr: any) => void, showCancel: boolean }) {
+function ShippingAddressForm({ onCancel, onSuccess, showCancel, cart }: { onCancel: () => void, onSuccess: (addr: any) => void, showCancel: boolean, cart: any[] }) {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -465,6 +466,38 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel }: { onCancel: ()
         pincode: '',
         is_default: true
     });
+
+    // Real-time Lead Capture
+    useEffect(() => {
+        const captureLead = async () => {
+            // Only capture if phone number looks complete (10 digits)
+            const cleanPhone = formData.phone.replace(/\D/g, "");
+            if (cleanPhone.length >= 10) {
+                try {
+                    await fetch('/api/leads', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            phone: cleanPhone,
+                            name: formData.name,
+                            email: formData.email,
+                            source: 'checkout',
+                            cart_summary: cart.map(item => ({
+                                name: item.name,
+                                quantity: item.quantity,
+                                price: item.price
+                            }))
+                        })
+                    });
+                } catch (e) {
+                    // Fail silently, don't interrupt user
+                    console.warn("Lead capture failed:", e);
+                }
+            }
+        };
+
+        const timer = setTimeout(captureLead, 2000); // 2-second debounce
+        return () => clearTimeout(timer);
+    }, [formData.phone, formData.name, formData.email, cart]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

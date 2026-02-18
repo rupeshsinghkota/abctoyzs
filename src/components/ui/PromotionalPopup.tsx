@@ -32,7 +32,7 @@ export function PromotionalPopup() {
 
     const handleClaim = () => {
         const phoneNumber = "918239269217";
-        const message = encodeURIComponent("I saw the 10% OFF offer! How can I get my FIRST10 discount code? 🎁");
+        const message = encodeURIComponent("I saw the 10% OFF offer! How can I get my Secret discount code? 🎁");
         window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
         handleClose();
     };

@@ -14,8 +14,8 @@ export function HeaderBanner() {
             icon: <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
         },
         {
-            text: "Get 10% OFF on your first order!",
-            code: "FIRST10",
+            text: "Unlock Secret 10% OFF Code on WhatsApp!",
+            code: "GET CODE",
             icon: <Ticket className="w-3.5 h-3.5" />
         }
     ];
@@ -29,6 +29,12 @@ export function HeaderBanner() {
 
     const handleCopy = (e: React.MouseEvent) => {
         e.stopPropagation();
+        if (messages[currentMessage].code === "GET CODE") {
+            const phoneNumber = "918239269217";
+            const message = encodeURIComponent("I saw the Secret 10% OFF offer! What is the discount code? 🎁");
+            window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+            return;
+        }
         navigator.clipboard.writeText("FIRST10");
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
