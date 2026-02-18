@@ -313,7 +313,7 @@ export default function CheckoutPage() {
 
     if (!session) {
         return (
-            <div className="min-h-screen pt-24 pb-12 bg-gray-50">
+            <div className="min-h-screen pt-14 md:pt-24 pb-12 bg-gray-50">
                 <div className="container mx-auto">
                     <Link
                         href="/cart"
