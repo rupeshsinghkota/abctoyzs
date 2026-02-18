@@ -3,9 +3,15 @@
 import React from "react";
 
 export function WhatsAppButton() {
-    const phoneNumber = "918239269217"; // Official business number
-    const message = encodeURIComponent("Hi ABC Toyz, I have a question about my order!");
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    const [whatsappUrl, setWhatsappUrl] = React.useState(`https://wa.me/918239269217?text=${encodeURIComponent("Hi ABC Toyz, I have a question!")}`);
+
+    React.useEffect(() => {
+        const phoneNumber = "918239269217"; // Official business number
+        const currentUrl = window.location.href;
+        const pageTitle = document.title;
+        const message = encodeURIComponent(`Hi ABC Toyz, I'm browsing ${pageTitle} and have a question!\n\nContext: ${currentUrl}`);
+        setWhatsappUrl(`https://wa.me/${phoneNumber}?text=${message}`);
+    }, []);
 
     return (
         <div className="fixed bottom-24 right-5 md:bottom-10 md:right-10 z-[100] group">

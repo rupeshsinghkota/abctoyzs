@@ -360,9 +360,14 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                         <div className="hidden lg:flex gap-4 pt-2">
                             <WishlistButton productId={product.id} size="lg" className="h-10 px-0 hover:bg-transparent text-muted-foreground hover:text-red-500 transition-all flex items-center gap-2" />
                             <span className="text-sm text-gray-300">|</span>
-                            <button className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">
+                            <a
+                                href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I have a question about ${product.name}.\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center"
+                            >
                                 Ask a Question
-                            </button>
+                            </a>
                         </div>
 
                         {/* Mobile Content Switcher (Specs vs Box Content) */}

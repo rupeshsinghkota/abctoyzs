@@ -21,6 +21,20 @@
   --color-accent-foreground: var(--accent-foreground);
 
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  @keyframes gradient-x {
+
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  --animate-gradient-x: gradient-x 3s ease infinite;
 }
 
 :root {

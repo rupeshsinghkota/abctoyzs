@@ -55,13 +55,13 @@ export function MobileHeader() {
                 {/* Drawer Container */}
                 <div
                     className={cn(
-                        "fixed inset-y-0 left-0 z-[1000] w-[85vw] max-w-[320px] bg-background shadow-2xl transition-transform duration-300 ease-out border-r border-border/10 flex flex-col",
+                        "fixed inset-y-0 left-0 z-[1000] w-[85vw] max-w-[320px] bg-background/95 backdrop-blur-xl shadow-2xl transition-transform duration-500 ease-out border-r border-border/10 flex flex-col",
                         isMenuOpen ? "translate-x-0" : "-translate-x-full"
                     )}
                 >
                     {/* Header: Logo & Close */}
-                    <div className="flex-none flex items-center justify-between p-4 border-b border-border/10 bg-background/95 backdrop-blur">
-                        <Link href="/" onClick={() => setIsMenuOpen(false)}>
+                    <div className="flex-none flex items-center justify-between p-5 border-b border-border/10">
+                        <Link href="/" onClick={() => setIsMenuOpen(false)} className="active:scale-95 transition-transform">
                             <img
                                 src="/logo_wide.png"
                                 alt="ABC Toyz"
@@ -70,7 +70,7 @@ export function MobileHeader() {
                         </Link>
                         <button
                             onClick={() => setIsMenuOpen(false)}
-                            className="p-2 -mr-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-colors"
+                            className="p-2 -mr-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
                         >
                             <X className="w-5 h-5" strokeWidth={1.5} />
                         </button>
@@ -209,33 +209,40 @@ export function MobileHeader() {
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex-none p-4 border-t border-border/10 bg-muted/20">
+                    <div className="flex-none p-5 border-t border-border/10 bg-secondary/20">
                         <div className={`grid gap-3 ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
                             {isAdmin && (
                                 <Link
                                     href="/admin"
-                                    className="flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border/50 hover:border-primary/50 transition-colors shadow-sm group"
+                                    className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/50 transition-all shadow-sm active:scale-95 group"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
-                                    <Lock className="w-5 h-5 mb-1 text-primary animate-pulse transition-colors" strokeWidth={1.5} />
-                                    <span className="text-xs font-bold text-primary">Admin</span>
+                                    <Lock className="w-5 h-5 mb-1.5 text-primary" strokeWidth={1.5} />
+                                    <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Admin</span>
                                 </Link>
                             )}
                             <Link
                                 href="/cart"
-                                className="flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border/50 hover:border-primary/50 transition-colors shadow-sm group"
+                                className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/50 transition-all shadow-sm active:scale-95 group"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                <ShoppingBag className="w-5 h-5 mb-1 group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                                <span className="text-xs font-medium text-muted-foreground">Cart</span>
+                                <div className="relative">
+                                    <ShoppingBag className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                                    {cartItemCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center rounded-full">
+                                            {cartItemCount}
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider group-hover:text-primary transition-colors">Cart</span>
                             </Link>
                             <Link
                                 href="/profile"
-                                className="flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border/50 hover:border-primary/50 transition-colors shadow-sm group"
+                                className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/50 transition-all shadow-sm active:scale-95 group"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                <User className="w-5 h-5 mb-1 group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                                <span className="text-xs font-medium text-muted-foreground">Profile</span>
+                                <User className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider group-hover:text-primary transition-colors">Profile</span>
                             </Link>
                         </div>
                     </div>
@@ -247,18 +254,18 @@ export function MobileHeader() {
 
     return (
         <>
-            <div className="w-full bg-background/95 backdrop-blur-md shadow-sm border-b border-border/40">
-                <div className="flex items-center justify-between px-4 h-12">
+            <div className="w-full h-14 border-b border-border/10">
+                <div className="flex items-center justify-between px-4 h-full">
                     {/* Left: Menu & Logo */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         <button
-                            className="p-2 -ml-2 hover:bg-accent rounded-full z-20 transition-colors"
+                            className="p-2 -ml-2 text-muted-foreground hover:text-primary active:scale-95 transition-all"
                             onClick={() => setIsMenuOpen(true)}
                         >
-                            <Menu className="w-5 h-5" strokeWidth={1.5} />
+                            <Menu className="w-6 h-6" strokeWidth={1.5} />
                         </button>
 
-                        <Link href="/" className="flex items-center">
+                        <Link href="/" className="flex items-center active:scale-95 transition-transform">
                             <img
                                 src="/logo_wide.png"
                                 alt="ABC Toyz"
@@ -269,14 +276,14 @@ export function MobileHeader() {
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-1">
-                        <Link href="/search" className="p-2 hover:bg-secondary/50 rounded-full transition-colors text-foreground/80">
+                        <Link href="/search" className="p-2 text-muted-foreground hover:text-primary active:scale-90 transition-all">
                             <Search className="w-5 h-5" strokeWidth={1.5} />
                         </Link>
 
-                        <Link href="/cart" className="p-2 hover:bg-secondary/50 rounded-full transition-colors text-foreground/70 hover:text-foreground relative">
+                        <Link href="/cart" className="relative p-2 text-muted-foreground hover:text-primary active:scale-90 transition-all">
                             <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
                             {cartItemCount > 0 && (
-                                <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center rounded-full ring-2 ring-background">
+                                <span className="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center rounded-full ring-2 ring-background animate-in zoom-in">
                                     {cartItemCount}
                                 </span>
                             )}
