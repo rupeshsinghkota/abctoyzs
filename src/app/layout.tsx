@@ -91,6 +91,8 @@ export const viewport = {
 
 
 
+import { PromotionalPopup } from "@/components/ui/PromotionalPopup";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -115,6 +117,7 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
         <Header />
+        <PromotionalPopup />
         <main className="relative flex flex-col min-h-screen">
           {children}
         </main>
