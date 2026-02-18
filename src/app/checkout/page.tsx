@@ -12,6 +12,7 @@ import {
     Banknote, Loader2, ShieldCheck, Package, ChevronRight,
     Ticket, X
 } from 'lucide-react';
+import { FastCheckoutOverlay } from '@/components/checkout/FastCheckoutOverlay';
 
 
 declare global {
@@ -34,6 +35,23 @@ export default function CheckoutPage() {
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
     const [showAddrForm, setShowAddrForm] = useState(false);
+    const [showFastCheckout, setShowFastCheckout] = useState(false);
+
+    useEffect(() => {
+        // Trigger Fast Checkout for clean sessions (guests)
+        const isAuth = document.cookie.includes("sb-access-token") || document.cookie.includes("known_user=true");
+        if (!isAuth && !sessionStorage.getItem("fastCheckoutDismissed")) {
+            // Slight delay for UX
+            setTimeout(() => setShowFastCheckout(true), 2000);
+        }
+    }, []);
+
+    const handleFastCheckoutVerify = (user: any) => {
+        setShowFastCheckout(false);
+        // Set cookie to remember them
+        document.cookie = "known_user=true; path=/; max-age=31536000";
+        // Potentially pre-fill address form with phone if we could pass it
+    };
 
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0;
@@ -448,6 +466,15 @@ export default function CheckoutPage() {
                         </div>
                     </div>
                 </div>
+                {showFastCheckout && (
+                    <FastCheckoutOverlay
+                        onVerified={handleFastCheckoutVerify}
+                        onClose={() => {
+                            setShowFastCheckout(false);
+                            sessionStorage.setItem("fastCheckoutDismissed", "true");
+                        }}
+                    />
+                )}
             </main>
         </div>
     );
@@ -488,6 +515,8 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel, cart }: { onCanc
                             }))
                         })
                     });
+                    localStorage.setItem("isLeadCaptured", "true");
+                    document.cookie = "known_user=true; path=/; max-age=31536000"; // 1 Year
                 } catch (e) {
                     // Fail silently, don't interrupt user
                     console.warn("Lead capture failed:", e);
@@ -505,6 +534,8 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel, cart }: { onCanc
         try {
             const newAddr = await ProfileService.addAddress(formData);
             // newAddr has the email because we returned it in ProfileService (even if not in DB yet)
+            localStorage.setItem("isLeadCaptured", "true");
+            document.cookie = "known_user=true; path=/; max-age=31536000";
             onSuccess(newAddr);
         } catch (error) {
             console.error("Failed to add address:", error);

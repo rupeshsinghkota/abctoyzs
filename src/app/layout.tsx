@@ -13,6 +13,7 @@ import Script from "next/script";
 import { Suspense } from "react";
 import GoogleTracking from "@/components/tracking/GoogleTracking";
 import FacebookPixel from "@/components/tracking/FacebookPixel";
+import WhatsAppTracker from "@/components/tracking/WhatsAppTracker";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -110,6 +111,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <GoogleTracking />
           <FacebookPixel />
+          <WhatsAppTracker />
           <ScrollToTop />
         </Suspense>
         <Script

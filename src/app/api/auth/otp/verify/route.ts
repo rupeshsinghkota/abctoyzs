@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { OTPService } from '@/lib/services/otp';
 
 export async function POST(request: Request) {
     try {
@@ -13,24 +14,14 @@ export async function POST(request: Request) {
         const phone10 = cleanPhone.length > 10 ? cleanPhone.slice(-10) : cleanPhone;
         const phone12 = `91${phone10}`;
 
-        // 1. Verify OTP from database
-        const { data: verification, error: fetchError } = await supabaseAdmin
-            .from('otp_verifications')
-            .select('*')
-            .or(`phone.eq.${cleanPhone},phone.eq.${phone10},phone.eq.${phone12}`)
-            .eq('otp_code', code)
-            .single();
+        // 1. Verify OTP using Service
+        const isValid = await OTPService.verifyOTP(cleanPhone, code);
 
-        if (fetchError || !verification) {
+        if (!isValid) {
             return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 });
         }
 
-        // 2. Check expiry
-        if (new Date(verification.expires_at) < new Date()) {
-            return NextResponse.json({ error: 'OTP has expired' }, { status: 400 });
-        }
-
-        // 3. Authenticate User (Supabase Auth)
+        // 2. Authenticate User (Supabase Auth) -> Continue with existing logic
         // We use the phone number as the primary identifier. 
         // We'll search for existing user by phone. 
         // Note: Supabase Auth users can have phone as their identity.
