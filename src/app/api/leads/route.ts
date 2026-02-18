@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { WhatsAppService } from '@/lib/services/whatsapp';
 
 export async function POST(req: Request) {
     try {
@@ -36,6 +37,24 @@ export async function POST(req: Request) {
             console.error('[Lead Capture Error]:', error);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
+
+        // --- NEW: Send Welcome WhatsApp Message ---
+        try {
+            // Ensure phone has country code (assuming IN +91 for now if length is 10)
+            const whatsappPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+
+            // Send Template Message (using a standard welcome or fallback to text if template not set)
+            // For now, using direct text to ensure it works immediately without template approval
+            const welcomeMessage = `Welcome to ABC Toyz! 🚗\n\nYour little one's adventure starts here. Use code *FIRST10* to get *10% OFF* your first order.\n\nShop now: https://abctoyz.in`;
+
+            // Fire and forget (don't block response)
+            WhatsAppService.sendMessage(whatsappPhone, welcomeMessage)
+                .catch(err => console.error("Failed to send welcome WP:", err));
+
+        } catch (wpError) {
+            console.error("WhatsApp trigger error:", wpError);
+        }
+        // ------------------------------------------
 
         return NextResponse.json({ success: true, lead: data?.[0] });
 
