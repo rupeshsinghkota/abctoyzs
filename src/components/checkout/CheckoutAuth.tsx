@@ -76,8 +76,16 @@ export function CheckoutAuth({ onAuthenticated }: CheckoutAuthProps) {
                 document.cookie = "known_user=true; path=/; max-age=31536000";
 
                 onAuthenticated(data.session);
+            } else if (data.session_link) {
+                // Existing user: follow magic link to get real session
+                toast.success("Welcome back! Continuing to checkout...");
+                localStorage.setItem("isLeadCaptured", "true");
+                document.cookie = "known_user=true; path=/; max-age=31536000";
+
+                // Redirect to the callback URL which handles session setting
+                window.location.href = data.session_link;
             } else {
-                throw new Error("Session creation failed");
+                throw new Error("Verification response invalid");
             }
         } catch (error: any) {
             toast.error(error.message);

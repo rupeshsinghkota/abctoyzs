@@ -131,7 +131,7 @@ export async function POST(request: Request) {
         if (linkError) throw linkError;
 
         const tokenHash = linkData.properties.hashed_token;
-        const callbackUrl = `${siteUrl}/auth/callback?token_hash=${tokenHash}&type=magiclink`;
+        const callbackUrl = `${siteUrl}/auth/callback?token_hash=${tokenHash}&type=magiclink&next=/checkout`;
 
         // 8. Cleanup OTP
         await supabaseAdmin.from('otp_verifications').delete().eq('phone', cleanPhone);
