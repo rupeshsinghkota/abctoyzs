@@ -151,10 +151,10 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8">
-            <div className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-50 overflow-hidden flex flex-col md:flex-row min-h-[500px]">
+            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-50 overflow-hidden flex flex-col md:flex-row min-h-[500px]">
 
                 {/* Visual Sidebar */}
-                <div className="w-full md:w-2/5 bg-zinc-900 p-10 flex flex-col justify-between relative text-white">
+                <div className="w-full md:w-2/5 bg-zinc-900 p-8 md:p-10 flex flex-col justify-between relative text-white">
                     <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
                         <ShieldCheck className="w-64 h-64" />
                     </div>
@@ -188,7 +188,7 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
                 </div>
 
                 {/* Form Content */}
-                <div className="flex-1 p-8 md:p-14 flex flex-col justify-center">
+                <div className="flex-1 p-6 md:p-14 flex flex-col justify-center">
                     <div className="mb-10 text-center md:text-left">
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 text-primary rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
                             Step 1: Verification

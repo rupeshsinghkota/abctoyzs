@@ -37,6 +37,16 @@ export default function CheckoutPage() {
 
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [session, setSession] = useState<any>(null);
+    const [codSettings, setCodSettings] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchCodSettings = async () => {
+            const supabase = createClient();
+            const { data } = await supabase.from('settings').select('*').single();
+            if (data) setCodSettings(data);
+        };
+        fetchCodSettings();
+    }, []);
 
     useEffect(() => {
         const initAuth = async () => {
@@ -165,75 +175,79 @@ export default function CheckoutPage() {
             }
             const orderData = await orderRes.json();
 
-            // 2. Trigger Razorpay
-            const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-                amount: orderData.amount,
-                currency: orderData.currency,
-                name: "ABC Toyz",
-                description: "Purchase from ABC Toyz",
-                order_id: orderData.razorpay_order_id,
-                handler: async function (response: any) {
-                    setLoading(true); // Show loading spinner during verification
-                    try {
-                        // 3. Verify Payment
-                        const verifyRes = await fetch('/api/checkout/verify', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                order_id: orderData.order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_signature: response.razorpay_signature
-                            })
-                        });
+            // 2. Check if Razorpay is needed (Amount > 0)
+            if (orderData.razorpay_order_id) {
+                const options = {
+                    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                    amount: orderData.amount,
+                    currency: orderData.currency,
+                    name: "ABC Toyz",
+                    description: "Purchase from ABC Toyz",
+                    order_id: orderData.razorpay_order_id,
+                    handler: async function (response: any) {
+                        setLoading(true); // Show loading spinner during verification
+                        try {
+                            // 3. Verify Payment
+                            const verifyRes = await fetch('/api/checkout/verify', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    order_id: orderData.order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature
+                                })
+                            });
 
-                        if (verifyRes.ok) {
-                            const result = await verifyRes.json();
+                            if (verifyRes.ok) {
+                                const result = await verifyRes.json();
 
-                            // Auto-login if new user credentials returned
-                            if (result.credentials) {
-                                try {
-                                    const supabase = createClient();
-                                    await supabase.auth.signInWithPassword({
-                                        email: result.credentials.email,
-                                        password: result.credentials.password
-                                    });
-                                } catch (loginError) {
-                                    console.error("Auto-login failed:", loginError);
-                                    // Don't block success page if login fails
+                                // Auto-login if new user credentials returned
+                                if (result.credentials) {
+                                    try {
+                                        const supabase = createClient();
+                                        await supabase.auth.signInWithPassword({
+                                            email: result.credentials.email,
+                                            password: result.credentials.password
+                                        });
+                                    } catch (loginError) {
+                                        console.error("Auto-login failed:", loginError);
+                                    }
                                 }
-                            }
 
-                            clearCart();
-                            // Pass amount in INR (orderData.amount is in paise)
-                            const amountInr = orderData.amount / 100;
-                            const successUrl = `/checkout/success?oid=${orderData.order_id}&amount=${amountInr}${result.isNewUser ? '&new_account=true' : ''}`;
-                            router.push(successUrl);
-                        } else {
-                            const errorData = await verifyRes.json();
-                            console.error("Verification failed:", errorData);
-                            alert(`Payment verification failed: ${errorData.error || 'Unknown Error'}`);
+                                clearCart();
+                                const amountInr = orderData.amount / 100;
+                                const successUrl = `/checkout/success?oid=${orderData.order_id}&amount=${amountInr}${result.isNewUser ? '&new_account=true' : ''}`;
+                                router.push(successUrl);
+                            } else {
+                                const errorData = await verifyRes.json();
+                                console.error("Verification failed:", errorData);
+                                alert(`Payment verification failed: ${errorData.error || 'Unknown Error'}`);
+                                setLoading(false);
+                            }
+                        } catch (error) {
+                            console.error("Verification Error:", error);
+                            alert("An error occurred during payment verification.");
                             setLoading(false);
                         }
-                    } catch (error) {
-                        console.error("Verification Error:", error);
-                        alert("An error occurred during payment verification.");
-                        setLoading(false);
+                    },
+                    prefill: {
+                        name: addresses.find(a => a.id === selectedAddressId)?.name || profile?.name || "",
+                        contact: addresses.find(a => a.id === selectedAddressId)?.phone || profile?.phone || "",
+                        email: profile?.email || ""
+                    },
+                    theme: {
+                        color: "#F97316" // Orange primary color
                     }
-                },
-                prefill: {
-                    name: addresses.find(a => a.id === selectedAddressId)?.name || profile?.name || "",
-                    contact: addresses.find(a => a.id === selectedAddressId)?.phone || profile?.phone || "",
-                    email: profile?.email || ""
-                },
-                theme: {
-                    color: "#F97316" // Orange primary color
-                }
-            };
+                };
 
-            const rzp = new (window as any).Razorpay(options);
-            rzp.open();
+                const rzp = new (window as any).Razorpay(options);
+                rzp.open();
+            } else {
+                // Normal COD - Direct Success
+                clearCart();
+                router.push(`/checkout/success?oid=${orderData.order_id}&amount=${total}`);
+            }
 
         } catch (error: any) {
             console.error("Checkout Error:", error);
@@ -446,8 +460,15 @@ export default function CheckoutPage() {
                                         <Banknote className="w-5 h-5" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="font-bold text-sm">COD with ₹500 Prepayment</p>
-                                        <p className="text-xs text-muted-foreground">Pay ₹500 now, rest on delivery (₹{(total - 500).toLocaleString()})</p>
+                                        <p className="font-bold text-sm">
+                                            {codSettings?.cod_mode === 'partial' ? 'Partial COD (Advance Payment)' : 'Cash on Delivery'}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {codSettings?.cod_mode === 'partial'
+                                                ? `Pay ₹${calculateCodAdvance(total, codSettings).advance} now to confirm, rest on delivery.`
+                                                : 'Pay full amount on delivery.'
+                                            }
+                                        </p>
                                     </div>
                                     {paymentMethod === 'COD' && (
                                         <div className="w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center">
@@ -475,6 +496,8 @@ export default function CheckoutPage() {
                             setAppliedCoupon={setAppliedCoupon}
                             loading={isApplyingCoupon}
                             error={couponError}
+                            paymentMethod={paymentMethod}
+                            codSettings={codSettings}
                         />
 
                         <div className="sticky bottom-0 lg:static p-4 lg:p-0 bg-background lg:bg-transparent border-t lg:border-t-0 -mx-4 lg:mx-0 shadow-lg lg:shadow-none">
@@ -490,7 +513,10 @@ export default function CheckoutPage() {
                                     </>
                                 ) : (
                                     <>
-                                        {paymentMethod === 'COD' ? 'Pay ₹500 Prepymt' : `Pay ₹${total.toLocaleString()}`}
+                                        {paymentMethod === 'COD' && codSettings?.cod_mode === 'partial'
+                                            ? `Pay ₹${calculateCodAdvance(total, codSettings).advance} Advance`
+                                            : `Pay ₹${total.toLocaleString()}`
+                                        }
                                         <ChevronRight className="w-5 h-5" />
                                     </>
                                 )}
@@ -827,4 +853,21 @@ function OrderSummaryCard({
             </div>
         </div>
     );
+}
+
+// Helper to calculate advance
+function calculateCodAdvance(total: number, settings: any) {
+    if (!settings || settings.cod_mode !== 'partial') return { advance: 0, balance: total };
+
+    let advance = 0;
+    if (settings.cod_advance_type === 'percentage') {
+        advance = Math.round((total * settings.cod_advance_value) / 100);
+    } else {
+        advance = settings.cod_advance_value;
+    }
+
+    // Safety: Advance cannot exceed total
+    if (advance > total) advance = total;
+
+    return { advance, balance: total - advance };
 }

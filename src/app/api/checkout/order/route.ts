@@ -23,8 +23,21 @@ export async function POST(req: Request) {
         }
 
         // Determine actual amount to be paid via Razorpay
-        // If COD, prepayment is 500, otherwise full amount
-        const razorpayAmount = payment_method === 'COD' ? 500 : total_amount;
+        let razorpayAmount = total_amount;
+
+        if (payment_method === 'COD') {
+            const { data: settings } = await supabase.from('settings').select('*').single();
+            if (settings?.cod_mode === 'partial') {
+                if (settings.cod_advance_type === 'percentage') {
+                    razorpayAmount = Math.round((total_amount * settings.cod_advance_value) / 100);
+                } else {
+                    razorpayAmount = settings.cod_advance_value;
+                }
+            } else {
+                // Normal COD - no online payment required
+                razorpayAmount = 0;
+            }
+        }
 
         // 1. Create a "pending" order in database
         let order;
@@ -83,25 +96,34 @@ export async function POST(req: Request) {
 
         if (itemsError) throw itemsError;
 
-        // 3. Create Razorpay Order
-        const razorpayOrder = await razorpay.orders.create({
-            amount: Math.round(razorpayAmount * 100), // Amount in paise
-            currency: 'INR',
-            receipt: order.id,
-        });
+        // 3. Create Razorpay Order (Only if amount > 0)
+        let razorpayOrderId = null;
+        let razorpayAmountPaise = 0;
+        let razorpayCurrency = 'INR';
 
-        // 4. Update order with Razorpay Order ID
-        await supabase
-            .from('orders')
-            .update({ razorpay_order_id: razorpayOrder.id })
-            .eq('id', order.id);
+        if (razorpayAmount > 0) {
+            const razorpayOrder = await razorpay.orders.create({
+                amount: Math.round(razorpayAmount * 100), // Amount in paise
+                currency: 'INR',
+                receipt: order.id,
+            });
+            razorpayOrderId = razorpayOrder.id;
+            razorpayAmountPaise = Number(razorpayOrder.amount);
+            razorpayCurrency = razorpayOrder.currency;
+
+            // 4. Update order with Razorpay Order ID
+            await supabase
+                .from('orders')
+                .update({ razorpay_order_id: razorpayOrderId })
+                .eq('id', order.id);
+        }
 
         return NextResponse.json({
             order_id: order.id,
-            razorpay_order_id: razorpayOrder.id,
-            amount: razorpayOrder.amount,
-            currency: razorpayOrder.currency,
-            prepayment: payment_method === 'COD'
+            razorpay_order_id: razorpayOrderId,
+            amount: razorpayAmountPaise,
+            currency: razorpayCurrency,
+            prepayment: payment_method === 'COD' && razorpayAmount > 0
         });
 
     } catch (error: any) {
