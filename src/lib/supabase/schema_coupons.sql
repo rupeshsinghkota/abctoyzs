@@ -47,3 +47,17 @@ CREATE TRIGGER set_updated_at
 
 -- Comment for clarity
 COMMENT ON TABLE coupons IS 'Store discount codes for the checkout process.';
+
+-- Update orders table to support coupons
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS coupon_code TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC DEFAULT 0;
+
+-- Function to increment coupon usage safely (atomic)
+CREATE OR REPLACE FUNCTION increment_coupon_usage(coupon_code TEXT)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE coupons
+    SET used_count = used_count + 1
+    WHERE code = UPPER(coupon_code);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

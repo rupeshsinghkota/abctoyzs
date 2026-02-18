@@ -96,6 +96,34 @@ export const PaymentProcessor = {
             throw updateError;
         }
 
+        // 3b. Increment Coupon Usage
+        if (order.coupon_code) {
+            try {
+                const { error: couponError } = await supabaseAdmin.rpc('increment_coupon_usage', {
+                    coupon_code: order.coupon_code
+                });
+
+                if (couponError) {
+                    // Fallback to manual increment if RPC missing
+                    console.log('[PaymentProcessor] RPC increment_coupon_usage failed, trying manual update');
+                    const { data: coupon } = await supabaseAdmin
+                        .from('coupons')
+                        .select('used_count')
+                        .eq('code', order.coupon_code.toUpperCase())
+                        .single();
+
+                    if (coupon) {
+                        await supabaseAdmin
+                            .from('coupons')
+                            .update({ used_count: (coupon.used_count || 0) + 1 })
+                            .eq('code', order.coupon_code.toUpperCase());
+                    }
+                }
+            } catch (err) {
+                console.error('[PaymentProcessor] Failed to increment coupon usage:', err);
+            }
+        }
+
         // 4. Upsert Profile
         if (userId) {
             try {
