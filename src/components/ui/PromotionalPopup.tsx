@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { X, MessageCircle, Gift, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -11,8 +12,16 @@ export function PromotionalPopup() {
 
     const [isSupressed, setIsSupressed] = useState(true); // Default to suppressed
 
+    const pathname = usePathname();
+
     useEffect(() => {
         const checkSuppression = async () => {
+            // 0. Pathname check (Suppress on checkout/login)
+            if (pathname?.startsWith("/checkout") || pathname?.startsWith("/login") || pathname?.startsWith("/admin")) {
+                setIsSupressed(true);
+                return;
+            }
+
             // 1. Fast checks (local storage)
             const hasSeenPopup = sessionStorage.getItem("hasSeenPromoPopup");
             const hasEngaged = localStorage.getItem("hasEngagedWhatsApp");
@@ -38,7 +47,7 @@ export function PromotionalPopup() {
         };
 
         checkSuppression();
-    }, []);
+    }, [pathname]);
 
     useEffect(() => {
         if (isSupressed) return;
