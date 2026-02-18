@@ -15,6 +15,17 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
     const [phone, setPhone] = useState("");
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [loading, setLoading] = useState(false);
+    const [resendTimer, setResendTimer] = useState(0);
+
+    useEffect(() => {
+        let interval: any;
+        if (resendTimer > 0) {
+            interval = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [resendTimer]);
 
     useEffect(() => {
         // Auto-fill from lead capture or previous session
@@ -43,6 +54,7 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
 
             toast.success("Verification code sent!");
             setStep('OTP');
+            setResendTimer(30); // 30 second cooldown
         } catch (error: any) {
             toast.error(error.message);
         } finally {
@@ -74,6 +86,7 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
 
                 // Mark as lead captured and known user
                 localStorage.setItem("isLeadCaptured", "true");
+                localStorage.setItem("verified_phone", phone);
                 document.cookie = "known_user=true; path=/; max-age=31536000";
 
                 onAuthenticated(data.session);
@@ -99,6 +112,7 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
                 // Existing user: follow magic link to get real session
                 toast.success("Welcome back! Continuing to checkout...");
                 localStorage.setItem("isLeadCaptured", "true");
+                localStorage.setItem("verified_phone", phone);
                 document.cookie = "known_user=true; path=/; max-age=31536000";
 
                 // Redirect to the callback URL which handles session setting
@@ -256,10 +270,25 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
 
                             <button
                                 onClick={() => setStep('PHONE')}
-                                className="w-full text-xs font-black text-zinc-400 hover:text-primary transition-colors uppercase tracking-widest text-center"
+                                className="w-full text-xs font-black text-zinc-400 hover:text-primary transition-colors uppercase tracking-widest text-center mb-4"
                             >
                                 Use a different number
                             </button>
+
+                            <div className="text-center">
+                                {resendTimer > 0 ? (
+                                    <p className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
+                                        Resend OTP in {resendTimer}s
+                                    </p>
+                                ) : (
+                                    <button
+                                        onClick={() => handleSendOTP()}
+                                        className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest"
+                                    >
+                                        Didn't get the code? Resend
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

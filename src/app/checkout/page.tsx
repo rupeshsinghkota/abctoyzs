@@ -524,6 +524,14 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel, cart }: { onCanc
         is_default: true
     });
 
+    // Pre-fill phone from verified session
+    useEffect(() => {
+        const verifiedPhone = localStorage.getItem("verified_phone");
+        if (verifiedPhone && !formData.phone) {
+            setFormData(prev => ({ ...prev, phone: verifiedPhone }));
+        }
+    }, []);
+
     // Real-time Lead Capture
     useEffect(() => {
         const captureLead = async () => {
@@ -596,7 +604,7 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel, cart }: { onCanc
                         placeholder="e.g. 9876543210"
                         className="w-full p-3 rounded-xl border bg-background text-sm focus:ring-2 focus:ring-primary/20 outline-none"
                         value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                     />
                 </div>
             </div>
