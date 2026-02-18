@@ -95,6 +95,35 @@ export default function CheckoutPage() {
         loadCheckoutData();
     }, []);
 
+    useEffect(() => {
+        if (typeof window !== "undefined" && cart.length > 0) {
+            // Track InitiateCheckout - Facebook
+            if ((window as any).fbq) {
+                (window as any).fbq('track', 'InitiateCheckout', {
+                    currency: 'INR',
+                    value: total,
+                    content_ids: cart.map(item => item.id),
+                    content_type: 'product',
+                    num_items: cart.length
+                });
+            }
+            // Track InitiateCheckout - Google Ads
+            if ((window as any).gtag) {
+                (window as any).gtag('event', 'begin_checkout', {
+                    value: total,
+                    currency: 'INR',
+                    items: cart.map(item => ({
+                        item_id: item.id,
+                        item_name: item.name,
+                        price: item.price,
+                        quantity: item.quantity
+                    }))
+                });
+            }
+            console.log('[Tracking] InitiateCheckout event fired');
+        }
+    }, [total]); // Fire when total is calculated
+
     const refreshAddresses = async (addrOrId?: any) => {
         try {
             const supabase = createClient();

@@ -83,6 +83,20 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             currency: 'INR',
         });
 
+        // Track Google AddToCart
+        if (typeof window !== "undefined" && (window as any).gtag) {
+            (window as any).gtag('event', 'add_to_cart', {
+                currency: 'INR',
+                value: finalPrice * quantity,
+                items: [{
+                    item_id: String(currentVariant?.id || product.id),
+                    item_name: finalName,
+                    price: finalPrice,
+                    quantity: quantity
+                }]
+            });
+        }
+
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);
     };

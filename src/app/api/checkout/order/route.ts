@@ -175,6 +175,45 @@ export async function POST(req: Request) {
                         .eq('id', order.id);
 
                     console.log('[CreateOrder] Full COD Shiprocket Order Created:', shiprocketRes.order_id);
+
+                    // 4. Send Purchase Event to Facebook Conversions API (CAPI) for Full COD
+                    try {
+                        const { FacebookCapi } = await import('@/lib/services/facebook-capi');
+                        const fullName = address.name || '';
+                        const [firstName, ...lastNameParts] = fullName.split(' ');
+                        const lastName = lastNameParts.join(' ');
+
+                        await FacebookCapi.trackEvent({
+                            eventName: 'Purchase',
+                            eventId: order.id,
+                            eventTime: Math.floor(Date.now() / 1000),
+                            actionSource: 'website',
+                            eventSourceUrl: `https://abctoyz.in/checkout/success?oid=${order.id}`,
+                            userData: {
+                                email: guest_email || `customer_${address.phone}@abctoyz.in`,
+                                phone: address.phone,
+                                first_name: firstName,
+                                last_name: lastName,
+                                city: address.city,
+                                state: address.state,
+                                zip: address.pincode,
+                                country: 'in',
+                            },
+                            customData: {
+                                currency: 'INR',
+                                value: total_amount,
+                                order_id: order.id,
+                                content_type: 'product',
+                                contents: items.map((item: any) => ({
+                                    id: String(item.id),
+                                    quantity: item.quantity
+                                }))
+                            }
+                        });
+                        console.log('[CreateOrder] Full COD CAPI Purchase event sent');
+                    } catch (capiError) {
+                        console.error('[CreateOrder] CAPI Error:', capiError);
+                    }
                 }
             } catch (srError) {
                 console.error('[CreateOrder] Shiprocket Error:', srError);
