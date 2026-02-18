@@ -118,6 +118,68 @@ export async function POST(req: Request) {
                 .from('orders')
                 .update({ razorpay_order_id: razorpayOrderId })
                 .eq('id', order.id);
+        } else if (payment_method === 'COD' && razorpayAmount === 0) {
+            // FULL COD: No payment needed now. Create Shiprocket Order immediately.
+            try {
+                const { ShiprocketService } = await import('@/lib/services/shiprocket'); // Dynamic import
+
+                // Need to fetch address details since we only have ID
+                const { data: address } = await supabase
+                    .from('addresses')
+                    .select('*')
+                    .eq('id', shipping_address_id)
+                    .single();
+
+                if (address) {
+                    const shiprocketPayload = {
+                        order_id: order.id,
+                        order_date: new Date().toISOString(),
+                        pickup_location: "Jhandewalan",
+                        billing_customer_name: address.name,
+                        billing_last_name: "",
+                        billing_address: address.address_line1,
+                        billing_address_2: address.address_line2 || "",
+                        billing_city: address.city,
+                        billing_pincode: address.pincode,
+                        billing_state: address.state,
+                        billing_country: "India",
+                        billing_email: guest_email || "guest@abctoyz.in",
+                        billing_phone: address.phone,
+                        shipping_is_billing: true,
+                        order_items: items.map((item: any) => ({
+                            name: item.name,
+                            sku: `SKU-${item.id}`,
+                            units: item.quantity,
+                            selling_price: item.price,
+                        })),
+                        payment_method: 'COD',
+                        sub_total: total_amount, // For Full COD, collect everything
+                        length: 100,
+                        breadth: 60,
+                        height: 50,
+                        weight: 10.0
+                    };
+
+                    console.log('[CreateOrder] Creating Full COD Shiprocket Order...');
+                    const shiprocketRes = await ShiprocketService.createOrder(shiprocketPayload);
+
+                    const shipmentId = shiprocketRes.shipments?.[0]?.id || shiprocketRes.shipment_id || null;
+
+                    await supabase
+                        .from('orders')
+                        .update({
+                            shiprocket_order_id: shiprocketRes.order_id,
+                            shipment_id: shipmentId,
+                            shipping_carrier: 'Shiprocket'
+                        })
+                        .eq('id', order.id);
+
+                    console.log('[CreateOrder] Full COD Shiprocket Order Created:', shiprocketRes.order_id);
+                }
+            } catch (srError) {
+                console.error('[CreateOrder] Shiprocket Error:', srError);
+                // We do NOT block order creation if Shiprocket fails, but we log it.
+            }
         }
 
         return NextResponse.json({

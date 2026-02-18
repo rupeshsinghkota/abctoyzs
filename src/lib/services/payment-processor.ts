@@ -175,8 +175,8 @@ export const PaymentProcessor = {
                         selling_price: item.price,
                     })),
                     payment_method: order.payment_method === 'COD' ? 'COD' : 'Prepaid',
-                    // If COD, the collectible amount is Total - 500 (Prepayment)
-                    sub_total: order.payment_method === 'COD' ? (order.total_amount - 500) : order.total_amount,
+                    // If COD, the collectible amount is Total - Advance
+                    sub_total: order.payment_method === 'COD' ? (order.total_amount - (order.advance_amount || 0)) : order.total_amount,
                     length: 100,   // Realistic toy dimensions (cm)
                     breadth: 60,
                     height: 50,
