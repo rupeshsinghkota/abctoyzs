@@ -34,6 +34,8 @@ TO anon, authenticated
 USING (is_active = true AND (expires_at IS NULL OR expires_at > now()));
 
 -- Function to handle updated_at
+DROP TRIGGER IF EXISTS set_updated_at ON coupons;
+DROP FUNCTION IF EXISTS handle_updated_at();
 CREATE OR REPLACE FUNCTION handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
