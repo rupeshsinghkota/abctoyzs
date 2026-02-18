@@ -196,7 +196,7 @@ export default function OrderDetailPage() {
                             </div>
 
                             {/* COD Breakdown */}
-                            {order.payment_method === 'COD' && (
+                            {order.payment_method === 'COD' && ((order as any).advance_amount || 0) > 0 && (
                                 <>
                                     <div className="flex justify-between text-sm text-emerald-600">
                                         <span>Prepaid (Online)</span>

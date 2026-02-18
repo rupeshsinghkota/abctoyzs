@@ -230,7 +230,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                                 <span>₹{order.total_amount}</span>
                             </div>
 
-                            {isCOD && (
+                            {isCOD && paidAmount > 0 && (
                                 <div className="bg-yellow-50 text-yellow-800 p-3 rounded-lg mt-4 text-xs space-y-1">
                                     <div className="flex justify-between font-medium">
                                         <span>Paid Online (Advance)</span>
