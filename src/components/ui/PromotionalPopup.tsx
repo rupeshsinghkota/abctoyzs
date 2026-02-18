@@ -98,7 +98,7 @@ export function PromotionalPopup() {
                     </button>
 
                     <p className="text-[10px] text-zinc-400 font-medium">
-                        *Valid on orders above ₹4999. First-time customers only.
+                        *Valid on orders above ₹1999. First-time customers only.
                     </p>
                 </div>
             </div>
