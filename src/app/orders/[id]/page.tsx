@@ -217,6 +217,12 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                             Payment Summary
                         </h3>
                         <div className="space-y-2 text-sm">
+                            <div className="flex justify-between pb-2 border-b mb-2">
+                                <span className="text-muted-foreground">Payment Method</span>
+                                <span className="font-medium text-zinc-900">
+                                    {order.payment_method === 'COD' ? 'Cash on Delivery' : 'Online Payment'}
+                                </span>
+                            </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span>₹{order.total_amount}</span>
