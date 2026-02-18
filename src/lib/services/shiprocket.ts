@@ -48,13 +48,29 @@ export const ShiprocketService = {
         try {
             const token = await this.authenticate();
 
+            const payload = { ...orderData };
+
+            // Partial COD Logic:
+            // If payment_method is COD, we must check if there's an advance_amount.
+            // If so, the "collectible amount" sent to Shiprocket should be (Total - Advance).
+            // Shiprocket uses 'sub_total' as the invoice value/collectible value for COD.
+
+            if (payload.payment_method === 'COD' && payload.advance_amount > 0) {
+                // Calculate balance to collect
+                const balanceToCollect = payload.sub_total - payload.advance_amount;
+
+                // Update payload for Shiprocket
+                // We keep payment_method as COD but update sub_total (collectible) to the balance
+                payload.sub_total = balanceToCollect;
+            }
+
             const response = await fetch('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(orderData),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {

@@ -53,7 +53,8 @@ export async function POST(req: Request) {
                     payment_status: 'pending',
                     status: 'processing',
                     payment_method: payment_method || 'PREPAID',
-                    guest_email: guest_email
+                    guest_email: guest_email,
+                    advance_amount: payment_method === 'COD' ? razorpayAmount : 0
                 })
                 .select()
                 .single();
@@ -71,7 +72,8 @@ export async function POST(req: Request) {
                     shipping_address_id: shipping_address_id,
                     payment_status: 'pending',
                     status: 'processing',
-                    payment_method: payment_method || 'PREPAID'
+                    payment_method: payment_method || 'PREPAID',
+                    advance_amount: payment_method === 'COD' ? razorpayAmount : 0
                 })
                 .select()
                 .single();

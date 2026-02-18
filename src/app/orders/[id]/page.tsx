@@ -65,8 +65,16 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     if (!order) return null;
 
     const isCOD = order.payment_method === 'COD';
-    const dueAmount = isCOD ? order.total_amount - 500 : 0;
-    const paidAmount = isCOD ? 500 : order.total_amount;
+    // Use stored advance_amount if available, otherwise fallback to 0 (or legacy 500 if needed, but 0 is safer default)
+    // Actually, distinct between prepaid and COD.
+    // If COD, paidAmount is advance_amount.
+    // If Prepaid, paidAmount is total_amount.
+
+    // We need to extend Order type to include advance_amount in this file first, but let's assume it comes from API.
+    // If not in type, we cast or add it.
+    const advancePaid = (order as any).advance_amount || 0;
+    const dueAmount = isCOD ? order.total_amount - advancePaid : 0;
+    const paidAmount = isCOD ? advancePaid : order.total_amount;
 
     // Derive tracking link (Generic Shiprocket tracking or similar)
     const trackingLink = order.shiprocket_order_id ? `#` : null; // Replace with actual tracking URL pattern if known

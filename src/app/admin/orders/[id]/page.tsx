@@ -200,11 +200,13 @@ export default function OrderDetailPage() {
                                 <>
                                     <div className="flex justify-between text-sm text-emerald-600">
                                         <span>Prepaid (Online)</span>
-                                        <span>- ₹500</span>
+                                        {/* @ts-ignore */}
+                                        <span>- ₹{((order as any).advance_amount || 0).toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-sm font-medium border-t border-dashed pt-2 mt-1">
                                         <span>To Collect (COD)</span>
-                                        <span>₹{(order.total_amount - 500).toLocaleString()}</span>
+                                        {/* @ts-ignore */}
+                                        <span>₹{(order.total_amount - ((order as any).advance_amount || 0)).toLocaleString()}</span>
                                     </div>
                                 </>
                             )}
@@ -216,7 +218,8 @@ export default function OrderDetailPage() {
                             <div className="flex justify-between text-xs text-muted-foreground pt-1">
                                 <span>Paid by {order.payment_method}</span>
                                 {order.payment_method === 'COD' && order.payment_status === 'partially_paid' && (
-                                    <span className="text-amber-600 font-medium ml-2">Prepaid ₹500 received</span>
+                                    // @ts-ignore
+                                    <span className="text-amber-600 font-medium ml-2">Prepaid ₹{((order as any).advance_amount || 0).toLocaleString()} received</span>
                                 )}
                             </div>
                         </div>
