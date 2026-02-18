@@ -308,7 +308,7 @@ export default function CheckoutPage() {
                         <ArrowLeft className="w-4 h-4" />
                         Modify Cart
                     </Link>
-                    <CheckoutAuth onAuthenticated={handleAuthenticated} />
+                    <CheckoutAuth onAuthenticated={handleAuthenticated} cart={cart} />
                 </div>
             </div>
         );

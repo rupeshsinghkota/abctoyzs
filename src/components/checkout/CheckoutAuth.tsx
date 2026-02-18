@@ -7,9 +7,10 @@ import { createClient } from "@/lib/supabase/client";
 
 interface CheckoutAuthProps {
     onAuthenticated: (session: any) => void;
+    cart: any[];
 }
 
-export function CheckoutAuth({ onAuthenticated }: CheckoutAuthProps) {
+export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
     const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
     const [phone, setPhone] = useState("");
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -76,6 +77,24 @@ export function CheckoutAuth({ onAuthenticated }: CheckoutAuthProps) {
                 document.cookie = "known_user=true; path=/; max-age=31536000";
 
                 onAuthenticated(data.session);
+
+                // --- Captured Lead after successful verification ---
+                try {
+                    fetch('/api/leads', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            phone: phone,
+                            source: 'checkout_otp_verified',
+                            cart_summary: cart.map(item => ({
+                                name: item.name,
+                                quantity: item.quantity,
+                                price: item.price
+                            }))
+                        })
+                    });
+                } catch (e) {
+                    console.warn("Lead capture after OTP failed:", e);
+                }
             } else if (data.session_link) {
                 // Existing user: follow magic link to get real session
                 toast.success("Welcome back! Continuing to checkout...");
