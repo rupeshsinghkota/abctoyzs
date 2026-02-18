@@ -54,7 +54,20 @@ export default async function Home() {
   const jeeps = products.filter(p => p.category === 'jeeps').slice(0, 10);
 
   // Spotlight Product (Highest Price or IsFeatured)
-  const featuredProduct = products.find(p => p.is_featured) || products.reduce((prev, current) => (prev.price > current.price) ? prev : current, products[0]);
+  const featuredProduct = products.find(p => p.is_featured) || (products.length > 0 ? products.reduce((prev, current) => (prev.price > current.price) ? prev : current, products[0]) : null);
+
+  if (products.length === 0) {
+    return (
+      <div className="flex flex-col min-h-screen pb-20 items-center justify-center p-8 bg-zinc-50">
+        <HeroSlider />
+        <div className="text-center py-20 space-y-4">
+          <h2 className="text-2xl font-bold">Welcome to ABC Toyz</h2>
+          <p className="text-muted-foreground">Our exciting collection is loading. Please check back soon!</p>
+        </div>
+        <Newsletter />
+      </div>
+    );
+  }
 
 
   return (

@@ -3,7 +3,7 @@ import { Product } from '@/lib/data';
 import Link from 'next/link';
 import { ArrowRight, Star } from 'lucide-react';
 
-export function FeatureSpotlight({ product, reversed = false }: { product: Product, reversed?: boolean }) {
+export function FeatureSpotlight({ product, reversed = false }: { product: Product | null, reversed?: boolean }) {
     if (!product) return null;
 
     // Sanitize description: Prefer meta_description, fallback to stripping HTML tags

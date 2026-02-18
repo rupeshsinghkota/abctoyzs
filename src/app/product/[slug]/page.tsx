@@ -136,15 +136,7 @@ export default async function ProductPage({ params }: PageProps) {
     ].filter(h => h.value);
 
     // ... (previous code)
-    const whatsInBox = product.box_content && product.box_content.length > 0
-        ? product.box_content
-        : [
-            'Ride-on vehicle (fully assembled)',
-            '2.4G Parental Remote Control',
-            'Rechargeable Battery & Charger',
-            'User Manual & Warranty Card',
-            'Assembly Tools'
-        ];
+    const whatsInBox = product.box_content || [];
 
 
 

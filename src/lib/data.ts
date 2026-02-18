@@ -103,111 +103,6 @@ export const AGE_CATEGORIES = [
 
 import { createClient } from "@/lib/supabase/client";
 
-export const products: Product[] = [
-    {
-        id: '1',
-        name: 'BMW M5 Competition Ride-On',
-        category: 'cars',
-        subCategory: 'Sports',
-        price: 24999,
-        mrp: 34999,
-        rating: 4.8,
-        reviews: 124,
-        image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&auto=format&fit=crop&q=60',
-        images: [
-            'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&auto=format&fit=crop&q=60',
-            'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&auto=format&fit=crop&q=60',
-        ],
-        videos: [
-            'https://cdn.coverr.co/videos/coverr-driving-a-go-cart-4560/1080p.mp4'
-        ],
-        tag: 'New',
-        specs: { battery: '12V 7Ah', mobile_app: true, max_load: '30kg', speed: '3-5 km/h', charging_time: '8-10 Hours', run_time: '1-2 Hours' },
-        description: "The officially licensed BMW M5 Competition ride-on car delivers the ultimate driving experience for your little one.",
-        voltage: '12V',
-        ageGroup: '3-6',
-        slug: 'bmw-m5-competition-ride-on'
-    },
-    {
-        id: '2',
-        name: 'Jeep Wrangler Rubicon Style',
-        category: 'jeeps',
-        subCategory: 'Off-road',
-        price: 18500,
-        mrp: 25999,
-        rating: 4.5,
-        reviews: 89,
-        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&auto=format&fit=crop&q=60',
-        images: [
-            'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&auto=format&fit=crop&q=60',
-        ],
-        tag: 'Best Seller',
-        specs: { battery: '12V 10Ah', mobile_app: false, max_load: '35kg', speed: '3-6 km/h', charging_time: '8-12 Hours', run_time: '45-90 Mins' },
-        description: "Conquer the backyard with this rugged Jeep style ride-on.",
-        voltage: '12V',
-        ageGroup: '1-3',
-        slug: 'jeep-wrangler-rubicon-style'
-    },
-    // ...
-    {
-        id: '3',
-        name: 'Mercedes AMG G63 24V',
-        category: 'jeeps',
-        subCategory: 'Luxury',
-        price: 32000,
-        mrp: 45000,
-        rating: 4.9,
-        reviews: 210,
-        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&auto=format&fit=crop&q=60',
-        images: [
-            'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&auto=format&fit=crop&q=60'
-        ],
-        specs: { battery: '24V 14Ah', mobile_app: true, max_load: '50kg', speed: '5-8 km/h', charging_time: '6-8 Hours', run_time: '1-2 Hours' },
-        description: "The ultimate luxury SUV for kids. 6 wheels, 4 motors, and pure power.",
-        voltage: '24V',
-        ageGroup: '6-10',
-        slug: 'mercedes-amg-g63-6x6'
-    },
-    {
-        id: '4',
-        name: 'Maverick UTV Buggy',
-        category: 'utvs',
-        subCategory: 'Off-road',
-        price: 45000,
-        mrp: 55000,
-        rating: 4.7,
-        reviews: 34,
-        image: 'https://images.unsplash.com/photo-1570125909517-53cb21c89581?w=800&auto=format&fit=crop&q=60',
-        images: [
-            'https://images.unsplash.com/photo-1570125909517-53cb21c89581?w=800&auto=format&fit=crop&q=60'
-        ],
-        specs: { battery: '24V', mobile_app: false, max_load: '60kg', speed: '10 km/h', charging_time: '8-10 Hours', run_time: '1 Hour' },
-        description: "Built for rough terrain. The Maverick UTV is the beast of ride-ons.",
-        voltage: '24V',
-        ageGroup: '6-10',
-        slug: 'maverick-utv-buggy'
-    },
-    {
-        id: '6',
-        name: 'Drift Go-Kart Pro',
-        category: 'gokarts',
-        subCategory: 'Drift',
-        price: 22000,
-        mrp: 30999,
-        rating: 4.6,
-        reviews: 56,
-        image: 'https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?w=800&auto=format&fit=crop&q=60',
-        images: [
-            'https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?w=800&auto=format&fit=crop&q=60'
-        ],
-        specs: { battery: '24V', mobile_app: false, max_load: '45kg', speed: '12 km/h', charging_time: '8-10 Hours', run_time: '40-60 Mins' },
-        description: "For the young racer. Special drift wheels for sliding action.",
-        voltage: '24V',
-        ageGroup: '10-plus',
-        slug: 'drift-go-kart-pro'
-    }
-];
-
 // Data Fetching Helper
 export async function fetchProducts(slug?: string): Promise<Product[]> {
     try {
@@ -219,11 +114,8 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
         if (slug) {
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
             if (isUUID) {
-                // If it looks like a UUID, check BOTH slug (text) and id (uuid) cols
                 query = query.or(`slug.eq.${slug},id.eq.${slug}`);
             } else {
-                // If it's NOT a UUID (e.g. "bmw-m5"), ONLY check slug col. 
-                // Checks against ID col would crash with "invalid input syntax for type uuid"
                 query = query.eq('slug', slug);
             }
         }
@@ -232,63 +124,25 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
 
         if (error) {
             console.error("[fetchProducts] Supabase error:", error);
-            console.log("[fetchProducts] Falling back to static data.");
-            return processProducts(products); // Fallback to static data
+            return [];
         }
 
         if (!data || data.length === 0) {
-            console.warn("[fetchProducts] Warning: Supabase returned no data. count:", data?.length);
-
-            // FALLBACK MECHANISM: If looking for a specific slug but failed, try fetching ALL and filtering.
-            // This fixes issues where 'eq' or 'or' query might fail due to RLS or tricky slug characters.
             if (slug) {
-                console.log(`[fetchProducts] Attempting Global Fallback for slug: ${slug}`);
                 const { data: allData } = await supabase.from('products').select('*, variants:product_variants(*)');
                 if (allData) {
                     const match = allData.find((p: any) => p.slug === slug || p.id === slug);
-                    if (match) {
-                        console.log("[fetchProducts] Found via Global Fallback!");
-                        // Use helper to process single item wrapped in array
-                        return processProducts([match]);
-                    }
+                    if (match) return processProducts([match]);
                 }
             }
-
-            console.log("[fetchProducts] Falling back to static data (no DB data found).");
-            // If slug provided, filter static data
-            if (slug) {
-                const staticMatch = products.find(p => p.slug === slug || p.id === slug);
-                return staticMatch ? processProducts([staticMatch as any]) : []; // processProducts expects array
-            }
-            return processProducts(products); // Return all static products
+            return [];
         }
 
-        // Process DB products
-        const processedDBProducts = processProducts(data);
-
-        // If we fetched ALL products (no slug), we should merge with static data to ensure catalog is full
-        if (!slug) {
-            const dbIds = new Set(processedDBProducts.map(p => p.id));
-            const dbSlugs = new Set(processedDBProducts.map(p => p.slug));
-
-            const missingStaticProducts = products.filter(p =>
-                !dbIds.has(p.id) && !dbSlugs.has(p.slug)
-            );
-
-            console.log(`[fetchProducts] Merged ${processedDBProducts.length} DB products with ${missingStaticProducts.length} static products.`);
-            return [...processedDBProducts, ...missingStaticProducts];
-        }
-
-        return processedDBProducts;
+        return processProducts(data);
 
     } catch (e) {
         console.error("fetchProducts error:", e);
-        console.log("[fetchProducts] Falling back to static data (exception).");
-        if (slug) {
-            const staticMatch = products.find(p => p.slug === slug || p.id === slug);
-            return staticMatch ? processProducts([staticMatch as any]) : [];
-        }
-        return processProducts(products);
+        return [];
     }
 }
 
@@ -308,29 +162,24 @@ export async function searchProducts(query: string): Promise<Product[]> {
             return [];
         }
 
-        if (data.length === 0) {
-            return [];
-        }
-
-        // Parse search results (simplified mapping)
         return data.map((item: any) => ({
             id: item.id,
             slug: item.slug || item.id,
             name: item.name,
-            category: 'cars',
-            price: item.base_price,
-            mrp: item.mrp,
-            rating: item.rating || 0,
-            reviews: item.review_count || 0,
-            image: item.images?.[0] || '',
-            images: item.images || [],
+            category: (typeof item.category === 'string') ? item.category.toLowerCase() : 'cars',
+            price: Number(item.base_price) || 0,
+            mrp: item.mrp ? Number(item.mrp) : undefined,
+            rating: Number(item.rating) || 0,
+            reviews: Number(item.review_count) || 0,
+            image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
+            images: Array.isArray(item.images) ? item.images : [],
             description: item.description || '',
             is_new: !!item.is_new,
             is_featured: !!item.is_featured,
             tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
             specs: item.specs || {},
             voltage: item.voltage,
-            ageGroup: item.age_group,
+            ageGroup: normalizeAgeGroup(item.age_group) || item.age_group,
             subCategory: item.subCategory,
             meta_title: item.meta_title,
             meta_description: item.meta_description
@@ -356,46 +205,39 @@ export function normalizeAgeGroup(input: string | undefined): '1-3' | '3-6' | '6
     if (normalized === '10+') return '10-plus';
 
     // Fuzzy mapping for legacy or alternative formats
-    // Handle specific ranges first to avoid partial matches on single digits
     if (['6-12', '8-12', '5-8', '5-10'].some(k => normalized.includes(k))) return '6-10';
-
     if (['1', '2', '3', 'toddler', '1-3 years'].some(k => normalized.includes(k) && !normalized.includes('10'))) return '1-3';
     if (['4', '5', '3-5', '3-6 years', 'preschool'].some(k => normalized.includes(k))) return '3-6';
     if (['6', '7', '8', '9', 'school', 'kid'].some(k => normalized.includes(k) && !normalized.includes('10'))) return '6-10';
     if (['10', '11', '12', 'teen', 'adult', 'big'].some(k => normalized.includes(k))) return '10-plus';
 
-    // Fallback based on simple parsing if possible, otherwise return input as is (or undefined to be safe)
     return undefined;
 }
 
-// Helper to map DB result to Product interface (extracted to avoid duplication)
+// Helper to map DB result to Product interface
 function processProducts(data: any[]): Product[] {
-    // Merge with static products data
     return data.map((item: any) => {
-        const mappedProduct = {
+        return {
             id: item.id,
             slug: item.slug || item.id,
             name: item.name || 'Untitled Product',
-            // SAFETY: Check if category is a string before calling toLowerCase
             category: (typeof item.category === 'string' && item.category.trim()) ? item.category.toLowerCase() : 'cars',
             price: Number(item.base_price) || 0,
             mrp: item.mrp ? Number(item.mrp) : undefined,
             rating: Number(item.rating) || 0,
             reviews: Number(item.review_count) || 0,
-            // SAFETY: Check if images is actually an array
             image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
             images: Array.isArray(item.images) ? item.images : [],
             description: item.description || '',
             banners: Array.isArray(item.banners) ? item.banners : [],
             is_new: !!item.is_new,
             is_featured: !!item.is_featured,
-            stock: Number(item.stock) || 12,
+            stock: Number(item.stock) || 0,
             tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
             specs: item.specs || {},
             voltage: item.voltage,
-            ageGroup: normalizeAgeGroup(item.age_group) || item.age_group, // Try to normalize, fallback to raw
+            ageGroup: normalizeAgeGroup(item.age_group) || item.age_group,
             subCategory: item.subCategory,
-            // Premium & Variations
             videos: Array.isArray(item.videos) ? item.videos : [],
             box_content: Array.isArray(item.box_content) ? item.box_content : [],
             product_dimensions: item.product_dimensions,
@@ -409,15 +251,5 @@ function processProducts(data: any[]): Product[] {
             marketing_suite: item.marketing_suite,
             ad_creatives: item.ad_creatives
         };
-
-        // Find matching static product to overlay data
-        const staticMatch = products.find(p => p.slug === mappedProduct.slug || p.id === mappedProduct.id);
-        if (staticMatch) {
-            return {
-                ...mappedProduct,
-                ...staticMatch, // Static data overrides DB data (useful for hardcoding MRPs, specs, etc.)
-            };
-        }
-        return mappedProduct;
     });
 }
