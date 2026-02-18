@@ -53,10 +53,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // Force dynamic rendering to ensure fresh data on every request (fixes localhost 404s due to caching)
 export const dynamic = 'force-dynamic';
-export const revalidate = 300; // Revalidate every 5 minutes
+// export const revalidate = 300; // REMOVED to prevent stale data persistence
+
+const LEGACY_SLUGS = [
+    'maverick-utv-buggy',
+    'bmw-m5-competition-ride-on',
+    'jeep-wrangler-rubicon-style',
+    'mercedes-amg-g63-6x6',
+    'drift-go-kart-pro'
+];
 
 export default async function ProductPage({ params }: PageProps) {
     const { slug } = await params;
+
+    // Explicitly 404 legacy static slugs to clear cache/index
+    if (LEGACY_SLUGS.includes(slug)) {
+        return notFound();
+    }
 
     // Use fetchProducts(slug) which uses the Client SDK logic (createBrowserClient).
     // This was verified to work via the /api/debug/products endpoint.
