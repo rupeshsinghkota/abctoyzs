@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingCart, Users, Home } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, Home, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function AdminBottomNav() {
@@ -13,6 +13,7 @@ export function AdminBottomNav() {
         { icon: Package, label: 'Products', href: '/admin/products' },
         { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
         { icon: Users, label: 'Users', href: '/admin/customers' },
+        { icon: Settings, label: 'Settings', href: '/admin/settings' },
         { icon: Home, label: 'Store', href: '/' },
     ];
 
