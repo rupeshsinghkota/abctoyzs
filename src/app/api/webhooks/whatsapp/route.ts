@@ -189,10 +189,16 @@ export async function POST(req: Request) {
             }
         }
 
-        const history = (conversationHistory || []).reverse().map(msg => ({
-            role: (msg.role === 'admin' || msg.role === 'model_handover' || (msg.role === 'model' && msg.message?.includes('(ADMIN)'))) ? 'model' : msg.role as 'user' | 'model',
-            parts: [{ text: msg.message }]
-        }));
+        const rawHistory = (conversationHistory || [])
+            .filter(msg => msg.message && !msg.message.includes(`[WAMID:${wamid}]`)) // Exclude current hit
+            .reverse()
+            .map(msg => ({
+                role: (msg.role === 'admin' || msg.role === 'model_handover' || (msg.role === 'model' && msg.message?.includes('(ADMIN)'))) ? 'model' : msg.role as 'user' | 'model',
+                parts: [{ text: msg.message }]
+            }));
+
+        const firstUserIdx = rawHistory.findIndex(m => m.role === 'user');
+        const history = firstUserIdx !== -1 ? rawHistory.slice(firstUserIdx) : [];
 
         const response = await AuraService.generateResponse(messageText, history, userContext);
 
