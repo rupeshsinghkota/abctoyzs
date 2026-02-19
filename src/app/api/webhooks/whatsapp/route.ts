@@ -31,19 +31,20 @@ export async function POST(req: Request) {
 
         // Detect if this is a "sent" event (outbound) or message event (inbound)
         const isSentByMe = payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent' ||
-            payload.direction === 'outbound' || payload.action === 'sent' || payload.direction === 'out';
+            payload.direction === 'outbound' || payload.action === 'sent' || payload.direction === 'out' ||
+            payload.event_type === 'sent' || payload.event === 'outbound-message-status';
 
         // Extract fields
         // For 'sent' messages, the customer's number is usually in 'recipient_number' or 'to'
-        let customerNumber = payload.recipient_number || payload.to || payload.recipient || payload.destination || "";
+        let customerNumber = payload.recipient_number || payload.to || payload.recipient || payload.destination || payload.mobile || "";
         let sender = payload.sender || payload.from || payload.mobile || payload.customerNumber || "";
-        let messageText = payload.message || payload.text?.body || payload.content || payload.text || "";
+        let messageText = payload.message || payload.text?.body || payload.content || payload.text || payload.body || "";
 
         // If it's sent by me, the 'sender' is our business, and we care about the 'customerNumber'
         const effectivePhone = isSentByMe ? customerNumber : sender;
 
-        console.log(`[WhatsApp Webhook] payload:`, JSON.stringify(payload, null, 2));
-        console.log(`[WhatsApp Webhook] isSentByMe: ${isSentByMe}, effectivePhone: ${effectivePhone}`);
+        console.log(`[WhatsApp Webhook DEBUG] Payload:`, JSON.stringify(body, null, 2));
+        console.log(`[WhatsApp Webhook DEBUG] isSentByMe: ${isSentByMe}, effectivePhone: ${effectivePhone}`);
 
         if (!effectivePhone || !messageText) {
             console.log("[WhatsApp] Ignored: Missing phone or message.");
@@ -235,6 +236,8 @@ export async function POST(req: Request) {
             .eq('phone_number', cleanPhone)
             .order('created_at', { ascending: false })
             .limit(10);
+
+        console.log(`[WhatsApp Webhook DEBUG] History for ${cleanPhone}:`, JSON.stringify(conversationHistory));
 
         // --- HUMAN TAKEOVER DETECTION ---
         // 1. If this message is Sent By Admin (Outbound), log it and skip AI
