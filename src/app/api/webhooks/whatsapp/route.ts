@@ -71,19 +71,28 @@ export async function POST(req: Request) {
             }
             return NextResponse.json({ status: "success", reason: "status_update_processed" });
         }
-
         // 2. EXTRACT MESSAGE TEXT AND PHONE
         let customerPhone = payload.customerNumber || payload.recipient_number || payload.to || payload.from ||
             payload.recipient || payload.destination || payload.mobile || payload.customerNumber || payload.number ||
             firstMessage?.from || "";
 
-        let messageText = payload.text || payload.message || payload.body || payload.caption ||
-            firstMessage?.text?.body || "";
-
         const cleanPhone = customerPhone.replace(/\D/g, "");
+        const integratedNum = (payload.integratedNumber || "").replace(/\D/g, "");
+
         if (!cleanPhone || cleanPhone === "DEBUG") {
             return NextResponse.json({ status: "ignored", reason: "invalid_phone" });
         }
+
+        // --- MULTI-TENANT FILTER ---
+        // If this hit is for a different business number (e.g. D2BCart 917557777987), ignore it.
+        // Incoming hits have integratedNumber = TARGET. Outbound manual hits have customerNumber = TARGET.
+        if (integratedNum && integratedNum !== TARGET_NUMBER && cleanPhone !== TARGET_NUMBER) {
+            console.log(`[WhatsApp] 🛑 Ignoring hit for different business number: ${integratedNum}`);
+            return NextResponse.json({ status: "ignored", reason: "wrong_business_number" });
+        }
+
+        let messageText = payload.text || payload.message || payload.body || payload.caption ||
+            firstMessage?.text?.body || "";
 
         // 3. DEDUPLICATION
         if (wamid) {
@@ -107,13 +116,16 @@ export async function POST(req: Request) {
 
         if (isSentByMe) {
             console.log(`[WhatsApp] 👩‍💼 Outbound message from ${cleanPhone}. Logging as Admin.`);
-            const targetRecipient = (payload.to || payload.recipient_number || payload.recipient)?.replace(/\D/g, "");
-            await supabase.from('whatsapp_conversations').insert({
-                phone_number: cleanPhone === TARGET_NUMBER ? targetRecipient : cleanPhone,
-                role: 'model',
-                message: `(ADMIN) [WAMID:${wamid || 'N/A'}] ${messageText || '[Media/Template]'}`,
-                created_at: new Date().toISOString()
-            });
+            const targetRecipient = (payload.to || payload.recipient_number || payload.recipient || payload.integratedNumber)?.replace(/\D/g, "");
+
+            if (targetRecipient && targetRecipient !== TARGET_NUMBER) {
+                await supabase.from('whatsapp_conversations').insert({
+                    phone_number: targetRecipient,
+                    role: 'model',
+                    message: `(ADMIN) [WAMID:${wamid || 'N/A'}] ${messageText || '[Media/Template]'}`,
+                    created_at: new Date().toISOString()
+                });
+            }
             return NextResponse.json({ status: "success", reason: "admin_reply_logged" });
         }
 
