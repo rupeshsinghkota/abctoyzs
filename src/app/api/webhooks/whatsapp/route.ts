@@ -111,7 +111,7 @@ export async function POST(req: Request) {
             created_at: new Date().toISOString()
         });
 
-        // 5. RATE LIMITING (Max 5 messages in last 1 hour)
+        // 5. RATE LIMITING (Max 6 messages in last 1 hour)
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         const { count: recentMsgCount } = await supabase
             .from('whatsapp_conversations')
@@ -120,7 +120,7 @@ export async function POST(req: Request) {
             .eq('role', 'user')
             .gt('created_at', oneHourAgo);
 
-        if ((recentMsgCount || 0) > 5) {
+        if ((recentMsgCount || 0) >= 6) {
             console.log(`[WhatsApp] 🛑 Rate Limit Triggered for ${cleanPhone}. (${recentMsgCount} msgs/hr)`);
             const { data: recentHandoff } = await supabase.from('whatsapp_conversations').select('id').eq('phone_number', cleanPhone).eq('role', 'model_handover').gt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).maybeSingle();
 
