@@ -30,16 +30,20 @@ export async function POST(req: Request) {
         const payload = Array.isArray(body) ? body[0] : body;
 
         // Detect if this is a "sent" event (outbound) or message event (inbound)
-        const isSentByMe = payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent' || payload.direction === 'outbound';
+        const isSentByMe = payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent' ||
+            payload.direction === 'outbound' || payload.action === 'sent' || payload.direction === 'out';
 
         // Extract fields
         // For 'sent' messages, the customer's number is usually in 'recipient_number' or 'to'
-        let customerNumber = payload.recipient_number || payload.to || payload.recipient || "";
+        let customerNumber = payload.recipient_number || payload.to || payload.recipient || payload.destination || "";
         let sender = payload.sender || payload.from || payload.mobile || payload.customerNumber || "";
         let messageText = payload.message || payload.text?.body || payload.content || payload.text || "";
 
         // If it's sent by me, the 'sender' is our business, and we care about the 'customerNumber'
         const effectivePhone = isSentByMe ? customerNumber : sender;
+
+        console.log(`[WhatsApp Webhook] payload:`, JSON.stringify(payload, null, 2));
+        console.log(`[WhatsApp Webhook] isSentByMe: ${isSentByMe}, effectivePhone: ${effectivePhone}`);
 
         if (!effectivePhone || !messageText) {
             console.log("[WhatsApp] Ignored: Missing phone or message.");
@@ -76,8 +80,11 @@ export async function POST(req: Request) {
         const TARGET_NUMBER = "8239269217"; // Core number
         // If receiver IS present (inbound), it must be us. 
         // If integrated_number IS present (outbound), it must be us.
-        const receiver = body.receiver || body.integratedNumber || body.integrated_number || "";
+        const receiver = body.receiver || body.integratedNumber || body.integrated_number ||
+            payload.receiver || payload.integratedNumber || payload.integrated_number || "";
         const cleanReceiver = typeof receiver === 'string' ? receiver.replace(/\D/g, "") : "";
+
+        console.log(`[WhatsApp Webhook] Receiver: ${receiver}, Clean: ${cleanReceiver}, Target: ${TARGET_NUMBER}`);
 
         if (cleanReceiver && !cleanReceiver.includes(TARGET_NUMBER)) {
             console.log(`[WhatsApp Webhook] 🛑 Ignoring message for ${receiver} (Clean: ${cleanReceiver}). I am AbcToyz.`);
@@ -250,6 +257,7 @@ export async function POST(req: Request) {
 
             if (messageDate > twentyFourHoursAgo) {
                 console.log(`[WhatsApp] 👨‍💼 HUMAN TAKEOVER: Last reply was from an admin at ${latestAdminMessage.created_at}. AI staying silent for ${cleanPhone}.`);
+                console.log(`[WhatsApp] Admin status: role=${latestAdminMessage.role}, message="${latestAdminMessage.message}"`);
 
                 // Still log the incoming customer message
                 await supabase.from('whatsapp_conversations').insert({
