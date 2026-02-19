@@ -29,6 +29,18 @@ export async function POST(req: Request) {
         // Wrapper for Array handling
         const payload = Array.isArray(body) ? body[0] : body;
 
+        // --- RAW DEBUG LOG ---
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+        const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
+
+        await supabase.from('whatsapp_conversations').insert({
+            phone_number: 'DEBUG',
+            role: 'user',
+            message: `RAW_PAYLOAD: ${JSON.stringify(body).substring(0, 500)}`,
+            created_at: new Date().toISOString()
+        });
+
         // Detect if this is a "sent" event (outbound) or message event (inbound)
         // Check event names and also check if the sender is our own integrated number
         const TARGET_NUMBER = "8239269217"; // AbcToyz Core number
@@ -37,15 +49,13 @@ export async function POST(req: Request) {
             payload.direction === 'outbound' || payload.action === 'sent' || payload.direction === 'out' ||
             payload.event_type === 'sent' || payload.event === 'outbound-message-status';
 
-        // Extract fields
-        // For 'sent' messages, the customer's number is usually in 'recipient_number' or 'to'
-        let customerNumber = payload.recipient_number || payload.to || payload.recipient || payload.destination || payload.mobile || "";
-        let sender = payload.sender || payload.from || payload.mobile || payload.customerNumber || "";
-        let messageText = payload.message || payload.text?.body || payload.content || payload.text || payload.body || "";
+        // 🛑 Broaden extraction: Try almost every possible field name
+        let customerNumber = payload.recipient_number || payload.to || payload.recipient || payload.destination || payload.mobile || payload.customerNumber || payload.number || "";
+        let sender = payload.sender || payload.from || payload.mobile || payload.customerNumber || payload.number || "";
+        let messageText = payload.message || payload.text?.body || payload.content || payload.text || payload.body || payload.msg || "";
 
         // Normalize for comparison
-        const cleanSender = sender.replace(/\D/g, "");
-        const cleanCustomer = customerNumber.replace(/\D/g, "");
+        const cleanSender = typeof sender === 'string' ? sender.replace(/\D/g, "") : "";
 
         // REFINED DETECTION: If the SENDER is our business number, it's definitely sent by us
         const reallySentByMe = isSentByMe || (cleanSender && cleanSender.includes(TARGET_NUMBER));
@@ -58,18 +68,23 @@ export async function POST(req: Request) {
 
         if (!effectivePhone || !messageText) {
             console.log("[WhatsApp] Ignored: Missing phone or message.");
+            // Log rejection reason for debugging
+            await supabase.from('whatsapp_conversations').insert({
+                phone_number: 'DEBUG',
+                role: 'user',
+                message: `REJECTED: Missing phone (${effectivePhone}) or message (${messageText})`,
+                created_at: new Date().toISOString()
+            });
             return NextResponse.json({ status: "ignored" });
         }
 
         // Normalize (remove non-digits)
-        const cleanPhone = effectivePhone.replace(/\D/g, "");
+        const cleanPhone = typeof effectivePhone === 'string' ? effectivePhone.replace(/\D/g, "") : "";
 
-        console.log(`[WhatsApp] Processing ${isSentByMe ? 'OUTBOUND' : 'INBOUND'} message for ${cleanPhone}: "${messageText}"`);
+        console.log(`[WhatsApp] Processing ${reallySentByMe ? 'OUTBOUND' : 'INBOUND'} message for ${cleanPhone}: "${messageText}"`);
 
         // DEDUPLICATION: Check if we processed this exact message recently (within 2 minutes)
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-        const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
+        // (supabase client already initialized)
 
         const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
         const { data: recentMessages } = await supabase
