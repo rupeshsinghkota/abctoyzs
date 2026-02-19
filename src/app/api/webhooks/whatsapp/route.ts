@@ -29,21 +29,27 @@ export async function POST(req: Request) {
         // Wrapper for Array handling
         const payload = Array.isArray(body) ? body[0] : body;
 
+        // Detect if this is a "sent" event (outbound) or message event (inbound)
+        const isSentByMe = payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent' || payload.direction === 'outbound';
+
         // Extract fields
+        // For 'sent' messages, the customer's number is usually in 'recipient_number' or 'to'
+        let customerNumber = payload.recipient_number || payload.to || payload.recipient || "";
         let sender = payload.sender || payload.from || payload.mobile || payload.customerNumber || "";
         let messageText = payload.message || payload.text?.body || payload.content || payload.text || "";
 
+        // If it's sent by me, the 'sender' is our business, and we care about the 'customerNumber'
+        const effectivePhone = isSentByMe ? customerNumber : sender;
 
-
-        if (!sender || !messageText) {
-            console.log("[WhatsApp] Ignored: Missing sender or message.");
+        if (!effectivePhone || !messageText) {
+            console.log("[WhatsApp] Ignored: Missing phone or message.");
             return NextResponse.json({ status: "ignored" });
         }
 
-        // Normalize sender (remove non-digits)
-        sender = sender.replace(/\D/g, "");
+        // Normalize (remove non-digits)
+        const cleanPhone = effectivePhone.replace(/\D/g, "");
 
-        console.log(`[WhatsApp] Processing message from ${sender}: "${messageText}"`);
+        console.log(`[WhatsApp] Processing ${isSentByMe ? 'OUTBOUND' : 'INBOUND'} message for ${cleanPhone}: "${messageText}"`);
 
         // DEDUPLICATION: Check if we processed this exact message recently (within 2 minutes)
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -54,8 +60,8 @@ export async function POST(req: Request) {
         const { data: recentMessages } = await supabase
             .from('whatsapp_conversations')
             .select('message, created_at')
-            .eq('phone_number', sender)
-            .eq('role', 'user')
+            .eq('phone_number', cleanPhone)
+            .eq('role', isSentByMe ? 'admin' : 'user')
             .eq('message', messageText)
             .gte('created_at', twoMinutesAgo)
             .limit(1);
@@ -68,12 +74,13 @@ export async function POST(req: Request) {
         // 🛑 MULTI-TENANT FILTER: Ignore messages NOT meant for AbcToyz
         // AbcToyz Number: 918239269217
         const TARGET_NUMBER = "8239269217"; // Core number
-        let rawReceiver = body.receiver || body.integratedNumber || body.integrated_number || "";
-        const cleanReceiver = typeof rawReceiver === 'string' ? rawReceiver.replace(/\D/g, "") : "";
+        // If receiver IS present (inbound), it must be us. 
+        // If integrated_number IS present (outbound), it must be us.
+        const receiver = body.receiver || body.integratedNumber || body.integrated_number || "";
+        const cleanReceiver = typeof receiver === 'string' ? receiver.replace(/\D/g, "") : "";
 
-        // If receiver is present and DOES NOT contain our core number, ignore it.
         if (cleanReceiver && !cleanReceiver.includes(TARGET_NUMBER)) {
-            console.log(`[WhatsApp Webhook] 🛑 Ignoring message for ${rawReceiver} (Clean: ${cleanReceiver}). I am AbcToyz.`);
+            console.log(`[WhatsApp Webhook] 🛑 Ignoring message for ${receiver} (Clean: ${cleanReceiver}). I am AbcToyz.`);
             return NextResponse.json({ status: "ignored", reason: "wrong_number" });
         }
 
@@ -81,13 +88,13 @@ export async function POST(req: Request) {
         // (Supabase client already initialized above for deduplication)
 
         // Check if a user exists with this phone number (search in addresses linked to orders)
-        console.log(`[Context] Fetching orders for phone: ${sender}`);
+        console.log(`[Context] Fetching orders for phone: ${cleanPhone}`);
 
         // Try multiple phone number variations for better matching
         const phoneVariations = [
-            sender,                                    // 918239269217
-            sender.substring(2),                       // 8239269217 (without 91)
-            sender.substring(0, 2) + ' ' + sender.substring(2), // 91 8239269217
+            cleanPhone,                                    // 918239269217
+            cleanPhone.substring(2),                       // 8239269217 (without 91)
+            cleanPhone.substring(0, 2) + ' ' + cleanPhone.substring(2), // 91 8239269217
         ];
 
         console.log(`[Context] Trying phone variations:`, phoneVariations);
@@ -175,14 +182,14 @@ export async function POST(req: Request) {
         if (orderError) {
             console.error(`[Context] Order fetch error:`, orderError);
         } else {
-            console.log(`[Context] Found ${recentOrders?.length || 0} orders for ${sender}`);
+            console.log(`[Context] Found ${recentOrders?.length || 0} orders for ${cleanPhone}`);
         }
 
         // Build RICH context with full customer data
         let userContext = `
 # USER CONTEXT
 - Customer Name: ${customerName || 'Customer'}
-- Phone Number: ${sender}
+- Phone Number: ${cleanPhone}
 - Authentication: WhatsApp User (Mobile Verified)
 `;
 
@@ -218,23 +225,35 @@ export async function POST(req: Request) {
         const { data: conversationHistory } = await supabase
             .from('whatsapp_conversations')
             .select('role, message, created_at')
-            .eq('phone_number', sender)
+            .eq('phone_number', cleanPhone)
             .order('created_at', { ascending: false })
             .limit(10);
 
         // --- HUMAN TAKEOVER DETECTION ---
-        // Check if an admin has replied recently (last 24 hours)
+        // 1. If this message is Sent By Admin (Outbound), log it and skip AI
+        if (isSentByMe) {
+            console.log(`[WhatsApp] 📤 Logging OUTBOUND message from admin for ${cleanPhone}`);
+            await supabase.from('whatsapp_conversations').insert({
+                phone_number: cleanPhone,
+                role: 'admin',
+                message: messageText,
+                created_at: new Date().toISOString()
+            });
+            return NextResponse.json({ status: "success", reason: "admin_reply_logged" });
+        }
+
+        // 2. Check if an admin has replied recently (last 24 hours)
         const latestAdminMessage = conversationHistory?.find(msg => msg.role === 'admin' || msg.role === 'model_handover');
         if (latestAdminMessage) {
             const messageDate = new Date(latestAdminMessage.created_at);
             const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 1000 * 60);
 
             if (messageDate > twentyFourHoursAgo) {
-                console.log(`[WhatsApp] 👨‍💼 HUMAN TAKEOVER: Last reply was from an admin at ${latestAdminMessage.created_at}. AI staying silent.`);
+                console.log(`[WhatsApp] 👨‍💼 HUMAN TAKEOVER: Last reply was from an admin at ${latestAdminMessage.created_at}. AI staying silent for ${cleanPhone}.`);
 
-                // Still log the user customer message as history
+                // Still log the incoming customer message
                 await supabase.from('whatsapp_conversations').insert({
-                    phone_number: sender,
+                    phone_number: cleanPhone,
                     role: 'user',
                     message: messageText,
                     created_at: new Date().toISOString()
@@ -244,23 +263,12 @@ export async function POST(req: Request) {
             }
         }
 
-        // Detect if THIS incoming webhook is a "sent" message (Sent by admin from phone)
-        // Some providers send 'sent' or 'delivered' events for messages sent from the device
-        const isSentByMe = payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent';
-        if (isSentByMe) {
-            console.log(`[WhatsApp] 📤 Detected message SENT BY ADMIN. Logging as admin role.`);
-            await supabase.from('whatsapp_conversations').insert({
-                phone_number: sender,
-                role: 'admin',
-                message: messageText,
-                created_at: new Date().toISOString()
-            });
-            return NextResponse.json({ status: "success", reason: "admin_sent_logged" });
-        }
+        // 3. Detect if THIS incoming webhook is a "sent" message (Sent by admin from phone)
+        // (Handled above in step 1)
 
         // Reverse to get chronological order (oldest first) for AI context
         const history = conversationHistory ? conversationHistory.reverse().map(msg => ({
-            role: msg.role === 'admin' ? 'model' : msg.role, // Treat admin as model for context
+            role: (msg.role === 'admin' || msg.role === 'model_handover') ? 'model' : msg.role,
             parts: [{ text: msg.message }]
         })) : [];
 
@@ -280,7 +288,7 @@ export async function POST(req: Request) {
 
             // Still save the user message
             await supabase.from('whatsapp_conversations').insert({
-                phone_number: sender,
+                phone_number: cleanPhone,
                 role: 'user',
                 message: messageText,
                 created_at: new Date().toISOString()
@@ -291,9 +299,9 @@ export async function POST(req: Request) {
 
         const response = await AuraService.generateResponse(messageText, history, userContext);
 
-        // 4. Save User Message to History
+        // 4. Save User Message to History (If not already saved)
         await supabase.from('whatsapp_conversations').insert({
-            phone_number: sender,
+            phone_number: cleanPhone,
             role: 'user',
             message: messageText,
             created_at: new Date().toISOString()
@@ -301,12 +309,12 @@ export async function POST(req: Request) {
 
         // 5. Send Reply
         if (response.text) {
-            await WhatsAppService.sendMessage(sender, response.text);
+            await WhatsAppService.sendMessage(cleanPhone, response.text);
 
             // 6. Save AI Response to History
             await supabase.from('whatsapp_conversations').insert({
-                phone_number: sender,
-                role: 'model',
+                phone_number: cleanPhone,
+                role: response.handover ? 'model_handover' : 'model',
                 message: response.text,
                 created_at: new Date().toISOString()
             });
