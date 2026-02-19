@@ -13,6 +13,14 @@ export async function POST(req: Request) {
     try {
         console.log("Incoming WhatsApp Webhook Raw:", rawBody);
 
+        // --- GLOBAL DEBUG WITNESS ---
+        await supabase.from('whatsapp_conversations').insert({
+            phone_number: 'DEBUG_V3',
+            role: 'user',
+            message: `HIT: ${rawBody.substring(0, 200)}...`,
+            created_at: new Date().toISOString()
+        });
+
         let body: any = {};
         try {
             body = JSON.parse(rawBody);
