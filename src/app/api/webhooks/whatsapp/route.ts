@@ -219,7 +219,7 @@ export async function POST(req: Request) {
                 created_at: new Date().toISOString()
             });
         } catch (inner) {
-            console.error("FAILED TO LOG ERROR TO DB:", inner.message);
+            console.error("FAILED TO LOG ERROR TO DB:", inner instanceof Error ? inner.message : String(inner));
         }
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
