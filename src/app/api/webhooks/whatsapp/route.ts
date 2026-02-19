@@ -30,6 +30,9 @@ export async function POST(req: Request) {
         const payload = Array.isArray(body) ? body[0] : body;
 
         // Detect if this is a "sent" event (outbound) or message event (inbound)
+        // Check event names and also check if the sender is our own integrated number
+        const TARGET_NUMBER = "8239269217"; // AbcToyz Core number
+
         const isSentByMe = payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent' ||
             payload.direction === 'outbound' || payload.action === 'sent' || payload.direction === 'out' ||
             payload.event_type === 'sent' || payload.event === 'outbound-message-status';
@@ -40,11 +43,18 @@ export async function POST(req: Request) {
         let sender = payload.sender || payload.from || payload.mobile || payload.customerNumber || "";
         let messageText = payload.message || payload.text?.body || payload.content || payload.text || payload.body || "";
 
+        // Normalize for comparison
+        const cleanSender = sender.replace(/\D/g, "");
+        const cleanCustomer = customerNumber.replace(/\D/g, "");
+
+        // REFINED DETECTION: If the SENDER is our business number, it's definitely sent by us
+        const reallySentByMe = isSentByMe || (cleanSender && cleanSender.includes(TARGET_NUMBER));
+
         // If it's sent by me, the 'sender' is our business, and we care about the 'customerNumber'
-        const effectivePhone = isSentByMe ? customerNumber : sender;
+        const effectivePhone = reallySentByMe ? customerNumber : sender;
 
         console.log(`[WhatsApp Webhook DEBUG] Payload:`, JSON.stringify(body, null, 2));
-        console.log(`[WhatsApp Webhook DEBUG] isSentByMe: ${isSentByMe}, effectivePhone: ${effectivePhone}`);
+        console.log(`[WhatsApp Webhook DEBUG] isSentByMe: ${isSentByMe}, reallySentByMe: ${reallySentByMe}, effectivePhone: ${effectivePhone}`);
 
         if (!effectivePhone || !messageText) {
             console.log("[WhatsApp] Ignored: Missing phone or message.");
@@ -78,7 +88,7 @@ export async function POST(req: Request) {
 
         // 🛑 MULTI-TENANT FILTER: Ignore messages NOT meant for AbcToyz
         // AbcToyz Number: 918239269217
-        const TARGET_NUMBER = "8239269217"; // Core number
+        // (TARGET_NUMBER defined above)
         // If receiver IS present (inbound), it must be us. 
         // If integrated_number IS present (outbound), it must be us.
         const receiver = body.receiver || body.integratedNumber || body.integrated_number ||
@@ -241,7 +251,7 @@ export async function POST(req: Request) {
 
         // --- HUMAN TAKEOVER DETECTION ---
         // 1. If this message is Sent By Admin (Outbound), log it and skip AI
-        if (isSentByMe) {
+        if (reallySentByMe) {
             console.log(`[WhatsApp] 📤 Logging OUTBOUND message from admin for ${cleanPhone}`);
             // Use 'model' role to bypass DB constraint if 'admin' is not allowed, 
             // but add a prefix for detection logic.
