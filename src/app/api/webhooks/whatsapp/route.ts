@@ -42,10 +42,14 @@ export async function POST(req: Request) {
         });
 
         // Detect if this is a "sent" event (outbound) or message event (inbound)
-        // Check event names and also check if the sender is our own integrated number
-        const TARGET_NUMBER = "8239269217"; // AbcToyz Core number
+        // AbcToyz Number: 918239269217
+        const TARGET_NUMBER = "8239269217";
 
-        const isSentByMe = payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent' ||
+        // MSG91 direction: 1 means outbound. direction: 0 means inbound.
+        const directionValue = payload.direction;
+        const isDirectionOutbound = directionValue === 1 || directionValue === '1' || directionValue === 'outbound' || payload.direction_id === 1;
+
+        const isSentByMe = isDirectionOutbound || payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent' ||
             payload.direction === 'outbound' || payload.action === 'sent' || payload.direction === 'out' ||
             payload.event_type === 'sent' || payload.event === 'outbound-message-status';
 
@@ -58,13 +62,15 @@ export async function POST(req: Request) {
         const cleanSender = typeof sender === 'string' ? sender.replace(/\D/g, "") : "";
 
         // REFINED DETECTION: If the SENDER is our business number, it's definitely sent by us
+        // Also check if it's an outbound direction and has text (actual manual reply)
+        const hasTextContent = typeof messageText === 'string' && messageText.trim().length > 0;
         const reallySentByMe = isSentByMe || (cleanSender && cleanSender.includes(TARGET_NUMBER));
 
-        // If it's sent by me, the 'sender' is our business, and we care about the 'customerNumber'
+        // If it's sent by me, we care about the 'customerNumber' (recipient)
         const effectivePhone = reallySentByMe ? customerNumber : sender;
 
         console.log(`[WhatsApp Webhook DEBUG] Payload:`, JSON.stringify(body, null, 2));
-        console.log(`[WhatsApp Webhook DEBUG] isSentByMe: ${isSentByMe}, reallySentByMe: ${reallySentByMe}, effectivePhone: ${effectivePhone}`);
+        console.log(`[WhatsApp Webhook DEBUG] reallySentByMe: ${reallySentByMe}, effectivePhone: ${effectivePhone}`);
 
         if (!effectivePhone || !messageText) {
             console.log("[WhatsApp] Ignored: Missing phone or message.");
@@ -266,17 +272,53 @@ export async function POST(req: Request) {
 
         // --- HUMAN TAKEOVER DETECTION ---
         // 1. If this message is Sent By Admin (Outbound), log it and skip AI
-        if (reallySentByMe) {
+        if (reallySentByMe && hasTextContent) {
             console.log(`[WhatsApp] 📤 Logging OUTBOUND message from admin for ${cleanPhone}`);
             // Use 'model' role to bypass DB constraint if 'admin' is not allowed, 
             // but add a prefix for detection logic.
+            // Log message_id in metadata if available for context tracking
+            const messageId = payload.wamid || payload.uuid || payload.message_uuid || payload.id;
             await supabase.from('whatsapp_conversations').insert({
                 phone_number: cleanPhone,
                 role: 'model', // Fallback role
                 message: `(ADMIN) ${messageText}`,
+                metadata: messageId ? { message_id: messageId } : undefined,
                 created_at: new Date().toISOString()
             });
             return NextResponse.json({ status: "success", reason: "admin_reply_logged" });
+        }
+
+        // 1.B CONTEXT CHECK (REPLY TO UNKNOWN MESSAGE)
+        // If the customer is replying to a message we don't have in our history,
+        // it means a human sent that message from the dashboard/phone.
+        const contextId = payload.context?.id || payload.reply_to_message_id ||
+            payload.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.context?.id;
+
+        if (!reallySentByMe && contextId) {
+            const { data: knownMessage } = await supabase
+                .from('whatsapp_conversations')
+                .select('id')
+                .contains('metadata', { message_id: contextId })
+                .limit(1);
+
+            if (!knownMessage || knownMessage.length === 0) {
+                console.log(`[WhatsApp] 🛑 CONTEXT TAKEOVER: User replied to unknown msg ${contextId}. AI silence for ${cleanPhone}.`);
+                await supabase.from('whatsapp_conversations').insert({
+                    phone_number: cleanPhone,
+                    role: 'model',
+                    message: `(ADMIN) [Intervention Detected via Context Reply]`,
+                    created_at: new Date().toISOString()
+                });
+
+                // Still log the customer's message
+                await supabase.from('whatsapp_conversations').insert({
+                    phone_number: cleanPhone,
+                    role: 'user',
+                    message: messageText,
+                    created_at: new Date().toISOString()
+                });
+                return NextResponse.json({ status: "success", reason: "context_takeover" });
+            }
         }
 
         // 2. Check if an admin has replied recently (last 24 hours)
@@ -353,13 +395,15 @@ export async function POST(req: Request) {
 
         // 5. Send Reply
         if (response.text) {
-            await WhatsAppService.sendMessage(cleanPhone, response.text);
+            const sendResult = await WhatsAppService.sendMessage(cleanPhone, response.text);
+            const sentMessageId = (sendResult as any)?.message_uuid || (sendResult as any)?.wamid;
 
             // 6. Save AI Response to History
             await supabase.from('whatsapp_conversations').insert({
                 phone_number: cleanPhone,
                 role: response.handover ? 'model_handover' : 'model',
                 message: response.text,
+                metadata: sentMessageId ? { message_id: sentMessageId } : undefined,
                 created_at: new Date().toISOString()
             });
         }
