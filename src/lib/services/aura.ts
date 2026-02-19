@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@supabase/supabase-js";
+import { WhatsAppService } from "./whatsapp";
 
 // Helper to get Supabase Client
 function getSupabase() {
@@ -210,6 +211,17 @@ async function shipping_calculator({ pincode }: { pincode: string }) {
 
 async function notify_chandan({ reason, customer_phone }: { reason: string, customer_phone?: string }) {
     console.log(`[HANDOVER] Reason: ${reason}, Customer: ${customer_phone || 'Unknown'}`);
+
+    // Send WhatsApp alert to Chandan
+    const adminPhone = process.env.ADMIN_PHONE_NUMBER || "919155149597";
+    const alertMessage = `🚨 *HANDOVER ALERT*\n\nReason: ${reason}\nCustomer: ${customer_phone || 'Unknown'}\n\nPlease check the dashboard to respond.`;
+
+    try {
+        await WhatsAppService.sendMessage(adminPhone, alertMessage);
+    } catch (e) {
+        console.error("Failed to notify Chandan via WhatsApp:", e);
+    }
+
     return "HANDOVER_TRIGGERED";
 }
 
