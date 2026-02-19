@@ -21,14 +21,6 @@ export async function POST(req: Request) {
             body = Object.fromEntries(params);
         }
 
-        // --- IMMEDIATE RAW DEBUG LOG ---
-        await supabase.from('whatsapp_conversations').insert({
-            phone_number: 'DEBUG',
-            role: 'user',
-            message: `RAW_PAYLOAD: ${rawBody}`,
-            created_at: new Date().toISOString()
-        });
-
         const payload = Array.isArray(body) ? body[0] : (body.entry?.[0]?.changes?.[0]?.value || body);
 
         // --- ROBUST PARSING FOR STRINGIFIED MESSAGES ---
