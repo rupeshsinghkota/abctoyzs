@@ -222,9 +222,45 @@ export async function POST(req: Request) {
             .order('created_at', { ascending: false })
             .limit(10);
 
-        // Reverse to get chronological order (oldest first)
+        // --- HUMAN TAKEOVER DETECTION ---
+        // Check if an admin has replied recently (last 24 hours)
+        const latestAdminMessage = conversationHistory?.find(msg => msg.role === 'admin' || msg.role === 'model_handover');
+        if (latestAdminMessage) {
+            const messageDate = new Date(latestAdminMessage.created_at);
+            const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 1000 * 60);
+
+            if (messageDate > twentyFourHoursAgo) {
+                console.log(`[WhatsApp] 👨‍💼 HUMAN TAKEOVER: Last reply was from an admin at ${latestAdminMessage.created_at}. AI staying silent.`);
+
+                // Still log the user customer message as history
+                await supabase.from('whatsapp_conversations').insert({
+                    phone_number: sender,
+                    role: 'user',
+                    message: messageText,
+                    created_at: new Date().toISOString()
+                });
+
+                return NextResponse.json({ status: "success", reason: "human_takeover" });
+            }
+        }
+
+        // Detect if THIS incoming webhook is a "sent" message (Sent by admin from phone)
+        // Some providers send 'sent' or 'delivered' events for messages sent from the device
+        const isSentByMe = payload.event === 'sent' || payload.type === 'sent' || payload.status === 'sent';
+        if (isSentByMe) {
+            console.log(`[WhatsApp] 📤 Detected message SENT BY ADMIN. Logging as admin role.`);
+            await supabase.from('whatsapp_conversations').insert({
+                phone_number: sender,
+                role: 'admin',
+                message: messageText,
+                created_at: new Date().toISOString()
+            });
+            return NextResponse.json({ status: "success", reason: "admin_sent_logged" });
+        }
+
+        // Reverse to get chronological order (oldest first) for AI context
         const history = conversationHistory ? conversationHistory.reverse().map(msg => ({
-            role: msg.role, // 'user' or 'model'
+            role: msg.role === 'admin' ? 'model' : msg.role, // Treat admin as model for context
             parts: [{ text: msg.message }]
         })) : [];
 
