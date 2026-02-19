@@ -277,7 +277,8 @@ export async function POST(req: Request) {
 
         // --- HUMAN TAKEOVER DETECTION ---
         // 1. If this message is Sent By Admin (Outbound), log it and skip AI
-        if (reallySentByMe && hasTextContent) {
+        // Check messageText directly as it might have been updated with a placeholder above
+        if (reallySentByMe && (hasTextContent || messageText)) {
             console.log(`[WhatsApp] 📤 Logging OUTBOUND message from admin for ${cleanPhone}`);
             // Use 'model' role to bypass DB constraint if 'admin' is not allowed, 
             // but add a prefix for detection logic.
