@@ -10,6 +10,7 @@ interface Settings {
     cod_mode: 'normal' | 'partial';
     cod_advance_type: 'percentage' | 'fixed';
     cod_advance_value: number;
+    ai_reply_enabled: boolean;
 }
 
 export default function SettingsPage() {
@@ -19,7 +20,8 @@ export default function SettingsPage() {
         id: '',
         cod_mode: 'normal',
         cod_advance_type: 'percentage',
-        cod_advance_value: 0
+        cod_advance_value: 0,
+        ai_reply_enabled: true
     });
 
     const supabase = createClient();
@@ -44,7 +46,8 @@ export default function SettingsPage() {
                         .insert([{
                             cod_mode: 'normal',
                             cod_advance_type: 'percentage',
-                            cod_advance_value: 0
+                            cod_advance_value: 0,
+                            ai_reply_enabled: true
                         }])
                         .select()
                         .single();
@@ -59,7 +62,8 @@ export default function SettingsPage() {
                     id: data.id,
                     cod_mode: data.cod_mode || 'normal',
                     cod_advance_type: data.cod_advance_type || 'percentage',
-                    cod_advance_value: data.cod_advance_value || 0
+                    cod_advance_value: data.cod_advance_value || 0,
+                    ai_reply_enabled: data.ai_reply_enabled !== false // Default to true if null
                 });
             }
         } catch (error: any) {
@@ -78,7 +82,8 @@ export default function SettingsPage() {
                 .update({
                     cod_mode: settings.cod_mode,
                     cod_advance_type: settings.cod_advance_type,
-                    cod_advance_value: settings.cod_advance_value
+                    cod_advance_value: settings.cod_advance_value,
+                    ai_reply_enabled: settings.ai_reply_enabled
                 })
                 .eq('id', settings.id);
 
@@ -230,7 +235,48 @@ export default function SettingsPage() {
                     </div>
                 </div>
 
-                {/* 2. Future Settings Placeholders */}
+                {/* 2. AI Configuration Card */}
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div className="flex items-start gap-4 mb-6">
+                        <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center shrink-0">
+                            <span className="text-xl font-bold text-purple-600">AI</span>
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-lg font-bold text-gray-900">AI Configuration</h2>
+                                    <p className="text-sm text-gray-500 mt-1">Manage AI-powered customer interactions.</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={settings.ai_reply_enabled}
+                                        onChange={(e) => setSettings({ ...settings, ai_reply_enabled: e.target.checked })}
+                                    />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-black/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="pl-0 md:pl-14">
+                        <div className="bg-purple-50/50 rounded-lg p-4 border border-purple-100">
+                            <h3 className="text-sm font-bold text-purple-900 mb-1">WhatsApp AI Replies</h3>
+                            <p className="text-sm text-purple-800/80">
+                                When enabled, the AI will automatically respond to customer inquiries on WhatsApp using order context and store information.
+                            </p>
+                            {!settings.ai_reply_enabled && (
+                                <div className="mt-3 flex items-center gap-2 text-amber-600 font-medium text-sm">
+                                    <Ban className="w-4 h-4" />
+                                    AI replies are currently disabled
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3. Future Settings Placeholders */}
                 {/* Add more cards here for Shipping, SEO, etc. */}
             </div>
         </div>

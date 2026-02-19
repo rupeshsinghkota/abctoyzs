@@ -231,6 +231,28 @@ export async function POST(req: Request) {
         console.log(`[Context] Loaded ${history.length} messages from conversation history`);
 
         // 3. Generate Response
+        // Fetch AI reply toggle setting
+        const { data: globalSettings } = await supabase
+            .from('settings')
+            .select('ai_reply_enabled')
+            .single();
+
+        const aiEnabled = globalSettings ? globalSettings.ai_reply_enabled !== false : true;
+
+        if (!aiEnabled) {
+            console.log("[WhatsApp] AI Reply disabled in settings. Skipping response.");
+
+            // Still save the user message
+            await supabase.from('whatsapp_conversations').insert({
+                phone_number: sender,
+                role: 'user',
+                message: messageText,
+                created_at: new Date().toISOString()
+            });
+
+            return NextResponse.json({ status: "success", reason: "ai_disabled" });
+        }
+
         const response = await AuraService.generateResponse(messageText, history, userContext);
 
         // 4. Save User Message to History
