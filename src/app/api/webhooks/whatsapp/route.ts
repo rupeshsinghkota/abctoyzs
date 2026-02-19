@@ -204,15 +204,8 @@ export async function POST(req: Request) {
 
         if (response.text) {
             const sendResult = await WhatsAppService.sendMessage(cleanPhone, response.text);
-            const sentWamid = (sendResult as any)?.message_uuid || (sendResult as any)?.wamid || (sendResult as any)?.uuid || (sendResult as any)?.request_id;
-
-            // Temporary Debug Log
-            await supabase.from('whatsapp_conversations').insert({
-                phone_number: 'DEBUG_SEND',
-                role: 'user',
-                message: `SEND_RESULT: ${JSON.stringify(sendResult)}`,
-                created_at: new Date().toISOString()
-            });
+            const sentWamid = (sendResult as any)?.data?.message_uuid || (sendResult as any)?.message_uuid ||
+                (sendResult as any)?.wamid || (sendResult as any)?.uuid || (sendResult as any)?.request_id;
 
             await supabase.from('whatsapp_conversations').insert({
                 phone_number: cleanPhone,
