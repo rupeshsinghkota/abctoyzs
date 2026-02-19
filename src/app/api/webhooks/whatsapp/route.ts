@@ -121,7 +121,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ status: "success", reason: "admin_reply_logged" });
         }
 
-        // 5. RATE LIMITING (Max 3 messages in last 1 hour)
+        // 5. PROCEED TO LOG USER MESSAGE (Early, so we see attempts in DB)
+        await supabase.from('whatsapp_conversations').insert({
+            phone_number: cleanPhone,
+            role: 'user',
+            message: `[WAMID:${wamid || 'N/A'}] ${messageText || '[Unsupported Content or Empty Message]'}`,
+            created_at: new Date().toISOString()
+        });
+
+        // 6. RATE LIMITING (Max 10 messages in last 1 hour)
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         const { count: recentMsgCount } = await supabase
             .from('whatsapp_conversations')
@@ -130,11 +138,19 @@ export async function POST(req: Request) {
             .eq('role', 'user')
             .gt('created_at', oneHourAgo);
 
-        if ((recentMsgCount || 0) >= 3) {
+        if ((recentMsgCount || 0) > 10) {
             console.log(`[WhatsApp] 🛑 Rate Limit Triggered for ${cleanPhone}. (${recentMsgCount} msgs/hr)`);
 
-            // Only send the "Stop" message once per burst
-            if (recentMsgCount === 3) {
+            // Only send the "Stop" message if we haven't already sent a handover today
+            const { data: recentHandoff } = await supabase
+                .from('whatsapp_conversations')
+                .select('id')
+                .eq('phone_number', cleanPhone)
+                .eq('role', 'model_handover')
+                .gt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+                .maybeSingle();
+
+            if (!recentHandoff) {
                 const limitMessage = "I've received several messages from you. To ensure you get the best assistance, I've notified our team. Someone will contact you shortly! 😊";
                 await supabase.from('whatsapp_conversations').insert({
                     phone_number: cleanPhone,
@@ -143,29 +159,10 @@ export async function POST(req: Request) {
                     created_at: new Date().toISOString()
                 });
 
-                // Send the actual WhatsApp message
-                try {
-                    const msg91Response = await fetch('https://api.msg91.com/api/v5/whatsapp/send', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'authkey': process.env.MSG91_AUTH_KEY || ''
-                        },
-                        body: JSON.stringify({
-                            integrated_number: TARGET_NUMBER,
-                            content_type: 'text',
-                            payload: {
-                                to: cleanPhone,
-                                type: 'text',
-                                text: limitMessage
-                            }
-                        })
-                    });
-                    const resJson = await msg91Response.json();
-                    console.log("[WhatsApp] Rate limit notification sent:", resJson);
-                } catch (e) {
-                    console.error("[WhatsApp] Failed to send rate limit notice:", e);
-                }
+                // Send actual notification to customer
+                await WhatsAppService.sendMessage(cleanPhone, limitMessage);
+                // Notify Chandan
+                await AuraService.generateResponse("SYSTEM_RATE_LIMIT_NOTICE", [], `# HANDOVER\nReason: Rate Limit Exceeded for ${cleanPhone}`);
             }
 
             return NextResponse.json({ status: "success", reason: "rate_limited" });
@@ -173,14 +170,8 @@ export async function POST(req: Request) {
 
         // --- CHECK FOR EMPTY MESSAGES ---
         if (!messageText) {
-            console.log("[WhatsApp] ⚠️ Empty message text, possibly unsupported content. Logging and ignoring AI reply.");
-            await supabase.from('whatsapp_conversations').insert({
-                phone_number: cleanPhone,
-                role: 'user',
-                message: `[WAMID:${wamid || 'N/A'}] [Unsupported Content or Empty Message]`,
-                created_at: new Date().toISOString()
-            });
-            return NextResponse.json({ status: "success", reason: "empty_message_logged" });
+            console.log("[WhatsApp] ⚠️ Empty message text, possibly unsupported content. Already logged.");
+            return NextResponse.json({ status: "success", reason: "empty_message_ignored" });
         }
 
         // 5. HUMAN TAKEOVER CHECK
@@ -203,24 +194,11 @@ export async function POST(req: Request) {
 
             if (messageDate > twentyFourHoursAgo) {
                 console.log(`[WhatsApp] 👨‍💼 HUMAN TAKEOVER ACTIVE for ${cleanPhone}. AI silent.`);
-                await supabase.from('whatsapp_conversations').insert({
-                    phone_number: cleanPhone,
-                    role: 'user',
-                    message: `[WAMID:${wamid || 'N/A'}] ${messageText}`,
-                    created_at: new Date().toISOString()
-                });
                 return NextResponse.json({ status: "success", reason: "human_takeover_active" });
             }
         }
 
-        // 6. PROCEED TO AI RESPONSE
-        await supabase.from('whatsapp_conversations').insert({
-            phone_number: cleanPhone,
-            role: 'user',
-            message: `[WAMID:${wamid || 'N/A'}] ${messageText}`,
-            created_at: new Date().toISOString()
-        });
-
+        // 7. PROCEED TO AI RESPONSE
         const { data: globalSettings } = await supabase.from('settings').select('ai_reply_enabled').single();
         if (globalSettings?.ai_reply_enabled === false) {
             return NextResponse.json({ status: "success", reason: "ai_disabled" });
