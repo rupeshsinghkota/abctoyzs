@@ -243,17 +243,25 @@ export async function POST(req: Request) {
         // 1. If this message is Sent By Admin (Outbound), log it and skip AI
         if (isSentByMe) {
             console.log(`[WhatsApp] 📤 Logging OUTBOUND message from admin for ${cleanPhone}`);
+            // Use 'model' role to bypass DB constraint if 'admin' is not allowed, 
+            // but add a prefix for detection logic.
             await supabase.from('whatsapp_conversations').insert({
                 phone_number: cleanPhone,
-                role: 'admin',
-                message: messageText,
+                role: 'model', // Fallback role
+                message: `(ADMIN) ${messageText}`,
                 created_at: new Date().toISOString()
             });
             return NextResponse.json({ status: "success", reason: "admin_reply_logged" });
         }
 
         // 2. Check if an admin has replied recently (last 24 hours)
-        const latestAdminMessage = conversationHistory?.find(msg => msg.role === 'admin' || msg.role === 'model_handover');
+        // We check for 'admin' role or 'model' role with '(ADMIN)' prefix
+        const latestAdminMessage = conversationHistory?.find(msg =>
+            msg.role === 'admin' ||
+            msg.role === 'model_handover' ||
+            (msg.role === 'model' && msg.message?.startsWith('(ADMIN)'))
+        );
+
         if (latestAdminMessage) {
             const messageDate = new Date(latestAdminMessage.created_at);
             const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 1000 * 60);
@@ -279,7 +287,7 @@ export async function POST(req: Request) {
 
         // Reverse to get chronological order (oldest first) for AI context
         const history = conversationHistory ? conversationHistory.reverse().map(msg => ({
-            role: (msg.role === 'admin' || msg.role === 'model_handover') ? 'model' : msg.role,
+            role: (msg.role === 'admin' || msg.role === 'model_handover' || (msg.role === 'model' && msg.message?.startsWith('(ADMIN)'))) ? 'model' : msg.role,
             parts: [{ text: msg.message }]
         })) : [];
 
