@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         await supabase.from('whatsapp_conversations').insert({
             phone_number: 'DEBUG',
             role: 'user',
-            message: `RAW_PAYLOAD: ${JSON.stringify(body).substring(0, 500)}`,
+            message: `RAW_PAYLOAD: ${JSON.stringify(body)}`,
             created_at: new Date().toISOString()
         });
 
