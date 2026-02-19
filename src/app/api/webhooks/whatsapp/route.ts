@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { AuraService } from "@/lib/services/aura";
-import { WhatsAppService } from "@/lib/services/whatsapp"; // Correct import path
+import { WhatsAppService } from "@/lib/services/whatsapp";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
@@ -11,15 +11,7 @@ export async function POST(req: Request) {
     const supabase = await import("@supabase/supabase-js").then(m => m.createClient(supabaseUrl, supabaseKey));
 
     try {
-        console.log("Incoming WhatsApp Webhook Raw:", rawBody);
-
-        // --- GLOBAL DEBUG WITNESS ---
-        await supabase.from('whatsapp_conversations').insert({
-            phone_number: 'DEBUG_V3',
-            role: 'user',
-            message: `HIT: ${rawBody.substring(0, 200)}...`,
-            created_at: new Date().toISOString()
-        });
+        console.log("Incoming WhatsApp Webhook...");
 
         let body: any = {};
         try {
@@ -48,16 +40,8 @@ export async function POST(req: Request) {
         if (statusUpdate && (['sent', 'delivered', 'read'].includes(statusUpdate.status))) {
             if (statusUpdate.status === 'sent' && wamid) {
                 await new Promise(r => setTimeout(r, 800)); // Grace period
-
-                // Check if this message was already logged using WAMID prefix
-                const { data: existingMsg } = await supabase
-                    .from('whatsapp_conversations')
-                    .select('id')
-                    .ilike('message', `%[WAMID:${wamid}]%`)
-                    .maybeSingle();
-
+                const { data: existingMsg } = await supabase.from('whatsapp_conversations').select('id').ilike('message', `%[WAMID:${wamid}]%`).maybeSingle();
                 if (!existingMsg) {
-                    console.log(`[WhatsApp] 🚀 Manual Admin Reply Detected via Status! WAMID: ${wamid}`);
                     const recipientPhone = statusUpdate.recipient_id?.replace(/\D/g, "");
                     if (recipientPhone) {
                         await supabase.from('whatsapp_conversations').insert({
@@ -71,6 +55,7 @@ export async function POST(req: Request) {
             }
             return NextResponse.json({ status: "success", reason: "status_update_processed" });
         }
+
         // 2. EXTRACT MESSAGE TEXT AND PHONE
         let customerPhone = payload.customerNumber || payload.recipient_number || payload.to || payload.from ||
             payload.recipient || payload.destination || payload.mobile || payload.customerNumber || payload.number ||
@@ -84,10 +69,7 @@ export async function POST(req: Request) {
         }
 
         // --- MULTI-TENANT FILTER ---
-        // If this hit is for a different business number (e.g. D2BCart 917557777987), ignore it.
-        // Incoming hits have integratedNumber = TARGET. Outbound manual hits have customerNumber = TARGET.
         if (integratedNum && integratedNum !== TARGET_NUMBER && cleanPhone !== TARGET_NUMBER) {
-            console.log(`[WhatsApp] 🛑 Ignoring hit for different business number: ${integratedNum}`);
             return NextResponse.json({ status: "ignored", reason: "wrong_business_number" });
         }
 
@@ -96,14 +78,8 @@ export async function POST(req: Request) {
 
         // 3. DEDUPLICATION
         if (wamid) {
-            const { data: alreadyProcessed } = await supabase
-                .from('whatsapp_conversations')
-                .select('id')
-                .ilike('message', `%[WAMID:${wamid}]%`)
-                .maybeSingle();
-
+            const { data: alreadyProcessed } = await supabase.from('whatsapp_conversations').select('id').ilike('message', `%[WAMID:${wamid}]%`).maybeSingle();
             if (alreadyProcessed) {
-                console.log(`[WhatsApp] 🛑 Duplicate Hit Ignored. WAMID: ${wamid}`);
                 return NextResponse.json({ status: "ignored", reason: "duplicate_hit" });
             }
         }
@@ -115,9 +91,7 @@ export async function POST(req: Request) {
             payload.event === 'sent';
 
         if (isSentByMe) {
-            console.log(`[WhatsApp] 👩‍💼 Outbound message from ${cleanPhone}. Logging as Admin.`);
             const targetRecipient = (payload.to || payload.recipient_number || payload.recipient || payload.integratedNumber)?.replace(/\D/g, "");
-
             if (targetRecipient && targetRecipient !== TARGET_NUMBER) {
                 await supabase.from('whatsapp_conversations').insert({
                     phone_number: targetRecipient,
@@ -129,7 +103,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ status: "success", reason: "admin_reply_logged" });
         }
 
-        // 5. PROCEED TO LOG USER MESSAGE (Early, so we see attempts in DB)
+        // --- PROCEED TO LOG USER MESSAGE EARLY ---
         await supabase.from('whatsapp_conversations').insert({
             phone_number: cleanPhone,
             role: 'user',
@@ -137,7 +111,7 @@ export async function POST(req: Request) {
             created_at: new Date().toISOString()
         });
 
-        // 6. RATE LIMITING (Max 10 messages in last 1 hour)
+        // 5. RATE LIMITING (Max 5 messages in last 1 hour)
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         const { count: recentMsgCount } = await supabase
             .from('whatsapp_conversations')
@@ -146,17 +120,9 @@ export async function POST(req: Request) {
             .eq('role', 'user')
             .gt('created_at', oneHourAgo);
 
-        if ((recentMsgCount || 0) > 10) {
+        if ((recentMsgCount || 0) > 5) {
             console.log(`[WhatsApp] 🛑 Rate Limit Triggered for ${cleanPhone}. (${recentMsgCount} msgs/hr)`);
-
-            // Only send the "Stop" message if we haven't already sent a handover today
-            const { data: recentHandoff } = await supabase
-                .from('whatsapp_conversations')
-                .select('id')
-                .eq('phone_number', cleanPhone)
-                .eq('role', 'model_handover')
-                .gt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-                .maybeSingle();
+            const { data: recentHandoff } = await supabase.from('whatsapp_conversations').select('id').eq('phone_number', cleanPhone).eq('role', 'model_handover').gt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).maybeSingle();
 
             if (!recentHandoff) {
                 const limitMessage = "I've received several messages from you. To ensure you get the best assistance, I've notified our team. Someone will contact you shortly! 😊";
@@ -166,53 +132,38 @@ export async function POST(req: Request) {
                     message: limitMessage,
                     created_at: new Date().toISOString()
                 });
-
-                // Send actual notification to customer
                 await WhatsAppService.sendMessage(cleanPhone, limitMessage);
-                // Notify Chandan
                 await AuraService.generateResponse("SYSTEM_RATE_LIMIT_NOTICE", [], `# HANDOVER\nReason: Rate Limit Exceeded for ${cleanPhone}`);
             }
-
             return NextResponse.json({ status: "success", reason: "rate_limited" });
         }
 
-        // --- CHECK FOR EMPTY MESSAGES ---
-        if (!messageText) {
-            console.log("[WhatsApp] ⚠️ Empty message text, possibly unsupported content. Already logged.");
-            return NextResponse.json({ status: "success", reason: "empty_message_ignored" });
-        }
-
-        // 5. HUMAN TAKEOVER CHECK
-        const { data: conversationHistory } = await supabase
-            .from('whatsapp_conversations')
-            .select('role, message, created_at')
-            .eq('phone_number', cleanPhone)
-            .order('created_at', { ascending: false })
-            .limit(10);
-
+        // 6. HUMAN TAKEOVER CHECK (Silences AI for 24h)
+        const { data: conversationHistory } = await supabase.from('whatsapp_conversations').select('role, message, created_at').eq('phone_number', cleanPhone).order('created_at', { ascending: false }).limit(10);
         const latestAdminMessage = conversationHistory?.find(msg =>
             msg.role === 'admin' ||
             msg.role === 'model_handover' ||
-            (msg.role === 'model' && (msg.message?.startsWith('(ADMIN)') || msg.message?.includes('[Manual Admin Reply]')))
+            (msg.role === 'model' && (msg.message?.includes('(ADMIN)') || msg.message?.includes('[Manual Admin Reply]')))
         );
 
         if (latestAdminMessage) {
             const messageDate = new Date(latestAdminMessage.created_at);
-            const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
-            if (messageDate > twentyFourHoursAgo) {
+            if (messageDate > new Date(Date.now() - 24 * 60 * 60 * 1000)) {
                 console.log(`[WhatsApp] 👨‍💼 HUMAN TAKEOVER ACTIVE for ${cleanPhone}. AI silent.`);
                 return NextResponse.json({ status: "success", reason: "human_takeover_active" });
             }
         }
 
-        // 7. PROCEED TO AI RESPONSE
+        if (!messageText) {
+            return NextResponse.json({ status: "success", reason: "empty_message_ignored" });
+        }
+
         const { data: globalSettings } = await supabase.from('settings').select('ai_reply_enabled').single();
         if (globalSettings?.ai_reply_enabled === false) {
             return NextResponse.json({ status: "success", reason: "ai_disabled" });
         }
 
-        // Rich Context
+        // 7. PROCEED TO AI RESPONSE
         const phoneVariations = [cleanPhone, cleanPhone.substring(2)];
         let customerName = null;
         let matchingAddresses = null;
@@ -223,14 +174,12 @@ export async function POST(req: Request) {
 
         let userContext = `# USER CONTEXT\n- Customer Name: ${customerName || 'Customer'}\n- Phone: ${cleanPhone}\n`;
         if (matchingAddresses?.length) {
-            const { data: orders } = await supabase.from('orders').select(`id, status, total_amount, created_at, tracking_id`).in('shipping_address_id', matchingAddresses.map(a => a.id)).order('created_at', { ascending: false }).limit(3);
-            if (orders?.length) {
-                userContext += `\n## RECENT ORDERS\n` + orders.map(o => `- Order #${o.id}: ${o.status}, Amount: ${o.total_amount}`).join('\n');
-            }
+            const { data: orders } = await supabase.from('orders').select(`id, status, total_amount, created_at`).in('shipping_address_id', matchingAddresses.map(a => a.id)).order('created_at', { ascending: false }).limit(3);
+            if (orders?.length) userContext += `\n## RECENT ORDERS\n` + orders.map(o => `- Order #${o.id}: ${o.status}, Amount: ${o.total_amount}`).join('\n');
         }
 
         const rawHistory = (conversationHistory || [])
-            .filter(msg => msg.message && !msg.message.includes(`[WAMID:${wamid}]`)) // Exclude current hit
+            .filter(msg => msg.message && !msg.message.includes(`[WAMID:${wamid}]`))
             .reverse()
             .map(msg => ({
                 role: (msg.role === 'admin' || msg.role === 'model_handover' || (msg.role === 'model' && msg.message?.includes('(ADMIN)'))) ? 'model' : msg.role as 'user' | 'model',
@@ -241,12 +190,9 @@ export async function POST(req: Request) {
         const history = firstUserIdx !== -1 ? rawHistory.slice(firstUserIdx) : [];
 
         const response = await AuraService.generateResponse(messageText, history, userContext);
-
         if (response.text) {
             const sendResult = await WhatsAppService.sendMessage(cleanPhone, response.text);
-            const sentWamid = (sendResult as any)?.data?.message_uuid || (sendResult as any)?.message_uuid ||
-                (sendResult as any)?.wamid || (sendResult as any)?.uuid || (sendResult as any)?.request_id;
-
+            const sentWamid = (sendResult as any)?.data?.message_uuid || (sendResult as any)?.message_uuid || (sendResult as any)?.wamid || (sendResult as any)?.uuid;
             await supabase.from('whatsapp_conversations').insert({
                 phone_number: cleanPhone,
                 role: response.handover ? 'model_handover' : 'model',
@@ -266,9 +212,7 @@ export async function POST(req: Request) {
                 message: `CRASH: ${error.message} \n Payload: ${rawBody.substring(0, 300)}`,
                 created_at: new Date().toISOString()
             });
-        } catch (inner) {
-            console.error("FAILED TO LOG ERROR TO DB:", inner instanceof Error ? inner.message : String(inner));
-        }
+        } catch (inner) { }
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
