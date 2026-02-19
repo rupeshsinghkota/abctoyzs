@@ -72,16 +72,21 @@ export async function POST(req: Request) {
         console.log(`[WhatsApp Webhook DEBUG] Payload:`, JSON.stringify(body, null, 2));
         console.log(`[WhatsApp Webhook DEBUG] reallySentByMe: ${reallySentByMe}, effectivePhone: ${effectivePhone}`);
 
-        if (!effectivePhone || !messageText) {
+        if (!effectivePhone || (!messageText && !reallySentByMe)) {
             console.log("[WhatsApp] Ignored: Missing phone or message.");
             // Log rejection reason for debugging
             await supabase.from('whatsapp_conversations').insert({
                 phone_number: 'DEBUG',
-                role: 'user',
+                role: 'user', // strictly for debug log
                 message: `REJECTED: Missing phone (${effectivePhone}) or message (${messageText})`,
                 created_at: new Date().toISOString()
             });
             return NextResponse.json({ status: "ignored" });
+        }
+
+        // If it's an outbound message without text (common in status updates), set a placeholder
+        if (reallySentByMe && !messageText) {
+            messageText = "[Manual Admin Reply]";
         }
 
         // Normalize (remove non-digits)
