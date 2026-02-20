@@ -219,27 +219,31 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             </div>
 
 
+                            <ProductActions
+                                product={product}
+                                selectedAttributes={selectedAttributes}
+                                onAttributeSelect={setSelectedAttributes}
+                                currentVariant={currentVariant}
+                            />
 
-                            {/* Pincode Check */}
-                            <div className="border border-gray-100 rounded-lg p-2 flex flex-col gap-1.5 bg-gray-50/50">
-                                <form onSubmit={checkDelivery} className="flex gap-1.5">
-                                    <div className="relative flex-1">
-                                        <MapPin className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-primary" />
-                                        <input
-                                            type="text"
-                                            maxLength={6}
-                                            placeholder="Pincode"
-                                            value={pincode}
-                                            onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                                            className="w-full bg-white border border-gray-200 rounded-md pl-6 pr-2 py-1.5 text-[11px] font-medium focus:outline-none focus:ring-1 focus:ring-primary transition-all"
-                                        />
-                                    </div>
+                            {/* Pincode / Delivery Check — below buy actions */}
+                            <div className="border border-gray-100 rounded-lg p-2 flex flex-col gap-1.5 bg-gray-50/30">
+                                <form onSubmit={checkDelivery} className="flex gap-1.5 items-center">
+                                    <Truck className="w-3.5 h-3.5 text-gray-400 shrink-0 ml-1" />
+                                    <input
+                                        type="text"
+                                        maxLength={6}
+                                        placeholder="Check delivery · Enter pincode"
+                                        value={pincode}
+                                        onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                                        className="flex-1 bg-transparent text-[11px] font-medium focus:outline-none placeholder:text-gray-400"
+                                    />
                                     <button
                                         type="submit"
                                         disabled={pincode.length !== 6 || estimate.loading}
-                                        className="bg-gray-900 text-white px-2.5 rounded-md text-[10px] font-bold hover:bg-primary transition-all disabled:opacity-50"
+                                        className="text-primary text-[10px] font-black uppercase tracking-wider hover:underline disabled:opacity-40 disabled:no-underline px-1 shrink-0"
                                     >
-                                        {estimate.loading ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Check'}
+                                        {estimate.loading ? <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> : 'Check'}
                                     </button>
                                 </form>
                                 {estimate.serviceable ? (
@@ -248,18 +252,11 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                         <span className="font-bold">Delivers by {estimate.formattedDate}</span>
                                     </div>
                                 ) : estimate.message ? (
-                                    <p className="text-[10px] font-medium text-red-500">{estimate.message}</p>
+                                    <p className="text-[10px] font-medium text-red-500 pl-6">{estimate.message}</p>
                                 ) : (
-                                    <p className="text-[9px] font-medium text-gray-400">Free delivery all over India</p>
+                                    <p className="text-[9px] font-medium text-gray-400 pl-6">🚚 Free delivery all over India</p>
                                 )}
                             </div>
-
-                            <ProductActions
-                                product={product}
-                                selectedAttributes={selectedAttributes}
-                                onAttributeSelect={setSelectedAttributes}
-                                currentVariant={currentVariant}
-                            />
                         </div>
 
                         {/* Desktop Wishlist & Share */}
