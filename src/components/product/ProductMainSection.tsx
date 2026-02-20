@@ -154,10 +154,22 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
     // ... (rest of component)
 
+    const galleryRef = useRef<HTMLDivElement>(null);
+
+    const handleAttributeSelect = (attrs: Record<string, string>) => {
+        setSelectedAttributes(attrs);
+        // On mobile, scroll to gallery so user sees the new variant image
+        if (window.innerWidth < 1024 && galleryRef.current) {
+            setTimeout(() => {
+                galleryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 150);
+        }
+    };
+
     return (
         <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-start max-w-[1600px] mx-auto">
             {/* LEFT: Gallery (66%) */}
-            <div className="lg:col-span-8 bg-transparent">
+            <div className="lg:col-span-8 bg-transparent" ref={galleryRef}>
                 {/* Key prop ensures gallery resets/updates when images change deeply */}
                 <ImageGallery
                     key={displayImages[0]}
@@ -217,7 +229,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             <ProductActions
                                 product={product}
                                 selectedAttributes={selectedAttributes}
-                                onAttributeSelect={setSelectedAttributes}
+                                onAttributeSelect={handleAttributeSelect}
                                 currentVariant={currentVariant}
                             />
 
