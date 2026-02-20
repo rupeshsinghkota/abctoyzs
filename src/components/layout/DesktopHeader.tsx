@@ -63,9 +63,9 @@ export function DesktopHeader() {
             </div>
 
             {/* Navigation Bar */}
-            <div className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-border/5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
-                <div className="container max-w-7xl mx-auto px-6 h-[48px] flex items-center justify-center">
-                    <nav className="flex items-center gap-10">
+            <div className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-border/5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] overflow-x-auto no-scrollbar">
+                <div className="container max-w-7xl mx-auto px-4 lg:px-6 h-[48px] flex items-center justify-center md:justify-start lg:justify-center">
+                    <nav className="flex items-center gap-4 lg:gap-6 xl:gap-8 min-w-max">
                         {/* View All Option */}
                         <NavLink href="/category/all">
                             View All
@@ -84,7 +84,7 @@ export function DesktopHeader() {
 
                         {/* Power Dropdown */}
                         <div className="relative group">
-                            <button className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-foreground/60 hover:text-primary transition-colors py-1">
+                            <button className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.15em] text-foreground/60 hover:text-primary transition-colors py-2 whitespace-nowrap">
                                 By Power <ChevronDown className="w-3 h-3" />
                             </button>
                             <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -105,7 +105,7 @@ export function DesktopHeader() {
 
                         {/* Age Dropdown */}
                         <div className="relative group/menu">
-                            <button className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.15em] text-foreground/50 hover:text-primary transition-colors py-2">
+                            <button className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.15em] text-foreground/50 hover:text-primary transition-colors py-2 whitespace-nowrap">
                                 By Age <ChevronDown className="w-3 h-3 transition-transform group-hover/menu:rotate-180" />
                             </button>
                             <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-300 z-50 translate-y-2 group-hover/menu:translate-y-0">
@@ -134,7 +134,7 @@ function NavLink({ href, children, isPrimary = false }: { href: string; children
         <Link
             href={href}
             className={cn(
-                "text-[11px] font-black uppercase tracking-[0.15em] transition-all duration-300 py-3 px-2 relative group",
+                "text-[11px] font-black uppercase tracking-[0.15em] transition-all duration-300 py-3 px-2 relative group whitespace-nowrap",
                 isPrimary ? "text-primary hover:text-primary" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
             )}
         >
