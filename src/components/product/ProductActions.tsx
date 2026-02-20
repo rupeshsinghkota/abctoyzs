@@ -208,13 +208,25 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 <div className="space-y-3 order-3 md:order-1 bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm">
                     {displayRegularPrice ? (
                         <div className="flex flex-col gap-2">
+                            {/* Tier 1: True MRP */}
                             <div className="flex items-center justify-between w-full">
-                                <span className="text-sm font-bold text-gray-500 uppercase tracking-widest">Regular Rate</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Maximum Retail Price (MRP)</span>
+                                <span className="text-sm font-bold text-gray-300 line-through decoration-gray-200 decoration-1">
+                                    ₹{displayMRP.toLocaleString()}
+                                </span>
+                            </div>
+
+                            {/* Tier 2: Normal Website Rate */}
+                            <div className="flex items-center justify-between w-full">
+                                <span className="text-sm font-bold text-gray-500 uppercase tracking-widest">Regular Store Price</span>
                                 <span className="text-lg font-bold text-gray-400 line-through decoration-gray-300 decoration-2">
                                     ₹{displayRegularPrice.toLocaleString()}
                                 </span>
                             </div>
-                            <div className="h-px w-full bg-gray-100" />
+
+                            <div className="h-px w-full bg-gray-100 my-1" />
+
+                            {/* Tier 3: Today's Final Sale */}
                             <div className="flex flex-col items-start gap-1">
                                 <span className="text-sm font-black text-red-600 uppercase tracking-widest flex items-center gap-1.5">
                                     <Flame className="w-4 h-4" /> Today's Discounted Rate
