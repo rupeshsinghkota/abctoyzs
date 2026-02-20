@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket, Timer, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 import { trackFbEvent } from '@/components/tracking/FacebookPixel';
@@ -43,6 +43,37 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
     // Calculate Discount
     const discount = Math.round(((displayMRP - displayPrice) / displayMRP) * 100);
+
+    // --- Countdown Timer Logic ---
+    const [timeLeft, setTimeLeft] = useState('');
+    useEffect(() => {
+        // Only run countdown if there's an actual global or valid discount showing
+        if (discount <= 0) return;
+
+        const updateTimer = () => {
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(23, 59, 59, 999);
+
+            const diff = midnight.getTime() - now.getTime();
+            if (diff <= 0) {
+                setTimeLeft('00:00:00');
+                return;
+            }
+
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            setTimeLeft(
+                `${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`
+            );
+        };
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+        return () => clearInterval(interval);
+    }, [discount]);
 
     // Check if checks pass
     const allAttributesSelected = product.attributes
@@ -148,6 +179,25 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
 
                 <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full order-2 md:order-2" />
+
+                {/* TODAY'S SPECIAL OFFER BANNER */}
+                {discount > 0 && timeLeft && (
+                    <div className="order-2 md:order-1 bg-gradient-to-r from-red-50 to-orange-50 border border-red-100/50 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in zoom-in-95 duration-500">
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 animate-pulse">
+                                <Flame className="w-5 h-5 flex-shrink-0" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-xs font-black uppercase text-red-600 tracking-wider">Today's Special</span>
+                                <span className="text-sm font-bold text-gray-900 leading-none mt-0.5 mb-0 pb-0">Save {discount}% on this order!</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-white/80 px-3 py-1.5 rounded-lg shadow-sm w-full sm:w-auto overflow-hidden">
+                            <Timer className="w-4 h-4 text-red-500 flex-shrink-0" />
+                            <span className="text-xs font-black text-red-600 tracking-widest uppercase truncate">Ends in: <span className="text-gray-900 font-mono text-sm ml-1 tabular-nums">{timeLeft}</span></span>
+                        </div>
+                    </div>
+                )}
 
                 {/* Price Display (Premium Deal Style) */}
                 <div className="space-y-2 order-3 md:order-1">
