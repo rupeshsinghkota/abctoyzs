@@ -226,147 +226,166 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 currentVariant={currentVariant}
                             />
 
-                            {/* Pincode / Delivery Check — below buy actions */}
-                            <div className="border border-gray-100 rounded-lg p-2 flex flex-col gap-1.5 bg-gray-50/30">
-                                <form onSubmit={checkDelivery} className="flex gap-1.5 items-center">
-                                    <Truck className="w-3.5 h-3.5 text-gray-400 shrink-0 ml-1" />
+                            {/* Quick Specs — 2×2 micro grid */}
+                            {(() => {
+                                const specs = [
+                                    { label: 'Age', value: product.specs?.suitable_age || (product.ageGroup ? `${product.ageGroup} Yrs` : null) },
+                                    { label: 'Speed', value: product.specs?.speed ? (product.specs.speed.length > 12 ? product.specs.speed.slice(0, 12) + '…' : product.specs.speed) : null },
+                                    { label: 'Load', value: product.specs?.max_load },
+                                    { label: 'Control', value: product.specs?.mobile_app ? 'App+Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },
+                                ].filter(s => s.value);
+                                return specs.length > 0 ? (
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 py-2 border-t border-gray-100">
+                                        {specs.map((s, i) => (
+                                            <div key={i} className="flex items-center justify-between">
+                                                <span className="text-[10px] text-gray-400 font-medium">{s.label}</span>
+                                                <span className="text-[10px] font-bold text-gray-700">{s.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : null;
+                            })()}
+
+                            {/* Delivery Check — minimal inline */}
+                            <div className="flex items-center gap-2 py-1.5 border-t border-gray-100">
+                                <Truck className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                <form onSubmit={checkDelivery} className="flex items-center gap-1.5 flex-1">
                                     <input
                                         type="text"
                                         maxLength={6}
-                                        placeholder="Check delivery · Enter pincode"
+                                        placeholder="Enter pincode"
                                         value={pincode}
                                         onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                                        className="flex-1 bg-transparent text-[11px] font-medium focus:outline-none placeholder:text-gray-400"
+                                        className="w-20 bg-transparent text-[11px] font-medium focus:outline-none placeholder:text-gray-300 border-b border-dashed border-gray-200 focus:border-primary pb-0.5"
                                     />
                                     <button
                                         type="submit"
                                         disabled={pincode.length !== 6 || estimate.loading}
-                                        className="text-primary text-[10px] font-black uppercase tracking-wider hover:underline disabled:opacity-40 disabled:no-underline px-1 shrink-0"
+                                        className="text-[10px] font-bold text-primary disabled:opacity-30 shrink-0"
                                     >
-                                        {estimate.loading ? <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> : 'Check'}
+                                        {estimate.loading ? '...' : 'Check'}
                                     </button>
                                 </form>
-                                {estimate.serviceable ? (
-                                    <div className="flex items-center gap-1 text-[10px] text-green-700 bg-green-50 px-2 py-0.5 rounded">
-                                        <Truck className="w-2.5 h-2.5 shrink-0" />
-                                        <span className="font-bold">Delivers by {estimate.formattedDate}</span>
-                                    </div>
-                                ) : estimate.message ? (
-                                    <p className="text-[10px] font-medium text-red-500 pl-6">{estimate.message}</p>
-                                ) : (
-                                    <p className="text-[9px] font-medium text-gray-400 pl-6">🚚 Free delivery all over India</p>
-                                )}
+                                <span className="text-[10px] text-gray-400 font-medium shrink-0">
+                                    {estimate.serviceable
+                                        ? <span className="text-green-600 font-bold">✓ {estimate.formattedDate}</span>
+                                        : estimate.message
+                                            ? <span className="text-red-500">{estimate.message}</span>
+                                            : 'Free shipping'}
+                                </span>
                             </div>
-                        </div>
 
-                        {/* Desktop Wishlist & Share */}
-                        <div className="hidden lg:flex gap-4 pt-2">
-                            <WishlistButton productId={product.id} size="lg" className="h-10 px-0 hover:bg-transparent text-muted-foreground hover:text-red-500 transition-all flex items-center gap-2" />
-                            <span className="text-sm text-gray-300">|</span>
-                            <a
-                                href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I have a question about ${product.name}.\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center"
+                        </div>
+                    </div>
+
+                    {/* Desktop Wishlist & Share */}
+                    <div className="hidden lg:flex gap-4 pt-2">
+                        <WishlistButton productId={product.id} size="lg" className="h-10 px-0 hover:bg-transparent text-muted-foreground hover:text-red-500 transition-all flex items-center gap-2" />
+                        <span className="text-sm text-gray-300">|</span>
+                        <a
+                            href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I have a question about ${product.name}.\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center"
+                        >
+                            Ask a Question
+                        </a>
+                    </div>
+
+                    {/* Mobile Content Switcher */}
+                    <div className="lg:hidden space-y-3 pb-4 pt-3 border-t mt-3">
+                        {/* Segmented Control */}
+                        <div className="flex p-0.5 bg-gray-100 rounded-xl">
+                            <button
+                                onClick={() => setActiveTab('specs')}
+                                className={cn(
+                                    "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-[10px] text-[11px] font-bold transition-all duration-200",
+                                    activeTab === 'specs'
+                                        ? "bg-white text-gray-900 shadow-sm"
+                                        : "text-gray-500"
+                                )}
                             >
-                                Ask a Question
-                            </a>
+                                <Gauge className="w-3.5 h-3.5" />
+                                Specs
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('box')}
+                                className={cn(
+                                    "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-[10px] text-[11px] font-bold transition-all duration-200",
+                                    activeTab === 'box'
+                                        ? "bg-white text-gray-900 shadow-sm"
+                                        : "text-gray-500"
+                                )}
+                            >
+                                <Package className="w-3.5 h-3.5" />
+                                In the Box
+                            </button>
                         </div>
 
-                        {/* Mobile Content Switcher */}
-                        <div className="lg:hidden space-y-3 pb-4 pt-3 border-t mt-3">
-                            {/* Segmented Control */}
-                            <div className="flex p-0.5 bg-gray-100 rounded-xl">
-                                <button
-                                    onClick={() => setActiveTab('specs')}
-                                    className={cn(
-                                        "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-[10px] text-[11px] font-bold transition-all duration-200",
-                                        activeTab === 'specs'
-                                            ? "bg-white text-gray-900 shadow-sm"
-                                            : "text-gray-500"
-                                    )}
-                                >
-                                    <Gauge className="w-3.5 h-3.5" />
-                                    Specs
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('box')}
-                                    className={cn(
-                                        "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-[10px] text-[11px] font-bold transition-all duration-200",
-                                        activeTab === 'box'
-                                            ? "bg-white text-gray-900 shadow-sm"
-                                            : "text-gray-500"
-                                    )}
-                                >
-                                    <Package className="w-3.5 h-3.5" />
-                                    In the Box
-                                </button>
-                            </div>
-
-                            {/* Tab Content — no min-height */}
-                            <div>
-                                {activeTab === 'specs' ? (
-                                    <div className="bg-gray-50/50 rounded-xl p-3 border border-gray-100 animate-in fade-in duration-200">
-                                        <ProductSpecs
-                                            specs={product.specs}
-                                            additionalInfo={{
-                                                "Voltage": product.voltage,
-                                                "Recommended Age": product.ageGroup,
-                                                "Category": product.category?.charAt(0).toUpperCase() + product.category?.slice(1)
-                                            }}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden animate-in fade-in duration-200">
-                                        <div className="divide-y divide-gray-50">
-                                            {boxContent.map((item, idx) => (
-                                                <div key={idx} className="flex items-center gap-3 p-2.5">
-                                                    <div className="w-5 h-5 rounded-md bg-green-50 flex items-center justify-center shrink-0">
-                                                        <CheckCircle2 className="w-3 h-3 text-green-600" />
-                                                    </div>
-                                                    <span className="text-xs font-bold text-gray-700">{item}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="pb-4" ref={descriptionRef}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-6 h-6 bg-primary/10 rounded-md flex items-center justify-center shrink-0">
-                                        <Package className="w-3 h-3 text-primary" />
-                                    </div>
-                                    <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">Product Description</h3>
-                                    <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
+                        {/* Tab Content — no min-height */}
+                        <div>
+                            {activeTab === 'specs' ? (
+                                <div className="bg-gray-50/50 rounded-xl p-3 border border-gray-100 animate-in fade-in duration-200">
+                                    <ProductSpecs
+                                        specs={product.specs}
+                                        additionalInfo={{
+                                            "Voltage": product.voltage,
+                                            "Recommended Age": product.ageGroup,
+                                            "Category": product.category?.charAt(0).toUpperCase() + product.category?.slice(1)
+                                        }}
+                                    />
                                 </div>
+                            ) : (
+                                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden animate-in fade-in duration-200">
+                                    <div className="divide-y divide-gray-50">
+                                        {boxContent.map((item, idx) => (
+                                            <div key={idx} className="flex items-center gap-3 p-2.5">
+                                                <div className="w-5 h-5 rounded-md bg-green-50 flex items-center justify-center shrink-0">
+                                                    <CheckCircle2 className="w-3 h-3 text-green-600" />
+                                                </div>
+                                                <span className="text-xs font-bold text-gray-700">{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
-                                <div className="relative rounded-lg border border-gray-200 bg-white overflow-hidden border-l-3 border-l-primary">
-                                    <div className="max-h-[50vh] overflow-y-auto px-3 py-3">
-                                        <div className="prose prose-sm premium-prose max-w-none">
-                                            {product.description ? (
-                                                <div dangerouslySetInnerHTML={{ __html: product.description }} />
-                                            ) : (
-                                                <p>Premium ride-on toy with advanced features.</p>
-                                            )}
-                                        </div>
+                        <div className="pb-4" ref={descriptionRef}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-6 h-6 bg-primary/10 rounded-md flex items-center justify-center shrink-0">
+                                    <Package className="w-3 h-3 text-primary" />
+                                </div>
+                                <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">Product Description</h3>
+                                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
+                            </div>
+
+                            <div className="relative rounded-lg border border-gray-200 bg-white overflow-hidden border-l-3 border-l-primary">
+                                <div className="max-h-[50vh] overflow-y-auto px-3 py-3">
+                                    <div className="prose prose-sm premium-prose max-w-none">
+                                        {product.description ? (
+                                            <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                                        ) : (
+                                            <p>Premium ride-on toy with advanced features.</p>
+                                        )}
                                     </div>
-                                    <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none">
-                                        <div className="h-8 bg-gradient-to-t from-white to-transparent" />
-                                    </div>
+                                </div>
+                                <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none">
+                                    <div className="h-8 bg-gradient-to-t from-white to-transparent" />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {/* Sticky Cart Bar (Synced with selection) */}
-            <StickyCartBar
-                product={product}
-                selectedAttributes={selectedAttributes}
-                currentVariant={currentVariant}
-                isReady={true}
-            />
+        </div>
+            {/* Sticky Cart Bar (Synced with selection) */ }
+    <StickyCartBar
+        product={product}
+        selectedAttributes={selectedAttributes}
+        currentVariant={currentVariant}
+        isReady={true}
+    />
         </div >
     );
 }

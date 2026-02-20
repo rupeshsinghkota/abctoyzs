@@ -286,16 +286,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </p>
             )}
 
-            {/* Quick Specs — subtle horizontal pills */}
-            {highlights.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                    {highlights.map((item, idx) => (
-                        <span key={idx} className="text-[9px] font-bold text-gray-500 bg-gray-50 border border-gray-100 rounded-full px-2 py-0.5">
-                            {item.label}: {typeof item.value === 'string' && item.value.length > 15 ? item.value.slice(0, 15) + '…' : item.value}
-                        </span>
-                    ))}
-                </div>
-            )}
+
 
             {/* Actions Row */}
             <div className="space-y-2 pt-1">
