@@ -42,13 +42,18 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
     const displayStock = currentVariant ? currentVariant.stock : 7; // Default mock stock
 
     // Calculate Discount
-    const discount = Math.round(((displayMRP - displayPrice) / displayMRP) * 100);
+    const displayRegularPrice = currentVariant?.regular_price || product.regular_price || null;
+    const isGlobalSaleActive = !!displayRegularPrice;
+
+    // We base the percentage math on the regular selling price if it exists, otherwise standard MRP
+    const basePriceForDiscountMath = displayRegularPrice || displayMRP;
+    const discount = Math.round(((basePriceForDiscountMath - displayPrice) / basePriceForDiscountMath) * 100);
 
     // --- Countdown Timer Logic ---
     const [timeLeft, setTimeLeft] = useState('');
     useEffect(() => {
-        // Only run countdown if there's an actual global or valid discount showing
-        if (discount <= 0) return;
+        // Only run countdown if there's an actual global discount showing
+        if (!isGlobalSaleActive || discount <= 0) return;
 
         const updateTimer = () => {
             const now = new Date();
@@ -73,7 +78,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
         updateTimer();
         const interval = setInterval(updateTimer, 1000);
         return () => clearInterval(interval);
-    }, [discount]);
+    }, [discount, isGlobalSaleActive]);
 
     // Check if checks pass
     const allAttributesSelected = product.attributes
@@ -181,7 +186,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 <div className="h-px bg-gradient-to-r from-border/50 via-border to-transparent w-full order-2 md:order-2" />
 
                 {/* TODAY'S SPECIAL OFFER BANNER */}
-                {discount > 0 && timeLeft && (
+                {isGlobalSaleActive && timeLeft && (
                     <div className="order-2 md:order-1 bg-gradient-to-r from-red-50 to-orange-50 border border-red-100/50 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in zoom-in-95 duration-500">
                         <div className="flex items-center gap-2">
                             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 animate-pulse">
@@ -201,12 +206,12 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
                 {/* Price Display (Premium Deal Style) */}
                 <div className="space-y-3 order-3 md:order-1 bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm">
-                    {discount > 0 ? (
+                    {displayRegularPrice ? (
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between w-full">
                                 <span className="text-sm font-bold text-gray-500 uppercase tracking-widest">Regular Rate</span>
                                 <span className="text-lg font-bold text-gray-400 line-through decoration-gray-300 decoration-2">
-                                    ₹{displayMRP.toLocaleString()}
+                                    ₹{displayRegularPrice.toLocaleString()}
                                 </span>
                             </div>
                             <div className="h-px w-full bg-gray-100" />

@@ -6,6 +6,7 @@ export interface Product {
     category: string; // Primary: cars, jeeps, bikes, etc.
     price: number;
     mrp?: number;
+    regular_price?: number;
     rating: number;
     reviews: number;
     image: string;
@@ -71,6 +72,7 @@ export interface ProductVariant {
     attributes: Record<string, string>; // { "Color": "Red" }
     price: number;
     mrp?: number;
+    regular_price?: number;
     stock: number;
     sku?: string;
     image?: string;
@@ -193,6 +195,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
                 category: (typeof item.category === 'string') ? item.category.toLowerCase() : 'cars',
                 price: finalPrice,
                 mrp: finalPrice < finalMrp ? finalMrp : undefined,
+                regular_price: discount > 0 ? originalPrice : undefined,
                 rating: Number(item.rating) || 0,
                 reviews: Number(item.review_count) || 0,
                 image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
@@ -265,7 +268,7 @@ function processProducts(data: any[], globalDiscount: number = 0): Product[] {
                 vFinalMrp = Math.max(vOrigMrp, vOrigPrice);
             }
 
-            return { ...v, price: vFinalPrice, mrp: vFinalMrp };
+            return { ...v, price: vFinalPrice, mrp: vFinalMrp, regular_price: globalDiscount > 0 ? vOrigPrice : undefined };
         }) : [];
 
         return {
@@ -275,6 +278,7 @@ function processProducts(data: any[], globalDiscount: number = 0): Product[] {
             category: (typeof item.category === 'string' && item.category.trim()) ? item.category.toLowerCase() : 'cars',
             price: finalPrice,
             mrp: finalPrice < finalMrp ? finalMrp : undefined,
+            regular_price: globalDiscount > 0 ? originalPrice : undefined,
             rating: Number(item.rating) || 0,
             reviews: Number(item.review_count) || 0,
             image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',

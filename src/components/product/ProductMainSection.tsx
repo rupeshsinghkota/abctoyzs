@@ -189,7 +189,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     )}
                                 </div>
 
-                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black font-heading leading-[1.1] tracking-tighter text-foreground">
+                                <h1 className="text-3xl md:text-3xl lg:text-4xl font-extrabold font-heading leading-tight tracking-tight text-gray-900">
                                     {product.name}
                                 </h1>
                             </div>
@@ -258,55 +258,51 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
                             {/* EMI Info Widget */}
 
-                            {/* Pincode Check Widget */}
-                            <div className="bg-zinc-50 border border-zinc-100 rounded-2xl p-4 space-y-3">
+                            {/* Pincode Check Widget - Modernized Inline Design */}
+                            <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-3 sm:p-4 space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-xs font-black text-zinc-500 uppercase tracking-widest">
-                                        <MapPin className="w-3.5 h-3.5" />
-                                        Check Delivery
+                                    <div className="flex items-center gap-2 text-xs font-bold text-gray-700 uppercase tracking-widest">
+                                        <MapPin className="w-4 h-4 text-primary" />
+                                        Delivery Estimate
                                     </div>
                                     {estimate.serviceable && (
-                                        <span className="text-[10px] font-bold text-green-600 flex items-center gap-1">
+                                        <span className="text-[10px] font-bold text-green-600 flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-full">
                                             <CheckCircle2 className="w-3 h-3" />
-                                            Serviceable
+                                            Available
                                         </span>
                                     )}
                                 </div>
 
-                                <form onSubmit={checkDelivery} className="flex gap-2">
+                                <form onSubmit={checkDelivery} className="relative flex items-center w-full">
                                     <input
                                         type="text"
                                         maxLength={6}
-                                        placeholder="Enter Pincode"
+                                        placeholder="Enter Delivery Pincode"
                                         value={pincode}
                                         onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                                        className="flex-1 bg-white border border-zinc-200 rounded-xl px-4 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-4 pr-20 py-2.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:bg-white transition-all"
                                     />
                                     <button
                                         type="submit"
                                         disabled={pincode.length !== 6 || estimate.loading}
-                                        className="bg-zinc-900 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-primary transition-all disabled:opacity-50"
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 bg-gray-900 text-white px-3 md:px-4 rounded-md text-xs font-bold hover:bg-primary transition-all disabled:opacity-50 disabled:hover:bg-gray-900 flex items-center justify-center min-w-[60px]"
                                     >
-                                        {estimate.loading ? '...' : 'Check'}
+                                        {estimate.loading ? (
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        ) : 'Check'}
                                     </button>
                                 </form>
 
-                                {estimate.loading && (
-                                    <p className="text-[10px] font-medium text-zinc-400 animate-pulse">Calculating delivery date...</p>
-                                )}
-
                                 {estimate.serviceable ? (
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <Truck className="w-4 h-4 text-primary" />
-                                        <span className="font-bold text-zinc-900">
-                                            Get it by <span className="text-primary">{estimate.formattedDate}</span>
+                                    <div className="flex items-start gap-2 text-sm bg-green-50/50 p-2.5 rounded-lg border border-green-100/50">
+                                        <Truck className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+                                        <span className="font-medium text-gray-800 leading-tight">
+                                            Fast Delivery by <span className="font-bold text-green-700">{estimate.formattedDate}</span>
                                         </span>
                                     </div>
                                 ) : estimate.message ? (
-                                    <p className="text-[10px] font-bold text-red-500">{estimate.message}</p>
-                                ) : (
-                                    <p className="text-[10px] font-medium text-zinc-400 italic">Enter pincode to see express delivery date</p>
-                                )}
+                                    <p className="text-[11px] font-medium text-red-500 bg-red-50 p-2 rounded-lg">{estimate.message}</p>
+                                ) : null}
                             </div>
 
                             <ProductActions
@@ -315,33 +311,6 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 onAttributeSelect={setSelectedAttributes}
                                 currentVariant={currentVariant}
                             />
-                        </div>
-
-                        {/* Trust Signals - Clean Row (Compact) */}
-                        <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="flex flex-col gap-0.5">
-                                    <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
-                                        <Truck className="w-3.5 h-3.5" />
-                                        <span>Free delivery</span>
-                                    </div>
-                                    <p className="text-[9px] text-muted-foreground pl-5">On all orders</p>
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                    <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
-                                        <ShieldCheck className="w-3.5 h-3.5" />
-                                        <span>Warranty</span>
-                                    </div>
-                                    <p className="text-[9px] text-muted-foreground pl-5">1 Year Motor & Battery</p>
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                    <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
-                                        <RotateCcw className="w-3.5 h-3.5" />
-                                        <span>Replacement</span>
-                                    </div>
-                                    <p className="text-[9px] text-muted-foreground pl-5">10 Days Easy</p>
-                                </div>
-                            </div>
                         </div>
 
                         {/* Desktop Wishlist & Share */}
@@ -360,31 +329,31 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
                         {/* Mobile Content Switcher (Specs vs Box Content) */}
                         <div className="lg:hidden space-y-6 pb-8 pt-6 border-t mt-4">
-                            {/* Tab Headers */}
-                            <div className="flex p-1 bg-gray-100/80 rounded-2xl">
+                            {/* Segmented Control iOS Style */}
+                            <div className="flex p-1 bg-gray-100 rounded-[14px]">
                                 <button
                                     onClick={() => setActiveTab('specs')}
                                     className={cn(
-                                        "flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black transition-all",
+                                        "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-[10px] text-[13px] font-bold transition-all duration-200",
                                         activeTab === 'specs'
-                                            ? "bg-white text-gray-900 shadow-sm"
+                                            ? "bg-white text-gray-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
                                             : "text-gray-500 hover:text-gray-700"
                                     )}
                                 >
                                     <Gauge className="w-4 h-4" />
-                                    TECH SPECS
+                                    Tech Specs
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('box')}
                                     className={cn(
-                                        "flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black transition-all",
+                                        "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-[10px] text-[13px] font-bold transition-all duration-200",
                                         activeTab === 'box'
-                                            ? "bg-white text-gray-900 shadow-sm"
+                                            ? "bg-white text-gray-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
                                             : "text-gray-500 hover:text-gray-700"
                                     )}
                                 >
                                     <Package className="w-4 h-4" />
-                                    WHAT'S INSIDE?
+                                    What's Inside?
                                 </button>
                             </div>
 
