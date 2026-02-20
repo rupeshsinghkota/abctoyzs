@@ -400,7 +400,7 @@ export default function CheckoutPage() {
             </header>
 
             <main className="container mx-auto px-4 py-4 lg:py-6 max-w-[1200px]">
-                <div className="grid md:grid-cols-[1fr,340px] lg:grid-cols-[1fr,440px] gap-6 lg:gap-8 xl:gap-12">
+                <div className="grid md:grid-cols-[1fr_340px] lg:grid-cols-[1fr_440px] gap-6 lg:gap-8 xl:gap-12">
                     {/* Left Column: Information */}
                     <div className="space-y-6">
 
