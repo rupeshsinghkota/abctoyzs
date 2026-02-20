@@ -146,8 +146,8 @@ ${activeStyle === 'Poster' ? `POSTER LAYOUT:
 --- CONTENT DIRECTIVES ---
 
 LAYER 1 — TOP STRIP:
-- Logo: ABC Toyz brand logo in the top-left corner. SCALE: Keep the logo small and elegant, do not let it dominate the design.
-${numMrp > numPrice ? `- Sale: Tiny red "SALE" ribbon in top-right.` : ''}
+- Logo: ABC Toyz brand logo in the top-left corner. SCALE: Keep the logo very small, elegant, and unobtrusive.
+${numMrp > numPrice ? `- SALE TAG: A very discrete, modern, sleek "SALE" pill badge in the top-right. NO giant red ribbons.` : ''}
 
 LAYER 2 — HERO ZONE:
 - Photorealistic scene: ${compositionDesc}
@@ -157,25 +157,29 @@ LAYER 2 — HERO ZONE:
 ${activeScene === 'Birthday Celebration' ? '- Add colorful balloons and confetti for a festive look.' : ''}
 
 LAYER 3 — BOTTOM INFO BAR:
-- Dark semi-transparent gradient overlay at the bottom.
-${activeStyle === 'Poster' ? `  LINE 1: CATCHY HEADLINE — Write a short, emotional headline like "${headlineTheme || 'Premium Ride-On Toys'}" in BOLD thick white font.
-  LINE 2: "${shortName}" model name in slightly smaller text.` : `  LINE 1: "${shortName}" in bold white sans-serif.`}
+- Add a soft, elegant dark gradient overlay at the bottom to make text legible.
+${activeStyle === 'Poster' ? `  LINE 1: CATCHY HEADLINE — Write a short, highly emotional, punchy headline like "${headlineTheme || 'Premium Ride-On Toys'}" in a clean, modern, thick white font.
+  LINE 2: "${shortName}" in sleek, slightly smaller typography.` : `  LINE 1: "${shortName}" in a bold, modern, thick white sans-serif font.`}
   LINE ${activeStyle === 'Poster' ? '3' : '2'}: ${priceSection}
-${specLine ? `  LINE ${activeStyle === 'Poster' ? '4' : '3'}: Specs as pill badges: ${specLine}` : ''}
-  LAST LINE: "🚚 Free Shipping  •  💳 COD Available  •  abctoyz.in"
+${specLine ? `  LINE ${activeStyle === 'Poster' ? '4' : '3'}: Tech specs displayed cleanly: ${specLine}` : ''}
+  LAST LINE: "🚚 Free Shipping  |  💳 COD Available  |  abctoyz.in" in very small, widely-spaced premium font.
 
 --- TYPOGRAPHY RULES ---
-- FONT: Use a modern, thick, impactful sans-serif (style: Montserrat/Bebas Neue) for headlines.
-- READABILITY: All text must be 100% sharp and readable. Add subtle shadows to text if background is busy.
+- FONT STYLE: Use highly premium, modern, thick, impactful sans-serif fonts (like Inter, Roboto Black, or Montserrat).
+- HIERARCHY: Big, bold main headline. Clean, legible sub-text.
+- AESTHETICS: Text must look professionally designed by a high-end graphic designer. Use proper tracking (letter spacing) and clean layouts. No messy spacing.
+- READABILITY: All text must be 100% sharp and readable. Add subtle dark shadows or soft gradients behind text.
 - Product name should be SHORT.
-- NO random/gibberish characters.
+- NO spelling errors, NO random/gibberish characters.
 
 --- PHOTO RULES ---
-- PHOTOREALISTIC only — NO cartoon/illustration.
-- Vehicle must match reference image exactly.
-- Clean, premium, aspirational environment.
+- PHOTOREALISTIC only — NO cartoon/illustration/CGI look. Use cinematic, high-budget commercial photography style.
+- LIGHTING: Beautiful, soft, dynamic lighting (e.g., golden hour, studio softbox, or cinematic neon depending on the scene).
+- The vehicle must match the reference image exactly.
+- The environment must feel premium, aspirational, and highly realistic.
+- HUMAN INTERACTION: If a child is in the scene, the pose must be COMPLETELY NATURAL and proportionate to the vehicle.
 
-VIBE: ${vibe || "Premium, Aspirational, Clean, Modern"}.`;
+VIBE: ${vibe || "Ultra-Premium, Aspirational, High-Converting D2C Advertisement, Cinematic, Modern"}.`;
 
             // Build content parts
             const contents: any[] = [
