@@ -30,14 +30,15 @@ export function DesktopHeader() {
 
                     {/* Center: Search */}
                     <div className="flex-1 max-w-2xl px-8 group relative hidden md:block">
-                        <div className="relative w-full">
+                        <form action="/search" className="relative w-full">
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-primary transition-colors duration-300" />
                             <input
                                 type="text"
+                                name="q"
                                 placeholder="Search our premium collection..."
                                 className="w-full h-12 pl-12 pr-4 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 focus:bg-white dark:focus:bg-zinc-950 focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all duration-300 text-sm font-medium focus:outline-none placeholder:text-zinc-400 shadow-inner"
                             />
-                        </div>
+                        </form>
                     </div>
 
                     {/* Right: Actions */}
@@ -63,9 +64,9 @@ export function DesktopHeader() {
             </div>
 
             {/* Navigation Bar */}
-            <div className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-border/5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] overflow-x-auto no-scrollbar">
+            <div className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-border/5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
                 <div className="container max-w-7xl mx-auto px-4 lg:px-6 h-[48px] flex items-center justify-center md:justify-start lg:justify-center">
-                    <nav className="flex items-center gap-4 lg:gap-6 xl:gap-8 min-w-max">
+                    <nav className="flex items-center gap-4 lg:gap-6 xl:gap-8">
                         {/* View All Option */}
                         <NavLink href="/category/all">
                             View All
