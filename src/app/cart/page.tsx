@@ -147,7 +147,7 @@ export default function CartPage() {
                 </div>
 
                 {/* Mobile Sticky Button */}
-                <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-xl border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pb-safe z-50">
+                <div className="lg:hidden fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 p-4 bg-white/90 backdrop-blur-xl border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40">
                     <button
                         onClick={handleCheckout}
                         className="w-full bg-black text-white h-16 rounded-[20px] font-black text-lg shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6"
