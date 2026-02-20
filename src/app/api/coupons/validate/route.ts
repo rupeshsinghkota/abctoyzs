@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
     try {
-        const { code, amount } = await req.json();
+        const { code, amount, paymentMethod } = await req.json();
 
         if (!code) {
             return NextResponse.json({ error: 'Coupon code is required' }, { status: 400 });
@@ -39,9 +39,6 @@ export async function POST(req: Request) {
                 error: `Minimum order amount for this coupon is ₹${coupon.min_order_amount}`
             }, { status: 400 });
         }
-
-        const rawBody = await req.json().catch(() => ({}));
-        const paymentMethod = rawBody.paymentMethod || null;
 
         // 5. Validate Payment Method Restriction
         if (paymentMethod && coupon.allowed_payment_method && coupon.allowed_payment_method !== 'ALL') {
