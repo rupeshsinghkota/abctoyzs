@@ -389,7 +389,7 @@ export default function CheckoutPage() {
                         <Link href="/cart" className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors">
                             <ArrowLeft className="w-5 h-5 text-gray-700" />
                         </Link>
-                        <h1 className="font-black text-xl tracking-tight text-gray-900">Checkout</h1>
+                        <h1 className="font-black text-lg md:text-xl tracking-tight text-gray-900">Checkout</h1>
                     </div>
                     <div className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full border border-green-100 text-green-700">
                         <ShieldCheck className="w-3.5 h-3.5" strokeWidth={2.5} />
@@ -412,7 +412,7 @@ export default function CheckoutPage() {
                                         1
                                         <div className="absolute inset-0 rounded-full ring-4 ring-black/5" />
                                     </div>
-                                    <h2 className="font-black text-lg tracking-tight text-gray-900">Shipping Address</h2>
+                                    <h2 className="font-black text-base md:text-lg tracking-tight text-gray-900">Shipping Address</h2>
                                 </div>
                                 {!showAddrForm && (
                                     <button
@@ -468,8 +468,8 @@ export default function CheckoutPage() {
                                                         <span className="text-[9px] bg-black text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-widest shadow-sm">Default</span>
                                                     )}
                                                 </div>
-                                                <p className="text-xs text-muted-foreground mb-1">{addr.phone}</p>
-                                                <p className="text-xs text-muted-foreground line-clamp-2">
+                                                <p className="text-[11px] md:text-xs text-muted-foreground mb-1">{addr.phone}</p>
+                                                <p className="text-[11px] md:text-xs text-muted-foreground line-clamp-2">
                                                     {addr.address_line1}, {addr.address_line2 && `${addr.address_line2}, `}
                                                     {addr.city}, {addr.state} - {addr.pincode}
                                                 </p>
@@ -487,7 +487,7 @@ export default function CheckoutPage() {
                                     2
                                     <div className="absolute inset-0 rounded-full ring-4 ring-black/5" />
                                 </div>
-                                <h2 className="font-black text-lg tracking-tight text-gray-900">Payment Method</h2>
+                                <h2 className="font-black text-base md:text-lg tracking-tight text-gray-900">Payment Method</h2>
                             </div>
                             <div className="p-5 lg:p-7 space-y-4">
                                 {/* Prepaid Option */}
@@ -507,7 +507,7 @@ export default function CheckoutPage() {
                                         <CreditCard className="w-5 h-5" />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-4 mt-2 sm:mt-0">
-                                        <p className="font-black text-gray-900 text-[15px]">Pay Online Now</p>
+                                        <p className="font-black text-gray-900 text-sm md:text-[15px]">Pay Online Now</p>
                                         <p className="text-[11px] text-gray-500 font-medium">Faster dispatch. Secure via Razorpay.</p>
                                     </div>
                                     {paymentMethod === 'PREPAID' && (
@@ -529,7 +529,7 @@ export default function CheckoutPage() {
                                         <Banknote className="w-5 h-5" />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-4">
-                                        <p className="font-black text-gray-900 text-[15px]">
+                                        <p className="font-black text-gray-900 text-sm md:text-[15px]">
                                             {codSettings?.cod_mode === 'partial' ? 'Partial COD (Advance)' : 'Cash on Delivery'}
                                         </p>
                                         <p className="text-[11px] text-gray-500 font-medium">
@@ -576,11 +576,11 @@ export default function CheckoutPage() {
                             <button
                                 onClick={handlePayment}
                                 disabled={loading || cart.length === 0}
-                                className="w-full bg-black text-white h-16 rounded-[20px] font-black text-lg shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6 disabled:opacity-50"
+                                className="w-full bg-black text-white h-14 md:h-16 rounded-[20px] font-black text-base md:text-lg shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6 disabled:opacity-50"
                             >
                                 <div className="flex flex-col items-start leading-none">
-                                    <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total</span>
-                                    <span className="text-xl tracking-tight">₹{total.toLocaleString()}</span>
+                                    <span className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total</span>
+                                    <span className="text-lg md:text-xl tracking-tight">₹{total.toLocaleString()}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {loading ? (
@@ -856,7 +856,7 @@ function OrderSummaryCard({
                         3
                         <div className="absolute inset-0 rounded-full ring-4 ring-black/5" />
                     </div>
-                    <h2 className="font-black text-lg tracking-tight text-gray-900">Order Summary</h2>
+                    <h2 className="font-black text-base md:text-lg tracking-tight text-gray-900">Order Summary</h2>
                 </div>
             </div>
 
@@ -869,7 +869,7 @@ function OrderSummaryCard({
                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-bold text-sm text-gray-900 line-clamp-2 leading-tight">{item.name}</p>
+                                <p className="font-bold text-xs md:text-sm text-gray-900 line-clamp-2 leading-tight">{item.name}</p>
                                 <div className="flex items-center gap-2 mt-1.5">
                                     <span className="text-[10px] bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-md">Qty: {item.quantity}</span>
                                     <div className="flex items-center gap-1.5">
@@ -881,7 +881,7 @@ function OrderSummaryCard({
                                 </div>
                             </div>
                             <div className="flex flex-col items-end shrink-0">
-                                <p className="font-black text-gray-900 text-base">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                <p className="font-black text-gray-900 text-sm md:text-base">₹{(item.price * item.quantity).toLocaleString()}</p>
                                 {(item.regularPrice || item.mrp) && (item.regularPrice || item.mrp)! > item.price && (
                                     <p className="text-green-600 text-[9px] font-black uppercase tracking-widest mt-0.5 whitespace-nowrap">
                                         Save ₹{(((item.regularPrice || item.mrp)!) - item.price).toLocaleString()}
@@ -902,7 +902,7 @@ function OrderSummaryCard({
                                     <Ticket className="w-5 h-5 text-orange-500" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-black text-gray-900 tracking-tight">PREPAID5</p>
+                                    <p className="text-xs md:text-sm font-black text-gray-900 tracking-tight">PREPAID5</p>
                                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Save 5% on Online Payment</p>
                                 </div>
                             </div>
@@ -963,7 +963,7 @@ function OrderSummaryCard({
                     )}
                 </div>
 
-                <div className="space-y-3 text-sm pt-2">
+                <div className="space-y-3 text-xs md:text-sm pt-2">
                     <div className="flex justify-between items-center text-gray-500 font-medium">
                         <span>Subtotal ({cart.length} items)</span>
                         <span className="text-gray-900 font-bold">₹{subtotal.toLocaleString()}</span>
@@ -985,8 +985,8 @@ function OrderSummaryCard({
 
                     <div className="flex justify-between items-end">
                         <div className="flex flex-col">
-                            <span className="font-black text-2xl tracking-tighter text-gray-900 leading-none">Total</span>
-                            <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Incl. of all taxes</span>
+                            <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 leading-none">Total</span>
+                            <span className="text-[9px] md:text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Incl. of all taxes</span>
                         </div>
                         <span className="text-3xl font-black text-gray-900 tracking-tighter leading-none">₹{total.toLocaleString()}</span>
                     </div>

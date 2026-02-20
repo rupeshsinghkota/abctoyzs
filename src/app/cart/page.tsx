@@ -55,8 +55,8 @@ export default function CartPage() {
                             </div>
                             <div className="flex-1 flex flex-col justify-between min-w-0">
                                 <div>
-                                    <div className="flex justify-between items-start gap-4">
-                                        <h3 className="font-bold text-sm md:text-base line-clamp-2 text-gray-900 leading-snug">{item.name}</h3>
+                                    <div className="flex justify-between items-start gap-3 md:gap-4">
+                                        <h3 className="font-bold text-xs md:text-sm line-clamp-2 text-gray-900 leading-snug">{item.name}</h3>
                                         <button
                                             onClick={() => removeFromCart(item.id)}
                                             className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 -mr-2 -mt-2 rounded-full transition-all shrink-0"
@@ -67,15 +67,15 @@ export default function CartPage() {
                                     </div>
                                     <div className="flex flex-col mt-1">
                                         <div className="flex items-center gap-2">
-                                            <p className="text-black font-black text-lg">₹{item.price.toLocaleString()}</p>
+                                            <p className="text-black font-black text-base md:text-lg">₹{item.price.toLocaleString()}</p>
                                             {(item.regularPrice || item.mrp) && (item.regularPrice || item.mrp)! > item.price && (
-                                                <p className="text-gray-400 text-[11px] line-through font-bold">
+                                                <p className="text-gray-400 text-[10px] md:text-[11px] line-through font-bold">
                                                     ₹{(item.regularPrice || item.mrp)?.toLocaleString()}
                                                 </p>
                                             )}
                                         </div>
                                         {(item.regularPrice || item.mrp) && (item.regularPrice || item.mrp)! > item.price && (
-                                            <p className="text-green-600 text-[10px] font-black uppercase tracking-widest mt-0.5">
+                                            <p className="text-green-600 text-[9px] md:text-[10px] font-black uppercase tracking-widest mt-0.5">
                                                 You Save ₹{(((item.regularPrice || item.mrp)!) - item.price).toLocaleString()}
                                             </p>
                                         )}
@@ -90,7 +90,7 @@ export default function CartPage() {
                                         >
                                             <Minus className="w-3.5 h-3.5" strokeWidth={3} />
                                         </button>
-                                        <span className="text-sm font-black w-8 text-center text-gray-900">{item.quantity}</span>
+                                        <span className="text-xs md:text-sm font-black w-8 text-center text-gray-900">{item.quantity}</span>
                                         <button
                                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                             className="w-9 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 rounded-r-full transition-colors"
@@ -106,8 +106,8 @@ export default function CartPage() {
 
                 {/* Order Summary */}
                 <div className="mt-8 md:mt-0 md:w-1/3 bg-white border border-gray-100 rounded-[28px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] lg:sticky lg:top-24">
-                    <h3 className="text-xl font-black text-gray-900 mb-6 tracking-tight">Order Summary</h3>
-                    <div className="space-y-4 text-sm">
+                    <h3 className="text-lg lg:text-xl font-black text-gray-900 mb-6 tracking-tight">Order Summary</h3>
+                    <div className="space-y-4 text-xs md:text-sm">
                         <div className="flex justify-between items-center text-gray-500 font-medium">
                             <span>Subtotal ({cart.length} items)</span>
                             <span className="text-gray-900 font-bold">₹{subtotal.toLocaleString()}</span>
@@ -121,10 +121,10 @@ export default function CartPage() {
 
                         <div className="flex justify-between items-end">
                             <div className="flex flex-col">
-                                <span className="font-black text-2xl tracking-tighter text-gray-900 leading-none">Total</span>
-                                <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Incl. of all taxes</span>
+                                <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 leading-none">Total</span>
+                                <span className="text-[9px] md:text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Incl. of all taxes</span>
                             </div>
-                            <span className="text-3xl font-black text-gray-900 tracking-tighter leading-none">₹{total.toLocaleString()}</span>
+                            <span className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none">₹{total.toLocaleString()}</span>
                         </div>
                     </div>
 
@@ -132,7 +132,7 @@ export default function CartPage() {
                     <div className="hidden lg:block">
                         <button
                             onClick={handleCheckout}
-                            className="w-full mt-6 bg-black text-white h-16 rounded-[20px] font-black text-lg shadow-xl shadow-black/20 hover:shadow-black/30 hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                            className="w-full mt-6 bg-black text-white h-16 rounded-[20px] font-black text-base lg:text-lg shadow-xl shadow-black/20 hover:shadow-black/30 hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                         >
                             Proceed to Checkout
                             <ArrowRight className="w-5 h-5" />
@@ -150,11 +150,11 @@ export default function CartPage() {
                 <div className="lg:hidden fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 p-4 bg-white/90 backdrop-blur-xl border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40">
                     <button
                         onClick={handleCheckout}
-                        className="w-full bg-black text-white h-16 rounded-[20px] font-black text-lg shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6"
+                        className="w-full bg-black text-white h-14 rounded-[20px] font-black text-base shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6"
                     >
                         <div className="flex flex-col items-start leading-none">
-                            <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total</span>
-                            <span className="text-xl tracking-tight">₹{total.toLocaleString()}</span>
+                            <span className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total</span>
+                            <span className="text-lg md:text-xl tracking-tight">₹{total.toLocaleString()}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             Checkout <ArrowRight className="w-5 h-5" />
