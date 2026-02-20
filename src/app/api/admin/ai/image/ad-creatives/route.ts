@@ -187,7 +187,7 @@ ${specLine ? `  LINE ${activeStyle === 'Poster' ? '4' : '3'}: Tech specs display
 --- PHOTO RULES ---
 - PHOTOREALISTIC only — NO cartoon/illustration/CGI look. Use cinematic, high-budget commercial photography style.
 - LIGHTING: Beautiful, soft, dynamic lighting (e.g., golden hour, studio softbox, or cinematic neon depending on the scene).
-- The vehicle must match the reference image exactly.
+- The vehicle must match the reference image exactly. NEVER change the vehicle's color, wheel design, or physical features. The product color must remain exactly as it is in the uploaded photo.
 - The environment must feel premium, aspirational, and highly realistic.
 - HUMAN INTERACTION: If a child is in the scene, the pose must be COMPLETELY NATURAL and proportionate to the vehicle.
 
