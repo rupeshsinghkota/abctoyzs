@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { Search, ShoppingBag, Menu, X, Home, Grid, User, Package, ChevronDown, ChevronRight, Zap, Baby, Lock } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, Home, Grid, User, Package, ChevronDown, ChevronRight, Zap, Baby, Lock, MapPin, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -222,27 +222,20 @@ export function MobileHeader() {
                                 </Link>
                             )}
                             <Link
-                                href="/cart"
+                                href="/track-order"
                                 className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/50 transition-all shadow-sm active:scale-95 group"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                <div className="relative">
-                                    <ShoppingBag className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                                    {cartItemCount > 0 && (
-                                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center rounded-full">
-                                            {cartItemCount}
-                                        </span>
-                                    )}
-                                </div>
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider group-hover:text-primary transition-colors">Cart</span>
+                                <MapPin className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider group-hover:text-primary transition-colors">Track</span>
                             </Link>
                             <Link
-                                href="/profile"
+                                href="/contact-us"
                                 className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/50 transition-all shadow-sm active:scale-95 group"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                <User className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider group-hover:text-primary transition-colors">Profile</span>
+                                <HelpCircle className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider group-hover:text-primary transition-colors">Help</span>
                             </Link>
                         </div>
                     </div>
