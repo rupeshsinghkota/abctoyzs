@@ -177,27 +177,58 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     </div>
                 )}
 
-                {displayRegularPrice ? (
-                    <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
-                        <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
-                            ₹{displayPrice.toLocaleString()}
-                        </span>
-                        <span className="text-xs text-gray-400 font-bold line-through">₹{displayRegularPrice.toLocaleString()}</span>
-                        <span className="text-[10px] text-gray-300 font-bold line-through">₹{displayMRP.toLocaleString()}</span>
-                        <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
-                            -{discount}%
-                        </span>
-                        <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
-                    </div>
-                ) : (
-                    <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
-                        <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
-                            ₹{displayPrice.toLocaleString()}
-                        </span>
+                {displayRegularPrice ? (() => {
+                    const totalSaved = displayMRP - displayPrice;
+                    const totalOffPercent = Math.round((totalSaved / displayMRP) * 100);
+                    const extraSaved = displayRegularPrice - displayPrice;
+                    return (
+                        <div className="space-y-1">
+                            {/* Main price + total % off MRP */}
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
+                                    ₹{displayPrice.toLocaleString()}
+                                </span>
+                                <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                    {totalOffPercent}% OFF
+                                </span>
+                                <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
+                            </div>
+                            {/* MRP + Our Price labels */}
+                            <div className="flex items-center gap-3 text-[11px]">
+                                <span className="text-gray-400">
+                                    MRP <span className="line-through font-bold">₹{displayMRP.toLocaleString()}</span>
+                                </span>
+                                <span className="text-gray-400">
+                                    Our Price <span className="line-through font-bold">₹{displayRegularPrice.toLocaleString()}</span>
+                                </span>
+                            </div>
+                            {/* Total savings callout */}
+                            <div className="text-[11px] font-bold text-green-700">
+                                🎉 You save ₹{totalSaved.toLocaleString()} (₹{extraSaved.toLocaleString()} extra today!)
+                            </div>
+                        </div>
+                    );
+                })() : (
+                    <div className="space-y-0.5">
+                        <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
+                            <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
+                                ₹{displayPrice.toLocaleString()}
+                            </span>
+                            {displayMRP > displayPrice && (
+                                <>
+                                    <span className="text-xs text-gray-400 line-through">MRP ₹{displayMRP.toLocaleString()}</span>
+                                    <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                        {Math.round(((displayMRP - displayPrice) / displayMRP) * 100)}% OFF
+                                    </span>
+                                </>
+                            )}
+                            <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
+                        </div>
                         {displayMRP > displayPrice && (
-                            <span className="text-xs font-bold text-gray-400 line-through">₹{displayMRP.toLocaleString()}</span>
+                            <div className="text-[11px] font-bold text-green-700">
+                                You save ₹{(displayMRP - displayPrice).toLocaleString()}
+                            </div>
                         )}
-                        <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
                     </div>
                 )}
             </div>
