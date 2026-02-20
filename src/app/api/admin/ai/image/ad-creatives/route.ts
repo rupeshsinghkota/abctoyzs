@@ -119,13 +119,17 @@ export async function POST(req: Request) {
         const generateImage = async (format: 'SQUARE1' | 'SQUARE2' | 'SQUARE3') => {
             let aspectRatio: string = "1:1";
             let compositionDesc: string;
+            let distinctEnvironment: string;
 
             if (format === 'SQUARE1') {
                 compositionDesc = "Clean and direct composition. FRONT OR 3/4 ANGLE. The vehicle should be large and clearly visible, acting as the undisputed hero of the image. Standard eye-level commercial product shot.";
+                distinctEnvironment = "SETTING: A brightly lit, high-end toy boutique or a pristine, modern studio with soft pastel lighting. Extremely clean, highlighting the product perfectly.";
             } else if (format === 'SQUARE2') {
                 compositionDesc = "Dramatic wide/environmental composition. LOW ANGLE OR WIDE ANGLE. Show more of the beautiful background environment. The vehicle should be slightly smaller to show scale and context in its luxurious surroundings.";
+                distinctEnvironment = "SETTING: A luxurious suburban driveway in front of a modern mansion, during golden hour. Warm sunlight hitting the pavement, surrounded by manicured green lawns and elegant architecture.";
             } else { // SQUARE3
                 compositionDesc = "High-energy lifestyle/action composition. DYNAMIC ANGLE. The vehicle should look like it is in motion or being actively enjoyed. Frame it for maximum excitement and energy.";
+                distinctEnvironment = "SETTING: A vibrant, sun-drenched outdoor park or scenic promenade. Slightly blurred background (bokeh) to emphasize motion and fun, with lush greenery and clear blue skies.";
             }
 
             // Build a SHORT display name (strip brand prefix, keep model only)
@@ -137,6 +141,7 @@ export async function POST(req: Request) {
             // Build the price line
             let priceSection = 'PRICE TAG: Do NOT show the price or numbers in this image. Keep it clean and focused on the product features.';
 
+            // OVERRIDE the user's global vibe to force distinct environments for the 3 variations
             const prompt = `Generate a professional e-commerce product ${activeStyle === 'Poster' ? 'lifestyle poster' : 'advertisement image'}.
 
 PRODUCT: "${shortName}" — a children's ride-on toy vehicle.
@@ -158,7 +163,7 @@ ${numMrp > numPrice ? `- SALE TAG: A very discrete, modern, sleek "SALE" pill ba
 
 LAYER 2 — HERO ZONE:
 - Photorealistic scene: ${compositionDesc}
-- ${scenePrompt}
+- ${distinctEnvironment}
 - The ride-on vehicle integrated perfectly. IMPORTANT: Show the WHOLE vehicle. It must be prominent, fully centered, and NO parts of the vehicle should be cropped or cut off by the edges of the image.
 - HUMAN ELEMENT: ${audiencePrompt}
 ${activeScene === 'Birthday Celebration' ? '- Add colorful balloons and confetti for a festive look.' : ''}

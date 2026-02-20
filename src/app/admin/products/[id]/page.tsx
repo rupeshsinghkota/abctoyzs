@@ -416,48 +416,39 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         }
         setIsGeneratingAds(true);
         try {
-            const modes = ['functional', 'celebration', 'adventure'];
-            const allCreatives: any[] = [];
+            const res = await fetch('/api/admin/ai/image/ad-creatives', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productName: formData.name,
+                    price: formData.base_price,
+                    mrp: formData.mrp,
+                    originalImageUrl: formData.images[0],
+                    vibe: formData.prompt_notes,
+                    mode: 'auto', // Now generates 1 set of 3 distinct environments
+                    specs: {
+                        voltage: formData.voltage,
+                        age: formData.specs?.suitable_age,
+                        motor: formData.specs?.motor,
+                        speed: formData.specs?.speed,
+                        runTime: formData.specs?.run_time,
+                        maxLoad: formData.specs?.max_load,
+                        seats: formData.specs?.seats,
+                        remoteControl: formData.specs?.remote_control,
+                    }
+                })
+            });
 
-            for (const mode of modes) {
-                const res = await fetch('/api/admin/ai/image/ad-creatives', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        productName: formData.name,
-                        price: formData.base_price,
-                        mrp: formData.mrp,
-                        originalImageUrl: formData.images[0],
-                        vibe: formData.prompt_notes,
-                        mode,
-                        specs: {
-                            voltage: formData.voltage,
-                            age: formData.specs?.suitable_age,
-                            motor: formData.specs?.motor,
-                            speed: formData.specs?.speed,
-                            runTime: formData.specs?.run_time,
-                            maxLoad: formData.specs?.max_load,
-                            seats: formData.specs?.seats,
-                            remoteControl: formData.specs?.remote_control,
-                        }
-                    })
-                });
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
 
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-
-                allCreatives.push({
-                    ...data.creatives,
-                    mode
-                });
-            }
-
+            // Store directly as an object, NOT an array of modes
             setFormData(prev => ({
                 ...prev,
-                ad_creatives: allCreatives as any
+                ad_creatives: data.creatives as any
             }));
 
-            alert('✨ 3 Different Ad Styles Generated Successfully!');
+            alert('✨ 3 Distinct Ad Styles Generated Successfully!');
 
         } catch (error: any) {
             console.error('Ad Generation Failed:', error);
@@ -478,46 +469,37 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         setIsGeneratingAds(true);
 
         try {
-            const modes = ['functional', 'celebration', 'adventure'];
-            const allCreatives: any[] = [];
+            const res = await fetch('/api/admin/ai/image/ad-creatives', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productName: `${formData.name} - ${variant.name}`,
+                    price: variant.price,
+                    mrp: (variant as any).mrp || formData.mrp,
+                    originalImageUrl: variant.image,
+                    vibe: formData.prompt_notes,
+                    mode: 'auto', // Now generates 1 set of 3 distinct environments
+                    specs: {
+                        voltage: formData.voltage,
+                        age: formData.specs?.suitable_age,
+                        motor: formData.specs?.motor,
+                        speed: formData.specs?.speed,
+                        runTime: formData.specs?.run_time,
+                        maxLoad: formData.specs?.max_load,
+                        seats: formData.specs?.seats,
+                        remoteControl: formData.specs?.remote_control,
+                    }
+                })
+            });
 
-            for (const mode of modes) {
-                const res = await fetch('/api/admin/ai/image/ad-creatives', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        productName: `${formData.name} - ${variant.name}`,
-                        price: variant.price,
-                        mrp: (variant as any).mrp || formData.mrp,
-                        originalImageUrl: variant.image,
-                        vibe: formData.prompt_notes,
-                        mode,
-                        specs: {
-                            voltage: formData.voltage,
-                            age: formData.specs?.suitable_age,
-                            motor: formData.specs?.motor,
-                            speed: formData.specs?.speed,
-                            runTime: formData.specs?.run_time,
-                            maxLoad: formData.specs?.max_load,
-                            seats: formData.specs?.seats,
-                            remoteControl: formData.specs?.remote_control,
-                        }
-                    })
-                });
-
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-
-                allCreatives.push({
-                    ...data.creatives,
-                    mode
-                });
-            }
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
 
             const newVars = [...variants];
-            newVars[index].ad_creatives = allCreatives as any;
+            // Store directly as an object, NOT an array of modes
+            newVars[index].ad_creatives = data.creatives as any;
             setVariants(newVars);
-            alert(`✨ 3 Ad Styles Generated for ${variant.name}!`);
+            alert(`✨ 3 Distinct Ad Styles Generated for ${variant.name}!`);
 
         } catch (error: any) {
             console.error('Variant Ad Generation Failed:', error);
@@ -550,49 +532,36 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         const newVars = [...variants];
 
         try {
-            const modes = ['functional', 'celebration', 'adventure'];
-
             for (let i = 0; i < newVars.length; i++) {
                 const variant = newVars[i];
-                // Use the same helper for consistency
                 if (variant.image && hasNoAds(variant)) {
                     try {
-                        const allCreatives: any[] = [];
-                        for (const mode of modes) {
-                            const res = await fetch('/api/admin/ai/image/ad-creatives', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    productName: `${formData.name} - ${variant.name}`,
-                                    price: variant.price,
-                                    mrp: (variant as any).mrp || formData.mrp,
-                                    originalImageUrl: variant.image,
-                                    vibe: formData.prompt_notes,
-                                    mode,
-                                    specs: {
-                                        voltage: formData.voltage,
-                                        age: formData.specs?.suitable_age,
-                                        motor: formData.specs?.motor,
-                                        speed: formData.specs?.speed,
-                                        runTime: formData.specs?.run_time,
-                                        maxLoad: formData.specs?.max_load,
-                                        seats: formData.specs?.seats,
-                                        remoteControl: formData.specs?.remote_control,
-                                    }
-                                })
-                            });
+                        const res = await fetch('/api/admin/ai/image/ad-creatives', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                productName: `${formData.name} - ${variant.name}`,
+                                price: variant.price,
+                                mrp: (variant as any).mrp || formData.mrp,
+                                originalImageUrl: variant.image,
+                                vibe: formData.prompt_notes,
+                                mode: 'auto', // Generates exactly 3 diverse environments
+                                specs: {
+                                    voltage: formData.voltage,
+                                    age: formData.specs?.suitable_age,
+                                    motor: formData.specs?.motor,
+                                    speed: formData.specs?.speed,
+                                    runTime: formData.specs?.run_time,
+                                    maxLoad: formData.specs?.max_load,
+                                    seats: formData.specs?.seats,
+                                    remoteControl: formData.specs?.remote_control,
+                                }
+                            })
+                        });
 
-                            const data = await res.json();
-                            if (data.creatives) {
-                                allCreatives.push({
-                                    ...data.creatives,
-                                    mode
-                                });
-                            }
-                        }
-
-                        if (allCreatives.length > 0) {
-                            newVars[i].ad_creatives = allCreatives as any;
+                        const data = await res.json();
+                        if (data.creatives) {
+                            newVars[i].ad_creatives = data.creatives as any;
                             successCount++;
                             // Partial update for UX
                             setVariants([...newVars]);
