@@ -68,8 +68,8 @@ export async function GET(request: NextRequest) {
                 brand: 'ABC Toyz',
                 condition: 'new',
                 availability: isBaseInStock ? 'in_stock' : 'out_of_stock',
-                price: `${product.mrp || product.price} INR`,
-                sale_price: product.mrp && product.mrp > product.price ? `${product.price} INR` : undefined,
+                price: `${product.mrp || product.regular_price || product.price} INR`,
+                sale_price: (product.mrp || product.regular_price) && (product.mrp || product.regular_price || 0) > product.price ? `${product.price} INR` : undefined,
                 google_category: 'Toys & Games > Toys > Riding Toys > Electric Riding Toys',
                 category: product.category,
                 mpn: product.id,
@@ -94,8 +94,8 @@ export async function GET(request: NextRequest) {
 
                 const variantPrice = variant.price || product.price;
                 const variantMrp = variant.mrp || product.mrp;
-                const displayPrice = variantMrp || variantPrice;
-                const salePrice = variantMrp && variantMrp > variantPrice ? variantPrice : undefined;
+                const basePrice = variantMrp || variant.regular_price || variantPrice;
+                const salePrice = basePrice > variantPrice ? variantPrice : undefined;
 
                 // Construct Variant Deep Link
                 const params = new URLSearchParams();
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
                     image: variantImage,
                     additional_images: variantAdditionalImages,
                     availability: isVariantInStock ? 'in_stock' : 'out_of_stock',
-                    price: `${displayPrice} INR`,
+                    price: `${basePrice} INR`,
                     sale_price: salePrice ? `${salePrice} INR` : undefined,
                     color: color,
                     size: voltage,
