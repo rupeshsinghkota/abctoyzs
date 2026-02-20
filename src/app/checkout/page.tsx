@@ -35,6 +35,11 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
     const [showAddrForm, setShowAddrForm] = useState(false);
 
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [session, setSession] = useState<any>(null);
     const [codSettings, setCodSettings] = useState<any>(null);
@@ -333,6 +338,15 @@ export default function CheckoutPage() {
             setIsApplyingCoupon(false);
         }
     };
+
+    if (!mounted) {
+        return (
+            <div className="min-h-screen pt-24 pb-12 px-4 flex flex-col items-center justify-center bg-gray-50">
+                <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+                <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Loading Secure Checkout...</p>
+            </div>
+        );
+    }
 
     if (cart.length === 0 && !loading) {
         return (

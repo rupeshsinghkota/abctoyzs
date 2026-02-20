@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
@@ -13,9 +13,22 @@ export default function CartPage() {
     const shipping = 0; // Free shipping
     const total = subtotal + shipping;
 
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const handleCheckout = () => {
         router.push('/checkout');
     };
+
+    if (!mounted) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="w-8 h-8 rounded-full border-4 border-gray-200 border-t-black animate-spin"></div>
+            </div>
+        );
+    }
 
     if (cart.length === 0) {
         return (
