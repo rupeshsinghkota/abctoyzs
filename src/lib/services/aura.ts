@@ -55,12 +55,16 @@ Before replying, ALWAYS check the chat history (provided below).
 - **Direct Goal:** Answer the query accurately. If you can't answer, trigger a handover.
 - **No AI Mention:** Never mention you are an AI or bot.
 
-# SENDING PRODUCT IMAGES
-When a user asks to see a product or asks about what products you have, you MUST send them an image of the product. 
-- You receive the \`image\` URL from the \`query_inventory\` tool.
-- To send an image, simply include the URL anywhere in your response wrapped in exactly these tags: \`[IMAGE: <url>]\`
-- Example: "We have the Mercedes 12V in stock! [IMAGE: https://abctoyz.in/.../mercedes.png] It features a remote control and dual motors."
-- **CRITICAL:** Only include ONE image per response. Do not use standard markdown like \`![alt](url)\`. Only use the \`[IMAGE: url]\` format.
+# SENDING PRODUCT IMAGES & LINKS
+When a user asks to see a product or asks about what products you have:
+1. **Include an Image:** You MUST send them an image of the product.
+2. **Include the Link:** You MUST include the direct link (url) to the product.
+3. **Limit Options:** You MUST ONLY suggest 1 or 2 products maximum per message to avoid overwhelming the customer.
+
+- You receive the image and url from the query_inventory tool.
+- Include the image URL anywhere in your response wrapped exactly like this: [IMAGE: url]
+- Example: "The Mercedes 12V is in stock for ₹15,000! [IMAGE: https://abctoyz.in/.../mercedes.png] Check it out here: https://abctoyz.in/product/mercedes-12v"
+- **CRITICAL:** Only include ONE image tag per response. Do not use standard markdown like ![alt](url).
 
 # COUPONS & PROMOTIONS
 - **Popup/Secret Code:** If user sends "How can I get my Secret discount code?" OR "Wait! I don't want to miss out. Please send me the 10% OFF discount code! 🎁", reply EXACTLY: "Welcome to the family! 🚗 Use code *PREPAID5* for 5% OFF your order when you choose to pay via Prepaid. Need help choosing a ride?"
@@ -145,7 +149,7 @@ async function query_inventory({ category, search_term }: { category?: string, s
             words.forEach(word => {
                 q1 = q1.ilike('name', `%${word}%`);
             });
-            const { data: d1 } = await q1.limit(10);
+            const { data: d1 } = await q1.limit(3);
 
             if (d1 && d1.length > 0) {
                 data = d1;
@@ -154,7 +158,7 @@ async function query_inventory({ category, search_term }: { category?: string, s
                 let q2 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
                 if (category) q2 = q2.ilike('category', `%${category}%`);
                 const orString = words.map(w => `name.ilike.%${w}%`).join(',');
-                const { data: d2 } = await q2.or(orString).order('stock', { ascending: false }).limit(10);
+                const { data: d2 } = await q2.or(orString).order('stock', { ascending: false }).limit(3);
                 data = d2;
             }
         }
@@ -164,7 +168,7 @@ async function query_inventory({ category, search_term }: { category?: string, s
     if (!data || data.length === 0) {
         let q3 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
         if (category) q3 = q3.ilike('category', `%${category}%`);
-        const { data: d3 } = await q3.order('stock', { ascending: false }).limit(10);
+        const { data: d3 } = await q3.order('stock', { ascending: false }).limit(3);
         data = d3;
     }
 
