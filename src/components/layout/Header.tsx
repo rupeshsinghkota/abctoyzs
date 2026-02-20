@@ -13,8 +13,6 @@ export function Header() {
     const [scrollProgress, setScrollProgress] = useState(0);
     const lastScrollY = useRef(0);
 
-    if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout')) return null;
-
     useEffect(() => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
@@ -42,6 +40,8 @@ export function Header() {
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout')) return null;
 
     return (
         <header
