@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { Search, Menu, X, Home, Navigation, Package, MapPin, HelpCircle, Lock, ShoppingCart } from "lucide-react";
+import { Search, Menu, X, Home, Navigation, Package, MapPin, HelpCircle, Lock, ShoppingCart, CarFront, Bike, Truck, Gamepad2, Gauge, Mountain, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -68,20 +68,7 @@ export function MobileHeader() {
                     </div>
 
                     {/* Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto min-h-0">
-                        {/* Inline Search Bar */}
-                        <div className="p-4 pb-0">
-                            <form action="/search" className="relative" onSubmit={() => setIsMenuOpen(false)}>
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                <input
-                                    type="text"
-                                    name="q"
-                                    placeholder="Search ride-on toys..."
-                                    className="w-full bg-secondary/50 border border-border/20 rounded-2xl h-12 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:text-muted-foreground/50 font-medium"
-                                />
-                            </form>
-                        </div>
-
+                    <div className="flex-1 overflow-y-auto min-h-0 py-2">
                         <div className="p-4 space-y-1">
                             {/* Primary Links */}
                             <Link
@@ -106,20 +93,36 @@ export function MobileHeader() {
 
                             {/* The Garage (Grid UI) */}
                             <div className="pt-2 pb-4">
-                                <div className="px-3 mb-3 flex items-center justify-between">
-                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">The Garage</h3>
+                                <div className="px-3 mb-4 flex items-center justify-between">
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">The Garage</h3>
                                 </div>
-                                <div className="grid grid-cols-2 gap-2 px-2">
-                                    {VEHICLE_CATEGORIES.map((cat) => (
-                                        <Link
-                                            key={cat.value}
-                                            href={`/category/${cat.value}`}
-                                            className="flex flex-col p-3 rounded-2xl bg-secondary/30 hover:bg-primary/5 border border-border/20 hover:border-primary/20 transition-all active:scale-95 group"
-                                            onClick={() => setIsMenuOpen(false)}
-                                        >
-                                            <span className="text-xs font-bold text-foreground/80 group-hover:text-primary transition-colors">{cat.label}</span>
-                                        </Link>
-                                    ))}
+                                <div className="grid grid-cols-2 gap-3 px-2">
+                                    {VEHICLE_CATEGORIES.map((cat) => {
+                                        const Icon = {
+                                            cars: CarFront,
+                                            jeeps: Truck,
+                                            bikes: Bike,
+                                            atvs: Zap,
+                                            utvs: Gamepad2,
+                                            gokarts: Gauge,
+                                            dirtbikes: Mountain,
+                                            scooters: Zap,
+                                        }[cat.value] || Package;
+
+                                        return (
+                                            <Link
+                                                key={cat.value}
+                                                href={`/category/${cat.value}`}
+                                                className="flex flex-col gap-2 p-4 rounded-2xl bg-secondary/20 hover:bg-primary/5 border border-border/10 hover:border-primary/30 transition-all active:scale-95 group"
+                                                onClick={() => setIsMenuOpen(false)}
+                                            >
+                                                <div className="w-8 h-8 rounded-xl bg-white/50 border border-border/10 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
+                                                    <Icon className="w-4 h-4" strokeWidth={1.5} />
+                                                </div>
+                                                <span className="text-xs font-bold text-foreground/70 group-hover:text-primary transition-colors">{cat.label}</span>
+                                            </Link>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -167,33 +170,33 @@ export function MobileHeader() {
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex-none p-5 border-t border-border/10 bg-secondary/20">
+                    <div className="flex-none p-5 border-t border-border/10 bg-background/50 backdrop-blur-md">
                         <div className={`grid gap-3 ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
                             {isAdmin && (
                                 <Link
                                     href="/admin"
-                                    className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/50 transition-all shadow-sm active:scale-95 group"
+                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-background border border-border/50 hover:border-primary/50 transition-all active:scale-95 group"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     <Lock className="w-5 h-5 mb-1.5 text-primary" strokeWidth={1.5} />
-                                    <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Admin</span>
+                                    <span className="text-[9px] font-black text-primary uppercase tracking-widest">Admin</span>
                                 </Link>
                             )}
                             <Link
                                 href="/track-order"
-                                className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/50 transition-all shadow-sm active:scale-95 group"
+                                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-background border border-border/50 hover:border-primary/50 transition-all active:scale-95 group"
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 <MapPin className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider group-hover:text-primary transition-colors">Track</span>
+                                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest group-hover:text-primary transition-colors">Track</span>
                             </Link>
                             <Link
                                 href="/contact-us"
-                                className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-background/50 border border-border/50 hover:border-primary/50 transition-all shadow-sm active:scale-95 group"
+                                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-background border border-border/50 hover:border-primary/50 transition-all active:scale-95 group"
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 <HelpCircle className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider group-hover:text-primary transition-colors">Help</span>
+                                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest group-hover:text-primary transition-colors">Help</span>
                             </Link>
                         </div>
                     </div>
