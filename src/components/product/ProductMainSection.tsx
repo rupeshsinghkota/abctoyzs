@@ -168,40 +168,40 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
             {/* RIGHT: Info & Actions (33%) */}
             <div className="lg:col-span-4 relative -mt-20 lg:mt-0 z-10 w-full">
-                <div className="bg-white rounded-t-[40px] lg:rounded-none px-6 pt-8 pb-24 lg:pb-0 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] lg:shadow-none min-h-[50vh]">
-                    <div className="lg:sticky lg:top-28 space-y-5">
+                <div className="bg-white rounded-t-[32px] lg:rounded-none px-4 pt-5 pb-24 lg:px-6 lg:pt-8 lg:pb-0 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] lg:shadow-none min-h-[50vh]">
+                    <div className="lg:sticky lg:top-28 space-y-3 lg:space-y-5">
 
                         {/* --- SCARCITY TRIGGER: Live Viewers --- */}
                         <LiveViewersBadge />
 
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-3">
+                        <div className="space-y-3 lg:space-y-4">
+                            <div className="space-y-1.5 lg:space-y-2">
+                                <div className="flex items-center gap-2">
                                     {product.tag && (
-                                        <span className="px-2 py-0.5 text-[10px] font-black text-white bg-black rounded-md uppercase tracking-[0.2em]">
+                                        <span className="px-1.5 py-0.5 text-[9px] font-black text-white bg-black rounded-md uppercase tracking-[0.15em]">
                                             {product.tag}
                                         </span>
                                     )}
                                     {product.rating >= 4.5 && (
-                                        <span className="px-2 py-0.5 text-[10px] font-black text-primary bg-primary/10 rounded-md uppercase tracking-[0.2em] border border-primary/20">
+                                        <span className="px-1.5 py-0.5 text-[9px] font-black text-primary bg-primary/10 rounded-md uppercase tracking-[0.15em] border border-primary/20">
                                             Top Rated
                                         </span>
                                     )}
                                 </div>
 
-                                <h1 className="text-3xl md:text-3xl lg:text-4xl font-extrabold font-heading leading-tight tracking-tight text-gray-900">
+                                <h1 className="text-xl md:text-2xl lg:text-3xl font-extrabold font-heading leading-tight tracking-tight text-gray-900">
                                     {product.name}
                                 </h1>
                             </div>
 
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 rounded-md border border-gray-100">
                                     <div className="flex items-center gap-0.5">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <Star
                                                 key={star}
                                                 className={cn(
-                                                    "w-3 h-3",
+                                                    "w-2.5 h-2.5",
                                                     star <= Math.round(product.rating)
                                                         ? "fill-primary text-primary"
                                                         : "fill-gray-200 text-gray-200"
@@ -209,61 +209,61 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                             />
                                         ))}
                                     </div>
-                                    <span className="text-[11px] font-black text-foreground ml-1">{product.rating || '5.0'}</span>
+                                    <span className="text-[10px] font-black text-foreground ml-0.5">{product.rating || '5.0'}</span>
                                 </div>
                                 {product.reviews > 0 && (
-                                    <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">
-                                        {product.reviews} Verified Reviews
+                                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+                                        {product.reviews} Reviews
                                     </span>
                                 )}
                             </div>
 
-                            {/* Trust Pills — Compact Horizontal Row */}
-                            <div className="flex flex-wrap gap-2">
+                            {/* Trust Pills — Scrollable Row on Mobile */}
+                            <div className="flex overflow-x-auto gap-1.5 no-scrollbar -mx-1 px-1 pb-0.5">
                                 {[
-                                    { icon: Truck, label: 'Ships 24–48h' },
-                                    { icon: ShieldCheck, label: '1-Yr Warranty' },
-                                    { icon: CheckCircle2, label: 'ISI Certified' },
-                                    { icon: RotateCcw, label: '10-Day Replace' },
+                                    { icon: Truck, label: '24–48h' },
+                                    { icon: ShieldCheck, label: '1-Yr Wrnty' },
+                                    { icon: CheckCircle2, label: 'ISI Cert.' },
+                                    { icon: RotateCcw, label: '10-Day Rplc' },
                                 ].map(({ icon: Icon, label }) => (
-                                    <div key={label} className="flex items-center gap-1.5 bg-zinc-50 border border-zinc-100 rounded-full px-3 py-1.5">
-                                        <Icon className="w-3 h-3 text-primary shrink-0" />
-                                        <span className="text-[10px] font-black text-zinc-700 whitespace-nowrap">{label}</span>
+                                    <div key={label} className="flex items-center gap-1 bg-zinc-50 border border-zinc-100 rounded-full px-2 py-1 shrink-0">
+                                        <Icon className="w-2.5 h-2.5 text-primary shrink-0" />
+                                        <span className="text-[9px] font-black text-zinc-600 whitespace-nowrap">{label}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Pincode Check — Compact Inline */}
-                            <div className="border border-gray-100 rounded-xl p-2.5 flex flex-col gap-2 bg-gray-50/50">
-                                <form onSubmit={checkDelivery} className="flex gap-2">
+                            {/* Pincode Check */}
+                            <div className="border border-gray-100 rounded-lg p-2 flex flex-col gap-1.5 bg-gray-50/50">
+                                <form onSubmit={checkDelivery} className="flex gap-1.5">
                                     <div className="relative flex-1">
-                                        <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
+                                        <MapPin className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-primary" />
                                         <input
                                             type="text"
                                             maxLength={6}
-                                            placeholder="6-digit pincode"
+                                            placeholder="Pincode"
                                             value={pincode}
                                             onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                                            className="w-full bg-white border border-gray-200 rounded-lg pl-7 pr-2 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                                            className="w-full bg-white border border-gray-200 rounded-md pl-6 pr-2 py-1.5 text-[11px] font-medium focus:outline-none focus:ring-1 focus:ring-primary transition-all"
                                         />
                                     </div>
                                     <button
                                         type="submit"
                                         disabled={pincode.length !== 6 || estimate.loading}
-                                        className="bg-gray-900 text-white px-3 rounded-lg text-xs font-bold hover:bg-primary transition-all disabled:opacity-50"
+                                        className="bg-gray-900 text-white px-2.5 rounded-md text-[10px] font-bold hover:bg-primary transition-all disabled:opacity-50"
                                     >
-                                        {estimate.loading ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Check'}
+                                        {estimate.loading ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Check'}
                                     </button>
                                 </form>
                                 {estimate.serviceable ? (
-                                    <div className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 px-2 py-1 rounded-lg">
-                                        <Truck className="w-3 h-3 shrink-0" />
+                                    <div className="flex items-center gap-1 text-[10px] text-green-700 bg-green-50 px-2 py-0.5 rounded">
+                                        <Truck className="w-2.5 h-2.5 shrink-0" />
                                         <span className="font-bold">Delivers by {estimate.formattedDate}</span>
                                     </div>
                                 ) : estimate.message ? (
-                                    <p className="text-[11px] font-medium text-red-500">{estimate.message}</p>
+                                    <p className="text-[10px] font-medium text-red-500">{estimate.message}</p>
                                 ) : (
-                                    <p className="text-[10px] font-medium text-gray-400">Free delivery all over India</p>
+                                    <p className="text-[9px] font-medium text-gray-400">Free delivery all over India</p>
                                 )}
                             </div>
 
