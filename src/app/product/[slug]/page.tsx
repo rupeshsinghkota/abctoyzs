@@ -178,15 +178,15 @@ export default async function ProductPage({ params }: PageProps) {
             <main className="container max-w-[1800px] mx-auto px-0 md:px-6 lg:px-8">
                 <ProductMainSection product={product} boxContent={whatsInBox} />
 
-                {/* DESKTOP FULL WIDTH DETAILS (Below Fold) */}
-                <div className="hidden lg:block mt-12 max-w-7xl mx-auto space-y-16 px-4 pb-16">
+                {/* DESKTOP FULL WIDTH DETAILS */}
+                <div className="hidden lg:block mt-6 max-w-7xl mx-auto space-y-8 px-4 pb-8">
 
 
                     {/* 2. Specs & Box Contents (Optimized Compact Layout) */}
                     <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 items-start px-4 md:px-0">
 
                         {/* Specs Card */}
-                        <div className="relative group/specs bg-white p-6 lg:p-8 rounded-[32px] border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] h-full overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-primary/5">
+                        <div className="relative group/specs bg-white p-5 lg:p-6 rounded-2xl border border-gray-100 shadow-sm h-full overflow-hidden transition-all duration-500 hover:shadow-lg">
                             <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24 opacity-50 transition-opacity" />
 
                             <div className="relative flex items-center justify-between mb-6">
@@ -213,7 +213,7 @@ export default async function ProductPage({ params }: PageProps) {
                         </div>
 
                         {/* Box Contents Card */}
-                        <div className="relative group/box bg-white p-6 lg:p-8 rounded-[32px] border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] h-full overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-orange-500/5">
+                        <div className="relative group/box bg-white p-5 lg:p-6 rounded-2xl border border-gray-100 shadow-sm h-full overflow-hidden transition-all duration-500 hover:shadow-lg">
                             <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/5 rounded-full blur-3xl -mr-24 -mt-24 opacity-50 transition-opacity" />
 
                             <div className="relative flex items-center justify-between mb-6">
@@ -257,7 +257,7 @@ export default async function ProductPage({ params }: PageProps) {
                             </div>
 
                             {/* Description Content */}
-                            <div className="bg-gray-50/50 rounded-3xl border border-gray-100 p-8 lg:p-10">
+                            <div className="bg-gray-50/50 rounded-2xl border border-gray-100 p-6 lg:p-8">
                                 <div
                                     className="prose prose-lg premium-prose max-w-none"
                                     dangerouslySetInnerHTML={{ __html: product.description }}
@@ -272,9 +272,9 @@ export default async function ProductPage({ params }: PageProps) {
 
             {/* Related Products — visible on ALL devices */}
             {relatedProducts.length > 0 && (
-                <div className="md:mt-8 border-t pt-4 md:pt-10 px-4 lg:px-0 pb-0">
+                <div className="md:mt-6 border-t pt-4 md:pt-6 px-4 lg:px-0 pb-0">
                     <div className="container mx-auto">
-                        <h2 className="text-xl md:text-2xl lg:text-3xl font-black mb-6 md:mb-8">You Might Also Like</h2>
+                        <h2 className="text-lg md:text-xl lg:text-2xl font-black mb-4 md:mb-6">You Might Also Like</h2>
                         <ProductGrid products={relatedProducts} />
                     </div>
                 </div>
