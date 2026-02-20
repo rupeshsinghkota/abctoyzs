@@ -218,20 +218,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 )}
                             </div>
 
-                            {/* Trust Pills — Scrollable Row on Mobile */}
-                            <div className="flex overflow-x-auto gap-1.5 no-scrollbar -mx-1 px-1 pb-0.5">
-                                {[
-                                    { icon: Truck, label: '24–48h' },
-                                    { icon: ShieldCheck, label: '1-Yr Wrnty' },
-                                    { icon: CheckCircle2, label: 'ISI Cert.' },
-                                    { icon: RotateCcw, label: '10-Day Rplc' },
-                                ].map(({ icon: Icon, label }) => (
-                                    <div key={label} className="flex items-center gap-1 bg-zinc-50 border border-zinc-100 rounded-full px-2 py-1 shrink-0">
-                                        <Icon className="w-2.5 h-2.5 text-primary shrink-0" />
-                                        <span className="text-[9px] font-black text-zinc-600 whitespace-nowrap">{label}</span>
-                                    </div>
-                                ))}
-                            </div>
+
 
                             {/* Pincode Check */}
                             <div className="border border-gray-100 rounded-lg p-2 flex flex-col gap-1.5 bg-gray-50/50">
