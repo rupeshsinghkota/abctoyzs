@@ -339,29 +339,6 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
             </div>
 
-            {/* MOBILE STICKY BAR */}
-            <div className="fixed bottom-0 left-0 right-0 z-[100] p-2 bg-white/90 backdrop-blur-xl border-t border-gray-200 lg:hidden shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pb-safe">
-                <div className="flex items-center gap-2 w-full max-w-md mx-auto">
-                    <div className="w-10 h-10 bg-gray-50 rounded-lg border border-gray-100 overflow-hidden flex-shrink-0">
-                        <img
-                            src={currentVariant?.image || product.images[0] || product.image || ""}
-                            alt=""
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-                    <div className="flex flex-col min-w-0 flex-1">
-                        <span className="text-lg font-black tracking-tighter text-gray-900 leading-none">₹{displayPrice.toLocaleString()}</span>
-                        <span className="text-[8px] text-gray-500 font-bold truncate">Taxes & shipping incl.</span>
-                    </div>
-                    <button
-                        onClick={handleBuyNow}
-                        disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="h-10 px-5 bg-primary text-white text-xs font-black rounded-xl flex items-center justify-center shadow-lg shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50 tracking-wide shrink-0"
-                    >
-                        BUY NOW
-                    </button>
-                </div>
-            </div>
         </div>
     );
 }

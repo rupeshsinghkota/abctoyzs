@@ -379,13 +379,6 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                 </div>
             </div>
 
-            {/* Sticky Cart Bar (Synced with selection) */}
-            <StickyCartBar
-                product={product}
-                selectedAttributes={selectedAttributes}
-                currentVariant={currentVariant}
-                isReady={true}
-            />
         </div>
     );
 }
