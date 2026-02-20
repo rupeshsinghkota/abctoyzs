@@ -581,14 +581,15 @@ export default function CheckoutPage() {
                             codSettings={codSettings}
                             onPayment={handlePayment}
                             isPaymentLoading={loading}
+                            selectedAddressId={selectedAddressId}
                         />
 
                         {/* Mobile Sticky Checkout Bar */}
                         <div className="lg:hidden fixed bottom-[env(safe-area-inset-bottom)] left-0 right-0 p-4 bg-white/90 backdrop-blur-xl border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40">
                             <button
                                 onClick={handlePayment}
-                                disabled={loading || cart.length === 0}
-                                className="w-full bg-black text-white h-14 md:h-16 rounded-[20px] font-black text-base md:text-lg shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6 disabled:opacity-50"
+                                disabled={loading || cart.length === 0 || !selectedAddressId}
+                                className="w-full bg-black text-white h-14 md:h-16 rounded-[20px] font-black text-base md:text-lg shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="flex flex-col items-start leading-none">
                                     <span className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total</span>
@@ -602,7 +603,7 @@ export default function CheckoutPage() {
                                         </>
                                     ) : (
                                         <>
-                                            {paymentMethod === 'COD' ? "Confirm COD" : "Pay Now"}
+                                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'COD' ? "Confirm COD" : "Pay Now"}
                                             <ChevronRight className="w-5 h-5" />
                                         </>
                                     )}
@@ -841,7 +842,8 @@ function OrderSummaryCard({
     paymentMethod,
     codSettings,
     onPayment,
-    isPaymentLoading
+    isPaymentLoading,
+    selectedAddressId
 }: {
     cart: any[];
     subtotal: number;
@@ -859,6 +861,7 @@ function OrderSummaryCard({
     codSettings?: any;
     onPayment: () => void;
     isPaymentLoading: boolean;
+    selectedAddressId: string | null;
 }) {
     return (
         <div className="bg-white border border-gray-100 rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:sticky md:top-20 lg:top-24">
@@ -1007,7 +1010,7 @@ function OrderSummaryCard({
             <div className="hidden lg:block p-4 pt-0 border-t border-gray-100 mt-4 bg-gray-50/30">
                 <button
                     onClick={onPayment}
-                    disabled={isPaymentLoading || cart.length === 0}
+                    disabled={isPaymentLoading || cart.length === 0 || !selectedAddressId}
                     className="w-full mt-4 bg-black text-white h-14 rounded-2xl font-black text-lg shadow-xl shadow-black/20 hover:shadow-black/30 hover:-translate-y-1 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                     {isPaymentLoading ? (
@@ -1017,7 +1020,7 @@ function OrderSummaryCard({
                         </>
                     ) : (
                         <>
-                            {paymentMethod === 'COD' ? (
+                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'COD' ? (
                                 codSettings?.cod_mode === 'partial'
                                     ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
                                     : "Complete Cash on Delivery"
