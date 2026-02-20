@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useStore } from '@/store/useStore';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -45,21 +45,22 @@ export default function CartPage() {
                 <div className="space-y-4 md:w-2/3">
                     <h1 className="text-2xl font-bold font-heading mb-6 hidden md:block">Shopping Cart</h1>
                     {cart.map((item) => (
-                        <div key={item.id} className="flex gap-4 p-4 bg-card border rounded-2xl shadow-sm">
-                            <div className="relative w-20 h-20 bg-muted rounded-xl overflow-hidden shrink-0">
+                        <div key={item.id} className="flex gap-4 p-5 bg-white border border-gray-100 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden group">
+                            <div className="relative w-24 h-24 bg-gray-50 rounded-[18px] overflow-hidden shrink-0 border border-gray-100">
                                 <img
                                     src={item.image}
                                     alt={item.name}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover mix-blend-multiply"
                                 />
                             </div>
-                            <div className="flex-1 flex flex-col justify-between">
+                            <div className="flex-1 flex flex-col justify-between min-w-0">
                                 <div>
-                                    <div className="flex justify-between items-start">
-                                        <h3 className="font-bold text-sm md:text-base line-clamp-2">{item.name}</h3>
+                                    <div className="flex justify-between items-start gap-4">
+                                        <h3 className="font-bold text-sm md:text-base line-clamp-2 text-gray-900 leading-snug">{item.name}</h3>
                                         <button
                                             onClick={() => removeFromCart(item.id)}
-                                            className="text-muted-foreground hover:text-destructive p-1"
+                                            className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 -mr-2 -mt-2 rounded-full transition-all shrink-0"
+                                            aria-label="Remove item"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
@@ -80,21 +81,21 @@ export default function CartPage() {
                                         )}
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3 mt-2">
-                                    <div className="flex items-center border rounded-lg bg-background">
+                                <div className="flex items-center justify-between mt-3">
+                                    <div className="flex items-center border border-gray-200 rounded-full bg-white h-9">
                                         <button
                                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                             disabled={item.quantity <= 1}
-                                            className="p-1 px-2 hover:bg-muted disabled:opacity-50"
+                                            className="w-9 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 rounded-l-full disabled:opacity-30 transition-colors"
                                         >
-                                            <Minus className="w-3 h-3" />
+                                            <Minus className="w-3.5 h-3.5" strokeWidth={3} />
                                         </button>
-                                        <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
+                                        <span className="text-sm font-black w-8 text-center text-gray-900">{item.quantity}</span>
                                         <button
                                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                            className="p-1 px-2 hover:bg-muted"
+                                            className="w-9 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 rounded-r-full transition-colors"
                                         >
-                                            <Plus className="w-3 h-3" />
+                                            <Plus className="w-3.5 h-3.5" strokeWidth={3} />
                                         </button>
                                     </div>
                                 </div>
@@ -104,37 +105,65 @@ export default function CartPage() {
                 </div>
 
                 {/* Order Summary */}
-                <div className="mt-8 md:mt-0 md:w-1/3 bg-card border rounded-2xl p-6 shadow-sm sticky md:top-24">
-                    <h3 className="text-lg font-bold mb-4">Order Summary</h3>
-                    <div className="space-y-3 text-sm">
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Subtotal</span>
-                            <span className="font-medium">₹{subtotal.toLocaleString()}</span>
+                <div className="mt-8 md:mt-0 md:w-1/3 bg-white border border-gray-100 rounded-[28px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] lg:sticky lg:top-24">
+                    <h3 className="text-xl font-black text-gray-900 mb-6 tracking-tight">Order Summary</h3>
+                    <div className="space-y-4 text-sm">
+                        <div className="flex justify-between items-center text-gray-500 font-medium">
+                            <span>Subtotal ({cart.length} items)</span>
+                            <span className="text-gray-900 font-bold">₹{subtotal.toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Shipping</span>
-                            <span className="text-green-600 font-medium">Free</span>
+                        <div className="flex justify-between items-center text-gray-500 font-medium">
+                            <span>Shipping</span>
+                            <span className="text-green-600 font-black tracking-widest uppercase text-xs">Free</span>
                         </div>
-                        <div className="border-t pt-3 flex justify-between text-base font-bold">
-                            <span>Total</span>
-                            <span>₹{total.toLocaleString()}</span>
+
+                        <div className="h-px w-full bg-gray-100 my-4" />
+
+                        <div className="flex justify-between items-end">
+                            <div className="flex flex-col">
+                                <span className="font-black text-2xl tracking-tighter text-gray-900 leading-none">Total</span>
+                                <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Incl. of all taxes</span>
+                            </div>
+                            <span className="text-3xl font-black text-gray-900 tracking-tighter leading-none">₹{total.toLocaleString()}</span>
                         </div>
                     </div>
 
+                    {/* Desktop Button Location */}
+                    <div className="hidden lg:block">
+                        <button
+                            onClick={handleCheckout}
+                            className="w-full mt-6 bg-black text-white h-16 rounded-[20px] font-black text-lg shadow-xl shadow-black/20 hover:shadow-black/30 hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                        >
+                            Proceed to Checkout
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
+                        <div className="mt-4 flex flex-col items-center justify-center gap-2">
+                            <p className="text-[11px] font-bold text-gray-500 flex items-center gap-1.5 uppercase tracking-wider">
+                                <span className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center"><Truck className="w-2.5 h-2.5 text-green-600" /></span>
+                                Free Delivery Guaranteed
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile Sticky Button */}
+                <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-xl border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pb-safe z-50">
                     <button
                         onClick={handleCheckout}
-                        className="w-full mt-6 py-4 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                        className="w-full bg-black text-white h-16 rounded-[20px] font-black text-lg shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6"
                     >
-                        Proceed to Checkout
-                        <ArrowRight className="w-4 h-4" />
+                        <div className="flex flex-col items-start leading-none">
+                            <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total</span>
+                            <span className="text-xl tracking-tight">₹{total.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            Checkout <ArrowRight className="w-5 h-5" />
+                        </div>
                     </button>
-
-                    <div className="mt-6 p-4 rounded-xl bg-muted/50 border border-dashed text-center">
-                        <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
-                            <Truck className="w-4 h-4" />
-                            Free delivery on all orders!
-                        </p>
-                    </div>
+                    <p className="text-[10px] text-center font-bold text-gray-500 mt-3 flex items-center justify-center gap-1.5 uppercase tracking-wider">
+                        <ShieldCheck className="w-3.5 h-3.5 text-green-600" />
+                        100% Secure Checkout
+                    </p>
                 </div>
             </div>
         </div>
