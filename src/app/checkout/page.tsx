@@ -399,14 +399,14 @@ export default function CheckoutPage() {
                 </div>
             </header>
 
-            <main className="container mx-auto px-4 py-6 max-w-[1200px]">
-                <div className="grid lg:grid-cols-[1fr,440px] gap-8 xl:gap-12">
+            <main className="container mx-auto px-4 py-4 lg:py-6 max-w-[1200px]">
+                <div className="grid md:grid-cols-[1fr,340px] lg:grid-cols-[1fr,440px] gap-6 lg:gap-8 xl:gap-12">
                     {/* Left Column: Information */}
                     <div className="space-y-6">
 
                         {/* Address Selection */}
-                        <div className="bg-white border border-gray-100 rounded-[28px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                            <div className="p-5 lg:p-7 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                        <div className="bg-white border border-gray-100 rounded-3xl lg:rounded-[28px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                            <div className="p-4 lg:p-7 border-b border-gray-100 bg-gray-50/50 flex flex-wrap items-center justify-between gap-y-2">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-sm relative">
                                         1
@@ -849,8 +849,8 @@ function OrderSummaryCard({
     isPaymentLoading: boolean;
 }) {
     return (
-        <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] lg:sticky lg:top-24">
-            <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+        <div className="bg-white border border-gray-100 rounded-3xl lg:rounded-[32px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:sticky md:top-20 lg:top-24">
+            <div className="p-4 lg:p-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-sm relative">
                         3
@@ -860,9 +860,9 @@ function OrderSummaryCard({
                 </div>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
                 {/* Product List */}
-                <div className="max-h-60 overflow-y-auto pr-2 no-scrollbar border-b border-gray-100 pb-4">
+                <div className="max-h-[25vh] overflow-y-auto pr-2 no-scrollbar border-b border-gray-100 pb-3 lg:pb-4">
                     {cart.map((item: any) => (
                         <div key={item.id} className="flex gap-4 mb-5 last:mb-0 items-center">
                             <div className="w-16 h-16 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 mb-0 shadow-sm">
