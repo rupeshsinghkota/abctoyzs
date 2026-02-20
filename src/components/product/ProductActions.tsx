@@ -178,30 +178,26 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 )}
 
                 {displayRegularPrice ? (
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
-                                ₹{displayPrice.toLocaleString()}
-                            </span>
-                            <span className="text-xs text-gray-400 font-bold line-through">₹{displayRegularPrice.toLocaleString()}</span>
-                            <span className="text-[10px] text-gray-300 font-bold line-through">₹{displayMRP.toLocaleString()}</span>
-                            <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
-                                -{discount}%
-                            </span>
-                        </div>
-                        <span className="text-[10px] font-medium text-green-600">Inclusive of all taxes</span>
+                    <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
+                        <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
+                            ₹{displayPrice.toLocaleString()}
+                        </span>
+                        <span className="text-xs text-gray-400 font-bold line-through">₹{displayRegularPrice.toLocaleString()}</span>
+                        <span className="text-[10px] text-gray-300 font-bold line-through">₹{displayMRP.toLocaleString()}</span>
+                        <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                            -{discount}%
+                        </span>
+                        <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-0.5">
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
-                                ₹{displayPrice.toLocaleString()}
-                            </span>
-                            {displayMRP > displayPrice && (
-                                <span className="text-xs font-bold text-gray-400 line-through">₹{displayMRP.toLocaleString()}</span>
-                            )}
-                        </div>
-                        <span className="text-[10px] font-medium text-green-600">Inclusive of all taxes</span>
+                    <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
+                        <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
+                            ₹{displayPrice.toLocaleString()}
+                        </span>
+                        {displayMRP > displayPrice && (
+                            <span className="text-xs font-bold text-gray-400 line-through">₹{displayMRP.toLocaleString()}</span>
+                        )}
+                        <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
                     </div>
                 )}
             </div>
@@ -316,9 +312,9 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
 
                 {/* PREPAID5 */}
-                <div className="flex items-center gap-2 bg-green-50/80 border border-green-100 rounded-lg px-2.5 py-1.5">
+                <div className="flex items-center gap-2 bg-green-50/80 border border-dashed border-green-300 rounded-lg px-2.5 py-1.5 animate-pulse [animation-duration:3s]">
                     <Ticket className="w-3.5 h-3.5 text-green-600 shrink-0" />
-                    <span className="text-[10px] font-bold text-green-800">Extra 5% OFF — use <span className="bg-white px-1 py-0.5 rounded border border-green-100 font-black">PREPAID5</span></span>
+                    <span className="text-[10px] font-bold text-green-800">Extra 5% OFF — use <span className="bg-white px-1.5 py-0.5 rounded border border-green-200 font-black tracking-wide">PREPAID5</span></span>
                 </div>
 
                 <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 pb-6 lg:pb-0">

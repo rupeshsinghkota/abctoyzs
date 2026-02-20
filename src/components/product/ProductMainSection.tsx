@@ -192,10 +192,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 <h1 className="text-xl md:text-2xl lg:text-3xl font-extrabold font-heading leading-tight tracking-tight text-gray-900">
                                     {product.name}
                                 </h1>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 rounded-md border border-gray-100">
+                                <div className="flex items-center gap-2">
                                     <div className="flex items-center gap-0.5">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <Star
@@ -209,13 +206,11 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                             />
                                         ))}
                                     </div>
-                                    <span className="text-[10px] font-black text-foreground ml-0.5">{product.rating || '5.0'}</span>
+                                    <span className="text-[10px] font-black text-foreground">{product.rating || '5.0'}</span>
+                                    {product.reviews > 0 && (
+                                        <span className="text-[10px] font-medium text-muted-foreground/60">({product.reviews})</span>
+                                    )}
                                 </div>
-                                {product.reviews > 0 && (
-                                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                                        {product.reviews} Reviews
-                                    </span>
-                                )}
                             </div>
 
 
@@ -226,53 +221,37 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 currentVariant={currentVariant}
                             />
 
-                            {/* Quick Specs — aligned grid */}
-                            {(() => {
-                                const specs = [
-                                    { label: 'Age', value: product.specs?.suitable_age || (product.ageGroup ? `${product.ageGroup} Yrs` : null) },
-                                    { label: 'Speed', value: product.specs?.speed ? (product.specs.speed.length > 12 ? product.specs.speed.slice(0, 12) + '…' : product.specs.speed) : null },
-                                    { label: 'Load', value: product.specs?.max_load },
-                                    { label: 'Control', value: product.specs?.mobile_app ? 'App+Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },
-                                ].filter(s => s.value);
-                                return specs.length > 0 ? (
-                                    <div className="grid grid-cols-[auto_1fr_auto_1fr] gap-x-3 gap-y-1.5 py-2.5 border-t border-gray-100">
-                                        {specs.map((s, i) => (
-                                            <Fragment key={i}>
-                                                <span className="text-[10px] text-gray-400 font-medium">{s.label}</span>
-                                                <span className="text-[10px] font-bold text-gray-700">{s.value}</span>
-                                            </Fragment>
-                                        ))}
-                                    </div>
-                                ) : null;
-                            })()}
-
-                            {/* Delivery Check — minimal inline */}
-                            <div className="flex items-center gap-2 py-1.5 border-t border-gray-100">
-                                <Truck className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                                <form onSubmit={checkDelivery} className="flex items-center gap-1.5 flex-1">
+                            {/* Delivery Check — clean card */}
+                            <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-3 space-y-2">
+                                <form onSubmit={checkDelivery} className="flex items-center gap-2">
+                                    <MapPin className="w-4 h-4 text-primary shrink-0" />
                                     <input
                                         type="text"
                                         maxLength={6}
-                                        placeholder="Enter pincode"
+                                        inputMode="numeric"
+                                        placeholder="Enter delivery pincode"
                                         value={pincode}
                                         onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                                        className="w-20 bg-transparent text-[11px] font-medium focus:outline-none placeholder:text-gray-300 border-b border-dashed border-gray-200 focus:border-primary pb-0.5"
+                                        className="flex-1 bg-transparent text-xs font-medium focus:outline-none placeholder:text-gray-400"
                                     />
                                     <button
                                         type="submit"
                                         disabled={pincode.length !== 6 || estimate.loading}
-                                        className="text-[10px] font-bold text-primary disabled:opacity-30 shrink-0"
+                                        className="text-[10px] font-black text-primary uppercase tracking-wider disabled:opacity-30 shrink-0 hover:underline"
                                     >
-                                        {estimate.loading ? '...' : 'Check'}
+                                        {estimate.loading ? '…' : 'Check'}
                                     </button>
                                 </form>
-                                <span className="text-[10px] text-gray-400 font-medium shrink-0">
-                                    {estimate.serviceable
-                                        ? <span className="text-green-600 font-bold">✓ {estimate.formattedDate}</span>
-                                        : estimate.message
-                                            ? <span className="text-red-500">{estimate.message}</span>
-                                            : 'Free shipping'}
-                                </span>
+                                {estimate.serviceable ? (
+                                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-green-700 bg-green-50 rounded-lg px-2.5 py-1.5">
+                                        <Truck className="w-3.5 h-3.5 shrink-0" />
+                                        Delivers by {estimate.formattedDate}
+                                    </div>
+                                ) : estimate.message ? (
+                                    <p className="text-[11px] font-medium text-red-500 pl-6">{estimate.message}</p>
+                                ) : (
+                                    <p className="text-[10px] text-gray-400 pl-6">Free delivery across India</p>
+                                )}
                             </div>
 
                         </div>
