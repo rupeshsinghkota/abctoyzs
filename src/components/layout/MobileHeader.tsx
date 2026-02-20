@@ -223,36 +223,38 @@ export function MobileHeader() {
                                 className="h-6 w-auto object-contain"
                             />
                         </Link>
-                        {/* Right: Search & Cart */}
-                        <div className="flex items-center gap-2">
-                            <Link
-                                href="/search"
-                                className="p-2 text-muted-foreground hover:text-primary active:scale-95 transition-all"
-                            >
-                                <Search className="w-5 h-5" strokeWidth={1.5} />
-                            </Link>
+                    </div>
 
-                            <Link
-                                href="/cart"
-                                className="p-2 text-muted-foreground hover:text-primary active:scale-95 transition-all relative"
-                            >
-                                <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
-                                {(() => {
-                                    const cart = useStore(state => state.cart);
-                                    const count = cart.reduce((acc, item) => acc + item.quantity, 0);
-                                    if (count === 0) return null;
-                                    return (
-                                        <span className="absolute top-1 right-1 w-4 h-4 bg-primary text-[10px] font-black text-white flex items-center justify-center rounded-full ring-2 ring-white">
-                                            {count}
-                                        </span>
-                                    );
-                                })()}
-                            </Link>
-                        </div>
+                    {/* Right: Search & Cart */}
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href="/search"
+                            className="p-2 text-muted-foreground hover:text-primary active:scale-95 transition-all"
+                        >
+                            <Search className="w-5 h-5" strokeWidth={1.5} />
+                        </Link>
+
+                        <Link
+                            href="/cart"
+                            className="p-2 text-muted-foreground hover:text-primary active:scale-95 transition-all relative"
+                        >
+                            <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
+                            {(() => {
+                                const cart = useStore(state => state.cart);
+                                const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+                                if (count === 0) return null;
+                                return (
+                                    <span className="absolute top-1 right-1 w-4 h-4 bg-primary text-[10px] font-black text-white flex items-center justify-center rounded-full ring-2 ring-white">
+                                        {count}
+                                    </span>
+                                );
+                            })()}
+                        </Link>
                     </div>
                 </div>
+            </div>
 
-                <MobileDrawer />
-            </>
-            );
+            <MobileDrawer />
+        </>
+    );
 }
