@@ -316,13 +316,11 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                         {/* Tab Content — no min-height */}
                         <div>
                             {activeTab === 'specs' ? (
-                                <div className="bg-gray-50/50 rounded-xl p-3 border border-gray-100 animate-in fade-in duration-200">
+                                <div className="animate-in fade-in duration-200 py-1">
                                     <ProductSpecs
                                         specs={product.specs}
                                         additionalInfo={{
-                                            "Voltage": product.voltage,
                                             "Recommended Age": product.ageGroup,
-                                            "Category": product.category?.charAt(0).toUpperCase() + product.category?.slice(1)
                                         }}
                                     />
                                 </div>
