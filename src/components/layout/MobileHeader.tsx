@@ -93,10 +93,10 @@ export function MobileHeader() {
 
                             {/* The Garage (Grid UI) */}
                             <div className="pt-2 pb-4">
-                                <div className="px-3 mb-4 flex items-center justify-between">
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">The Garage</h3>
+                                <div className="px-3 mb-4 flex items-center justify-between border-l-2 border-primary ml-1">
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900/60">The Garage</h3>
                                 </div>
-                                <div className="grid grid-cols-2 gap-3 px-2">
+                                <div className="grid grid-cols-2 gap-3 px-3">
                                     {VEHICLE_CATEGORIES.map((cat) => {
                                         const Icon = {
                                             cars: CarFront,
@@ -113,13 +113,13 @@ export function MobileHeader() {
                                             <Link
                                                 key={cat.value}
                                                 href={`/category/${cat.value}`}
-                                                className="flex flex-col gap-2 p-4 rounded-2xl bg-secondary/20 hover:bg-primary/5 border border-border/10 hover:border-primary/30 transition-all active:scale-95 group"
+                                                className="flex flex-col items-center gap-3 p-5 rounded-[24px] bg-white border border-gray-100 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-all active:scale-95 group"
                                                 onClick={() => setIsMenuOpen(false)}
                                             >
-                                                <div className="w-8 h-8 rounded-xl bg-white/50 border border-border/10 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
-                                                    <Icon className="w-4 h-4" strokeWidth={1.5} />
+                                                <div className="w-10 h-10 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                                                    <Icon className="w-5 h-5" strokeWidth={2} />
                                                 </div>
-                                                <span className="text-xs font-bold text-foreground/70 group-hover:text-primary transition-colors">{cat.label}</span>
+                                                <span className="text-[11px] font-extrabold text-gray-800 tracking-tight">{cat.label}</span>
                                             </Link>
                                         );
                                     })}
@@ -130,16 +130,16 @@ export function MobileHeader() {
 
                             {/* Shop By Needs */}
                             <div className="pt-2 pb-4">
-                                <h3 className="px-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">Shop By Needs</h3>
+                                <h3 className="px-3 text-[10px] font-black uppercase tracking-[0.2em] text-gray-900/60 mb-4 border-l-2 border-primary ml-1">Shop By Needs</h3>
                                 <div className="space-y-1">
-                                    <div className="px-2">
-                                        <p className="text-[10px] font-bold text-muted-foreground/60 mb-2 pl-2">By Power</p>
-                                        <div className="flex flex-wrap gap-2">
+                                    <div className="px-3">
+                                        <p className="text-[10px] font-bold text-gray-400 mb-2.5 ml-1">By Power</p>
+                                        <div className="flex flex-wrap gap-2.5">
                                             {POWER_CATEGORIES.slice(0, 4).map((power) => (
                                                 <Link
                                                     key={power.value}
                                                     href={`/category/power/${power.value}`}
-                                                    className="px-3 py-1.5 rounded-lg bg-secondary/50 text-xs font-medium text-foreground/70 hover:bg-primary/10 hover:text-primary transition-colors"
+                                                    className="px-3.5 py-1.5 rounded-xl bg-gray-50 text-[11px] font-bold text-gray-700 hover:bg-primary/10 hover:text-primary border border-gray-100 transition-colors"
                                                     onClick={() => setIsMenuOpen(false)}
                                                 >
                                                     {power.label}
@@ -148,14 +148,14 @@ export function MobileHeader() {
                                         </div>
                                     </div>
 
-                                    <div className="px-2 pt-3">
-                                        <p className="text-[10px] font-bold text-muted-foreground/60 mb-2 pl-2">By Age</p>
-                                        <div className="flex flex-wrap gap-2">
+                                    <div className="px-3 pt-5">
+                                        <p className="text-[10px] font-bold text-gray-400 mb-2.5 ml-1">By Age</p>
+                                        <div className="flex flex-wrap gap-2.5">
                                             {AGE_CATEGORIES.slice(0, 4).map((age) => (
                                                 <Link
                                                     key={age.value}
                                                     href={`/category/age/${age.value}`}
-                                                    className="px-3 py-1.5 rounded-lg bg-secondary/50 text-xs font-medium text-foreground/70 hover:bg-primary/10 hover:text-primary transition-colors"
+                                                    className="px-3.5 py-1.5 rounded-xl bg-gray-50 text-[11px] font-bold text-gray-700 hover:bg-primary/10 hover:text-primary border border-gray-100 transition-colors"
                                                     onClick={() => setIsMenuOpen(false)}
                                                 >
                                                     {age.label}
@@ -170,7 +170,7 @@ export function MobileHeader() {
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex-none p-5 border-t border-border/10 bg-background/50 backdrop-blur-md">
+                    <div className="flex-none p-5 border-t border-border/10 bg-gray-50/50 backdrop-blur-md">
                         <div className={`grid gap-3 ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
                             {isAdmin && (
                                 <Link
@@ -184,19 +184,19 @@ export function MobileHeader() {
                             )}
                             <Link
                                 href="/track-order"
-                                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-background border border-border/50 hover:border-primary/50 transition-all active:scale-95 group"
+                                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-gray-100 hover:border-primary/50 transition-all active:scale-95 group"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                <MapPin className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest group-hover:text-primary transition-colors">Track</span>
+                                <MapPin className="w-5 h-5 mb-1.5 text-gray-500 group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                                <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest group-hover:text-primary transition-colors">Track</span>
                             </Link>
                             <Link
                                 href="/contact-us"
-                                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-background border border-border/50 hover:border-primary/50 transition-all active:scale-95 group"
+                                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-gray-100 hover:border-primary/50 transition-all active:scale-95 group"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                <HelpCircle className="w-5 h-5 mb-1.5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest group-hover:text-primary transition-colors">Help</span>
+                                <HelpCircle className="w-5 h-5 mb-1.5 text-gray-500 group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                                <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest group-hover:text-primary transition-colors">Help</span>
                             </Link>
                         </div>
                     </div>
