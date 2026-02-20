@@ -40,6 +40,18 @@ export async function POST(req: Request) {
             }, { status: 400 });
         }
 
+        const rawBody = await req.json().catch(() => ({}));
+        const paymentMethod = rawBody.paymentMethod || null;
+
+        // 5. Validate Payment Method Restriction
+        if (paymentMethod && coupon.allowed_payment_method && coupon.allowed_payment_method !== 'ALL') {
+            if (paymentMethod !== coupon.allowed_payment_method) {
+                return NextResponse.json({
+                    error: `This coupon is only valid for ${coupon.allowed_payment_method} orders.`
+                }, { status: 400 });
+            }
+        }
+
         // 5. Calculate Discount
         let discount = 0;
         if (coupon.discount_type === 'PERCENTAGE') {

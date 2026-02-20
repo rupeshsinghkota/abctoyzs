@@ -19,7 +19,8 @@ export default function CouponsPage() {
         min_order_amount: '0',
         max_discount: '',
         usage_limit: '',
-        expires_at: ''
+        expires_at: '',
+        allowed_payment_method: 'ALL'
     });
 
     useEffect(() => {
@@ -57,7 +58,8 @@ export default function CouponsPage() {
                 min_order_amount: '0',
                 max_discount: '',
                 usage_limit: '',
-                expires_at: ''
+                expires_at: '',
+                allowed_payment_method: 'ALL'
             });
             loadCoupons();
         } catch (error) {
@@ -193,14 +195,28 @@ export default function CouponsPage() {
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Expiry Date</label>
-                                    <input
-                                        type="date"
-                                        className="w-full p-3 rounded-xl border bg-background text-sm outline-none"
-                                        value={newCoupon.expires_at}
-                                        onChange={e => setNewCoupon({ ...newCoupon, expires_at: e.target.value })}
-                                    />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Expiry Date</label>
+                                        <input
+                                            type="date"
+                                            className="w-full p-3 rounded-xl border bg-background text-sm outline-none"
+                                            value={newCoupon.expires_at}
+                                            onChange={e => setNewCoupon({ ...newCoupon, expires_at: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Payment Method</label>
+                                        <select
+                                            className="w-full p-3 rounded-xl border bg-background text-sm outline-none"
+                                            value={newCoupon.allowed_payment_method}
+                                            onChange={e => setNewCoupon({ ...newCoupon, allowed_payment_method: e.target.value })}
+                                        >
+                                            <option value="ALL">All Methods</option>
+                                            <option value="PREPAID">Prepaid Only</option>
+                                            <option value="COD">COD Only</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <button
                                     type="submit"
@@ -234,6 +250,11 @@ export default function CouponsPage() {
                                         <span className="text-2xl font-black">
                                             {coupon.discount_type === 'PERCENTAGE' ? `${coupon.discount_value}% OFF` : `₹${coupon.discount_value} OFF`}
                                         </span>
+                                        {coupon.allowed_payment_method && coupon.allowed_payment_method !== 'ALL' && (
+                                            <div className="mt-1 inline-flex w-max items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700">
+                                                {coupon.allowed_payment_method} ONLY
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
                                         <button

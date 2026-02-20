@@ -69,6 +69,7 @@ export type Coupon = {
     usage_limit?: number;
     used_count: number;
     is_active: boolean;
+    allowed_payment_method?: string;
     created_at: string;
     updated_at: string;
 };

@@ -124,14 +124,22 @@ export default function CheckoutPage() {
         }
     }, [total]); // Fire when total is calculated
 
-    // Ensure PREPAID5 is only active for PREPAID payment methods
+    // Re-validate coupon when payment method changes
     useEffect(() => {
-        if (paymentMethod === 'COD' && appliedCoupon?.code === 'PREPAID5') {
-            setAppliedCoupon(null);
-            setCouponCode('');
-            alert('The PREPAID5 coupon has been removed as it is only valid for Prepaid orders.');
+        if (appliedCoupon && paymentMethod) {
+            fetch('/api/coupons/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: appliedCoupon.code, amount: subtotal, paymentMethod })
+            }).then(res => res.json()).then(data => {
+                if (data.error) {
+                    setAppliedCoupon(null);
+                    setCouponCode('');
+                    alert(`Coupon removed: ${data.error}`);
+                }
+            }).catch(console.error);
         }
-    }, [paymentMethod, appliedCoupon]);
+    }, [paymentMethod, appliedCoupon?.code, subtotal]);
 
     const refreshAddresses = async (addrOrId?: any) => {
         try {
@@ -298,20 +306,13 @@ export default function CheckoutPage() {
     const handleApplyCoupon = async () => {
         if (!couponCode.trim()) return;
 
-        // Custom frontend rule for PREPAID5
-        if (couponCode.trim().toUpperCase() === 'PREPAID5' && paymentMethod === 'COD') {
-            setCouponError('PREPAID5 is only valid for Prepaid orders.');
-            setIsApplyingCoupon(false);
-            return;
-        }
-
         setIsApplyingCoupon(true);
         setCouponError(null);
         try {
             const res = await fetch('/api/coupons/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: couponCode, amount: subtotal })
+                body: JSON.stringify({ code: couponCode, amount: subtotal, paymentMethod })
             });
             const data = await res.json();
             if (res.ok) {
