@@ -165,19 +165,19 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
         <div className="space-y-6">
             {/* Top Section Wrapper for Desktop Reordering */}
             <div className="flex flex-col gap-2 md:gap-6">
-                {/* Automotive Performance Badges - Order changes on desktop */}
-                <div className="flex overflow-x-auto pb-2 -mb-2 snap-x snap-mandatory no-scrollbar gap-2 sm:grid sm:grid-cols-2 sm:gap-3 sm:pb-0 sm:mb-0 order-1 md:order-3">
+                {/* Automotive Performance Badges - Sleek Horizontal Pills */}
+                <div className="flex overflow-x-auto pb-2 -mb-2 snap-x snap-mandatory no-scrollbar gap-2 sm:flex-wrap order-1 md:order-3 w-[calc(100vw-3rem)] lg:w-auto -ml-1 pr-6 lg:pr-0 lg:-ml-0 pl-1">
                     {highlights.map((item, idx) => (
                         <div
                             key={idx}
-                            className="group flex flex-1 min-w-[130px] sm:min-w-0 items-center gap-3 p-2.5 rounded-xl bg-gray-50/50 border border-gray-100/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40 transition-all duration-300 snap-center"
+                            className="group flex flex-none items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50/80 border border-gray-100 hover:bg-white hover:shadow-sm hover:border-gray-200 transition-all duration-300 snap-center"
                         >
-                            <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                <item.icon className="w-4 h-4 text-primary" strokeWidth={2} />
+                            <div className="w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                <item.icon className="w-3 h-3 text-primary" strokeWidth={2.5} />
                             </div>
-                            <div className="flex flex-col min-w-0">
-                                <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase truncate">{item.label}</span>
-                                <span className="text-[10px] font-black text-gray-900 truncate">{item.value}</span>
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] text-gray-500 font-bold tracking-wider uppercase">{item.label}:</span>
+                                <span className="text-[11px] font-black text-gray-900">{item.value}</span>
                             </div>
                         </div>
                     ))}
@@ -392,10 +392,42 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-3 md:gap-6 text-[9px] md:text-[10px] text-muted-foreground pt-3 font-bold uppercase tracking-wider opacity-70 border-t border-gray-100 mt-3 whitespace-nowrap overflow-x-auto no-scrollbar">
+                <div className="flex items-center justify-center gap-3 md:gap-6 text-[9px] md:text-[10px] text-muted-foreground pt-3 font-bold uppercase tracking-wider opacity-70 border-t border-gray-100 mt-3 whitespace-nowrap overflow-x-auto no-scrollbar pb-6 lg:pb-0">
                     <div className="flex items-center gap-1.5 shrink-0"><CheckCircle2 className="w-3 h-3 text-green-600" strokeWidth={2.5} /> Secure Payment</div>
                     <div className="flex items-center gap-1.5 shrink-0"><CheckCircle2 className="w-3 h-3 text-green-600" strokeWidth={2.5} /> Fast Dispatch</div>
                     <div className="flex items-center gap-1.5 shrink-0"><CheckCircle2 className="w-3 h-3 text-green-600" strokeWidth={2.5} /> 10-Day Replacement</div>
+                </div>
+            </div>
+
+            {/* MOBILE STICKY CHECKOUT BAR */}
+            <div className="fixed bottom-0 left-0 right-0 z-[100] p-3 bg-white/90 backdrop-blur-xl border-t border-gray-200 lg:hidden shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pb-safe">
+                <div className="flex items-center gap-3 w-full max-w-md mx-auto">
+                    {/* Tiny thumbnail */}
+                    <div className="w-12 h-12 bg-gray-50 rounded-xl border border-gray-100 overflow-hidden flex-shrink-0">
+                        <img
+                            src={currentVariant?.image || product.images[0] || product.image || ""}
+                            alt="thumbnail"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+
+                    {/* Price info */}
+                    <div className="flex flex-col min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-xl font-black tracking-tighter text-gray-900 leading-none">₹{displayPrice.toLocaleString()}</span>
+                        </div>
+                        <span className="text-[9px] text-gray-500 font-bold truncate">Taxes & Shipping included</span>
+                    </div>
+
+                    {/* Buy Now (Primary action) */}
+                    <button
+                        onClick={handleBuyNow}
+                        disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
+                        className="h-12 px-6 bg-primary text-white text-sm font-black rounded-[14px] flex items-center justify-center shadow-lg shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50 tracking-wide shrink-0"
+                    >
+                        BUY NOW
+                    </button>
+
                 </div>
             </div>
         </div>
