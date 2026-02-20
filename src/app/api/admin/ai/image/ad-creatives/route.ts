@@ -109,19 +109,16 @@ export async function POST(req: Request) {
         }
 
         // 2. Define Ad Generation for Each Format
-        const generateImage = async (format: 'SQUARE' | 'STORY' | 'LANDSCAPE') => {
-            let aspectRatio: string;
+        const generateImage = async (format: 'SQUARE1' | 'SQUARE2' | 'SQUARE3') => {
+            let aspectRatio: string = "1:1";
             let compositionDesc: string;
 
-            if (format === 'SQUARE') {
-                aspectRatio = "1:1";
+            if (format === 'SQUARE1') {
                 compositionDesc = "Centered composition perfect for Instagram Feed and Facebook Ads. Product prominently in the center with text above or below.";
-            } else if (format === 'STORY') {
-                aspectRatio = "9:16";
-                compositionDesc = "Full-screen vertical composition for Instagram Stories and Reels. Product in the lower-middle third. Leave the TOP 30% clear for platform UI elements. Immersive environment extending to all edges.";
-            } else { // LANDSCAPE
-                aspectRatio = "16:9";
-                compositionDesc = "Cinematic wide-angle composition for Facebook Feed and Audience Network. Product positioned on the right side with generous negative space on the left for text overlay.";
+            } else if (format === 'SQUARE2') {
+                compositionDesc = "Dynamic composition perfect for Instagram Feed and Facebook Ads. Focus on a slightly angled or low-angle perspective. Product prominently in the center.";
+            } else { // SQUARE3
+                compositionDesc = "Engaging lifestyle composition perfect for Instagram Feed and Facebook Ads. Product prominently in the center, showing action or fun.";
             }
 
             // Build a SHORT display name (strip brand prefix, keep model only)
@@ -131,13 +128,7 @@ export async function POST(req: Request) {
                 .trim();
 
             // Build the price line
-            let priceText = `₹${numPrice.toLocaleString('en-IN')}`;
-            let priceSection = `PRICE TAG: Show "${priceText}" in large bold white text ${activeStyle === 'Poster' ? 'with a subtle shadow' : 'inside a dark rounded pill badge'}.`;
-            if (numMrp > numPrice) {
-                priceSection += `
-  Next to it show "₹${numMrp.toLocaleString('en-IN')}" in smaller grey text with a strikethrough line.
-  Above or near the price, add a RED circular starburst badge with "${discount}% OFF" in bold white text.`;
-            }
+            let priceSection = 'PRICE TAG: Do NOT show the price or numbers in this image. Keep it clean and focused on the product features.';
 
             const prompt = `Generate a professional e-commerce product ${activeStyle === 'Poster' ? 'lifestyle poster' : 'advertisement image'}.
 
@@ -244,9 +235,9 @@ VIBE: ${vibe || "Premium, Aspirational, Clean, Modern"}.`;
 
         // 3. Run Generations in Parallel
         const [squareUrl, storyUrl, landscapeUrl] = await Promise.all([
-            generateImage('SQUARE'),
-            generateImage('STORY'),
-            generateImage('LANDSCAPE')
+            generateImage('SQUARE1'),
+            generateImage('SQUARE2'),
+            generateImage('SQUARE3')
         ]);
 
         return NextResponse.json({
