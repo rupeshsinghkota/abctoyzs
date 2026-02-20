@@ -105,6 +105,8 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
             variantId: currentVariant?.id,
             name: finalName,
             price: finalPrice,
+            regularPrice: displayRegularPrice || null,
+            mrp: displayMRP || null,
             image: finalImage,
             quantity: quantity,
             attributes: selectedAttributes

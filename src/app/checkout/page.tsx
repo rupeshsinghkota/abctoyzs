@@ -851,11 +851,21 @@ function OrderSummaryCard({
                                 <p className="font-bold text-sm text-gray-900 line-clamp-2 leading-tight">{item.name}</p>
                                 <div className="flex items-center gap-2 mt-1.5">
                                     <span className="text-[10px] bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-md">Qty: {item.quantity}</span>
-                                    <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">@ ₹{item.price.toLocaleString()}</span>
+                                    <div className="flex items-center gap-1.5">
+                                        {(item.regularPrice || item.mrp) && (item.regularPrice || item.mrp)! > item.price && (
+                                            <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase line-through">₹{(item.regularPrice || item.mrp)?.toLocaleString()}</span>
+                                        )}
+                                        <span className="text-[10px] text-black font-black tracking-widest uppercase">@ ₹{item.price.toLocaleString()}</span>
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex flex-col items-end shrink-0">
-                                <p className="font-black text-gray-900">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                <p className="font-black text-gray-900 text-base">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                {(item.regularPrice || item.mrp) && (item.regularPrice || item.mrp)! > item.price && (
+                                    <p className="text-green-600 text-[9px] font-black uppercase tracking-widest mt-0.5 whitespace-nowrap">
+                                        Save ₹{(((item.regularPrice || item.mrp)!) - item.price).toLocaleString()}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     ))}

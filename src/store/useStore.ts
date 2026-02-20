@@ -6,6 +6,8 @@ interface CartItem {
     variantId?: string; // Optional: specific variant ID
     name: string;
     price: number;
+    regularPrice?: number | null; // Added for Discount tracking
+    mrp?: number | null;          // Added for Discount tracking
     image: string;
     quantity: number;
     attributes?: Record<string, string>; // e.g. { Color: "Red" }

@@ -64,7 +64,21 @@ export default function CartPage() {
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
-                                    <p className="text-primary font-bold mt-1">₹{item.price.toLocaleString()}</p>
+                                    <div className="flex flex-col mt-1">
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-black font-black text-lg">₹{item.price.toLocaleString()}</p>
+                                            {(item.regularPrice || item.mrp) && (item.regularPrice || item.mrp)! > item.price && (
+                                                <p className="text-gray-400 text-[11px] line-through font-bold">
+                                                    ₹{(item.regularPrice || item.mrp)?.toLocaleString()}
+                                                </p>
+                                            )}
+                                        </div>
+                                        {(item.regularPrice || item.mrp) && (item.regularPrice || item.mrp)! > item.price && (
+                                            <p className="text-green-600 text-[10px] font-black uppercase tracking-widest mt-0.5">
+                                                You Save ₹{(((item.regularPrice || item.mrp)!) - item.price).toLocaleString()}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-3 mt-2">
                                     <div className="flex items-center border rounded-lg bg-background">
