@@ -322,9 +322,9 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
 
                 <div className="flex items-center justify-center gap-3 text-[8px] lg:text-[10px] text-muted-foreground font-bold uppercase tracking-wider opacity-60 pt-1 whitespace-nowrap pb-6 lg:pb-0">
-                    <span>✓ Secure Payment</span>
-                    <span>✓ Fast Dispatch</span>
-                    <span>✓ 10-Day Replace</span>
+                    <span>✓ Free Delivery</span>
+                    <span>✓ 1 Year Warranty</span>
+                    <span>✓ 10 Days Replacement</span>
                 </div>
             </div>
 
