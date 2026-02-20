@@ -191,12 +191,33 @@ export async function POST(req: Request) {
 
         const response = await AuraService.generateResponse(messageText, history, userContext);
         if (response.text) {
-            const sendResult = await WhatsAppService.sendMessage(cleanPhone, response.text);
+            let finalOutputText = response.text;
+            let extractedImageUrl = null;
+
+            // Extract [IMAGE: url] tag
+            const imageRegex = /\[IMAGE:\s*(https?:\/\/[^\s\]]+)\s*\]/i;
+            const match = finalOutputText.match(imageRegex);
+
+            if (match && match[1]) {
+                extractedImageUrl = match[1];
+                // Remove the tag from the text so it doesn't show to the customer
+                finalOutputText = finalOutputText.replace(imageRegex, '').trim();
+            }
+
+            let sendResult;
+            if (extractedImageUrl) {
+                // Send as an image with the remaining text as the caption
+                sendResult = await WhatsAppService.sendMediaMessage(cleanPhone, extractedImageUrl, finalOutputText);
+            } else {
+                // Standard text message
+                sendResult = await WhatsAppService.sendMessage(cleanPhone, finalOutputText);
+            }
+
             const sentWamid = (sendResult as any)?.data?.message_uuid || (sendResult as any)?.message_uuid || (sendResult as any)?.wamid || (sendResult as any)?.uuid;
             await supabase.from('whatsapp_conversations').insert({
                 phone_number: cleanPhone,
                 role: response.handover ? 'model_handover' : 'model',
-                message: `[WAMID:${sentWamid || 'N/A'}] ${response.text}`,
+                message: `[WAMID:${sentWamid || 'N/A'}] ${response.text}`, // We log the original response.text so the AI remembers it sent an image
                 created_at: new Date().toISOString()
             });
         }
