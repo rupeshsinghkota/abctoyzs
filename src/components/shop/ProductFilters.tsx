@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SlidersHorizontal, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils'; // Assuming cn utility exists
 
 interface FilterOption {
@@ -44,6 +45,12 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
     const searchParams = useSearchParams();
 
     const [isOpen, setIsOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     useBackToClose(isOpen, () => setIsOpen(false));
 
     // State for filters
@@ -136,156 +143,159 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
                 )}
             </button>
 
-            <AnimatePresence>
-                {isOpen && (
-                    <>
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsOpen(false)}
-                            className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
-                        />
+            {mounted && createPortal(
+                <AnimatePresence>
+                    {isOpen && (
+                        <>
+                            {/* Backdrop */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsOpen(false)}
+                                className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
+                            />
 
-                        {/* Drawer */}
-                        <motion.div
-                            initial={{ x: '100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed inset-y-0 right-0 w-full max-w-sm bg-background shadow-2xl z-50 flex flex-col"
-                        >
-                            {/* Header */}
-                            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-                                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-900/60">Search Filters</h2>
-                                <button onClick={() => setIsOpen(false)} className="p-2 -mr-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-xl transition-all">
-                                    <X className="w-5 h-5" strokeWidth={1.5} />
-                                </button>
-                            </div>
+                            {/* Drawer */}
+                            <motion.div
+                                initial={{ x: '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '100%' }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                className="fixed inset-y-0 right-0 w-full max-w-sm bg-background shadow-2xl z-50 flex flex-col"
+                            >
+                                {/* Header */}
+                                <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                                    <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-900/60">Search Filters</h2>
+                                    <button onClick={() => setIsOpen(false)} className="p-2 -mr-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-xl transition-all">
+                                        <X className="w-5 h-5" strokeWidth={1.5} />
+                                    </button>
+                                </div>
 
-                            {/* Content */}
-                            <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                                {/* Price Range */}
-                                {!hiddenFilters.includes('price') && (
-                                    <div className="space-y-4">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Price Range</h3>
-                                        <div className="flex items-center gap-4">
-                                            <div className="space-y-1">
-                                                <label className="text-xs text-muted-foreground">Min</label>
-                                                <input
-                                                    type="number"
-                                                    value={priceRange[0]}
-                                                    onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                                                    className="w-full p-2 border rounded-md text-sm"
-                                                    min={0}
-                                                />
+                                {/* Content */}
+                                <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                                    {/* Price Range */}
+                                    {!hiddenFilters.includes('price') && (
+                                        <div className="space-y-4">
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Price Range</h3>
+                                            <div className="flex items-center gap-4">
+                                                <div className="space-y-1">
+                                                    <label className="text-xs text-muted-foreground">Min</label>
+                                                    <input
+                                                        type="number"
+                                                        value={priceRange[0]}
+                                                        onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                                                        className="w-full p-2 border rounded-md text-sm"
+                                                        min={0}
+                                                    />
+                                                </div>
+                                                <span className="text-muted-foreground">-</span>
+                                                <div className="space-y-1">
+                                                    <label className="text-xs text-muted-foreground">Max</label>
+                                                    <input
+                                                        type="number"
+                                                        value={priceRange[1]}
+                                                        onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                                                        className="w-full p-2 border rounded-md text-sm"
+                                                        min={0}
+                                                    />
+                                                </div>
                                             </div>
-                                            <span className="text-muted-foreground">-</span>
-                                            <div className="space-y-1">
-                                                <label className="text-xs text-muted-foreground">Max</label>
-                                                <input
-                                                    type="number"
-                                                    value={priceRange[1]}
-                                                    onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                                                    className="w-full p-2 border rounded-md text-sm"
-                                                    min={0}
-                                                />
+                                        </div>
+                                    )}
+
+                                    {/* Voltage */}
+                                    {!hiddenFilters.includes('voltage') && (
+                                        <div className="space-y-4">
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Voltage</h3>
+                                            <div className="flex flex-wrap gap-2">
+                                                {VOLTAGE_OPTIONS.map((opt) => (
+                                                    <button
+                                                        key={opt.value}
+                                                        onClick={() => toggleSelection(opt.value, selectedVoltages, setSelectedVoltages)}
+                                                        className={cn(
+                                                            "px-3 py-1.5 rounded-md text-sm border transition-all",
+                                                            selectedVoltages.includes(opt.value)
+                                                                ? "bg-primary text-primary-foreground border-primary"
+                                                                : "bg-background hover:bg-muted border-input"
+                                                        )}
+                                                    >
+                                                        {opt.label}
+                                                    </button>
+                                                ))}
                                             </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Voltage */}
-                                {!hiddenFilters.includes('voltage') && (
-                                    <div className="space-y-4">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Voltage</h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {VOLTAGE_OPTIONS.map((opt) => (
-                                                <button
-                                                    key={opt.value}
-                                                    onClick={() => toggleSelection(opt.value, selectedVoltages, setSelectedVoltages)}
-                                                    className={cn(
-                                                        "px-3 py-1.5 rounded-md text-sm border transition-all",
-                                                        selectedVoltages.includes(opt.value)
-                                                            ? "bg-primary text-primary-foreground border-primary"
-                                                            : "bg-background hover:bg-muted border-input"
-                                                    )}
-                                                >
-                                                    {opt.label}
-                                                </button>
-                                            ))}
+                                    {/* Age Group */}
+                                    {!hiddenFilters.includes('age') && (
+                                        <div className="space-y-4">
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Age Group</h3>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {AGE_OPTIONS.map((opt) => (
+                                                    <button
+                                                        key={opt.value}
+                                                        onClick={() => toggleSelection(opt.value, selectedAges, setSelectedAges)}
+                                                        className={cn(
+                                                            "px-3 py-2 rounded-md text-sm border text-left flex items-center justify-between transition-all",
+                                                            selectedAges.includes(opt.value)
+                                                                ? "bg-primary text-primary-foreground border-primary"
+                                                                : "bg-background hover:bg-muted border-input"
+                                                        )}
+                                                    >
+                                                        {opt.label}
+                                                        {selectedAges.includes(opt.value) && <Check className="w-4 h-4" />}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Age Group */}
-                                {!hiddenFilters.includes('age') && (
-                                    <div className="space-y-4">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Age Group</h3>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {AGE_OPTIONS.map((opt) => (
-                                                <button
-                                                    key={opt.value}
-                                                    onClick={() => toggleSelection(opt.value, selectedAges, setSelectedAges)}
-                                                    className={cn(
-                                                        "px-3 py-2 rounded-md text-sm border text-left flex items-center justify-between transition-all",
-                                                        selectedAges.includes(opt.value)
-                                                            ? "bg-primary text-primary-foreground border-primary"
-                                                            : "bg-background hover:bg-muted border-input"
-                                                    )}
-                                                >
-                                                    {opt.label}
-                                                    {selectedAges.includes(opt.value) && <Check className="w-4 h-4" />}
-                                                </button>
-                                            ))}
+                                    {/* Seats */}
+                                    {!hiddenFilters.includes('seats') && (
+                                        <div className="space-y-4">
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Seats Capacity</h3>
+                                            <div className="flex flex-wrap gap-2.5">
+                                                {SEATS_OPTIONS.map((opt) => (
+                                                    <button
+                                                        key={opt.value}
+                                                        onClick={() => toggleSelection(opt.value, selectedSeats, setSelectedSeats)}
+                                                        className={cn(
+                                                            "px-4 py-2 rounded-xl text-[11px] font-bold border transition-all",
+                                                            selectedSeats.includes(opt.value)
+                                                                ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                                                                : "bg-white text-gray-600 border-gray-100 hover:border-primary/30"
+                                                        )}
+                                                    >
+                                                        {opt.label}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
 
-                                {/* Seats */}
-                                {!hiddenFilters.includes('seats') && (
-                                    <div className="space-y-4">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Seats Capacity</h3>
-                                        <div className="flex flex-wrap gap-2.5">
-                                            {SEATS_OPTIONS.map((opt) => (
-                                                <button
-                                                    key={opt.value}
-                                                    onClick={() => toggleSelection(opt.value, selectedSeats, setSelectedSeats)}
-                                                    className={cn(
-                                                        "px-4 py-2 rounded-xl text-[11px] font-bold border transition-all",
-                                                        selectedSeats.includes(opt.value)
-                                                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
-                                                            : "bg-white text-gray-600 border-gray-100 hover:border-primary/30"
-                                                    )}
-                                                >
-                                                    {opt.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Footer */}
-                            <div className="p-4 border-t bg-muted/20 flex gap-3">
-                                <button
-                                    onClick={clearFilters}
-                                    className="flex-1 px-4 py-2 border rounded-full text-sm font-medium hover:bg-muted transition-colors"
-                                >
-                                    Clear All
-                                </button>
-                                <button
-                                    onClick={updateFilters}
-                                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
-                                >
-                                    Show Results
-                                </button>
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                                {/* Footer */}
+                                <div className="p-4 border-t bg-muted/20 flex gap-3">
+                                    <button
+                                        onClick={clearFilters}
+                                        className="flex-1 px-4 py-2 border rounded-full text-sm font-medium hover:bg-muted transition-colors"
+                                    >
+                                        Clear All
+                                    </button>
+                                    <button
+                                        onClick={updateFilters}
+                                        className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+                                    >
+                                        Show Results
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 }
