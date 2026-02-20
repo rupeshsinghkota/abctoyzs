@@ -38,7 +38,7 @@ export default function CartPage() {
     }
 
     return (
-        <div className="min-h-screen pb-8 bg-background md:pb-0">
+        <div className="min-h-screen pb-32 bg-gray-50/50 md:pb-0">
             <div className="p-4 md:container md:mx-auto md:py-8 md:flex md:gap-8 md:items-start">
 
                 {/* Cart Items */}
