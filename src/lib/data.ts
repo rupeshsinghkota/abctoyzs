@@ -127,18 +127,24 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
             return [];
         }
 
+        let discount = 0;
+        const { data: settingsData } = await supabase.from('settings').select('global_daily_discount').single();
+        if (settingsData && settingsData.global_daily_discount) {
+            discount = settingsData.global_daily_discount;
+        }
+
         if (!data || data.length === 0) {
             if (slug) {
                 const { data: allData } = await supabase.from('products').select('*, variants:product_variants(*)');
                 if (allData) {
                     const match = allData.find((p: any) => p.slug === slug || p.id === slug);
-                    if (match) return processProducts([match]);
+                    if (match) return processProducts([match], discount);
                 }
             }
             return [];
         }
 
-        return processProducts(data);
+        return processProducts(data, discount);
 
     } catch (e) {
         console.error("fetchProducts error:", e);
@@ -162,28 +168,47 @@ export async function searchProducts(query: string): Promise<Product[]> {
             return [];
         }
 
-        return data.map((item: any) => ({
-            id: item.id,
-            slug: item.slug || item.id,
-            name: item.name,
-            category: (typeof item.category === 'string') ? item.category.toLowerCase() : 'cars',
-            price: Number(item.base_price) || 0,
-            mrp: item.mrp ? Number(item.mrp) : undefined,
-            rating: Number(item.rating) || 0,
-            reviews: Number(item.review_count) || 0,
-            image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
-            images: Array.isArray(item.images) ? item.images : [],
-            description: item.description || '',
-            is_new: !!item.is_new,
-            is_featured: !!item.is_featured,
-            tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
-            specs: item.specs || {},
-            voltage: item.voltage,
-            ageGroup: normalizeAgeGroup(item.age_group) || item.age_group,
-            subCategory: item.subCategory,
-            meta_title: item.meta_title,
-            meta_description: item.meta_description
-        })) as Product[];
+        let discount = 0;
+        const { data: settingsData } = await supabase.from('settings').select('global_daily_discount').single();
+        if (settingsData && settingsData.global_daily_discount) {
+            discount = settingsData.global_daily_discount;
+        }
+
+        return data.map((item: any) => {
+            const originalPrice = Number(item.base_price) || 0;
+            const originalMrp = item.mrp ? Number(item.mrp) : originalPrice;
+
+            let finalPrice = originalPrice;
+            let finalMrp = originalMrp;
+
+            if (discount > 0) {
+                finalPrice = Math.round(originalPrice * (1 - discount / 100));
+                finalMrp = Math.max(originalMrp, originalPrice);
+            }
+
+            return {
+                id: item.id,
+                slug: item.slug || item.id,
+                name: item.name,
+                category: (typeof item.category === 'string') ? item.category.toLowerCase() : 'cars',
+                price: finalPrice,
+                mrp: finalPrice < finalMrp ? finalMrp : undefined,
+                rating: Number(item.rating) || 0,
+                reviews: Number(item.review_count) || 0,
+                image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
+                images: Array.isArray(item.images) ? item.images : [],
+                description: item.description || '',
+                is_new: !!item.is_new,
+                is_featured: !!item.is_featured,
+                tag: item.is_new ? 'New' : (item.is_featured ? 'Featured' : undefined),
+                specs: item.specs || {},
+                voltage: item.voltage,
+                ageGroup: normalizeAgeGroup(item.age_group) || item.age_group,
+                subCategory: item.subCategory,
+                meta_title: item.meta_title,
+                meta_description: item.meta_description
+            };
+        }) as Product[];
 
     } catch (e) {
         console.error("Search error:", e);
@@ -215,15 +240,41 @@ export function normalizeAgeGroup(input: string | undefined): '1-3' | '3-6' | '6
 }
 
 // Helper to map DB result to Product interface
-function processProducts(data: any[]): Product[] {
+function processProducts(data: any[], globalDiscount: number = 0): Product[] {
     return data.map((item: any) => {
+        const originalPrice = Number(item.base_price) || 0;
+        const originalMrp = item.mrp ? Number(item.mrp) : originalPrice;
+
+        let finalPrice = originalPrice;
+        let finalMrp = originalMrp;
+
+        if (globalDiscount > 0) {
+            finalPrice = Math.round(originalPrice * (1 - globalDiscount / 100));
+            // When discounting, ensure MRP stringly represents the original highest value
+            finalMrp = Math.max(originalMrp, originalPrice);
+        }
+
+        const variants = Array.isArray(item.variants) ? item.variants.map((v: any) => {
+            const vOrigPrice = v.price || originalPrice;
+            const vOrigMrp = v.mrp || originalMrp;
+            let vFinalPrice = vOrigPrice;
+            let vFinalMrp = vOrigMrp;
+
+            if (globalDiscount > 0) {
+                vFinalPrice = Math.round(vOrigPrice * (1 - globalDiscount / 100));
+                vFinalMrp = Math.max(vOrigMrp, vOrigPrice);
+            }
+
+            return { ...v, price: vFinalPrice, mrp: vFinalMrp };
+        }) : [];
+
         return {
             id: item.id,
             slug: item.slug || item.id,
             name: item.name || 'Untitled Product',
             category: (typeof item.category === 'string' && item.category.trim()) ? item.category.toLowerCase() : 'cars',
-            price: Number(item.base_price) || 0,
-            mrp: item.mrp ? Number(item.mrp) : undefined,
+            price: finalPrice,
+            mrp: finalPrice < finalMrp ? finalMrp : undefined,
             rating: Number(item.rating) || 0,
             reviews: Number(item.review_count) || 0,
             image: (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : '',
@@ -245,7 +296,7 @@ function processProducts(data: any[]): Product[] {
             net_weight: item.net_weight,
             gross_weight: item.gross_weight,
             attributes: Array.isArray(item.attributes) ? item.attributes : [],
-            variants: Array.isArray(item.variants) ? item.variants : [],
+            variants: variants,
             meta_title: item.meta_title,
             meta_description: item.meta_description,
             marketing_suite: item.marketing_suite,

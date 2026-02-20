@@ -66,6 +66,11 @@ When a user asks to see a product or asks about what products you have:
 - Example: "The Mercedes 12V is in stock for ₹15,000! [IMAGE: https://abctoyz.in/.../mercedes.png] Check it out here: https://abctoyz.in/product/mercedes-12v"
 - **CRITICAL:** Only include ONE image tag per response. Do not use standard markdown like ![alt](url).
 
+# GLOBAL PRICING & DISCOUNTS
+- The prices you see from your tools are the **FINAL, ACTUAL** prices the customer pays.
+- If a Global Daily Discount is active (you will see it in your context), the prices reported by your tools *already* have this discount subtracted. Do not calculate the math twice.
+- You can mention the sale to create urgency (e.g. "Includes our 10% daily discount!").
+
 # COUPONS & PROMOTIONS
 - **Popup/Secret Code:** If user sends "How can I get my Secret discount code?" OR "Wait! I don't want to miss out. Please send me the 10% OFF discount code! 🎁", reply EXACTLY: "Welcome to the family! 🚗 Use code *PREPAID5* for 5% OFF your order when you choose to pay via Prepaid. Need help choosing a ride?"
 - **First Order Discount:** If a user asks about a discount, uses keywords like "PREPAID5", "discount code", or "offer", tell them they can use the code **PREPAID5** for 5% OFF exclusively on prepaid orders.
@@ -144,7 +149,7 @@ async function query_inventory({ category, search_term }: { category?: string, s
 
         if (words.length > 0) {
             // STAGE 1: Precise Match (Contains ALL significant words)
-            let q1 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
+            let q1 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug, mrp');
             if (category) q1 = q1.ilike('category', `%${category}%`);
             words.forEach(word => {
                 q1 = q1.ilike('name', `%${word}%`);
@@ -155,10 +160,11 @@ async function query_inventory({ category, search_term }: { category?: string, s
                 data = d1;
             } else {
                 // STAGE 2: Broad Match (Contains ANY significant word)
-                let q2 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
+                let q2 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug, mrp');
                 if (category) q2 = q2.ilike('category', `%${category}%`);
                 const orString = words.map(w => `name.ilike.%${w}%`).join(',');
-                const { data: d2 } = await q2.or(orString).order('stock', { ascending: false }).limit(3);
+                if (orString) q2 = q2.or(orString);
+                const { data: d2 } = await q2.limit(3);
                 data = d2;
             }
         }
@@ -166,24 +172,38 @@ async function query_inventory({ category, search_term }: { category?: string, s
 
     // Default: Just fetch by category if no search term or search failed
     if (!data || data.length === 0) {
-        let q3 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug');
+        let q3 = supabase.from('products').select('id, name, price:base_price, stock, category, images, slug, mrp');
         if (category) q3 = q3.ilike('category', `%${category}%`);
         const { data: d3 } = await q3.order('stock', { ascending: false }).limit(3);
         data = d3;
     }
 
-    if (!data || data.length === 0) {
-        return "I couldn't find any products matching those details. Could you describe it differently?";
+    let globalDiscount = 0;
+    const { data: settingsData } = await supabase.from('settings').select('global_daily_discount').single();
+    if (settingsData && settingsData.global_daily_discount) {
+        globalDiscount = settingsData.global_daily_discount;
     }
 
-    // Return structured data for AI to process
-    return JSON.stringify(data.map(p => ({
-        name: p.name,
-        price: p.price,
-        stock: p.stock > 0 ? p.stock : "Out of Stock",
-        image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-        url: `https://abctoyz.in/product/${p.slug}`
-    })));
+    if (!data) return "No products found.";
+
+    return data.map(p => {
+        let finalPrice = Number(p.price) || 0;
+        let originalMrp = p.mrp ? Number(p.mrp) : finalPrice;
+
+        if (globalDiscount > 0) {
+            finalPrice = Math.round(finalPrice * (1 - globalDiscount / 100));
+        }
+
+        return {
+            id: p.id,
+            name: p.name,
+            price: `₹${finalPrice.toLocaleString('en-IN')}`,
+            original_price: globalDiscount > 0 ? `₹${(Number(p.price) || 0).toLocaleString('en-IN')}` : undefined,
+            stock: p.stock > 0 ? "In Stock" : "Out of Stock",
+            url: p.slug ? `https://abctoyz.in/product/${p.slug}` : `https://abctoyz.in/product/${p.id}`,
+            image_url: p.images && p.images.length > 0 ? p.images[0] : null
+        };
+    });
 }
 
 async function check_order_status({ order_id }: { order_id: string }) {

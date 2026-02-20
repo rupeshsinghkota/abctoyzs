@@ -158,10 +158,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ status: "success", reason: "empty_message_ignored" });
         }
 
-        const { data: globalSettings } = await supabase.from('settings').select('ai_reply_enabled').single();
+        const { data: globalSettings } = await supabase.from('settings').select('ai_reply_enabled, global_daily_discount').single();
         if (globalSettings?.ai_reply_enabled === false) {
             return NextResponse.json({ status: "success", reason: "ai_disabled" });
         }
+
+        const activeDiscount = globalSettings?.global_daily_discount || 0;
 
         // 7. PROCEED TO AI RESPONSE
         const phoneVariations = [cleanPhone, cleanPhone.substring(2)];
@@ -173,6 +175,10 @@ export async function POST(req: Request) {
         }
 
         let userContext = `# USER CONTEXT\n- Customer Name: ${customerName || 'Customer'}\n- Phone: ${cleanPhone}\n`;
+        if (activeDiscount > 0) {
+            userContext += `- Active Store-Wide Sale: ${activeDiscount}% Off (Prices dynamically updated in tools)\n`;
+        }
+
         if (matchingAddresses?.length) {
             const { data: orders } = await supabase.from('orders').select(`id, status, total_amount, created_at`).in('shipping_address_id', matchingAddresses.map(a => a.id)).order('created_at', { ascending: false }).limit(3);
             if (orders?.length) userContext += `\n## RECENT ORDERS\n` + orders.map(o => `- Order #${o.id}: ${o.status}, Amount: ${o.total_amount}`).join('\n');

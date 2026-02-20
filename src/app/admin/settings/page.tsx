@@ -11,6 +11,7 @@ interface Settings {
     cod_advance_type: 'percentage' | 'fixed';
     cod_advance_value: number;
     ai_reply_enabled: boolean;
+    global_daily_discount: number;
 }
 
 export default function SettingsPage() {
@@ -21,7 +22,8 @@ export default function SettingsPage() {
         cod_mode: 'normal',
         cod_advance_type: 'percentage',
         cod_advance_value: 0,
-        ai_reply_enabled: true
+        ai_reply_enabled: true,
+        global_daily_discount: 0
     });
 
     const supabase = createClient();
@@ -47,7 +49,8 @@ export default function SettingsPage() {
                             cod_mode: 'normal',
                             cod_advance_type: 'percentage',
                             cod_advance_value: 0,
-                            ai_reply_enabled: true
+                            ai_reply_enabled: true,
+                            global_daily_discount: 0
                         }])
                         .select()
                         .single();
@@ -63,7 +66,8 @@ export default function SettingsPage() {
                     cod_mode: data.cod_mode || 'normal',
                     cod_advance_type: data.cod_advance_type || 'percentage',
                     cod_advance_value: data.cod_advance_value || 0,
-                    ai_reply_enabled: data.ai_reply_enabled !== false // Default to true if null
+                    ai_reply_enabled: data.ai_reply_enabled !== false, // Default to true if null
+                    global_daily_discount: data.global_daily_discount || 0
                 });
             }
         } catch (error: any) {
@@ -83,7 +87,8 @@ export default function SettingsPage() {
                     cod_mode: settings.cod_mode,
                     cod_advance_type: settings.cod_advance_type,
                     cod_advance_value: settings.cod_advance_value,
-                    ai_reply_enabled: settings.ai_reply_enabled
+                    ai_reply_enabled: settings.ai_reply_enabled,
+                    global_daily_discount: settings.global_daily_discount
                 })
                 .eq('id', settings.id);
 
@@ -232,6 +237,53 @@ export default function SettingsPage() {
                                 </div>
                             </div>
                         )}
+                    </div>
+                </div>
+
+                {/* Pricing & Promotions Card */}
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div className="flex items-start gap-4 mb-6">
+                        <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center shrink-0">
+                            <DollarSign className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-gray-900">Pricing & Promotions</h2>
+                            <p className="text-sm text-gray-500 mt-1">Manage global discounts and store-wide sales.</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-6 pl-0 md:pl-14">
+                        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-sm font-bold text-gray-900 tracking-wider">Global Daily Discount</h3>
+                                {settings.global_daily_discount > 0 && (
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                                        SALE ACTIVE ({settings.global_daily_discount}%)
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Enter a percentage value (0-100) to globally discount all products. This will automatically update prices on the website, cart, XML feeds, and AI responses.
+                            </p>
+
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Discount Percentage</label>
+                                <div className="relative max-w-xs">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span className="text-gray-400 font-bold">%</span>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={settings.global_daily_discount}
+                                        onChange={(e) => setSettings({ ...settings, global_daily_discount: Math.max(0, Math.min(100, Number(e.target.value))) })}
+                                        className="block w-full pl-8 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-black focus:border-black sm:text-sm font-medium transition-all"
+                                        placeholder="0"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
