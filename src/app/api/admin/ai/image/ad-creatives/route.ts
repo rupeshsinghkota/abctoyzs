@@ -53,22 +53,29 @@ export async function POST(req: Request) {
                 scenePrompt = "SETTING: Modern luxury home driveway or upscale city promenade. Polished concrete or clean pavement. Wealthy, aspirational urban environment.";
         }
 
+        // Extract age from specs to enforce demographic accuracy
+        let targetAge = "3-6"; // default
+        if (specs?.age) {
+            // Usually comes in as "3-8", "2-5", "8+", etc.
+            targetAge = String(specs.age).trim();
+        }
+
         let audiencePrompt = "";
         switch (activeAudience) {
             case 'Boy':
-                audiencePrompt = "A happy, photogenic young boy (age 3-6) riding or playing with the vehicle.";
+                audiencePrompt = `A happy, photogenic young boy (strictly around age ${targetAge}) riding or playfully interacting with the vehicle.`;
                 break;
             case 'Girl':
-                audiencePrompt = "A happy, photogenic young girl (age 3-6) riding or playing with the vehicle.";
+                audiencePrompt = `A happy, photogenic young girl (strictly around age ${targetAge}) riding or playfully interacting with the vehicle.`;
                 break;
             case 'Both':
-                audiencePrompt = "Two happy young children (a boy and a girl, age 3-6) playing together with the vehicle.";
+                audiencePrompt = `Two happy young children (a boy and a girl, strictly around age ${targetAge}) playing together with the vehicle.`;
                 break;
             case 'No Child':
-                audiencePrompt = "The product is shown alone in its environment, with NO children visible. Focus entirely on the vehicle's design and details.";
+                audiencePrompt = `The product is shown alone in its environment, with NO children visible. Focus entirely on the vehicle's design and details.`;
                 break;
             default:
-                audiencePrompt = "A happy, photogenic young child (age 3-6) naturally interacting with the vehicle.";
+                audiencePrompt = `A happy, photogenic young child (strictly around age ${targetAge}) naturally interacting with the vehicle.`;
         }
 
         // Build spec highlights for text overlay — filter out empty/N/A values
@@ -114,11 +121,11 @@ export async function POST(req: Request) {
             let compositionDesc: string;
 
             if (format === 'SQUARE1') {
-                compositionDesc = "Centered composition perfect for Instagram Feed and Facebook Ads. Product prominently in the center with text above or below.";
+                compositionDesc = "Clean and direct composition. FRONT OR 3/4 ANGLE. The vehicle should be large and clearly visible, acting as the undisputed hero of the image. Standard eye-level commercial product shot.";
             } else if (format === 'SQUARE2') {
-                compositionDesc = "Dynamic composition perfect for Instagram Feed and Facebook Ads. Focus on a slightly angled or low-angle perspective. Product prominently in the center.";
+                compositionDesc = "Dramatic wide/environmental composition. LOW ANGLE OR WIDE ANGLE. Show more of the beautiful background environment. The vehicle should be slightly smaller to show scale and context in its luxurious surroundings.";
             } else { // SQUARE3
-                compositionDesc = "Engaging lifestyle composition perfect for Instagram Feed and Facebook Ads. Product prominently in the center, showing action or fun.";
+                compositionDesc = "High-energy lifestyle/action composition. DYNAMIC ANGLE. The vehicle should look like it is in motion or being actively enjoyed. Frame it for maximum excitement and energy.";
             }
 
             // Build a SHORT display name (strip brand prefix, keep model only)
