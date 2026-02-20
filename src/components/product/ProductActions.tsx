@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 import { trackFbEvent } from '@/components/tracking/FacebookPixel';
@@ -294,7 +294,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 {/* --- PREPAID5 Promo Highlight --- */}
                 <div className="bg-green-50/80 border border-green-200/50 rounded-xl p-3 flex items-center gap-3">
                     <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center shrink-0">
-                        <Ticket, ShoppingBag className="w-4 h-4 text-green-600" />
+                        <Ticket className="w-4 h-4 text-green-600" />
                     </div>
                     <div>
                         <p className="text-xs font-bold text-green-800">Extra 5% OFF on Prepaid Orders</p>
