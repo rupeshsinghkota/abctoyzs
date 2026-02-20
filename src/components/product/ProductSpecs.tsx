@@ -24,14 +24,21 @@ export function ProductSpecs({ specs, additionalInfo }: ProductSpecsProps) {
     ].filter(item => item.value && item.value !== '-');
 
     return (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-0">
+        <div className="grid grid-cols-2 gap-3">
             {items.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-100/80 last:border-b-0">
-                    <div className="flex items-center gap-1.5">
-                        {item.icon && <item.icon className="w-3 h-3 text-gray-400" strokeWidth={2} />}
-                        <span className="text-[10px] text-gray-400 font-medium">{item.label}</span>
+                <div
+                    key={idx}
+                    className="flex flex-col gap-2 p-2.5 rounded-xl border border-gray-100 bg-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.02)] hover:border-primary/20 hover:shadow-md transition-all duration-300 group"
+                >
+                    <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-primary/5 flex items-center justify-center text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                            {item.icon && <item.icon className="w-3.5 h-3.5" strokeWidth={2.5} />}
+                        </div>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{item.label}</span>
                     </div>
-                    <span className="text-[11px] font-bold text-gray-800 text-right">{item.value}</span>
+                    <span className="text-[11px] font-black text-gray-900 leading-none pl-1">
+                        {item.value}
+                    </span>
                 </div>
             ))}
         </div>
