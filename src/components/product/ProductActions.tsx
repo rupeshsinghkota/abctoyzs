@@ -289,7 +289,17 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                         <ShoppingBag className="w-4 h-4" strokeWidth={2.5} />
                         BUY NOW
                     </button>
+                </div>
 
+                {/* --- PREPAID5 Promo Highlight --- */}
+                <div className="bg-green-50/80 border border-green-200/50 rounded-xl p-3 flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                        <Ticket, ShoppingBag className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                        <p className="text-xs font-bold text-green-800">Extra 5% OFF on Prepaid Orders</p>
+                        <p className="text-[10px] text-green-700/80 font-medium">Use code <span className="font-bold tracking-wider bg-white px-1 py-0.5 rounded shadow-sm border border-green-100">PREPAID5</span> at checkout</p>
+                    </div>
                 </div>
 
                 <div className="flex items-center justify-center gap-3 md:gap-6 text-[9px] md:text-[10px] text-muted-foreground pt-3 font-bold uppercase tracking-wider opacity-70 border-t border-gray-100 mt-3 whitespace-nowrap overflow-x-auto no-scrollbar">

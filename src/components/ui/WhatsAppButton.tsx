@@ -9,7 +9,7 @@ export function WhatsAppButton() {
         const phoneNumber = "918239269217"; // Official business number
         const currentUrl = window.location.href;
         const pageTitle = document.title;
-        const message = encodeURIComponent(`Hi ABC Toyz, I'm browsing ${pageTitle} and wanted to know more about the FIRST10 discount code!\n\nContext: ${currentUrl}`);
+        const message = encodeURIComponent(`Hi ABC Toyz, I'm browsing ${pageTitle} and wanted to know more!\n\nContext: ${currentUrl}`);
         setWhatsappUrl(`https://wa.me/${phoneNumber}?text=${message}`);
     }, []);
 

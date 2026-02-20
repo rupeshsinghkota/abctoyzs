@@ -45,7 +45,7 @@ export async function POST(req: Request) {
 
             // Send Template Message (using a standard welcome or fallback to text if template not set)
             // For now, using direct text to ensure it works immediately without template approval
-            const welcomeMessage = `Welcome to ABC Toyz! 🚗\n\nYour little one's adventure starts here. Use code *FIRST10* to get *10% OFF* your first order.\n\nShop now: https://abctoyz.in`;
+            const welcomeMessage = `Welcome to ABC Toyz! 🚗\n\nYour little one's adventure starts here. Use code *PREPAID5* to get *5% OFF* on all prepaid orders.\n\nShop now: https://abctoyz.in`;
 
             // Fire and forget (don't block response)
             WhatsAppService.sendMessage(whatsappPhone, welcomeMessage)

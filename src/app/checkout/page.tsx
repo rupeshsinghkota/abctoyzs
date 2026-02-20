@@ -124,6 +124,15 @@ export default function CheckoutPage() {
         }
     }, [total]); // Fire when total is calculated
 
+    // Ensure PREPAID5 is only active for PREPAID payment methods
+    useEffect(() => {
+        if (paymentMethod === 'COD' && appliedCoupon?.code === 'PREPAID5') {
+            setAppliedCoupon(null);
+            setCouponCode('');
+            alert('The PREPAID5 coupon has been removed as it is only valid for Prepaid orders.');
+        }
+    }, [paymentMethod, appliedCoupon]);
+
     const refreshAddresses = async (addrOrId?: any) => {
         try {
             const supabase = createClient();
@@ -288,6 +297,14 @@ export default function CheckoutPage() {
 
     const handleApplyCoupon = async () => {
         if (!couponCode.trim()) return;
+
+        // Custom frontend rule for PREPAID5
+        if (couponCode.trim().toUpperCase() === 'PREPAID5' && paymentMethod === 'COD') {
+            setCouponError('PREPAID5 is only valid for Prepaid orders.');
+            setIsApplyingCoupon(false);
+            return;
+        }
+
         setIsApplyingCoupon(true);
         setCouponError(null);
         try {
