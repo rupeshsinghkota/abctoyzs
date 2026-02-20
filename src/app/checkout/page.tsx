@@ -399,16 +399,16 @@ export default function CheckoutPage() {
                 </div>
             </header>
 
-            <main className="container mx-auto px-4 py-4 lg:py-6 max-w-[1200px]">
-                <div className="grid md:grid-cols-[1fr_340px] lg:grid-cols-[1fr_440px] gap-6 lg:gap-8 xl:gap-12">
+            <main className="container mx-auto px-4 py-3 max-w-[1200px]">
+                <div className="grid md:grid-cols-[1fr_340px] lg:grid-cols-[1fr_440px] gap-4 lg:gap-6">
                     {/* Left Column: Information */}
-                    <div className="space-y-6">
+                    <div className="space-y-4">
 
                         {/* Address Selection */}
-                        <div className="bg-white border border-gray-100 rounded-3xl lg:rounded-[28px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                            <div className="p-4 lg:p-7 border-b border-gray-100 bg-gray-50/50 flex flex-wrap items-center justify-between gap-y-2">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-sm relative">
+                        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                            <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex flex-wrap items-center justify-between gap-y-2">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-xs relative">
                                         1
                                         <div className="absolute inset-0 rounded-full ring-4 ring-black/5" />
                                     </div>
@@ -424,7 +424,7 @@ export default function CheckoutPage() {
                                 )}
                             </div>
 
-                            <div className="p-5 lg:p-7 space-y-4">
+                            <div className="p-4 space-y-3">
                                 {showAddrForm ? (
                                     <ShippingAddressForm
                                         onCancel={() => setShowAddrForm(false)}
@@ -449,7 +449,7 @@ export default function CheckoutPage() {
                                             <div
                                                 key={addr.id}
                                                 onClick={() => setSelectedAddressId(addr.id)}
-                                                className={`p-5 lg:p-6 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden group ${selectedAddressId === addr.id
+                                                className={`p-4 rounded-xl border-2 transition-all cursor-pointer relative overflow-hidden group ${selectedAddressId === addr.id
                                                     ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
                                                     : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
                                                     }`}
@@ -481,19 +481,19 @@ export default function CheckoutPage() {
                         </div>
 
                         {/* Payment Method Selection */}
-                        <div className="bg-white border border-gray-100 rounded-[28px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                            <div className="p-5 lg:p-7 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
-                                <div className="w-8 h-8 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-sm relative">
+                        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                            <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex items-center gap-2">
+                                <div className="w-6 h-6 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-xs relative">
                                     2
                                     <div className="absolute inset-0 rounded-full ring-4 ring-black/5" />
                                 </div>
                                 <h2 className="font-black text-base md:text-lg tracking-tight text-gray-900">Payment Method</h2>
                             </div>
-                            <div className="p-5 lg:p-7 space-y-4">
+                            <div className="p-4 space-y-3">
                                 {/* Prepaid Option */}
                                 <div
                                     onClick={() => setPaymentMethod('PREPAID')}
-                                    className={`flex items-center gap-4 p-5 lg:p-6 rounded-2xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'PREPAID'
+                                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'PREPAID'
                                         ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
                                         : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
                                         }`}
@@ -503,8 +503,8 @@ export default function CheckoutPage() {
                                         Recommended
                                     </div>
 
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm ${paymentMethod === 'PREPAID' ? 'bg-black text-white' : 'bg-gray-100 text-gray-400'}`}>
-                                        <CreditCard className="w-5 h-5" />
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${paymentMethod === 'PREPAID' ? 'bg-black text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                        <CreditCard className="w-4 h-4" />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-4 mt-2 sm:mt-0">
                                         <p className="font-black text-gray-900 text-sm md:text-[15px]">Pay Online Now</p>
@@ -520,13 +520,13 @@ export default function CheckoutPage() {
                                 {/* COD Option */}
                                 <div
                                     onClick={() => setPaymentMethod('COD')}
-                                    className={`flex items-center gap-4 p-5 lg:p-6 rounded-2xl border-2 cursor-pointer transition-all ${paymentMethod === 'COD'
+                                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'COD'
                                         ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
                                         : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
                                         }`}
                                 >
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm ${paymentMethod === 'COD' ? 'bg-black text-white' : 'bg-gray-100 text-gray-400'}`}>
-                                        <Banknote className="w-5 h-5" />
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${paymentMethod === 'COD' ? 'bg-black text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                        <Banknote className="w-4 h-4" />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-4">
                                         <p className="font-black text-gray-900 text-sm md:text-[15px]">
@@ -681,8 +681,8 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel, cart }: { onCanc
         }
     };
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                     <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Full Name</label>
                     <input
@@ -791,7 +791,7 @@ function ShippingAddressForm({ onCancel, onSuccess, showCancel, cart }: { onCanc
                 </select>
             </div>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-2 pt-1">
                 {showCancel && (
                     <button
                         type="button"
@@ -849,10 +849,10 @@ function OrderSummaryCard({
     isPaymentLoading: boolean;
 }) {
     return (
-        <div className="bg-white border border-gray-100 rounded-3xl lg:rounded-[32px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:sticky md:top-20 lg:top-24">
-            <div className="p-4 lg:p-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-sm relative">
+        <div className="bg-white border border-gray-100 rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:sticky md:top-20 lg:top-24">
+            <div className="p-3 lg:p-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-xs relative">
                         3
                         <div className="absolute inset-0 rounded-full ring-4 ring-black/5" />
                     </div>
@@ -860,12 +860,12 @@ function OrderSummaryCard({
                 </div>
             </div>
 
-            <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
+            <div className="p-4 space-y-3 lg:space-y-4">
                 {/* Product List */}
-                <div className="max-h-[25vh] overflow-y-auto pr-2 no-scrollbar border-b border-gray-100 pb-3 lg:pb-4">
+                <div className="max-h-[25vh] overflow-y-auto pr-2 no-scrollbar border-b border-gray-100 pb-2 lg:pb-3">
                     {cart.map((item: any) => (
-                        <div key={item.id} className="flex gap-4 mb-5 last:mb-0 items-center">
-                            <div className="w-16 h-16 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 mb-0 shadow-sm">
+                        <div key={item.id} className="flex gap-3 mb-3 last:mb-0 items-center">
+                            <div className="w-14 h-14 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 mb-0 shadow-sm">
                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -895,11 +895,11 @@ function OrderSummaryCard({
                 {/* Available Offers (Auto Apply) */}
                 {!appliedCoupon && (
                     <div className="pt-2 pb-1">
-                        <div className="bg-orange-50/80 border border-orange-200/50 rounded-2xl p-4 flex items-center justify-between gap-3 relative overflow-hidden shadow-sm">
+                        <div className="bg-orange-50/80 border border-orange-200/50 rounded-xl p-3 flex items-center justify-between gap-3 relative overflow-hidden shadow-sm">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-400/10 to-transparent rounded-bl-[100px] pointer-events-none" />
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center shrink-0 border border-orange-100/50">
-                                    <Ticket className="w-5 h-5 text-orange-500" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white shadow-sm rounded-full flex items-center justify-center shrink-0 border border-orange-100/50">
+                                    <Ticket className="w-4 h-4 text-orange-500" />
                                 </div>
                                 <div>
                                     <p className="text-xs md:text-sm font-black text-gray-900 tracking-tight">PREPAID5</p>
@@ -909,7 +909,7 @@ function OrderSummaryCard({
                             <button
                                 onClick={() => onApplyCoupon('PREPAID5')}
                                 disabled={loading}
-                                className="bg-white text-orange-600 border border-orange-200 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-sm hover:bg-orange-50 transition-all active:scale-95 disabled:opacity-50 relative z-10"
+                                className="bg-white text-orange-600 border border-orange-200 text-[10px] md:text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm hover:bg-orange-50 transition-all active:scale-95 disabled:opacity-50 relative z-10"
                             >
                                 Apply
                             </button>
@@ -949,7 +949,7 @@ function OrderSummaryCard({
                                 <button
                                     onClick={() => onApplyCoupon()}
                                     disabled={loading || !couponCode.trim()}
-                                    className="px-4 py-3 bg-zinc-900 text-white font-bold rounded-xl text-xs hover:bg-primary transition-all active:scale-95 disabled:opacity-50"
+                                    className="px-4 py-2 bg-zinc-900 text-white font-bold rounded-xl text-xs hover:bg-primary transition-all active:scale-95 disabled:opacity-50"
                                 >
                                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
                                 </button>
