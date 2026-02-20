@@ -3,26 +3,20 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { Search, ShoppingBag, Menu, X, Home, Grid, User, Package, ChevronDown, ChevronRight, Zap, Baby, Lock, MapPin, HelpCircle } from "lucide-react";
+import { Search, Menu, X, Home, Navigation, Package, MapPin, HelpCircle, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VEHICLE_CATEGORIES, POWER_CATEGORIES, AGE_CATEGORIES } from "@/lib/data";
 import { useAdmin } from "@/hooks/useAdmin";
 
-import { useStore } from "@/store/useStore";
 import { useBackToClose } from "@/hooks/useBackToClose";
 
 export function MobileHeader() {
     const { isAdmin } = useAdmin();
-    const cart = useStore((state) => state.cart);
-    const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useBackToClose(isMenuOpen, () => setIsMenuOpen(false));
-
-    // Accordion state
-    const [openSection, setOpenSection] = useState<string | null>("vehicles");
 
     useEffect(() => {
         setMounted(true);
@@ -33,10 +27,6 @@ export function MobileHeader() {
         }
         return () => { document.body.style.overflow = ''; };
     }, [isMenuOpen]);
-
-    const toggleSection = (section: string) => {
-        setOpenSection(openSection === section ? null : section);
-    };
 
     const MobileDrawer = () => {
         if (!mounted) return null;
@@ -78,6 +68,19 @@ export function MobileHeader() {
 
                     {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto min-h-0">
+                        {/* Inline Search Bar */}
+                        <div className="p-4 pb-0">
+                            <form action="/search" className="relative" onSubmit={() => setIsMenuOpen(false)}>
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <input
+                                    type="text"
+                                    name="q"
+                                    placeholder="Search ride-on toys..."
+                                    className="w-full bg-secondary/50 border border-border/20 rounded-2xl h-12 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:text-muted-foreground/50 font-medium"
+                                />
+                            </form>
+                        </div>
+
                         <div className="p-4 space-y-1">
                             {/* Primary Links */}
                             <Link
@@ -100,107 +103,61 @@ export function MobileHeader() {
 
                             <div className="h-px bg-border/20 my-2 mx-3" />
 
-                            {/* Accordion: Categories */}
-                            <div>
-                                <button
-                                    onClick={() => toggleSection("vehicles")}
-                                    className={cn(
-                                        "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200",
-                                        openSection === "vehicles" ? "bg-primary/5 text-primary" : "hover:bg-muted/50 text-foreground/80"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-3 font-medium">
-                                        <Grid className="w-5 h-5" strokeWidth={1.5} />
-                                        Categories
-                                    </div>
-                                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", openSection === "vehicles" ? "rotate-180" : "")} />
-                                </button>
-
-                                <div className={cn(
-                                    "grid transition-all duration-300 ease-in-out overflow-hidden",
-                                    openSection === "vehicles" ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
-                                )}>
-                                    <div className="min-h-0 pl-11 space-y-1 border-l-2 border-border/10 ml-5 my-1">
-                                        {VEHICLE_CATEGORIES.map((cat) => (
-                                            <Link
-                                                key={cat.value}
-                                                href={`/category/${cat.value}`}
-                                                className="block py-2 px-3 text-sm text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-muted/30"
-                                                onClick={() => setIsMenuOpen(false)}
-                                            >
-                                                {cat.label}
-                                            </Link>
-                                        ))}
-                                    </div>
+                            {/* The Garage (Grid UI) */}
+                            <div className="pt-2 pb-4">
+                                <div className="px-3 mb-3 flex items-center justify-between">
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">The Garage</h3>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 px-2">
+                                    {VEHICLE_CATEGORIES.map((cat) => (
+                                        <Link
+                                            key={cat.value}
+                                            href={`/category/${cat.value}`}
+                                            className="flex flex-col p-3 rounded-2xl bg-secondary/30 hover:bg-primary/5 border border-border/20 hover:border-primary/20 transition-all active:scale-95 group"
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            <span className="text-xs font-bold text-foreground/80 group-hover:text-primary transition-colors">{cat.label}</span>
+                                        </Link>
+                                    ))}
                                 </div>
                             </div>
 
-                            {/* Accordion: By Power */}
-                            <div>
-                                <button
-                                    onClick={() => toggleSection("power")}
-                                    className={cn(
-                                        "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200",
-                                        openSection === "power" ? "bg-primary/5 text-primary" : "hover:bg-muted/50 text-foreground/80"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-3 font-medium">
-                                        <Zap className="w-5 h-5" strokeWidth={1.5} />
-                                        By Power
-                                    </div>
-                                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", openSection === "power" ? "rotate-180" : "")} />
-                                </button>
+                            <div className="h-px bg-border/20 my-2 mx-3" />
 
-                                <div className={cn(
-                                    "grid transition-all duration-300 ease-in-out overflow-hidden",
-                                    openSection === "power" ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
-                                )}>
-                                    <div className="min-h-0 pl-11 space-y-1 border-l-2 border-border/10 ml-5 my-1">
-                                        {POWER_CATEGORIES.map((power) => (
-                                            <Link
-                                                key={power.value}
-                                                href={`/category/power/${power.value}`}
-                                                className="block py-2 px-3 text-sm text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-muted/30"
-                                                onClick={() => setIsMenuOpen(false)}
-                                            >
-                                                {power.label}
-                                            </Link>
-                                        ))}
+                            {/* Shop By Needs */}
+                            <div className="pt-2 pb-4">
+                                <h3 className="px-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">Shop By Needs</h3>
+                                <div className="space-y-1">
+                                    <div className="px-2">
+                                        <p className="text-[10px] font-bold text-muted-foreground/60 mb-2 pl-2">By Power</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {POWER_CATEGORIES.slice(0, 4).map((power) => (
+                                                <Link
+                                                    key={power.value}
+                                                    href={`/category/power/${power.value}`}
+                                                    className="px-3 py-1.5 rounded-lg bg-secondary/50 text-xs font-medium text-foreground/70 hover:bg-primary/10 hover:text-primary transition-colors"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                >
+                                                    {power.label}
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            {/* Accordion: By Age */}
-                            <div>
-                                <button
-                                    onClick={() => toggleSection("age")}
-                                    className={cn(
-                                        "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200",
-                                        openSection === "age" ? "bg-primary/5 text-primary" : "hover:bg-muted/50 text-foreground/80"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-3 font-medium">
-                                        <Baby className="w-5 h-5" strokeWidth={1.5} />
-                                        By Age
-                                    </div>
-                                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", openSection === "age" ? "rotate-180" : "")} />
-                                </button>
-
-                                <div className={cn(
-                                    "grid transition-all duration-300 ease-in-out overflow-hidden",
-                                    openSection === "age" ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
-                                )}>
-                                    <div className="min-h-0 pl-11 space-y-1 border-l-2 border-border/10 ml-5 my-1">
-                                        {AGE_CATEGORIES.map((age) => (
-                                            <Link
-                                                key={age.value}
-                                                href={`/category/age/${age.value}`}
-                                                className="block py-2 px-3 text-sm text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-muted/30"
-                                                onClick={() => setIsMenuOpen(false)}
-                                            >
-                                                {age.label}
-                                            </Link>
-                                        ))}
+                                    <div className="px-2 pt-3">
+                                        <p className="text-[10px] font-bold text-muted-foreground/60 mb-2 pl-2">By Age</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {AGE_CATEGORIES.slice(0, 4).map((age) => (
+                                                <Link
+                                                    key={age.value}
+                                                    href={`/category/age/${age.value}`}
+                                                    className="px-3 py-1.5 rounded-lg bg-secondary/50 text-xs font-medium text-foreground/70 hover:bg-primary/10 hover:text-primary transition-colors"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                >
+                                                    {age.label}
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -264,22 +221,6 @@ export function MobileHeader() {
                                 alt="ABC Toyz"
                                 className="h-6 w-auto object-contain"
                             />
-                        </Link>
-                    </div>
-
-                    {/* Right: Actions */}
-                    <div className="flex items-center gap-1">
-                        <Link href="/search" className="p-2 text-muted-foreground hover:text-primary active:scale-90 transition-all">
-                            <Search className="w-5 h-5" strokeWidth={1.5} />
-                        </Link>
-
-                        <Link href="/cart" className="relative p-2 text-muted-foreground hover:text-primary active:scale-90 transition-all">
-                            <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
-                            {cartItemCount > 0 && (
-                                <span className="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center rounded-full ring-2 ring-background animate-in zoom-in">
-                                    {cartItemCount}
-                                </span>
-                            )}
                         </Link>
                     </div>
                 </div>
