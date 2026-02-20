@@ -180,7 +180,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
             {/* RIGHT: Info & Actions (33%) */}
             <div className="lg:col-span-4 relative -mt-20 lg:mt-0 z-10 w-full">
-                <div className="bg-white rounded-t-[32px] lg:rounded-none px-4 pt-5 pb-24 lg:px-6 lg:pt-8 lg:pb-0 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] lg:shadow-none min-h-[50vh]">
+                <div className="bg-white rounded-t-[32px] lg:rounded-none px-4 pt-5 pb-6 lg:px-6 lg:pt-8 lg:pb-0 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] lg:shadow-none min-h-[50vh]">
                     <div className="lg:sticky lg:top-28 space-y-3 lg:space-y-5">
 
                         {/* --- SCARCITY TRIGGER: Live Viewers --- */}
@@ -350,7 +350,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             </div>
 
                             <div className="relative rounded-lg border border-gray-200 bg-white overflow-hidden border-l-3 border-l-primary">
-                                <div className="max-h-[50vh] overflow-y-auto px-3 py-3">
+                                <div className="max-h-[85vh] overflow-y-auto px-3 py-3">
                                     <div className="prose prose-sm premium-prose max-w-none">
                                         {product.description ? (
                                             <div dangerouslySetInnerHTML={{ __html: product.description }} />
