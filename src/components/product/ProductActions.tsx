@@ -200,29 +200,52 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 )}
 
                 {/* Price Display (Premium Deal Style) */}
-                <div className="space-y-2 order-3 md:order-1">
-                    <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">
-                                ₹{displayPrice.toLocaleString()}
-                            </span>
-                            {discount > 0 && (
-                                <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider box-decoration-clone shadow-sm">
-                                    Save {discount}%
-                                </span>
-                            )}
-                        </div>
-                        {discount > 0 && (
-                            <div className="flex items-center gap-2 mt-1.5">
-                                <span className="text-sm font-bold text-gray-500 line-through decoration-gray-400 decoration-2">
-                                    MRP ₹{displayMRP.toLocaleString()}
-                                </span>
-                                <span className="text-[10px] font-black text-green-600 flex items-center gap-0.5 bg-green-50 px-1.5 py-0.5 rounded-sm">
-                                    <CheckCircle2 className="w-3 h-3" /> All Inclusive
+                <div className="space-y-3 order-3 md:order-1 bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm">
+                    {discount > 0 ? (
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between w-full">
+                                <span className="text-sm font-bold text-gray-500 uppercase tracking-widest">Regular Rate</span>
+                                <span className="text-lg font-bold text-gray-400 line-through decoration-gray-300 decoration-2">
+                                    ₹{displayMRP.toLocaleString()}
                                 </span>
                             </div>
-                        )}
-                    </div>
+                            <div className="h-px w-full bg-gray-100" />
+                            <div className="flex flex-col items-start gap-1">
+                                <span className="text-sm font-black text-red-600 uppercase tracking-widest flex items-center gap-1.5">
+                                    <Flame className="w-4 h-4" /> Today's Discounted Rate
+                                </span>
+                                <div className="flex items-center gap-3 w-full">
+                                    <span className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
+                                        ₹{displayPrice.toLocaleString()}
+                                    </span>
+                                    <span className="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded disabled uppercase tracking-widest shadow-sm">
+                                        SAVE {discount}%
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mt-2 text-[11px] font-bold text-green-600 flex items-center gap-1 bg-green-50 px-2 flex-wrap py-1 rounded w-fit">
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Price includes all taxes & shipping. Use PREPAID5 for extra 5% off!
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                                <span className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
+                                    ₹{displayPrice.toLocaleString()}
+                                </span>
+                            </div>
+                            {displayMRP > displayPrice && (
+                                <div className="flex items-center gap-2 mt-1.5">
+                                    <span className="text-sm font-bold text-gray-500 line-through decoration-gray-300 decoration-2">
+                                        MRP ₹{displayMRP.toLocaleString()}
+                                    </span>
+                                    <span className="text-[10px] font-black text-green-600 flex items-center gap-0.5 bg-green-50 px-1.5 py-0.5 rounded-sm">
+                                        <CheckCircle2 className="w-3 h-3" /> All Inclusive
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 
