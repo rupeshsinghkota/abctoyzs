@@ -211,98 +211,60 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     </div>
                                     <span className="text-[11px] font-black text-foreground ml-1">{product.rating || '5.0'}</span>
                                 </div>
-                                <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">
-                                    {product.reviews} Verified Reviews
-                                </span>
+                                {product.reviews > 0 && (
+                                    <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">
+                                        {product.reviews} Verified Reviews
+                                    </span>
+                                )}
                             </div>
 
-                            {/* GMC Trust Bar - Strategic Placement */}
-                            <div className="grid grid-cols-2 gap-2 bg-zinc-50/50 p-3 rounded-2xl border border-zinc-100">
-                                <div className="flex items-start gap-2">
-                                    <div className="w-5 h-5 bg-white rounded-md shadow-sm border border-zinc-100 flex items-center justify-center shrink-0">
-                                        <Truck className="w-3 h-3 text-primary" />
+                            {/* Trust Pills — Compact Horizontal Row */}
+                            <div className="flex flex-wrap gap-2">
+                                {[
+                                    { icon: Truck, label: 'Ships 24–48h' },
+                                    { icon: ShieldCheck, label: '1-Yr Warranty' },
+                                    { icon: CheckCircle2, label: 'ISI Certified' },
+                                    { icon: RotateCcw, label: '10-Day Replace' },
+                                ].map(({ icon: Icon, label }) => (
+                                    <div key={label} className="flex items-center gap-1.5 bg-zinc-50 border border-zinc-100 rounded-full px-3 py-1.5">
+                                        <Icon className="w-3 h-3 text-primary shrink-0" />
+                                        <span className="text-[10px] font-black text-zinc-700 whitespace-nowrap">{label}</span>
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">Fast Dispatch</span>
-                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">Ships in 24-48h</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-2">
-                                    <div className="w-5 h-5 bg-white rounded-md shadow-sm border border-zinc-100 flex items-center justify-center shrink-0">
-                                        <ShieldCheck className="w-3 h-3 text-primary" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">1-Year Warranty</span>
-                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">Battery & Motor</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-2 mt-1">
-                                    <div className="w-5 h-5 bg-white rounded-md shadow-sm border border-zinc-100 flex items-center justify-center shrink-0">
-                                        <CheckCircle2 className="w-3 h-3 text-primary" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">Certified Safety</span>
-                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">ISI Standard Approved</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-2 mt-1">
-                                    <div className="w-5 h-5 bg-white rounded-md shadow-sm border border-zinc-100 flex items-center justify-center shrink-0">
-                                        <RotateCcw className="w-3 h-3 text-primary" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900 leading-none mb-0.5">Easy Replace</span>
-                                        <span className="text-[9px] font-bold text-zinc-500 leading-none">10-Day Window</span>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
 
-                            {/* EMI Info Widget */}
-
-                            {/* Pincode Check Widget - Modernized Inline Design */}
-                            <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-3 sm:p-4 space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-xs font-bold text-gray-700 uppercase tracking-widest">
-                                        <MapPin className="w-4 h-4 text-primary" />
-                                        Delivery Estimate
+                            {/* Pincode Check — Compact Inline */}
+                            <div className="border border-gray-100 rounded-xl p-2.5 flex flex-col gap-2 bg-gray-50/50">
+                                <form onSubmit={checkDelivery} className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
+                                        <input
+                                            type="text"
+                                            maxLength={6}
+                                            placeholder="6-digit pincode"
+                                            value={pincode}
+                                            onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                                            className="w-full bg-white border border-gray-200 rounded-lg pl-7 pr-2 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                                        />
                                     </div>
-                                    {estimate.serviceable && (
-                                        <span className="text-[10px] font-bold text-green-600 flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-full">
-                                            <CheckCircle2 className="w-3 h-3" />
-                                            Available
-                                        </span>
-                                    )}
-                                </div>
-
-                                <form onSubmit={checkDelivery} className="relative flex items-center w-full">
-                                    <input
-                                        type="text"
-                                        maxLength={6}
-                                        placeholder="Enter Delivery Pincode"
-                                        value={pincode}
-                                        onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-4 pr-20 py-2.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:bg-white transition-all"
-                                    />
                                     <button
                                         type="submit"
                                         disabled={pincode.length !== 6 || estimate.loading}
-                                        className="absolute right-1.5 top-1.5 bottom-1.5 bg-gray-900 text-white px-3 md:px-4 rounded-md text-xs font-bold hover:bg-primary transition-all disabled:opacity-50 disabled:hover:bg-gray-900 flex items-center justify-center min-w-[60px]"
+                                        className="bg-gray-900 text-white px-3 rounded-lg text-xs font-bold hover:bg-primary transition-all disabled:opacity-50"
                                     >
-                                        {estimate.loading ? (
-                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        ) : 'Check'}
+                                        {estimate.loading ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Check'}
                                     </button>
                                 </form>
-
                                 {estimate.serviceable ? (
-                                    <div className="flex items-start gap-2 text-sm bg-green-50/50 p-2.5 rounded-lg border border-green-100/50">
-                                        <Truck className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
-                                        <span className="font-medium text-gray-800 leading-tight">
-                                            Fast Delivery by <span className="font-bold text-green-700">{estimate.formattedDate}</span>
-                                        </span>
+                                    <div className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 px-2 py-1 rounded-lg">
+                                        <Truck className="w-3 h-3 shrink-0" />
+                                        <span className="font-bold">Delivers by {estimate.formattedDate}</span>
                                     </div>
                                 ) : estimate.message ? (
-                                    <p className="text-[11px] font-medium text-red-500 bg-red-50 p-2 rounded-lg">{estimate.message}</p>
-                                ) : null}
+                                    <p className="text-[11px] font-medium text-red-500">{estimate.message}</p>
+                                ) : (
+                                    <p className="text-[10px] font-medium text-gray-400">Free delivery all over India</p>
+                                )}
                             </div>
 
                             <ProductActions
