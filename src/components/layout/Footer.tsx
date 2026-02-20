@@ -14,7 +14,7 @@ export function Footer() {
     const [subscribing, setSubscribing] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
-    if (pathname?.startsWith('/admin')) return null;
+    if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout')) return null;
 
     const handleSubscribe = async (e: React.FormEvent) => {
         e.preventDefault();

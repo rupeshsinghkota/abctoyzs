@@ -13,7 +13,7 @@ export function Header() {
     const [scrollProgress, setScrollProgress] = useState(0);
     const lastScrollY = useRef(0);
 
-    if (pathname?.startsWith('/admin')) return null;
+    if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout')) return null;
 
     useEffect(() => {
         const handleScroll = () => {
