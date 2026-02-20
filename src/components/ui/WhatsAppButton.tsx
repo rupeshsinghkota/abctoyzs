@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 
 export function WhatsAppButton() {
+    const pathname = usePathname();
     const [whatsappUrl, setWhatsappUrl] = React.useState(`https://wa.me/918239269217?text=${encodeURIComponent("Hi ABC Toyz, I have a question!")}`);
 
     React.useEffect(() => {
@@ -12,6 +14,11 @@ export function WhatsAppButton() {
         const message = encodeURIComponent(`Hi ABC Toyz, I'm browsing ${pageTitle} and wanted to know more!\n\nContext: ${currentUrl}`);
         setWhatsappUrl(`https://wa.me/${phoneNumber}?text=${message}`);
     }, []);
+
+    // Hide the WhatsApp button in the main conversion funnels to prevent UI overlaps and distractions.
+    if (pathname?.startsWith('/cart') || pathname?.startsWith('/checkout')) {
+        return null;
+    }
 
     return (
         <div className="fixed bottom-24 right-5 md:bottom-10 md:right-10 z-[100] group">
