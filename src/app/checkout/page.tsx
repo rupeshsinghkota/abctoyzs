@@ -303,8 +303,13 @@ export default function CheckoutPage() {
         }
     };
 
-    const handleApplyCoupon = async () => {
-        if (!couponCode.trim()) return;
+    const handleApplyCoupon = async (eOrCode?: any) => {
+        const code = typeof eOrCode === 'string' ? eOrCode : couponCode;
+        if (!code.trim()) return;
+
+        if (typeof eOrCode === 'string') {
+            setCouponCode(code);
+        }
 
         setIsApplyingCoupon(true);
         setCouponError(null);
@@ -312,7 +317,7 @@ export default function CheckoutPage() {
             const res = await fetch('/api/coupons/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: couponCode, amount: subtotal, paymentMethod })
+                body: JSON.stringify({ code: code, amount: subtotal, paymentMethod })
             });
             const data = await res.json();
             if (res.ok) {
@@ -855,6 +860,31 @@ function OrderSummaryCard({
                         </div>
                     ))}
                 </div>
+
+                {/* Available Offers (Auto Apply) */}
+                {!appliedCoupon && (
+                    <div className="pt-2 pb-1">
+                        <div className="bg-orange-50/80 border border-orange-200/50 rounded-2xl p-4 flex items-center justify-between gap-3 relative overflow-hidden shadow-sm">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-400/10 to-transparent rounded-bl-[100px] pointer-events-none" />
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center shrink-0 border border-orange-100/50">
+                                    <Ticket className="w-5 h-5 text-orange-500" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-black text-gray-900 tracking-tight">PREPAID5</p>
+                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Save 5% on Online Payment</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => onApplyCoupon('PREPAID5')}
+                                disabled={loading}
+                                className="bg-white text-orange-600 border border-orange-200 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-sm hover:bg-orange-50 transition-all active:scale-95 disabled:opacity-50 relative z-10"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Coupon Input */}
                 <div className="pt-2">
