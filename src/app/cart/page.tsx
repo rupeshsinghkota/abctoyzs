@@ -50,7 +50,7 @@ export default function CartPage() {
                                 <img
                                     src={item.image}
                                     alt={item.name}
-                                    className="w-full h-full object-cover mix-blend-multiply"
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
                             <div className="flex-1 flex flex-col justify-between min-w-0">
@@ -81,7 +81,7 @@ export default function CartPage() {
                                         )}
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between mt-3">
+                                <div className="flex items-center justify-between mt-auto pt-3">
                                     <div className="flex items-center border border-gray-200 rounded-full bg-white h-9">
                                         <button
                                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
