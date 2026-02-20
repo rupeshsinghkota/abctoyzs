@@ -883,14 +883,14 @@ function OrderSummaryCard({
                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-bold text-xs text-gray-900 line-clamp-1 leading-tight">{item.name}</p>
+                                <p className="font-bold text-xs text-gray-900 line-clamp-2 leading-snug">{item.name}</p>
                                 <div className="flex items-center gap-2 mt-1">
                                     <span className="text-[9px] bg-gray-100 text-gray-500 font-bold px-1.5 py-0.5 rounded-md">Qty: {item.quantity}</span>
                                     <div className="flex items-center gap-1.5">
                                         {(item.regularPrice || item.mrp) && (item.regularPrice || item.mrp)! > item.price && (
-                                            <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase line-through">₹{(item.regularPrice || item.mrp)?.toLocaleString()}</span>
+                                            <span className="text-[10px] text-gray-400 font-bold line-through">₹{(item.regularPrice || item.mrp)?.toLocaleString()}</span>
                                         )}
-                                        <span className="text-[10px] text-black font-black tracking-widest uppercase">@ ₹{item.price.toLocaleString()}</span>
+                                        <span className="text-[10px] text-black font-black">₹{item.price.toLocaleString()}</span>
                                     </div>
                                 </div>
                             </div>
@@ -906,80 +906,65 @@ function OrderSummaryCard({
                     ))}
                 </div>
 
-                {/* Available Offers (Auto Apply) */}
-                {!appliedCoupon && (
-                    <div className="pt-2 pb-1">
-                        <div className="bg-orange-50/80 border border-orange-200/50 rounded-xl p-2 flex items-center justify-between gap-3 relative overflow-hidden shadow-sm">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-400/10 to-transparent rounded-bl-[100px] pointer-events-none" />
-                            <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 bg-white shadow-sm rounded-full flex items-center justify-center shrink-0 border border-orange-100/50">
-                                    <Ticket className="w-3 h-3 text-orange-500" />
-                                </div>
-                                <div>
-                                    <p className="text-xs md:text-sm font-black text-gray-900 tracking-tight">PREPAID5</p>
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Save 5% on Online Payment</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => onApplyCoupon('PREPAID5')}
-                                disabled={loading}
-                                className="bg-white text-orange-600 border border-orange-200 text-[10px] md:text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm hover:bg-orange-50 transition-all active:scale-95 disabled:opacity-50 relative z-10"
-                            >
-                                Apply
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Coupon Input */}
-                <div className="pt-2">
+                {/* Smart Coupon Section */}
+                <div>
                     {appliedCoupon ? (
-                        <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-xl animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between p-2.5 bg-green-50 border border-green-200 rounded-xl animate-in zoom-in-95 duration-200">
                             <div className="flex items-center gap-2">
                                 <Ticket className="w-4 h-4 text-green-600" />
                                 <div>
                                     <p className="text-[10px] font-bold text-green-700 uppercase leading-none">Coupon Applied</p>
-                                    <p className="font-bold text-sm text-green-900">{appliedCoupon.code}</p>
+                                    <p className="font-bold text-sm text-green-900">{appliedCoupon.code} — Save ₹{discount.toLocaleString()}</p>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => setAppliedCoupon(null)}
-                                className="p-1 hover:bg-green-100 rounded-lg transition-colors"
-                            >
+                            <button onClick={() => setAppliedCoupon(null)} className="p-1 hover:bg-green-100 rounded-lg transition-colors">
                                 <X className="w-4 h-4 text-green-600" />
                             </button>
                         </div>
                     ) : (
                         <div className="space-y-2">
+                            {/* Quick Apply Offer */}
+                            <div className="flex items-center gap-2 bg-orange-50/80 border border-orange-200/50 rounded-xl px-3 py-2">
+                                <Ticket className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                    <span className="text-xs font-black text-gray-900">PREPAID5</span>
+                                    <span className="text-[10px] text-gray-400 font-medium ml-1.5">• Save 5% on Online Payment</span>
+                                </div>
+                                <button
+                                    onClick={() => onApplyCoupon('PREPAID5')}
+                                    disabled={loading}
+                                    className="text-orange-600 text-[10px] font-black uppercase tracking-widest border border-orange-300 bg-white px-2.5 py-1 rounded-lg hover:bg-orange-50 transition-all shrink-0 disabled:opacity-50"
+                                >
+                                    Apply
+                                </button>
+                            </div>
+                            {/* Manual Coupon Input */}
                             <div className="flex gap-2">
                                 <input
                                     type="text"
-                                    placeholder="Coupon code"
-                                    className="flex-1 p-3 rounded-xl border bg-background text-sm font-bold uppercase focus:ring-2 focus:ring-primary/20 outline-none"
+                                    placeholder="Have another coupon?"
+                                    className="flex-1 p-2.5 rounded-xl border bg-background text-xs font-bold uppercase focus:ring-2 focus:ring-primary/20 outline-none"
                                     value={couponCode}
                                     onChange={(e) => setCouponCode(e.target.value)}
-                                // onKeyDown disabled to avoid form submit issues, use button
                                 />
                                 <button
                                     onClick={() => onApplyCoupon()}
                                     disabled={loading || !couponCode.trim()}
-                                    className="px-4 py-2 bg-zinc-900 text-white font-bold rounded-xl text-xs hover:bg-primary transition-all active:scale-95 disabled:opacity-50"
+                                    className="px-3 py-2 bg-zinc-900 text-white font-bold rounded-xl text-xs hover:bg-primary transition-all active:scale-95 disabled:opacity-50"
                                 >
                                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
                                 </button>
                             </div>
                             {error && (
-                                <p className="text-[10px] text-red-500 font-bold ml-1 animate-in slide-in-from-top-1">
-                                    {error}
-                                </p>
+                                <p className="text-[10px] text-red-500 font-bold ml-1 animate-in slide-in-from-top-1">{error}</p>
                             )}
                         </div>
                     )}
                 </div>
 
-                <div className="space-y-3 text-xs md:text-sm pt-2">
+                <div className="space-y-2 text-xs md:text-sm pt-1">
                     <div className="flex justify-between items-center text-gray-500 font-medium">
-                        <span>Subtotal ({cart.length} items)</span>
+                        <span>Subtotal ({cart.length} {cart.length === 1 ? 'item' : 'items'})</span>
                         <span className="text-gray-900 font-bold">₹{subtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center text-gray-500 font-medium">
@@ -989,21 +974,35 @@ function OrderSummaryCard({
                         </span>
                     </div>
                     {discount > 0 && (
-                        <div className="flex justify-between items-center text-green-600 font-black bg-green-50 p-2.5 rounded-xl border border-green-100 animate-in fade-in duration-300 mt-2">
-                            <span className="flex items-center gap-1.5"><Ticket className="w-4 h-4" /> Coupon Savings</span>
+                        <div className="flex justify-between items-center text-green-600 font-black bg-green-50 p-2 rounded-xl border border-green-100 animate-in fade-in duration-300">
+                            <span className="flex items-center gap-1.5"><Ticket className="w-3.5 h-3.5" /> Coupon Savings</span>
                             <span>- ₹{discount.toLocaleString()}</span>
                         </div>
                     )}
 
-                    <div className="h-px w-full bg-gray-100 my-4" />
+                    <div className="h-px w-full bg-gray-100 my-2" />
 
-                    <div className="flex justify-between items-end">
-                        <div className="flex flex-col">
-                            <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 leading-none">Total</span>
-                            <span className="text-[9px] md:text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Incl. of all taxes</span>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <span className="font-black text-lg tracking-tight text-gray-900">Total</span>
+                            <p className="text-[9px] text-gray-400 font-bold tracking-widest uppercase">Incl. of all taxes</p>
                         </div>
-                        <span className="text-3xl font-black text-gray-900 tracking-tighter leading-none">₹{total.toLocaleString()}</span>
+                        <span className="text-2xl font-black text-gray-900 tracking-tighter">₹{total.toLocaleString()}</span>
                     </div>
+
+                    {/* Total Savings Summary */}
+                    {(() => {
+                        const totalSaved = cart.reduce((acc: number, item: any) => {
+                            const mrp = item.regularPrice || item.mrp;
+                            if (mrp && mrp > item.price) return acc + (mrp - item.price) * item.quantity;
+                            return acc;
+                        }, 0) + discount;
+                        return totalSaved > 0 ? (
+                            <div className="flex items-center justify-center gap-1.5 bg-green-50 border border-green-100 rounded-xl py-1.5 animate-in fade-in">
+                                <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">🎉 You're saving ₹{totalSaved.toLocaleString()} on this order!</span>
+                            </div>
+                        ) : null;
+                    })()}
                 </div>
             </div>
             {/* Payment Button (Desktop Only) */}
