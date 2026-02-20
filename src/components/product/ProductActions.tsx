@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket, Timer, Flame } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket, Timer, Flame, Truck, ShieldCheck, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 import { trackFbEvent } from '@/components/tracking/FacebookPixel';
@@ -321,10 +321,21 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     <span className="text-[10px] font-bold text-green-800">Extra 5% OFF — use <span className="bg-white px-1 py-0.5 rounded border border-green-100 font-black">PREPAID5</span></span>
                 </div>
 
-                <div className="flex items-center justify-center gap-3 text-[8px] lg:text-[10px] text-muted-foreground font-bold uppercase tracking-wider opacity-60 pt-1 whitespace-nowrap pb-6 lg:pb-0">
-                    <span>✓ Free Delivery</span>
-                    <span>✓ 1 Year Warranty</span>
-                    <span>✓ 10 Days Replacement</span>
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 pb-6 lg:pb-0">
+                    <a href="/shipping-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
+                        <Truck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-[9px] font-bold text-gray-600 group-hover:text-primary transition-colors text-center leading-tight">Free<br />Delivery</span>
+                    </a>
+                    <div className="w-px h-8 bg-gray-100" />
+                    <a href="/warranty-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
+                        <ShieldCheck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-[9px] font-bold text-gray-600 group-hover:text-primary transition-colors text-center leading-tight">1 Year<br />Warranty</span>
+                    </a>
+                    <div className="w-px h-8 bg-gray-100" />
+                    <a href="/refund-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
+                        <RotateCcw className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-[9px] font-bold text-gray-600 group-hover:text-primary transition-colors text-center leading-tight">10 Days<br />Replacement</span>
+                    </a>
                 </div>
             </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, Fragment } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { ImageGallery } from '@/components/product/ImageGallery';
 import { ProductActions } from '@/components/product/ProductActions';
@@ -226,7 +226,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 currentVariant={currentVariant}
                             />
 
-                            {/* Quick Specs — 2×2 micro grid */}
+                            {/* Quick Specs — aligned grid */}
                             {(() => {
                                 const specs = [
                                     { label: 'Age', value: product.specs?.suitable_age || (product.ageGroup ? `${product.ageGroup} Yrs` : null) },
@@ -235,12 +235,12 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     { label: 'Control', value: product.specs?.mobile_app ? 'App+Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },
                                 ].filter(s => s.value);
                                 return specs.length > 0 ? (
-                                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 py-2 border-t border-gray-100">
+                                    <div className="grid grid-cols-[auto_1fr_auto_1fr] gap-x-3 gap-y-1.5 py-2.5 border-t border-gray-100">
                                         {specs.map((s, i) => (
-                                            <div key={i} className="flex items-center justify-between">
+                                            <Fragment key={i}>
                                                 <span className="text-[10px] text-gray-400 font-medium">{s.label}</span>
                                                 <span className="text-[10px] font-bold text-gray-700">{s.value}</span>
-                                            </div>
+                                            </Fragment>
                                         ))}
                                     </div>
                                 ) : null;
