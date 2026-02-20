@@ -125,12 +125,12 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
         <div className={className}>
             <button
                 onClick={() => setIsOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-secondary/80 hover:bg-secondary text-secondary-foreground rounded-full text-sm font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 shadow-sm hover:border-primary/30 text-gray-700 rounded-full text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 group"
             >
-                <SlidersHorizontal className="w-4 h-4" />
+                <SlidersHorizontal className="w-3.5 h-3.5 text-gray-400 group-hover:text-primary transition-colors" />
                 Filters
                 {activeCount > 0 && (
-                    <span className="bg-primary text-primary-foreground text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
+                    <span className="bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-black">
                         {activeCount}
                     </span>
                 )}
@@ -157,10 +157,10 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
                             className="fixed inset-y-0 right-0 w-full max-w-sm bg-background shadow-2xl z-50 flex flex-col"
                         >
                             {/* Header */}
-                            <div className="flex items-center justify-between p-4 border-b">
-                                <h2 className="text-lg font-bold">Filters</h2>
-                                <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-muted rounded-full">
-                                    <X className="w-5 h-5" />
+                            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-900/60">Search Filters</h2>
+                                <button onClick={() => setIsOpen(false)} className="p-2 -mr-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-xl transition-all">
+                                    <X className="w-5 h-5" strokeWidth={1.5} />
                                 </button>
                             </div>
 
@@ -169,7 +169,7 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
                                 {/* Price Range */}
                                 {!hiddenFilters.includes('price') && (
                                     <div className="space-y-4">
-                                        <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Price Range</h3>
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Price Range</h3>
                                         <div className="flex items-center gap-4">
                                             <div className="space-y-1">
                                                 <label className="text-xs text-muted-foreground">Min</label>
@@ -198,8 +198,8 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
 
                                 {/* Voltage */}
                                 {!hiddenFilters.includes('voltage') && (
-                                    <div className="space-y-3">
-                                        <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Voltage</h3>
+                                    <div className="space-y-4">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Voltage</h3>
                                         <div className="flex flex-wrap gap-2">
                                             {VOLTAGE_OPTIONS.map((opt) => (
                                                 <button
@@ -221,8 +221,8 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
 
                                 {/* Age Group */}
                                 {!hiddenFilters.includes('age') && (
-                                    <div className="space-y-3">
-                                        <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Age Group</h3>
+                                    <div className="space-y-4">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Age Group</h3>
                                         <div className="grid grid-cols-2 gap-2">
                                             {AGE_OPTIONS.map((opt) => (
                                                 <button
@@ -245,18 +245,18 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
 
                                 {/* Seats */}
                                 {!hiddenFilters.includes('seats') && (
-                                    <div className="space-y-3">
-                                        <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Seats</h3>
-                                        <div className="flex flex-wrap gap-2">
+                                    <div className="space-y-4">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Seats Capacity</h3>
+                                        <div className="flex flex-wrap gap-2.5">
                                             {SEATS_OPTIONS.map((opt) => (
                                                 <button
                                                     key={opt.value}
                                                     onClick={() => toggleSelection(opt.value, selectedSeats, setSelectedSeats)}
                                                     className={cn(
-                                                        "px-4 py-2 rounded-md text-sm border transition-all",
+                                                        "px-4 py-2 rounded-xl text-[11px] font-bold border transition-all",
                                                         selectedSeats.includes(opt.value)
-                                                            ? "bg-primary text-primary-foreground border-primary"
-                                                            : "bg-background hover:bg-muted border-input"
+                                                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                                                            : "bg-white text-gray-600 border-gray-100 hover:border-primary/30"
                                                     )}
                                                 >
                                                     {opt.label}
