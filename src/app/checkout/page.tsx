@@ -399,14 +399,14 @@ export default function CheckoutPage() {
                 </div>
             </header>
 
-            <main className="container mx-auto px-4 py-6 max-w-5xl">
-                <div className="grid lg:grid-cols-[1fr,380px] gap-8">
+            <main className="container mx-auto px-4 py-6 max-w-[1200px]">
+                <div className="grid lg:grid-cols-[1fr,440px] gap-8 xl:gap-12">
                     {/* Left Column: Information */}
                     <div className="space-y-6">
 
                         {/* Address Selection */}
                         <div className="bg-white border border-gray-100 rounded-[28px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                            <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                            <div className="p-5 lg:p-7 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-sm relative">
                                         1
@@ -424,7 +424,7 @@ export default function CheckoutPage() {
                                 )}
                             </div>
 
-                            <div className="p-4 space-y-3">
+                            <div className="p-5 lg:p-7 space-y-4">
                                 {showAddrForm ? (
                                     <ShippingAddressForm
                                         onCancel={() => setShowAddrForm(false)}
@@ -433,12 +433,12 @@ export default function CheckoutPage() {
                                         cart={cart}
                                     />
                                 ) : addresses.length === 0 ? (
-                                    <div className="text-center py-8 bg-muted/20 rounded-xl border border-dashed">
-                                        <MapPin className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-                                        <p className="text-sm text-muted-foreground mb-4">No addresses found</p>
+                                    <div className="text-center py-10 bg-muted/20 rounded-2xl border border-dashed">
+                                        <MapPin className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-50" />
+                                        <p className="text-sm text-muted-foreground mb-5">No delivery addresses found</p>
                                         <button
                                             onClick={() => setShowAddrForm(true)}
-                                            className="text-sm font-bold text-primary"
+                                            className="text-sm font-bold text-primary bg-primary/10 px-4 py-2 rounded-lg"
                                         >
                                             Add Your First Address
                                         </button>
@@ -449,7 +449,7 @@ export default function CheckoutPage() {
                                             <div
                                                 key={addr.id}
                                                 onClick={() => setSelectedAddressId(addr.id)}
-                                                className={`p-5 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden group ${selectedAddressId === addr.id
+                                                className={`p-5 lg:p-6 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden group ${selectedAddressId === addr.id
                                                     ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
                                                     : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
                                                     }`}
@@ -482,18 +482,18 @@ export default function CheckoutPage() {
 
                         {/* Payment Method Selection */}
                         <div className="bg-white border border-gray-100 rounded-[28px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                            <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                            <div className="p-5 lg:p-7 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
                                 <div className="w-8 h-8 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-sm relative">
                                     2
                                     <div className="absolute inset-0 rounded-full ring-4 ring-black/5" />
                                 </div>
                                 <h2 className="font-black text-lg tracking-tight text-gray-900">Payment Method</h2>
                             </div>
-                            <div className="p-5 space-y-4">
+                            <div className="p-5 lg:p-7 space-y-4">
                                 {/* Prepaid Option */}
                                 <div
                                     onClick={() => setPaymentMethod('PREPAID')}
-                                    className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'PREPAID'
+                                    className={`flex items-center gap-4 p-5 lg:p-6 rounded-2xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'PREPAID'
                                         ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
                                         : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
                                         }`}
@@ -520,7 +520,7 @@ export default function CheckoutPage() {
                                 {/* COD Option */}
                                 <div
                                     onClick={() => setPaymentMethod('COD')}
-                                    className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer transition-all ${paymentMethod === 'COD'
+                                    className={`flex items-center gap-4 p-5 lg:p-6 rounded-2xl border-2 cursor-pointer transition-all ${paymentMethod === 'COD'
                                         ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
                                         : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
                                         }`}
@@ -567,38 +567,38 @@ export default function CheckoutPage() {
                             error={couponError}
                             paymentMethod={paymentMethod}
                             codSettings={codSettings}
+                            onPayment={handlePayment}
+                            isPaymentLoading={loading}
                         />
 
-                        <div className="sticky bottom-0 lg:static p-4 lg:p-0 bg-white/90 backdrop-blur-xl lg:bg-transparent border-t border-gray-200 lg:border-t-0 -mx-4 lg:mx-0 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] lg:shadow-none pb-safe z-50">
+                        {/* Mobile Sticky Checkout Bar */}
+                        <div className="lg:hidden fixed bottom-[64px] left-0 right-0 p-4 bg-white/90 backdrop-blur-xl border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40">
                             <button
                                 onClick={handlePayment}
                                 disabled={loading || cart.length === 0}
-                                className="w-full bg-black text-white h-16 rounded-[20px] font-black text-lg shadow-xl shadow-black/20 hover:shadow-black/30 hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                className="w-full bg-black text-white h-16 rounded-[20px] font-black text-lg shadow-xl shadow-black/20 active:scale-[0.98] transition-transform flex items-center justify-between px-6 disabled:opacity-50"
                             >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        Processing...
-                                    </>
-                                ) : (
-                                    <>
-                                        {paymentMethod === 'COD' ? (
-                                            codSettings?.cod_mode === 'partial'
-                                                ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
-                                                : "Place Order (Cash on Delivery)"
-                                        ) : (
-                                            `Pay ₹${total.toLocaleString()} Now`
-                                        )}
-                                        <ChevronRight className="w-5 h-5" />
-                                    </>
-                                )}
+                                <div className="flex flex-col items-start leading-none">
+                                    <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total</span>
+                                    <span className="text-xl tracking-tight">₹{total.toLocaleString()}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            {paymentMethod === 'COD' ? "Confirm COD" : "Pay Now"}
+                                            <ChevronRight className="w-5 h-5" />
+                                        </>
+                                    )}
+                                </div>
                             </button>
-                            <p className="text-xs text-center font-bold text-gray-500 mt-4 flex items-center justify-center gap-1.5 uppercase tracking-wider">
-                                <ShieldCheck className="w-4 h-4 text-green-600" />
-                                100% Secure Checkout with Razorpay
-                            </p>
-                            <p className="text-[10px] text-center text-gray-400 mt-2 px-4">
-                                By placing this order, you agree to our <Link href="/terms-of-service" className="underline hover:text-black">Terms of Service</Link> and <Link href="/privacy-policy" className="underline hover:text-black">Privacy Policy</Link>.
+                            <p className="text-[10px] text-center font-bold text-gray-500 mt-3 flex items-center justify-center gap-1.5 uppercase tracking-wider">
+                                <ShieldCheck className="w-3.5 h-3.5 text-green-600" />
+                                100% Secure Checkout
                             </p>
                         </div>
                     </div>
@@ -818,17 +818,38 @@ function OrderSummaryCard({
     subtotal,
     total,
     shipping,
-    discount,
+    discount = 0,
     couponCode,
     setCouponCode,
     onApplyCoupon,
     appliedCoupon,
     setAppliedCoupon,
     loading,
-    error
-}: any) {
+    error,
+    paymentMethod,
+    codSettings,
+    onPayment,
+    isPaymentLoading
+}: {
+    cart: any[];
+    subtotal: number;
+    total: number;
+    shipping: number;
+    discount?: number;
+    couponCode: string;
+    setCouponCode: (v: string) => void;
+    onApplyCoupon: (overrideCode?: string) => Promise<void>;
+    appliedCoupon: any;
+    setAppliedCoupon: (v: any) => void;
+    loading: boolean;
+    error: string | null;
+    paymentMethod: 'PREPAID' | 'COD';
+    codSettings?: any;
+    onPayment: () => void;
+    isPaymentLoading: boolean;
+}) {
     return (
-        <div className="bg-white border border-gray-100 rounded-[28px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] lg:sticky lg:top-24">
+        <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] lg:sticky lg:top-24">
             <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-black text-white shadow-sm rounded-full flex items-center justify-center font-black text-sm relative">
@@ -926,7 +947,7 @@ function OrderSummaryCard({
                                 // onKeyDown disabled to avoid form submit issues, use button
                                 />
                                 <button
-                                    onClick={onApplyCoupon}
+                                    onClick={() => onApplyCoupon()}
                                     disabled={loading || !couponCode.trim()}
                                     className="px-4 py-3 bg-zinc-900 text-white font-bold rounded-xl text-xs hover:bg-primary transition-all active:scale-95 disabled:opacity-50"
                                 >
@@ -970,6 +991,39 @@ function OrderSummaryCard({
                         <span className="text-3xl font-black text-gray-900 tracking-tighter leading-none">₹{total.toLocaleString()}</span>
                     </div>
                 </div>
+            </div>
+            {/* Payment Button (Desktop Only) */}
+            <div className="hidden lg:block p-8 pt-0 border-t border-gray-100 mt-6 bg-gray-50/30">
+                <button
+                    onClick={onPayment}
+                    disabled={isPaymentLoading || cart.length === 0}
+                    className="w-full mt-8 bg-black text-white h-[72px] rounded-[24px] font-black text-xl shadow-xl shadow-black/20 hover:shadow-black/30 hover:-translate-y-1 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                    {isPaymentLoading ? (
+                        <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Processing...
+                        </>
+                    ) : (
+                        <>
+                            {paymentMethod === 'COD' ? (
+                                codSettings?.cod_mode === 'partial'
+                                    ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
+                                    : "Complete Cash on Delivery"
+                            ) : (
+                                `Pay ₹${total.toLocaleString()} Securely`
+                            )}
+                            <ChevronRight className="w-6 h-6" />
+                        </>
+                    )}
+                </button>
+                <p className="text-xs text-center font-bold text-gray-400 mt-4 flex items-center justify-center gap-1.5 uppercase tracking-wider">
+                    <ShieldCheck className="w-4 h-4 text-green-600" />
+                    100% Secure Checkout • Encrypted
+                </p>
+                <p className="text-[10px] text-center text-gray-400 mt-2 px-4 leading-relaxed">
+                    By placing your order, you agree to ABC Toyz Terms of Service and Privacy Policy. All transactions are securely processed.
+                </p>
             </div>
         </div>
     );
