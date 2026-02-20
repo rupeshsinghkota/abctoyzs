@@ -1269,36 +1269,36 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                         </h4>
                                                     </div>
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                        {/* Square (Feed) */}
+                                                        {/* Feed Variation 1 */}
                                                         <div className="space-y-2">
-                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Feed (1:1)</label>
+                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Variation 1 (Feed)</label>
                                                             <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
                                                                 {set.square ? (
-                                                                    <img src={set.square} className="w-full h-full object-cover" alt="Feed Ad" />
+                                                                    <img src={set.square} className="w-full h-full object-cover" alt="Feed Ad 1" />
                                                                 ) : (
                                                                     <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
                                                                 )}
                                                             </div>
                                                         </div>
 
-                                                        {/* Story (9:16) */}
+                                                        {/* Feed Variation 2 */}
                                                         <div className="space-y-2">
-                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Story (9:16)</label>
-                                                            <div className="aspect-[9/16] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all w-2/3 mx-auto shadow-sm">
+                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Variation 2 (Feed)</label>
+                                                            <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
                                                                 {set.story ? (
-                                                                    <img src={set.story} className="w-full h-full object-cover" alt="Story Ad" />
+                                                                    <img src={set.story} className="w-full h-full object-cover" alt="Feed Ad 2" />
                                                                 ) : (
                                                                     <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
                                                                 )}
                                                             </div>
                                                         </div>
 
-                                                        {/* Landscape (Audience Network) */}
+                                                        {/* Feed Variation 3 */}
                                                         <div className="space-y-2">
-                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Landscape (16:9)</label>
-                                                            <div className="aspect-[16/9] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                                                            <label className="text-[10px] font-bold uppercase text-muted-foreground block text-center">Variation 3 (Feed)</label>
+                                                            <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
                                                                 {set.landscape ? (
-                                                                    <img src={set.landscape} className="w-full h-full object-cover" alt="Landscape Ad" />
+                                                                    <img src={set.landscape} className="w-full h-full object-cover" alt="Feed Ad 3" />
                                                                 ) : (
                                                                     <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
                                                                 )}
@@ -1309,36 +1309,36 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             ))
                                         ) : (
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                {/* Square (Feed) */}
+                                                {/* Feed Variation 1 */}
                                                 <div className="space-y-2">
-                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Feed (1:1)</label>
+                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Variation 1 (Feed)</label>
                                                     <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
                                                         {formData.ad_creatives?.square ? (
-                                                            <img src={formData.ad_creatives.square} className="w-full h-full object-cover" alt="Feed Ad" />
+                                                            <img src={formData.ad_creatives.square} className="w-full h-full object-cover" alt="Feed Ad 1" />
                                                         ) : (
                                                             <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
                                                         )}
                                                     </div>
                                                 </div>
 
-                                                {/* Story (9:16) */}
+                                                {/* Feed Variation 2 */}
                                                 <div className="space-y-2">
-                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Story (9:16)</label>
-                                                    <div className="aspect-[9/16] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all w-2/3 mx-auto">
+                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Variation 2 (Feed)</label>
+                                                    <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
                                                         {formData.ad_creatives?.story ? (
-                                                            <img src={formData.ad_creatives.story} className="w-full h-full object-cover" alt="Story Ad" />
+                                                            <img src={formData.ad_creatives.story} className="w-full h-full object-cover" alt="Feed Ad 2" />
                                                         ) : (
                                                             <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
                                                         )}
                                                     </div>
                                                 </div>
 
-                                                {/* Landscape (Audience Network) */}
+                                                {/* Feed Variation 3 */}
                                                 <div className="space-y-2">
-                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Landscape (16:9)</label>
-                                                    <div className="aspect-[16/9] bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
+                                                    <label className="text-xs font-bold uppercase text-muted-foreground block text-center">Variation 3 (Feed)</label>
+                                                    <div className="aspect-square bg-muted rounded-xl relative overflow-hidden group border-2 border-transparent hover:border-blue-500 transition-all">
                                                         {formData.ad_creatives?.landscape ? (
-                                                            <img src={formData.ad_creatives.landscape} className="w-full h-full object-cover" alt="Landscape Ad" />
+                                                            <img src={formData.ad_creatives.landscape} className="w-full h-full object-cover" alt="Feed Ad 3" />
                                                         ) : (
                                                             <div className="flex items-center justify-center h-full text-muted-foreground text-xs">No Image</div>
                                                         )}
@@ -1599,16 +1599,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                             {Array.isArray(variant.ad_creatives) ? (
                                                                 variant.ad_creatives.map((set: any, sIdx: number) => (
                                                                     <div key={sIdx} className="grid grid-cols-3 gap-1 border-b border-muted pb-1 last:border-0" title={`${set.mode || 'Default'}`}>
-                                                                        <img src={set.square} className="w-8 h-8 rounded object-cover border" title="Feed" />
-                                                                        <img src={set.story} className="w-8 h-8 rounded object-cover border" title="Story" />
-                                                                        <img src={set.landscape} className="w-8 h-8 rounded object-cover border" title="Banner" />
+                                                                        <img src={set.square} className="w-8 h-8 rounded object-cover border" title="Feed Var 1" />
+                                                                        <img src={set.story} className="w-8 h-8 rounded object-cover border" title="Feed Var 2" />
+                                                                        <img src={set.landscape} className="w-8 h-8 rounded object-cover border" title="Feed Var 3" />
                                                                     </div>
                                                                 ))
                                                             ) : (
                                                                 <div className="grid grid-cols-3 gap-1">
-                                                                    <img src={variant.ad_creatives.square} className="w-8 h-8 rounded object-cover border" title="Feed" />
-                                                                    <img src={variant.ad_creatives.story} className="w-8 h-8 rounded object-cover border" title="Story" />
-                                                                    <img src={variant.ad_creatives.landscape} className="w-8 h-8 rounded object-cover border" title="Banner" />
+                                                                    <img src={variant.ad_creatives.square} className="w-8 h-8 rounded object-cover border" title="Feed Var 1" />
+                                                                    <img src={variant.ad_creatives.story} className="w-8 h-8 rounded object-cover border" title="Feed Var 2" />
+                                                                    <img src={variant.ad_creatives.landscape} className="w-8 h-8 rounded object-cover border" title="Feed Var 3" />
                                                                 </div>
                                                             )}
                                                             <button
