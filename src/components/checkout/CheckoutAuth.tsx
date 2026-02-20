@@ -151,7 +151,7 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-4 md:py-8">
-            <div className="bg-white rounded-3xl md:rounded-[2.5rem] shadow-[0_10px_30px_rgba(0,0,0,0.03)] md:shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-50 overflow-hidden flex flex-col md:flex-row min-h-[400px] md:min-h-[500px]">
+            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:shadow-[0_20px_50px_rgba(0,0,0,0.05)] border-2 border-gray-100 overflow-hidden flex flex-col md:flex-row min-h-[400px] md:min-h-[500px]">
 
                 {/* Visual Sidebar - Hidden on Mobile */}
                 <div className="hidden md:flex w-full md:w-2/5 bg-zinc-900 p-8 md:p-10 flex-col justify-between relative text-white">
@@ -190,15 +190,31 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
                 {/* Form Content */}
                 <div className="flex-1 p-6 md:p-14 flex flex-col justify-center">
                     <div className="mb-8 md:mb-10 text-center md:text-left">
+                        {/* Cart Teaser */}
+                        {cart.length > 0 && (
+                            <div className="flex items-center justify-center md:justify-start gap-2 mb-6">
+                                {cart.slice(0, 3).map((item, idx) => (
+                                    <div key={idx} className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden shadow-sm relative">
+                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                    </div>
+                                ))}
+                                {cart.length > 3 && (
+                                    <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-xs font-black text-gray-500 shadow-sm">
+                                        +{cart.length - 3}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 text-primary rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
                             Step 1: Verification
                         </div>
                         <h3 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight mb-2">
-                            {step === 'PHONE' ? 'Ready to drive?' : 'Check WhatsApp'}
+                            {step === 'PHONE' ? 'Almost yours!' : 'Check WhatsApp'}
                         </h3>
                         <p className="text-zinc-500 font-medium text-sm">
                             {step === 'PHONE'
-                                ? 'Verify your number to proceed with your order.'
+                                ? 'Verify your number to secure your order.'
                                 : `We've sent a 6-digit code to +91 ${phone}`
                             }
                         </p>
@@ -207,34 +223,34 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
                     {step === 'PHONE' ? (
                         <form onSubmit={handleSendOTP} className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="space-y-3">
-                                <div className="flex bg-zinc-50 border border-zinc-200 rounded-2xl md:rounded-[1.5rem] p-1 focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary/30 transition-all">
-                                    <div className="flex items-center gap-2 px-4 md:px-6 py-3 md:py-4 bg-white rounded-xl md:rounded-2xl shadow-sm border border-zinc-100">
-                                        <span className="text-base md:text-lg font-black text-zinc-900 leading-none">🇮🇳</span>
-                                        <span className="text-base md:text-lg font-black text-zinc-900 leading-none">+91</span>
+                                <div className="flex bg-zinc-50/50 border-2 border-zinc-100 rounded-2xl md:rounded-[1.5rem] p-1.5 focus-within:ring-4 focus-within:ring-[#25D366]/10 focus-within:border-[#25D366]/30 transition-all shadow-sm">
+                                    <div className="flex items-center gap-2 px-4 py-3 md:py-4 bg-white rounded-xl md:rounded-2xl shadow-sm border border-zinc-100">
+                                        <span className="text-xl md:text-2xl font-black text-zinc-900 leading-none">🇮🇳</span>
+                                        <span className="text-sm md:text-base font-black text-zinc-900 leading-none">+91</span>
                                     </div>
                                     <input
                                         type="tel"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                        placeholder="Enter 10-digit Mobile"
-                                        className="flex-1 bg-transparent px-4 md:px-6 py-3 md:py-4 outline-none font-black text-lg md:text-xl placeholder:text-zinc-300 tracking-tight w-full"
+                                        placeholder="Mobile Number"
+                                        className="flex-1 bg-transparent px-4 py-3 md:py-4 outline-none font-black text-xl md:text-2xl placeholder:text-zinc-300 tracking-tight w-full"
                                         autoFocus
                                     />
                                 </div>
                                 <div className="flex items-center gap-2 px-2 text-zinc-400 justify-center md:justify-start">
-                                    <Smartphone className="w-3.5 h-3.5" />
-                                    <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider">Number used for delivery updates</span>
+                                    <ShieldCheck className="w-4 h-4 text-green-500" />
+                                    <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-zinc-500">100% Secure & Private</span>
                                 </div>
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={loading || phone.length < 10}
-                                className="group w-full bg-primary hover:bg-primary/95 text-white font-black py-4 md:py-5 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center gap-3 shadow-xl md:shadow-2xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 text-sm md:text-base"
+                                className="group w-full bg-[#25D366] hover:bg-[#20BE5A] text-white font-black py-4 md:py-5 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center gap-3 shadow-[0_8px_20px_rgba(37,211,102,0.25)] transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 text-sm md:text-base"
                             >
                                 {loading ? <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin" /> : (
                                     <>
-                                        Get OTP on WhatsApp <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
+                                        Get OTP on WhatsApp <MessageCircle className="w-5 h-5 fill-white/20" />
                                     </>
                                 )}
                             </button>
@@ -252,7 +268,7 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
                                         onChange={(e) => handleOtpChange(idx, e.target.value)}
                                         onKeyDown={(e) => handleKeyDown(idx, e)}
                                         maxLength={1}
-                                        className="w-10 h-14 sm:w-14 sm:h-20 text-center text-2xl md:text-3xl font-black border-2 border-zinc-100 rounded-xl md:rounded-[1.25rem] focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all bg-zinc-50/50 shadow-inner"
+                                        className="w-12 h-16 sm:w-14 sm:h-16 text-center text-3xl font-black border-2 border-zinc-100 rounded-2xl focus:border-[#25D366] focus:ring-4 focus:ring-[#25D366]/10 outline-none transition-all bg-white shadow-sm"
                                     />
                                 ))}
                             </div>
@@ -260,11 +276,11 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
                             <button
                                 onClick={handleVerify}
                                 disabled={loading || otp.some(d => !d)}
-                                className="group w-full bg-primary hover:bg-primary/95 text-white font-black py-4 md:py-5 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center gap-3 shadow-xl md:shadow-2xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 text-sm md:text-base"
+                                className="group w-full bg-zinc-900 hover:bg-black text-white font-black py-4 md:py-5 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center gap-3 shadow-xl md:shadow-2xl shadow-zinc-900/20 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 text-sm md:text-base"
                             >
                                 {loading ? <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin" /> : (
                                     <>
-                                        Verify & Start Checkout <ShieldCheck className="w-4 h-4 md:w-5 md:h-5" />
+                                        Verify & Secure Order <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-green-400" />
                                     </>
                                 )}
                             </button>
