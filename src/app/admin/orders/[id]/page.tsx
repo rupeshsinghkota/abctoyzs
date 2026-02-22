@@ -6,7 +6,7 @@ import { InvoiceService } from '@/lib/services/invoice';
 import {
     Loader2, ArrowLeft, MoreHorizontal, Printer, MapPin,
     Mail, Phone, Package, Truck, CreditCard, Calendar,
-    CheckCircle2, AlertCircle, XCircle
+    CheckCircle2, AlertCircle, XCircle, Send
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -49,7 +49,8 @@ export default function OrderDetailPage() {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
-    // Modal removed - simplified workflow
+    const [isPushingShiprocket, setIsPushingShiprocket] = useState(false);
+    const [shiprocketPushError, setShiprocketPushError] = useState<string | null>(null);
 
     useEffect(() => {
         loadOrder();
@@ -90,7 +91,24 @@ export default function OrderDetailPage() {
         }
     }
 
-    // Manual shipping functions removed - orders auto-sync on payment
+    async function pushToShiprocket() {
+        if (!order) return;
+        setIsPushingShiprocket(true);
+        setShiprocketPushError(null);
+        try {
+            const res = await fetch(`/api/admin/orders/${order.id}/push-shiprocket`, {
+                method: 'POST',
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to push to Shiprocket');
+            // Refresh order to show new Shiprocket data
+            await loadOrder();
+        } catch (err: any) {
+            setShiprocketPushError(err.message);
+        } finally {
+            setIsPushingShiprocket(false);
+        }
+    }
 
     if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>;
     if (!order) return <div className="p-8 text-center">Order not found</div>;
@@ -311,11 +329,24 @@ export default function OrderDetailPage() {
                                 </div>
                             ) : (
                                 <div className="pt-4 border-t">
-                                    <div className="bg-yellow-50 rounded-lg p-3">
-                                        <p className="text-sm text-yellow-800">
-                                            ℹ️ Order will automatically sync to Shiprocket once payment is confirmed
-                                        </p>
-                                    </div>
+                                    {shiprocketPushError && (
+                                        <div className="mb-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                                            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                                            <span>{shiprocketPushError}</span>
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={pushToShiprocket}
+                                        disabled={isPushingShiprocket}
+                                        className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-zinc-900 hover:bg-zinc-700 text-white rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                                    >
+                                        {isPushingShiprocket ? (
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> Pushing to Shiprocket...</>
+                                        ) : (
+                                            <><Send className="w-4 h-4" /> Push to Shiprocket</>
+                                        )}
+                                    </button>
+                                    <p className="text-[11px] text-center text-zinc-400 mt-2">Creates a new shipment order in your Shiprocket account</p>
                                 </div>
                             )}
                         </div>
