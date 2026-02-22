@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const supabase = await createClient();
-        const orderId = params.id;
+        const { id: orderId } = await params;
 
         // 1. Fetch full order with items and address
         const { data: order, error } = await supabase
