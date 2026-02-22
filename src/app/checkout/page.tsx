@@ -339,6 +339,20 @@ export default function CheckoutPage() {
         }
     };
 
+    // Auto-apply PREPAID5 when switching to PREPAID with no coupon already applied
+    useEffect(() => {
+        if (paymentMethod === 'PREPAID' && !appliedCoupon && subtotal > 0) {
+            handleApplyCoupon('PREPAID5');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [paymentMethod]);
+
+    // One-click switch to prepaid + auto apply coupon
+    const handleSwitchToPrepaid = () => {
+        setPaymentMethod('PREPAID');
+        // useEffect above will auto-apply PREPAID5
+    };
+
     if (!mounted) {
         return (
             <div className="min-h-screen pt-24 pb-12 px-4 flex flex-col items-center justify-center bg-gray-50">
@@ -559,43 +573,52 @@ export default function CheckoutPage() {
                                 </div>
 
                                 {/* COD Partial Payment Notice — shown only when COD + partial mode */}
-                                {paymentMethod === 'COD' && codSettings?.cod_mode === 'partial' && (
-                                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 space-y-2 animate-in fade-in slide-in-from-top-1 duration-300">
-                                        <div className="flex items-start gap-2.5">
-                                            <span className="text-amber-500 text-base leading-none mt-0.5">⚠️</span>
-                                            <div>
-                                                <p className="text-xs font-black text-amber-900">Advance Payment Required for COD</p>
-                                                <p className="text-[11px] text-amber-700 font-medium mt-1 leading-relaxed">
-                                                    To confirm your COD order, a small advance of{' '}
-                                                    <span className="font-black">₹{calculateCodAdvance(total, codSettings).advance.toLocaleString()}</span>{' '}
-                                                    is collected online. The remaining{' '}
-                                                    <span className="font-black">₹{calculateCodAdvance(total, codSettings).balance.toLocaleString()}</span>{' '}
-                                                    is paid to the delivery partner.
-                                                </p>
+                                {paymentMethod === 'COD' && codSettings?.cod_mode === 'partial' && (() => {
+                                    const prepaidSaving = Math.round(total * 0.05);
+                                    return (
+                                        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 space-y-2.5 animate-in fade-in slide-in-from-top-1 duration-300">
+                                            <div className="flex items-start gap-2.5">
+                                                <span className="text-amber-500 text-base leading-none mt-0.5">⚠️</span>
+                                                <div>
+                                                    <p className="text-xs font-black text-amber-900">Advance Payment Required for COD</p>
+                                                    <p className="text-[11px] text-amber-700 font-medium mt-1 leading-relaxed">
+                                                        A small advance of{' '}
+                                                        <span className="font-black">₹{calculateCodAdvance(total, codSettings).advance.toLocaleString()}</span>{' '}
+                                                        is collected online now. The remaining{' '}
+                                                        <span className="font-black">₹{calculateCodAdvance(total, codSettings).balance.toLocaleString()}</span>{' '}
+                                                        is paid to the delivery partner.
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <ul className="space-y-1 pl-7">
-                                            <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
-                                                <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
-                                                This protects both you and us from failed deliveries
-                                            </li>
-                                            <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
-                                                <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
-                                                Advance is fully refundable if we are unable to deliver
-                                            </li>
-                                            <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
-                                                <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
-                                                Cancellation after dispatch may incur shipping charges
-                                            </li>
-                                        </ul>
-                                        <p className="text-[10px] text-amber-600 pl-7">
-                                            Want zero advance?{' '}
-                                            <button onClick={() => setPaymentMethod('PREPAID')} className="font-black underline">
-                                                Switch to full prepaid — extra 5% OFF
+                                            <ul className="space-y-1 pl-7">
+                                                <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
+                                                    <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
+                                                    This protects both you and us from failed deliveries
+                                                </li>
+                                                <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
+                                                    <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
+                                                    Advance is fully refundable if we cannot deliver
+                                                </li>
+                                                <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
+                                                    <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
+                                                    Cancellation after dispatch may incur shipping charges
+                                                </li>
+                                            </ul>
+                                            {/* Switch to Prepaid CTA */}
+                                            <button
+                                                onClick={handleSwitchToPrepaid}
+                                                className="w-full flex items-center justify-between bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 py-2 transition-all active:scale-[0.98] group"
+                                            >
+                                                <span className="text-[11px] font-black">
+                                                    ✅ Switch to Prepaid — Save ₹{prepaidSaving.toLocaleString()} (5% OFF)
+                                                </span>
+                                                <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-md group-hover:bg-white/30 transition-colors">
+                                                    Apply PREPAID5 →
+                                                </span>
                                             </button>
-                                        </p>
-                                    </div>
-                                )}
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>
