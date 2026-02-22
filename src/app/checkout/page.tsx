@@ -603,7 +603,11 @@ export default function CheckoutPage() {
                                         </>
                                     ) : (
                                         <>
-                                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'COD' ? "Confirm COD" : "Pay Now"}
+                                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'COD' ? (
+                                                codSettings?.cod_mode === 'partial'
+                                                    ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
+                                                    : "Confirm COD"
+                                            ) : "Pay Now"}
                                             <ChevronRight className="w-5 h-5" />
                                         </>
                                     )}
