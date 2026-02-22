@@ -9,6 +9,7 @@ import { FeatureSpotlight } from "@/components/home/FeatureSpotlight";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ProductHighlightGrid } from "@/components/home/ProductHighlightGrid";
 import { Testimonials } from "@/components/home/Testimonials";
+import { WhyBuyFromUs } from "@/components/home/WhyBuyFromUs";
 import { ShopByAge } from "@/components/home/ShopByAge";
 import { ShopByPower } from "@/components/home/ShopByPower";
 import { BudgetShowcase } from "@/components/home/BudgetShowcase";
@@ -137,6 +138,7 @@ export default async function Home() {
 
 
       <Testimonials />
+      <WhyBuyFromUs />
       <Newsletter />
     </div>
   );
