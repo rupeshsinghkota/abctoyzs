@@ -557,9 +557,47 @@ export default function CheckoutPage() {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* COD Partial Payment Notice — shown only when COD + partial mode */}
+                                {paymentMethod === 'COD' && codSettings?.cod_mode === 'partial' && (
+                                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 space-y-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                                        <div className="flex items-start gap-2.5">
+                                            <span className="text-amber-500 text-base leading-none mt-0.5">⚠️</span>
+                                            <div>
+                                                <p className="text-xs font-black text-amber-900">Advance Payment Required for COD</p>
+                                                <p className="text-[11px] text-amber-700 font-medium mt-1 leading-relaxed">
+                                                    To confirm your COD order, a small advance of{' '}
+                                                    <span className="font-black">₹{calculateCodAdvance(total, codSettings).advance.toLocaleString()}</span>{' '}
+                                                    is collected online. The remaining{' '}
+                                                    <span className="font-black">₹{calculateCodAdvance(total, codSettings).balance.toLocaleString()}</span>{' '}
+                                                    is paid to the delivery partner.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <ul className="space-y-1 pl-7">
+                                            <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
+                                                <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
+                                                This protects both you and us from failed deliveries
+                                            </li>
+                                            <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
+                                                <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
+                                                Advance is fully refundable if we are unable to deliver
+                                            </li>
+                                            <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
+                                                <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
+                                                Cancellation after dispatch may incur shipping charges
+                                            </li>
+                                        </ul>
+                                        <p className="text-[10px] text-amber-600 pl-7">
+                                            Want zero advance?{' '}
+                                            <button onClick={() => setPaymentMethod('PREPAID')} className="font-black underline">
+                                                Switch to full prepaid — extra 5% OFF
+                                            </button>
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
-
                     </div>
 
                     {/* Right Column: Order Summary */}
