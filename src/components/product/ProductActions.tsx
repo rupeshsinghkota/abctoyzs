@@ -348,20 +348,65 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     <span className="text-[10px] font-bold text-green-800">Extra 5% OFF — use <span className="bg-white px-1.5 py-0.5 rounded border border-green-200 font-black tracking-wide">PREPAID5</span></span>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 pb-6 lg:pb-0">
+                {/* Payment Trust Badges */}
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 px-3 py-2.5">
+                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-center mb-2">Safe & Secure Payments</p>
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                        {/* COD */}
+                        <span className="flex items-center gap-1 bg-white border border-gray-200 rounded-md px-2 py-1 text-[10px] font-black text-gray-700 shadow-sm">
+                            💵 COD
+                        </span>
+                        {/* UPI */}
+                        <span className="flex items-center gap-1 bg-white border border-gray-200 rounded-md px-2 py-1 text-[10px] font-black text-gray-700 shadow-sm">
+                            <svg width="14" height="14" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="48" height="48" rx="8" fill="#fff" />
+                                <path d="M24 8L8 28h16v12l16-20H24V8z" fill="#097939" />
+                                <path d="M24 8L8 28h16v12l16-20H24V8z" fill="url(#upi_grad)" opacity="0.6" />
+                                <defs><linearGradient id="upi_grad" x1="8" y1="8" x2="40" y2="40"><stop stopColor="#FF6B00" /><stop offset="1" stopColor="#097939" /></linearGradient></defs>
+                            </svg>
+                            UPI
+                        </span>
+                        {/* Razorpay */}
+                        <span className="flex items-center gap-1 bg-white border border-gray-200 rounded-md px-2 py-1 text-[10px] font-black text-[#2B85FF] shadow-sm">
+                            <svg width="14" height="14" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="48" height="48" rx="8" fill="#2B85FF" />
+                                <polygon points="14,36 26,12 34,24 22,24" fill="white" />
+                                <polygon points="22,24 30,36 34,24" fill="#A3CEFF" opacity="0.8" />
+                            </svg>
+                            Razorpay
+                        </span>
+                        {/* Visa */}
+                        <span className="flex items-center bg-white border border-gray-200 rounded-md px-2 py-1 shadow-sm">
+                            <svg width="28" height="10" viewBox="0 0 50 16" xmlns="http://www.w3.org/2000/svg">
+                                <text x="0" y="14" fontFamily="Arial" fontWeight="800" fontSize="16" fill="#1A1F71">VISA</text>
+                            </svg>
+                        </span>
+                        {/* Mastercard */}
+                        <span className="flex items-center gap-0.5 bg-white border border-gray-200 rounded-md px-2 py-1 shadow-sm">
+                            <svg width="26" height="16" viewBox="0 0 42 26" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="14" cy="13" r="13" fill="#EB001B" />
+                                <circle cx="28" cy="13" r="13" fill="#F79E1B" />
+                                <path d="M21 5.5a13 13 0 0 1 0 15 13 13 0 0 1 0-15z" fill="#FF5F00" />
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+
+                {/* Guarantee Row */}
+                <div className="flex items-center justify-between gap-2 bg-orange-50/50 border border-orange-100/70 rounded-xl px-3 py-2.5 pb-6 lg:pb-2.5">
                     <a href="/shipping-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
                         <Truck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] font-bold text-gray-600 group-hover:text-primary transition-colors text-center leading-tight">Free<br />Delivery</span>
+                        <span className="text-[9px] font-bold text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">Free<br />Delivery</span>
                     </a>
-                    <div className="w-px h-8 bg-gray-100" />
+                    <div className="w-px h-8 bg-orange-100" />
                     <a href="/warranty-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
                         <ShieldCheck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] font-bold text-gray-600 group-hover:text-primary transition-colors text-center leading-tight">1 Year<br />Warranty</span>
+                        <span className="text-[9px] font-bold text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">1 Year<br />Warranty</span>
                     </a>
-                    <div className="w-px h-8 bg-gray-100" />
+                    <div className="w-px h-8 bg-orange-100" />
                     <a href="/refund-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
                         <RotateCcw className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] font-bold text-gray-600 group-hover:text-primary transition-colors text-center leading-tight">10 Days<br />Replacement</span>
+                        <span className="text-[9px] font-bold text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">10 Days<br />Replacement</span>
                     </a>
                 </div>
             </div>
