@@ -607,7 +607,7 @@ export default function CheckoutPage() {
                                                 <div className="p-1.5 bg-zinc-50 rounded-lg">
                                                     <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
                                                 </div>
-                                                <span className="text-[8px] font-bold text-gray-500 leading-tight">ISI Marc<br />Quality</span>
+                                                <span className="text-[8px] font-bold text-gray-500 leading-tight">ISI Mark<br />Quality</span>
                                             </div>
                                         </div>
 
