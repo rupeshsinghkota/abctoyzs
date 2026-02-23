@@ -92,7 +92,26 @@ export const ShiprocketService = {
             }
 
             console.log('[Shiprocket] Order created:', responseData);
+
+            // Shiprocket returns 200 even for errors — check for order_id presence
+            if (!responseData.order_id) {
+                const msg = responseData?.message || 'Unknown Shiprocket error';
+
+                // Extract valid pickup location names if Shiprocket provided them
+                const locations: any[] = responseData?.data?.data || [];
+                const validNames = locations
+                    .map((l: any) => l.pickup_location_name || l.pickup_location || l.name)
+                    .filter(Boolean);
+
+                if (validNames.length > 0) {
+                    console.error('[Shiprocket] Valid pickup locations:', validNames);
+                    throw new Error(`${msg} | Valid pickup locations: ${validNames.join(', ')}`);
+                }
+                throw new Error(msg);
+            }
+
             return responseData;
+
         } catch (error) {
             console.error('[Shiprocket Service Error]:', error);
             throw error;
