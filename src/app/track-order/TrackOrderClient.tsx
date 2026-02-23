@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import {
     Search, Package, Truck, Clock,
     AlertCircle, MapPin, Hash,
-    FileText
+    FileText, CheckCircle2, MessageCircle, ArrowRight, Boxes, Ship
 } from "lucide-react";
 import { InvoiceService } from "@/lib/services/invoice";
+import { cn } from "@/lib/utils";
 
 export default function TrackOrderClient() {
     const [query, setQuery] = useState("");
@@ -38,28 +39,40 @@ export default function TrackOrderClient() {
         }
     };
 
+    // Helper to get overall progress percentage and current step
+    const getProgressInfo = (status: string) => {
+        const s = status?.toLowerCase() || "";
+        if (s.includes("delivered")) return { step: 4, percent: 100 };
+        if (s.includes("delivery") || s.includes("out for")) return { step: 3, percent: 75 };
+        if (s.includes("shipped") || s.includes("in transit") || s.includes("dispatched")) return { step: 2, percent: 50 };
+        if (s.includes("packed") || s.includes("ready")) return { step: 1, percent: 25 };
+        return { step: 0, percent: 5 };
+    };
+
+    const progress = trackingData ? getProgressInfo(trackingData.tracking.status || trackingData.order.status) : null;
+
     return (
-        <div className="min-h-screen bg-zinc-50 pt-32 pb-20">
-            <div className="container max-w-4xl mx-auto px-6">
+        <div className="min-h-screen bg-zinc-50 pt-24 md:pt-32 pb-20">
+            <div className="container max-w-4xl mx-auto px-4 md:px-6">
                 {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-6xl font-black text-zinc-900 tracking-tighter mb-4">
+                <div className="text-center mb-10 md:mb-12">
+                    <h1 className="text-3xl md:text-6xl font-black text-zinc-900 tracking-tighter mb-4">
                         Track Your <span className="text-primary italic">Adventure.</span>
                     </h1>
-                    <p className="text-zinc-500 text-lg">
+                    <p className="text-zinc-500 text-base md:text-lg">
                         Enter your Order ID or Phone Number to see real-time updates.
                     </p>
                 </div>
 
                 {/* Search Form */}
-                <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-zinc-200/50 border border-zinc-100 mb-12">
+                <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 shadow-xl shadow-zinc-200/50 border border-zinc-100 mb-8 md:mb-12">
                     <form onSubmit={handleTrack} className="flex flex-col md:flex-row gap-4">
                         <div className="relative flex-1">
                             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
                             <input
                                 type="text"
                                 placeholder="Order ID or Phone Number"
-                                className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-lg"
+                                className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl py-4 md:py-5 pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-base md:text-lg"
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                             />
@@ -67,9 +80,14 @@ export default function TrackOrderClient() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="bg-primary hover:bg-zinc-900 text-white font-black px-10 py-5 rounded-2xl transition-all active:scale-95 disabled:opacity-50 text-lg shadow-xl shadow-primary/20"
+                            className="bg-primary hover:bg-zinc-900 text-white font-black px-10 py-4 md:py-5 rounded-2xl transition-all active:scale-95 disabled:opacity-50 text-base md:text-lg shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
                         >
-                            {loading ? "Searching..." : "Track Order"}
+                            {loading ? "Searching..." : (
+                                <>
+                                    Track Order
+                                    <ArrowRight className="w-5 h-5" />
+                                </>
+                            )}
                         </button>
                     </form>
 
@@ -84,8 +102,48 @@ export default function TrackOrderClient() {
                 {/* Tracking Results */}
                 {trackingData && (
                     <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+
+                        {/* ───── High Level Progress Stepper ───── */}
+                        <div className="bg-white rounded-[2rem] p-6 md:p-10 shadow-lg shadow-zinc-200/40 border border-zinc-100 mb-8">
+                            <div className="relative flex justify-between items-center max-w-2xl mx-auto">
+                                {/* Progress Bar Background */}
+                                <div className="absolute top-1/2 left-0 right-0 h-1 bg-zinc-100 -translate-y-1/2 z-0" />
+                                {/* Progress Bar Fill */}
+                                <div
+                                    className="absolute top-1/2 left-0 h-1 bg-primary -translate-y-1/2 z-0 transition-all duration-1000 ease-out"
+                                    style={{ width: `${progress?.percent}%` }}
+                                />
+
+                                {[
+                                    { label: 'Ordered', icon: FileText },
+                                    { label: 'Packed', icon: Boxes },
+                                    { label: 'Shipped', icon: Truck },
+                                    { label: 'Delivered', icon: CheckCircle2 }
+                                ].map((step, idx) => {
+                                    const isCompleted = (progress?.step || 0) >= idx + 1;
+                                    const isCurrent = (progress?.step || 0) === idx;
+                                    return (
+                                        <div key={idx} className="relative z-10 flex flex-col items-center">
+                                            <div className={cn(
+                                                "w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500",
+                                                isCompleted ? "bg-primary text-white shadow-lg shadow-primary/30" : "bg-white border-2 border-zinc-100 text-zinc-300"
+                                            )}>
+                                                <step.icon className="w-5 h-5 md:w-6 md:h-6" />
+                                            </div>
+                                            <span className={cn(
+                                                "mt-3 text-[10px] md:text-xs font-black uppercase tracking-widest",
+                                                isCompleted ? "text-zinc-900" : "text-zinc-300"
+                                            )}>
+                                                {step.label}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
                         {/* Order Summary Card */}
-                        <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-xl shadow-zinc-200/50 border border-zinc-100 mb-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="bg-white rounded-[2rem] p-8 md:p-10 shadow-xl shadow-zinc-200/50 border border-zinc-100 mb-8 grid grid-cols-1 md:grid-cols-3 gap-8">
                             <SummaryItem
                                 icon={<Hash className="w-5 h-5" />}
                                 label="Order ID"
@@ -99,16 +157,16 @@ export default function TrackOrderClient() {
                             />
                             <SummaryItem
                                 icon={<Truck className="w-5 h-5" />}
-                                label="Payment"
-                                value={trackingData.order.payment_status === 'paid' ? 'Paid' : 'COD (Pending)'}
+                                label="AWB Number"
+                                value={trackingData.tracking.tracking_data?.shipment_track?.[0]?.awb_code || "Awaiting AWB"}
                             />
                         </div>
 
-                        {/* Customer Action: Download Invoice */}
-                        <div className="flex justify-center mb-8">
+                        {/* Customer Action: Download Invoice & Support */}
+                        <div className="flex flex-col md:flex-row justify-center gap-4 mb-8">
                             <button
                                 onClick={() => InvoiceService.generateInvoice(trackingData.order)}
-                                className="group flex items-center gap-3 bg-zinc-900 hover:bg-primary text-white px-8 py-5 rounded-3xl transition-all shadow-xl shadow-zinc-200 hover:shadow-primary/20 active:scale-95"
+                                className="group flex items-center gap-3 bg-zinc-900 hover:bg-zinc-800 text-white px-8 py-5 rounded-3xl transition-all shadow-xl shadow-zinc-200 active:scale-95"
                             >
                                 <div className="p-2 bg-white/10 rounded-xl group-hover:bg-white/20 transition-colors">
                                     <FileText className="w-5 h-5" />
@@ -118,11 +176,29 @@ export default function TrackOrderClient() {
                                     <p className="font-black text-sm">Download PDF Invoice</p>
                                 </div>
                             </button>
+
+                            <a
+                                href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I'm checking on my order #${trackingData.order.id.slice(0, 8).toUpperCase()}.\nStatus: ${trackingData.tracking.status || trackingData.order.status}`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-8 py-5 rounded-3xl transition-all shadow-xl shadow-green-100 active:scale-95"
+                            >
+                                <div className="p-2 bg-white/10 rounded-xl group-hover:bg-white/20 transition-colors">
+                                    <MessageCircle className="w-5 h-5" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Need Assistance?</p>
+                                    <p className="font-black text-sm">Chat via WhatsApp</p>
+                                </div>
+                            </a>
                         </div>
 
                         {/* Timeline */}
-                        <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-xl shadow-zinc-200/50 border border-zinc-100">
-                            <h3 className="text-2xl font-black text-zinc-900 mb-10">Delivery Timeline</h3>
+                        <div className="bg-white rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 shadow-xl shadow-zinc-200/50 border border-zinc-100 h-full">
+                            <h3 className="text-2xl font-black text-zinc-900 mb-10 flex items-center gap-3">
+                                <Clock className="w-6 h-6 text-primary" />
+                                Delivery Journey
+                            </h3>
 
                             <div className="space-y-0">
                                 {trackingData.tracking.tracking_data?.shipment_track_activities?.map((activity: any, idx: number) => (
@@ -132,11 +208,11 @@ export default function TrackOrderClient() {
                                         location={activity.location}
                                         activity={activity.activity}
                                         isFirst={idx === 0}
-                                        isLast={idx === trackingData.tracking.tracking_data.shipment_track_activities.length - 1}
+                                        isLast={idx === (trackingData.tracking.tracking_data.shipment_track_activities.length - 1)}
                                     />
                                 )) || (
                                         <div className="py-12 text-center text-zinc-400">
-                                            <Clock className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                                            <Package className="w-12 h-12 mx-auto mb-4 opacity-20" />
                                             <p className="font-bold">Syncing tracking details from Shiprocket...</p>
                                             <p className="text-sm">Please check back in 15-30 minutes.</p>
                                         </div>
@@ -155,26 +231,56 @@ function SummaryItem({ icon, label, value, highlight }: { icon: React.ReactNode,
         <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-zinc-400 mb-1">
                 {icon}
-                <span className="text-xs font-black uppercase tracking-widest">{label}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
             </div>
-            <p className={`text-xl font-black ${highlight ? 'text-primary uppercase italic' : 'text-zinc-900'}`}>{value}</p>
+            <p className={cn(
+                "text-lg md:text-xl font-black tracking-tight",
+                highlight ? 'text-primary uppercase italic' : 'text-zinc-900 truncate'
+            )}>
+                {value}
+            </p>
         </div>
     );
 }
 
 function TimelineItem({ date, location, activity, isFirst, isLast }: { date: string, location: string, activity: string, isFirst: boolean, isLast: boolean }) {
+    // Helper to get icon based on activity text
+    const getActivityIcon = (text: string) => {
+        const t = text.toLowerCase();
+        if (t.includes('delivered')) return <CheckCircle2 className="w-4 h-4" />;
+        if (t.includes('out for delivery')) return <Truck className="w-4 h-4" />;
+        if (t.includes('in transit') || t.includes('shipped')) return <Ship className="w-4 h-4" />;
+        if (t.includes('packed') || t.includes('ready')) return <Package className="w-4 h-4" />;
+        return <Clock className="w-4 h-4" />;
+    };
+
     return (
         <div className="flex gap-6">
             <div className="flex flex-col items-center">
-                <div className={`w-4 h-4 rounded-full ${isFirst ? 'bg-primary ring-4 ring-primary/20' : 'bg-zinc-200'} shrink-0`} />
-                {!isLast && <div className="w-1 h-16 bg-zinc-100" />}
+                <div className={cn(
+                    "w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-500 shrink-0",
+                    isFirst ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 text-zinc-400'
+                )}>
+                    {getActivityIcon(activity)}
+                </div>
+                {!isLast && <div className="w-0.5 h-16 bg-zinc-100 my-2" />}
             </div>
-            <div className="pb-10">
-                <p className="text-sm font-black text-zinc-400 uppercase tracking-widest mb-1">{date}</p>
-                <p className="text-lg font-bold text-zinc-900 mb-1 leading-tight">{activity}</p>
-                <div className="flex items-center gap-1 text-zinc-500 text-sm">
+            <div className="pb-10 pt-1">
+                <div className="flex items-center gap-3 mb-1">
+                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{date}</p>
+                    {isFirst && (
+                        <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[8px] font-black uppercase tracking-tighter rounded">Latest</span>
+                    )}
+                </div>
+                <p className={cn(
+                    "text-lg font-bold mb-1 leading-tight",
+                    isFirst ? "text-zinc-900" : "text-zinc-500"
+                )}>
+                    {activity}
+                </p>
+                <div className="flex items-center gap-1 text-zinc-400 text-xs">
                     <MapPin className="w-3 h-3" />
-                    <span className="font-medium italic">{location}</span>
+                    <span className="font-medium italic">{location || "Central Sorting Hub"}</span>
                 </div>
             </div>
         </div>
