@@ -9,9 +9,13 @@ import {
     Clock,
     CheckCircle2,
     Lock,
-    Scale
+    Scale,
+    Video,
+    PhoneCall,
+    Star
 } from "lucide-react";
 import { SettingsService } from '@/lib/services/settings';
+import { BRAND_CONFIG } from '@/config/brand';
 
 export async function generateMetadata(): Promise<Metadata> {
     const globalSEO = await SettingsService.getSEOConfig();
@@ -32,6 +36,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function PaymentPolicy() {
+    const advanceAmount = BRAND_CONFIG.payment.codAdvanceAmount;
+    const prepaidDiscount = BRAND_CONFIG.payment.prepaidDiscountPercentage;
+    const prepaidCoupon = BRAND_CONFIG.payment.prepaidCouponCode;
+
     return (
         <div className="min-h-screen bg-zinc-50 pt-24 pb-16">
             <div className="container max-w-4xl mx-auto px-6">
@@ -63,7 +71,7 @@ export default function PaymentPolicy() {
                                         <CheckCircle2 className="w-4 h-4" /> Instant Savings
                                     </h3>
                                     <p className="text-zinc-600 text-sm leading-relaxed">
-                                        Use code <span className="font-black text-emerald-700">PREPAID5</span> to get flat 5% off on your entire order. This is a direct saving for our most trusted customers.
+                                        Use code <span className="font-black text-emerald-700">{prepaidCoupon}</span> to get flat {prepaidDiscount}% off on your entire order. This is a direct saving for our most trusted customers.
                                     </p>
                                 </div>
                                 <div className="bg-emerald-50/50 border border-emerald-100 p-6 rounded-2xl">
@@ -92,7 +100,7 @@ export default function PaymentPolicy() {
 
                             <div className="prose prose-zinc max-w-none text-zinc-600 mb-8">
                                 <p>
-                                    As a premium retailer of heavy and high-value ride-on toys, we collect a small booking advance of <strong>₹500</strong> for all Cash on Delivery (COD) orders.
+                                    As a premium retailer of heavy and high-value ride-on toys, we collect a small booking advance of <strong>₹{advanceAmount}</strong> for all Cash on Delivery (COD) orders.
                                 </p>
                                 <h4 className="text-zinc-900 font-bold mb-2">Why do we collect an advance?</h4>
                                 <ul className="space-y-3">
@@ -106,7 +114,7 @@ export default function PaymentPolicy() {
                                     </li>
                                     <li className="flex gap-3">
                                         <div className="mt-1.5 w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0" />
-                                        <span><strong>Slot Confirmation:</strong> Your order is reserved in our inventory as soon as the advance is paid.</span>
+                                        <span><strong>Genuine Order Service:</strong> We provide unit-specific videos and photos only to customers with confirmed paid bookings to maintain operational quality.</span>
                                     </li>
                                 </ul>
                             </div>
@@ -118,6 +126,39 @@ export default function PaymentPolicy() {
                                     <p className="text-zinc-600 text-sm leading-relaxed">
                                         Your booking advance is <strong>completely refundable</strong> if you change your mind for any reason before the order is dispatched. Once cancelled pre-dispatch, the refund is initiated within 2-3 business days.
                                     </p>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* VIP Genuine Section */}
+                        <section className="bg-zinc-900 rounded-3xl p-8 text-white relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
+                            <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
+                                <div className="flex-1">
+                                    <h2 className="text-2xl font-black mb-4 flex items-center gap-3">
+                                        <Star className="w-6 h-6 text-primary fill-primary" /> Genuine Order VIP Service
+                                    </h2>
+                                    <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+                                        We treat our confirmed buyers as VIPs. Once your order is placed and the advance is paid, you gain exclusive access to our **Premium Verification Protocol**.
+                                    </p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="flex gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                                                <PhoneCall className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <p className="text-xs font-bold leading-tight">Post-order Verification Call within 1-2 hours</p>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                                                <Video className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <p className="text-xs font-bold leading-tight">Request Live Unit Videos/Photos on WhatsApp</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-primary/20 p-6 rounded-2xl border border-primary/30 text-center">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">Exclusive Access</p>
+                                    <p className="text-sm font-bold">Only paid bookings will be entertained for unit-specific details.</p>
                                 </div>
                             </div>
                         </section>

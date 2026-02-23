@@ -137,16 +137,16 @@ function SuccessContent() {
                             <div className="flex items-center gap-2.5 mb-3 justify-center">
                                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                                    {order.total_amount < (order as any).total_payable ? 'Advance Verified' : 'Next Steps'}
+                                    {order.total_amount < (order as any).total_payable ? 'VIP Service Activated' : 'Manual Verification'}
                                 </span>
                             </div>
                             <p className="text-base font-black italic tracking-tight mb-1">
-                                {order.total_amount < (order as any).total_payable ? 'Booking Confirmed!' : 'Manual Verification Required'}
+                                {order.total_amount < (order as any).total_payable ? 'Genuine Order Confirmed!' : 'Verification Pending'}
                             </p>
                             <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
                                 {order.total_amount < (order as any).total_payable
-                                    ? `We've received your booking advance. Our agent will WhatsApp/Call you shortly to share the dispatch timeline.`
-                                    : `Since this is a COD order, our agent will WhatsApp or Call you within 24 hours to verify your details before we dispatch.`
+                                    ? `We've received your booking advance. Your **Genuine Order VIP Service** is now active. Our agent will WhatsApp/Call you within 1-2 hours with product videos and dispatch details.`
+                                    : `Since this is a COD order, our agent will WhatsApp or Call you within 1-2 hours to verify your details before we activate your VIP service and dispatch.`
                                 }
                             </p>
                         </div>

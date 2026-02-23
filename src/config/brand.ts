@@ -22,5 +22,13 @@ export const BRAND_CONFIG = {
         tone: "Sophisticated yet playful",
         reinforceBrand: true,
         brandingFrequency: "2-3 mentions per description"
+    },
+
+    // Payment & Trust Settings
+    payment: {
+        codAdvanceAmount: 500,
+        codAdvanceType: 'fixed', // 'fixed' | 'percentage'
+        prepaidDiscountPercentage: 5,
+        prepaidCouponCode: "PREPAID5"
     }
 };

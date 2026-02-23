@@ -21,6 +21,9 @@ declare global {
     }
 }
 
+import { BRAND_CONFIG } from '@/config/brand';
+import { GenuineOrderGuarantee } from '@/components/trust/GenuineOrderGuarantee';
+
 export default function CheckoutPage() {
     const router = useRouter();
     const { cart, clearCart } = useStore();
@@ -599,7 +602,7 @@ export default function CheckoutPage() {
 
                                                     {codSettings?.cod_mode === 'partial' ? (
                                                         <p className="text-[11px] text-indigo-800 font-medium leading-relaxed">
-                                                            To protect against RTO/fake orders, a booking advance of <span className="font-black text-indigo-950 underline decoration-indigo-300 underline-offset-2">₹{calculateCodAdvance(total, codSettings).advance.toLocaleString()}</span> is collected via Razorpay. It is <span className="text-indigo-950 font-black">100% refundable</span> if you cancel before dispatch.
+                                                            Pay a secure <span className="text-indigo-950 font-black">₹{calculateCodAdvance(total, codSettings).advance.toLocaleString()} booking advance</span> via Razorpay to confirm your slot and activate **Genuine Order VIP Service**.
                                                         </p>
                                                     ) : (
                                                         <p className="text-[11px] text-indigo-800 font-medium leading-relaxed">
@@ -656,6 +659,8 @@ export default function CheckoutPage() {
                                                 <CreditCard className="w-3 h-3" />
                                                 Payment Secured by Razorpay & PCI-DSS
                                             </div>
+                                            {/* Genuine Order Service Component (VIP Benefits) */}
+                                            <GenuineOrderGuarantee />
                                         </div>
 
                                         {/* Step-by-Step Verification Journey */}
@@ -673,7 +678,7 @@ export default function CheckoutPage() {
                                                     </div>
                                                     <div className="pb-4">
                                                         <p className="text-[11px] font-black text-white">Confirmation Call/WhatsApp</p>
-                                                        <p className="text-[10px] text-zinc-500 font-medium leading-relaxed">Our agent will contact you within 24h to verify your details.</p>
+                                                        <p className="text-[10px] text-zinc-500 font-medium leading-relaxed">Our agent will contact you within 1-2 hours to verify your details.</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-3">
@@ -1251,7 +1256,16 @@ function OrderSummaryCard({
 
 // Helper to calculate advance
 function calculateCodAdvance(total: number, settings: any) {
-    if (!settings || settings.cod_mode !== 'partial') return { advance: 0, balance: total };
+    if (!settings || settings.cod_mode !== 'partial') {
+        // Fallback to BRAND_CONFIG if settings are not loaded yet or missing
+        if (BRAND_CONFIG.payment.codAdvanceType === 'percentage') {
+            const advance = Math.round((total * BRAND_CONFIG.payment.codAdvanceAmount) / 100);
+            return { advance: Math.min(advance, total), balance: total - Math.min(advance, total) };
+        } else {
+            const advance = BRAND_CONFIG.payment.codAdvanceAmount;
+            return { advance: Math.min(advance, total), balance: total - Math.min(advance, total) };
+        }
+    }
 
     let advance = 0;
     if (settings.cod_advance_type === 'percentage') {

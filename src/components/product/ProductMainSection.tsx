@@ -15,6 +15,7 @@ import { ProductReviews } from '@/components/product/ProductReviews';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/store/useStore';
 import { RecentlyViewed } from '@/components/product/RecentlyViewed';
+import { GenuineOrderGuarantee } from '@/components/trust/GenuineOrderGuarantee';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
     const router = useRouter();
@@ -289,6 +290,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     <p className="text-[10px] text-gray-400 pl-6">Free delivery across India</p>
                                 )}
                             </div>
+
+                            {/* Genuine Order Guarantee */}
+                            <GenuineOrderGuarantee className="mt-2" />
 
                         </div>
                     </div>

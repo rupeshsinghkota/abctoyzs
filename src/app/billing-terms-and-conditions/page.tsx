@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { CreditCard, ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
 import { SettingsService } from '@/lib/services/settings';
+import { BRAND_CONFIG } from '@/config/brand';
 
 export async function generateMetadata(): Promise<Metadata> {
     const globalSEO = await SettingsService.getSEOConfig();
@@ -83,9 +84,9 @@ export default function BillingTerms() {
                                 </p>
                             </div>
                             <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-100">
-                                <h3 className="font-bold text-zinc-900 mb-2">2. COD with ₹500 Prepayment</h3>
+                                <h3 className="font-bold text-zinc-900 mb-2">2. COD with ₹{BRAND_CONFIG.payment.codAdvanceAmount} Prepayment</h3>
                                 <p className="text-sm text-zinc-600 leading-relaxed">
-                                    For large ride-on toys, we offer Cash on Delivery with a mandatory ₹500 advance payment to confirm the order. The balance amount is payable to the courier at the time of delivery.
+                                    For large ride-on toys, we offer Cash on Delivery with a mandatory ₹{BRAND_CONFIG.payment.codAdvanceAmount} advance payment to confirm the order. The balance amount is payable to the courier at the time of delivery.
                                 </p>
                             </div>
                         </div>
