@@ -49,8 +49,13 @@ export async function POST(
         const isPartialCod = order.payment_method === 'COD' && advanceAmount > 0;
         const amountToCollect = isPartialCod ? totalAmount - advanceAmount : totalAmount;
 
+        // Shiprocket rejects UUID-format order IDs — use order_number or short suffix
+        const srOrderId = order.order_number
+            ? String(order.order_number)
+            : `AT-${order.id.replace(/-/g, '').slice(-8).toUpperCase()}`;
+
         const shiprocketPayload = {
-            order_id: order.id,
+            order_id: srOrderId,
             order_date: new Date(order.created_at).toISOString(),
             pickup_location: 'Jhandewalan',
             billing_customer_name: address.name,

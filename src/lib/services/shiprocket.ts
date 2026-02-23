@@ -9,13 +9,18 @@ export const ShiprocketService = {
             }),
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const error = await response.json();
-            console.error('[Shiprocket Auth Error]:', error);
-            throw new Error('Failed to authenticate with Shiprocket');
+            console.error('[Shiprocket Auth Error]:', data);
+            throw new Error(`Shiprocket auth failed: ${data?.message || data?.error || JSON.stringify(data)}`);
         }
 
-        const data = await response.json();
+        if (!data.token) {
+            console.error('[Shiprocket Auth] No token in response:', data);
+            throw new Error('Shiprocket auth succeeded but no token returned');
+        }
+
         return data.token;
     },
 
@@ -64,6 +69,8 @@ export const ShiprocketService = {
                 payload.sub_total = balanceToCollect;
             }
 
+            console.log('[Shiprocket] Sending payload:', JSON.stringify(payload, null, 2));
+
             const response = await fetch('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', {
                 method: 'POST',
                 headers: {
@@ -73,13 +80,19 @@ export const ShiprocketService = {
                 body: JSON.stringify(payload),
             });
 
+            const responseData = await response.json();
+
             if (!response.ok) {
-                const error = await response.json();
-                console.error('[Shiprocket Order Creation Error]:', error);
-                throw new Error('Failed to create order in Shiprocket');
+                console.error('[Shiprocket Order Creation Error]:', responseData);
+                const errorMsg = responseData?.message
+                    || responseData?.error
+                    || (Array.isArray(responseData?.errors) ? responseData.errors.join(', ') : null)
+                    || JSON.stringify(responseData);
+                throw new Error(`Shiprocket rejected order: ${errorMsg}`);
             }
 
-            return await response.json();
+            console.log('[Shiprocket] Order created:', responseData);
+            return responseData;
         } catch (error) {
             console.error('[Shiprocket Service Error]:', error);
             throw error;
