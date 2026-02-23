@@ -5,7 +5,7 @@ import { AdminService } from '@/lib/services/admin';
 import { InvoiceService } from '@/lib/services/invoice';
 import {
     Loader2, ArrowLeft, MoreHorizontal, Printer, MapPin,
-    Mail, Phone, Package, Truck, CreditCard, Calendar,
+    Mail, Phone, Package, Truck, CreditCard, Calendar, Clock,
     CheckCircle2, AlertCircle, XCircle, Send, RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
@@ -67,10 +67,24 @@ export default function OrderDetailPage() {
     const [isResettingShiprocket, setIsResettingShiprocket] = useState(false);
     const [shiprocketPushError, setShiprocketPushError] = useState<string | null>(null);
     const [selectedPickupKey, setSelectedPickupKey] = useState<string>('WAREHOUSE');
+    const [shiprocketLocations, setShiprocketLocations] = useState<any[]>([]);
 
     useEffect(() => {
         loadOrder();
+        fetchShiprocketLocations();
     }, [orderId]);
+
+    async function fetchShiprocketLocations() {
+        try {
+            const res = await fetch('/api/admin/shiprocket/pickup-locations');
+            const data = await res.json();
+            if (data.success) {
+                setShiprocketLocations(data.locations);
+            }
+        } catch (error) {
+            console.error('Error fetching shiprocket locations:', error);
+        }
+    }
 
     async function loadOrder() {
         try {
@@ -390,12 +404,57 @@ export default function OrderDetailPage() {
                                             value={selectedPickupKey}
                                             onChange={(e) => setSelectedPickupKey(e.target.value)}
                                         >
-                                            {Object.entries(PICKUP_LOCATIONS).map(([key, loc]) => (
-                                                <option key={key} value={key}>
-                                                    🏭 {loc.label}
-                                                </option>
-                                            ))}
+                                            {Object.entries(PICKUP_LOCATIONS).map(([key, loc]) => {
+                                                const srLoc = shiprocketLocations.find(l =>
+                                                    l.pickup_location === loc.shiprocketName ||
+                                                    l.pickup_location_name === loc.shiprocketName
+                                                );
+                                                const isVerified = srLoc?.verified === 1 || srLoc?.status === 'Active' || srLoc?.status === 1;
+                                                const exists = !!srLoc;
+
+                                                return (
+                                                    <option key={key} value={key}>
+                                                        {exists ? (isVerified ? '✅ ' : '⏳ ') : '➕ '} {loc.label}
+                                                        {exists && !isVerified && ' (Unverified)'}
+                                                        {!exists && ' (Needs Sync)'}
+                                                    </option>
+                                                );
+                                            })}
                                         </select>
+
+                                        {(() => {
+                                            const loc = PICKUP_LOCATIONS[selectedPickupKey];
+                                            const srLoc = shiprocketLocations.find(l =>
+                                                l.pickup_location === loc.shiprocketName ||
+                                                l.pickup_location_name === loc.shiprocketName
+                                            );
+                                            const isVerified = srLoc?.verified === 1 || srLoc?.status === 'Active' || srLoc?.status === 1;
+                                            const exists = !!srLoc;
+
+                                            if (exists && !isVerified) {
+                                                return (
+                                                    <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-[11px] text-amber-800 flex items-start gap-2">
+                                                        <AlertCircle className="w-3 h-3 mt-0.5 shrink-0" />
+                                                        <div>
+                                                            <strong>Action Required:</strong> This number needs verification.
+                                                            Check <strong>Settings → Pickup Address</strong> in Shiprocket and verify the phone number.
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            if (!exists && selectedPickupKey !== 'WAREHOUSE') {
+                                                return (
+                                                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-[11px] text-blue-800 flex items-start gap-2">
+                                                        <Clock className="w-3 h-3 mt-0.5 shrink-0" />
+                                                        <div>
+                                                            This address will be auto-created on your first push.
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
+
                                         <p className="text-[11px] text-muted-foreground mt-1.5 ml-1">
                                             {PICKUP_LOCATIONS[selectedPickupKey]?.address}
                                         </p>
