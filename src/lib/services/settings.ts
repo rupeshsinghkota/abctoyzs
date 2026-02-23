@@ -87,5 +87,24 @@ export const SettingsService = {
             });
 
         if (error) throw error;
+    },
+
+    async getSettings(supabaseClient?: any): Promise<any> {
+        try {
+            const supabase = supabaseClient || createClient();
+            const { data, error } = await supabase
+                .from('settings')
+                .select('*')
+                .single();
+
+            if (error || !data) {
+                return null;
+            }
+
+            return data;
+        } catch (e) {
+            console.error("[SettingsService] Error fetching settings:", e);
+            return null;
+        }
     }
 };

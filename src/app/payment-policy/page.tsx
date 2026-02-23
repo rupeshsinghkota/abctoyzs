@@ -35,10 +35,15 @@ export async function generateMetadata(): Promise<Metadata> {
     };
 }
 
-export default function PaymentPolicy() {
-    const advanceAmount = BRAND_CONFIG.payment.codAdvanceAmount;
+export default async function PaymentPolicy() {
+    const settings = await SettingsService.getSettings();
+
+    const advanceAmount = settings?.cod_advance_value || BRAND_CONFIG.payment.codAdvanceAmount;
+    const advanceType = settings?.cod_advance_type || BRAND_CONFIG.payment.codAdvanceType;
     const prepaidDiscount = BRAND_CONFIG.payment.prepaidDiscountPercentage;
     const prepaidCoupon = BRAND_CONFIG.payment.prepaidCouponCode;
+
+    const displayAdvance = advanceType === 'percentage' ? `${advanceAmount}%` : `₹${advanceAmount.toLocaleString()}`;
 
     return (
         <div className="min-h-screen bg-zinc-50 pt-24 pb-16">
@@ -100,7 +105,7 @@ export default function PaymentPolicy() {
 
                             <div className="prose prose-zinc max-w-none text-zinc-600 mb-8">
                                 <p>
-                                    As a premium retailer of heavy and high-value ride-on toys, we collect a small booking advance of <strong>₹{advanceAmount}</strong> for all Cash on Delivery (COD) orders.
+                                    As a premium retailer of high-value ride-on toys, we collect a small booking advance of <strong>{displayAdvance}</strong> for all Cash on Delivery (COD) orders.
                                 </p>
                                 <h4 className="text-zinc-900 font-bold mb-2">Why do we collect an advance?</h4>
                                 <ul className="space-y-3">

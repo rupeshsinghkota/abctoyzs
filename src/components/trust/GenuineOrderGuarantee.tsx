@@ -1,10 +1,11 @@
 "use client";
 
 import { CheckCircle2, Video, PhoneCall, ShieldCheck, Zap } from "lucide-react";
-import { BRAND_CONFIG } from "@/config/brand";
+import { useCodSettings } from "@/hooks/useCodSettings";
 
 export function GenuineOrderGuarantee({ className = "" }: { className?: string }) {
-    const advanceAmount = BRAND_CONFIG.payment.codAdvanceAmount;
+    const { advance, type } = useCodSettings();
+    const displayAdvance = type === 'percentage' ? `${advance}%` : `₹${advance}`;
 
     return (
         <div className={`space-y-4 ${className}`}>
@@ -51,7 +52,7 @@ export function GenuineOrderGuarantee({ className = "" }: { className?: string }
                             </div>
                             <div>
                                 <p className="text-[10px] font-black text-indigo-950 leading-tight">Genuine Only Service</p>
-                                <p className="text-[9px] text-red-500 font-bold">To maintain quality, only confirmed orders with ₹{advanceAmount} advance will be entertained for unit-specific details.</p>
+                                <p className="text-[9px] text-red-500 font-bold">To maintain quality, only confirmed orders with {displayAdvance} advance will be entertained for unit-specific details.</p>
                             </div>
                         </div>
                     </div>

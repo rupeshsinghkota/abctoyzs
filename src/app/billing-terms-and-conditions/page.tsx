@@ -21,7 +21,12 @@ export async function generateMetadata(): Promise<Metadata> {
     };
 }
 
-export default function BillingTerms() {
+export default async function BillingTerms() {
+    const settings = await SettingsService.getSettings();
+    const advanceAmount = settings?.cod_advance_value || BRAND_CONFIG.payment.codAdvanceAmount;
+    const advanceType = settings?.cod_advance_type || BRAND_CONFIG.payment.codAdvanceType;
+    const displayAdvance = advanceType === 'percentage' ? `${advanceAmount}%` : `₹${advanceAmount.toLocaleString()}`;
+
     return (
         <div className="min-h-screen bg-zinc-50 pt-24 pb-16">
             <div className="container max-w-4xl mx-auto px-6">
@@ -84,9 +89,9 @@ export default function BillingTerms() {
                                 </p>
                             </div>
                             <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-100">
-                                <h3 className="font-bold text-zinc-900 mb-2">2. COD with ₹{BRAND_CONFIG.payment.codAdvanceAmount} Prepayment</h3>
+                                <h3 className="font-bold text-zinc-900 mb-2">2. COD with {displayAdvance} Prepayment</h3>
                                 <p className="text-sm text-zinc-600 leading-relaxed">
-                                    For large ride-on toys, we offer Cash on Delivery with a mandatory ₹{BRAND_CONFIG.payment.codAdvanceAmount} advance payment to confirm the order. The balance amount is payable to the courier at the time of delivery.
+                                    For high-value ride-on toys, we offer Cash on Delivery with a mandatory {displayAdvance} advance payment to confirm the order. The balance amount is payable to the courier at the time of delivery.
                                 </p>
                             </div>
                         </div>
