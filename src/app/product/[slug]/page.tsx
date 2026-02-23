@@ -12,6 +12,7 @@ import { ProductCard } from '@/components/shop/ProductCard';
 import { Metadata } from 'next';
 import { MarketingHero } from '@/components/product/MarketingHero';
 import TrackProductView from '@/components/tracking/TrackProductView';
+import { RecentlyViewed } from '@/components/product/RecentlyViewed';
 
 interface PageProps {
     params: Promise<{
@@ -279,6 +280,11 @@ export default async function ProductPage({ params }: PageProps) {
                     </div>
                 </div>
             )}
+
+            {/* Recently Viewed — Relocated to bottom for cleaner layout */}
+            <div className="container mx-auto px-4 lg:px-8 pb-12">
+                <RecentlyViewed currentProductId={product.id} />
+            </div>
         </div>
     );
 }

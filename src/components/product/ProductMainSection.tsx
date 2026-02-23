@@ -14,7 +14,6 @@ import { LiveViewersBadge } from '@/components/product/LiveViewersBadge';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/store/useStore';
-import { RecentlyViewed } from '@/components/product/RecentlyViewed';
 import { GenuineOrderGuarantee } from '@/components/trust/GenuineOrderGuarantee';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
@@ -409,10 +408,6 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                 />
             </div>
 
-            {/* RECENTLY VIEWED SECTION */}
-            <div className="lg:col-span-12 px-4 lg:px-0">
-                <RecentlyViewed currentProductId={product.id} />
-            </div>
 
         </div>
     );
