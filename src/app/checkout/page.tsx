@@ -625,46 +625,65 @@ export default function CheckoutPage() {
                                 {/* COD Partial Payment Notice — shown only when COD + partial mode */}
                                 {paymentMethod === 'COD' && codSettings?.cod_mode === 'partial' && (() => {
                                     const prepaidSaving = Math.round(total * 0.05);
+                                    const advanceAmount = calculateCodAdvance(total, codSettings).advance;
+                                    const balanceAmount = calculateCodAdvance(total, codSettings).balance;
+
                                     return (
-                                        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 space-y-2.5 animate-in fade-in slide-in-from-top-1 duration-300">
-                                            <div className="flex items-start gap-2.5">
-                                                <span className="text-amber-500 text-base leading-none mt-0.5">⚠️</span>
-                                                <div>
-                                                    <p className="text-xs font-black text-amber-900">Advance Payment Required for COD</p>
-                                                    <p className="text-[11px] text-amber-700 font-medium mt-1 leading-relaxed">
-                                                        A small advance of{' '}
-                                                        <span className="font-black">₹{calculateCodAdvance(total, codSettings).advance.toLocaleString()}</span>{' '}
-                                                        is collected online now. The remaining{' '}
-                                                        <span className="font-black">₹{calculateCodAdvance(total, codSettings).balance.toLocaleString()}</span>{' '}
-                                                        is paid to the delivery partner.
+                                        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/30 px-5 py-4 space-y-3.5 animate-in fade-in slide-in-from-top-1 duration-300">
+                                            <div className="flex items-start gap-3">
+                                                <div className="mt-0.5 p-1.5 bg-indigo-600 rounded-lg shadow-md shadow-indigo-200">
+                                                    <ShieldCheck className="w-4 h-4 text-white" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <p className="text-xs font-black text-indigo-900 uppercase tracking-tight">Verified Booking Advance</p>
+                                                        <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-full border border-indigo-100 shadow-sm">
+                                                            <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+                                                            <span className="text-[8px] font-black text-indigo-600 uppercase">100% Refundable</span>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-[11px] text-indigo-800 font-medium leading-relaxed">
+                                                        To confirm your slot and protect against failed deliveries, a secure booking advance of{' '}
+                                                        <span className="font-black text-indigo-900 underline decoration-indigo-300 decoration-2 underline-offset-2">₹{advanceAmount.toLocaleString()}</span>{' '}
+                                                        is collected via **Razorpay Secure**.
                                                     </p>
                                                 </div>
                                             </div>
-                                            <ul className="space-y-1 pl-7">
-                                                <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
-                                                    <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
-                                                    This protects both you and us from failed deliveries
-                                                </li>
-                                                <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
-                                                    <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
-                                                    Advance is fully refundable if we cannot deliver
-                                                </li>
-                                                <li className="text-[10px] text-amber-700 font-medium flex items-center gap-1.5">
-                                                    <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
-                                                    Cancellation after dispatch may incur shipping charges
-                                                </li>
-                                            </ul>
+
+                                            <div className="grid grid-cols-2 gap-3 pb-1">
+                                                <div className="bg-white/80 p-2.5 rounded-xl border border-indigo-50 flex flex-col items-center text-center">
+                                                    <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Pay Now</span>
+                                                    <span className="text-sm font-black text-indigo-900">₹{advanceAmount.toLocaleString()}</span>
+                                                </div>
+                                                <div className="bg-white/80 p-2.5 rounded-xl border border-indigo-50 flex flex-col items-center text-center">
+                                                    <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">On Delivery</span>
+                                                    <span className="text-sm font-black text-indigo-900">₹{balanceAmount.toLocaleString()}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                                                    <p className="text-[10px] text-indigo-700 font-bold">100% Refund Guarantee: <span className="font-medium">Refunded if order is cancelled before dispatch.</span></p>
+                                                </div>
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                                                    <p className="text-[10px] text-indigo-700 font-bold tracking-tight">Razorpay Protection: <span className="font-medium">Your partial payment is secure & PCI-compliant.</span></p>
+                                                </div>
+                                            </div>
+
                                             {/* Switch to Prepaid CTA */}
                                             <button
                                                 onClick={handleSwitchToPrepaid}
-                                                className="w-full flex items-center justify-between bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 py-2 transition-all active:scale-[0.98] group"
+                                                className="w-full flex items-center justify-between bg-zinc-900 hover:bg-black text-white rounded-xl px-4 py-2.5 transition-all shadow-lg shadow-zinc-200 active:scale-[0.98] group"
                                             >
-                                                <span className="text-[11px] font-black">
-                                                    ✅ Switch to Prepaid — Save ₹{prepaidSaving.toLocaleString()} (5% OFF)
-                                                </span>
-                                                <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-md group-hover:bg-white/30 transition-colors">
-                                                    Apply PREPAID5 →
-                                                </span>
+                                                <div className="flex flex-col items-start leading-none">
+                                                    <span className="text-[11px] font-black">Switch to Full Prepaid</span>
+                                                    <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1">Extra ₹{prepaidSaving.toLocaleString()} Instant Savings</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-md group-hover:bg-white/20 transition-colors">
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-primary italic">Apply PREPAID5 →</span>
+                                                </div>
                                             </button>
                                         </div>
                                     );

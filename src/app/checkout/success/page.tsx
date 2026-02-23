@@ -133,14 +133,21 @@ function SuccessContent() {
 
                     {/* COD Special Verification Message */}
                     {!loading && order?.payment_method === 'COD' && (
-                        <div className="mb-8 p-4 bg-zinc-900 text-white rounded-2xl max-w-sm mx-auto animate-in slide-in-from-bottom-2 duration-500">
-                            <div className="flex items-center gap-2.5 mb-2 justify-center">
+                        <div className="mb-8 p-5 bg-zinc-900 text-white rounded-[2rem] max-w-sm mx-auto animate-in slide-in-from-bottom-2 duration-500 shadow-xl shadow-zinc-200">
+                            <div className="flex items-center gap-2.5 mb-3 justify-center">
                                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Next Steps</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                    {order.total_amount < (order as any).total_payable ? 'Advance Verified' : 'Next Steps'}
+                                </span>
                             </div>
-                            <p className="text-sm font-black italic tracking-tight mb-1">Manual Verification Required</p>
+                            <p className="text-base font-black italic tracking-tight mb-1">
+                                {order.total_amount < (order as any).total_payable ? 'Booking Confirmed!' : 'Manual Verification Required'}
+                            </p>
                             <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
-                                Since this is a COD order, our agent will <span className="text-primary italic">WhatsApp or Call</span> you within 24 hours to verify your details before we dispatch.
+                                {order.total_amount < (order as any).total_payable
+                                    ? `We've received your booking advance. Our agent will WhatsApp/Call you shortly to share the dispatch timeline.`
+                                    : `Since this is a COD order, our agent will WhatsApp or Call you within 24 hours to verify your details before we dispatch.`
+                                }
                             </p>
                         </div>
                     )}
