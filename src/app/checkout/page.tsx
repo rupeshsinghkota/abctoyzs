@@ -142,7 +142,7 @@ export default function CheckoutPage() {
                 if (data.error) {
                     setAppliedCoupon(null);
                     setCouponCode('');
-                    alert(`Coupon removed: ${data.error}`);
+                    // Silently remove - don't announce to avoid negative customer friction
                 }
             }).catch(console.error);
         }
