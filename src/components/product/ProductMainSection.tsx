@@ -176,6 +176,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                     key={displayImages[0]}
                     images={displayImages}
                     videos={product.videos}
+                    productName={product.name}
                 />
             </div>
 

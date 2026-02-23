@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Maximize2, Play, CirclePlay } from 'lucide-r
 interface ImageGalleryProps {
     images: string[];
     videos?: string[];
+    productName?: string;
 }
 
 type MediaItem = {
@@ -15,7 +16,7 @@ type MediaItem = {
     url: string;
 };
 
-export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
+export function ImageGallery({ images, videos = [], productName = "Product" }: ImageGalleryProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [desktopIndex, setDesktopIndex] = useState(0);
@@ -63,7 +64,7 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
                                     <div className="relative w-full h-full">
                                         <img
                                             src={item.url}
-                                            alt={`Product view ${index + 1}`}
+                                            alt={`${productName} - View ${index + 1}`}
                                             className="w-full h-full object-contain drop-shadow-sm p-0"
                                             loading={index === 0 ? 'eager' : 'lazy'}
                                             fetchPriority={index === 0 ? 'high' : 'auto'}
@@ -222,7 +223,7 @@ export function ImageGallery({ images, videos = [] }: ImageGalleryProps) {
 
                                 <img
                                     src={mediaItems[desktopIndex].url}
-                                    alt="Product Main View"
+                                    alt={`${productName} - Main View`}
                                     loading="eager"
                                     fetchPriority="high"
                                     className="w-full h-full object-contain p-8 transition-all duration-1000 ease-out group-hover:scale-105 relative z-10"
