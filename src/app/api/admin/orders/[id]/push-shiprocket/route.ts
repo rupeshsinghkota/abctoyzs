@@ -91,9 +91,29 @@ export async function POST(
             weight: 10.0,
         };
 
-        // 3. Push to Shiprocket
+        // 3. Auto-register pickup location in Shiprocket (safe no-op if already exists)
+        const PICKUP_ADDRESS_DETAILS: Record<string, any> = {
+            'Polygran India': {
+                pickup_location: 'Polygran India',
+                name: 'Polygran India',
+                email: process.env.SHIPROCKET_EMAIL!,
+                phone: '9038540911',
+                address: 'Warehouse No 14, Marson Compound, Budge Budge Trunk Road',
+                address_2: 'Chakmir, Maheshtala',
+                city: 'Kolkata',
+                state: 'West Bengal',
+                country: 'India',
+                pin_code: '700142',
+            },
+        };
+        if (PICKUP_ADDRESS_DETAILS[pickupLocationName]) {
+            await ShiprocketService.createPickupAddress(PICKUP_ADDRESS_DETAILS[pickupLocationName]);
+        }
+
+        // 4. Push to Shiprocket
         console.log(`[PushShiprocket] Pushing order ${orderId} to Shiprocket...`);
         const shiprocketRes = await ShiprocketService.createOrder(shiprocketPayload);
+
 
         const shiprocketOrderId = shiprocketRes.order_id;
         const shipmentId = shiprocketRes.shipments?.[0]?.id || shiprocketRes.shipment_id || null;

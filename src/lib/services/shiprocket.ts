@@ -98,7 +98,41 @@ export const ShiprocketService = {
             throw error;
         }
     },
+    // Create/register a pickup address in Shiprocket
+    // Safe to call even if address already exists — Shiprocket will just return an error we ignore
+    async createPickupAddress(details: {
+        pickup_location: string;   // must match exactly what you use in order payload
+        name: string;
+        email: string;
+        phone: string;
+        address: string;
+        address_2?: string;
+        city: string;
+        state: string;
+        country: string;
+        pin_code: string;
+    }) {
+        try {
+            const token = await this.authenticate();
+            const response = await fetch('https://apiv2.shiprocket.in/v1/external/settings/company/addpickup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(details),
+            });
+            const data = await response.json();
+            console.log('[Shiprocket] createPickupAddress response:', data);
+            return data;
+        } catch (err) {
+            // Non-fatal — if it already exists, order creation will still succeed
+            console.warn('[Shiprocket] createPickupAddress error (non-fatal):', err);
+        }
+    },
+
     async getTracking(orderId: string) {
+
         try {
             const token = await this.authenticate();
             const response = await fetch(`https://apiv2.shiprocket.in/v1/external/courier/track?order_id=${orderId}`, {
