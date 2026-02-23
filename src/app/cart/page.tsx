@@ -150,10 +150,26 @@ export default function CartPage() {
                             Proceed to Checkout
                             <ArrowRight className="w-5 h-5" />
                         </button>
-                        <div className="mt-4 flex flex-col items-center justify-center gap-2">
-                            <p className="text-[11px] font-bold text-gray-500 flex items-center gap-1.5 uppercase tracking-wider">
-                                <span className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center"><Truck className="w-2.5 h-2.5 text-green-600" /></span>
-                                Free Delivery Guaranteed
+                        <div className="mt-4 space-y-3">
+                            <div className="flex items-center justify-center gap-1.5 px-3 py-2 bg-green-50 rounded-xl border border-green-100">
+                                <ShieldCheck className="w-4 h-4 text-green-600" />
+                                <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">100% Secure Checkout</span>
+                            </div>
+
+                            <div className="flex flex-col items-center gap-2">
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Guaranteed Safe Payments</p>
+                                <div className="flex items-center justify-center gap-2 flex-wrap opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
+                                    <span className="bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[9px] font-black text-gray-700">💵 COD</span>
+                                    <span className="bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[9px] font-black text-gray-700">UPI</span>
+                                    <span className="bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[9px] font-black text-[#2B85FF]">Razorpay</span>
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-2.5" />
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4" />
+                                </div>
+                            </div>
+
+                            <p className="text-[10px] text-center font-bold text-gray-500 flex items-center justify-center gap-1.5 uppercase tracking-wider">
+                                <Truck className="w-3.5 h-3.5 text-primary" />
+                                Free Delivery Pan-India
                             </p>
                         </div>
                     </div>

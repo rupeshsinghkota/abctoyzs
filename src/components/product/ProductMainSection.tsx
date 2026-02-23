@@ -11,6 +11,7 @@ import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { StickyCartBar } from '@/components/product/StickyCartBar';
 import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-react';
 import { LiveViewersBadge } from '@/components/product/LiveViewersBadge';
+import { ProductReviews } from '@/components/product/ProductReviews';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
@@ -199,6 +200,10 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                             Top Rated
                                         </span>
                                     )}
+                                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-green-50 text-green-600 border border-green-100 rounded-md">
+                                        <ShieldCheck className="w-2.5 h-2.5" />
+                                        <span className="text-[9px] font-black uppercase tracking-wider">BIS Safety Certified</span>
+                                    </div>
                                 </div>
 
                                 <h1 className="text-xl md:text-2xl lg:text-3xl font-extrabold font-heading leading-tight tracking-tight text-gray-900">
@@ -277,8 +282,12 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I have a question about ${product.name}.\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center"
+                            className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 group"
                         >
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
                             Ask a Question
                         </a>
                     </div>
@@ -366,6 +375,15 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* REVIEWS SECTION */}
+            <div className="lg:col-span-12 px-4 lg:px-0">
+                <ProductReviews
+                    rating={product.rating || 5.0}
+                    reviewCount={product.reviews || 0}
+                    productName={product.name}
+                />
             </div>
 
         </div>

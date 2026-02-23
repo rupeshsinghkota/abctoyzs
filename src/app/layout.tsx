@@ -15,6 +15,7 @@ import GoogleTracking from "@/components/tracking/GoogleTracking";
 import FacebookPixel from "@/components/tracking/FacebookPixel";
 import WhatsAppTracker from "@/components/tracking/WhatsAppTracker";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
+import { RecentActivityToast } from "@/components/common/RecentActivityToast";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -127,6 +128,7 @@ export default function RootLayout({
         <BottomNav />
         <WhatsAppButton />
         <BackToTop />
+        <RecentActivityToast />
       </body>
     </html>
   );

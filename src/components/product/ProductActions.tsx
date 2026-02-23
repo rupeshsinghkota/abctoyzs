@@ -393,20 +393,22 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
 
                 {/* Guarantee Row */}
-                <div className="flex items-center justify-between gap-2 bg-orange-50/50 border border-orange-100/70 rounded-xl px-3 py-2.5 pb-6 lg:pb-2.5">
-                    <a href="/shipping-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
+                <div className="grid grid-cols-4 items-center gap-2 bg-orange-50/50 border border-orange-100/70 rounded-xl px-2 py-3">
+                    <a href="/shipping-policy" className="flex flex-col items-center gap-1 group">
                         <Truck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] font-bold text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">Free<br />Delivery</span>
+                        <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">Free<br />Delivery</span>
                     </a>
-                    <div className="w-px h-8 bg-orange-100" />
-                    <a href="/warranty-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
+                    <div className="flex flex-col items-center gap-1 group">
+                        <CheckCircle2 className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">BIS<br />Certified</span>
+                    </div>
+                    <a href="/warranty-policy" className="flex flex-col items-center gap-1 group">
                         <ShieldCheck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] font-bold text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">1 Year<br />Warranty</span>
+                        <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">1 Year<br />Warranty</span>
                     </a>
-                    <div className="w-px h-8 bg-orange-100" />
-                    <a href="/refund-policy" className="flex flex-col items-center gap-0.5 flex-1 group">
+                    <a href="/refund-policy" className="flex flex-col items-center gap-1 group">
                         <RotateCcw className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] font-bold text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">10 Days<br />Replacement</span>
+                        <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">Easy<br />Return</span>
                     </a>
                 </div>
             </div>
