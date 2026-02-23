@@ -144,3 +144,36 @@ export async function POST(
         return NextResponse.json({ error: err.message || 'Failed to push to Shiprocket' }, { status: 500 });
     }
 }
+
+// Reset Shiprocket data — allows repushing a previously pushed/cancelled order
+export async function DELETE(
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const supabase = await createClient();
+        const { id: orderId } = await params;
+
+        const { error } = await supabase
+            .from('orders')
+            .update({
+                shiprocket_order_id: null,
+                channel_order_id: null,
+                shipment_id: null,
+                shipping_carrier: null,
+                awb: null,
+                courier_name: null,
+                status: 'confirmed',
+            })
+            .eq('id', orderId);
+
+        if (error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        console.log(`[PushShiprocket] Reset Shiprocket data for order ${orderId}`);
+        return NextResponse.json({ success: true, message: 'Shiprocket data cleared. Order ready to repush.' });
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}

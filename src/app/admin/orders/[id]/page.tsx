@@ -6,7 +6,7 @@ import { InvoiceService } from '@/lib/services/invoice';
 import {
     Loader2, ArrowLeft, MoreHorizontal, Printer, MapPin,
     Mail, Phone, Package, Truck, CreditCard, Calendar,
-    CheckCircle2, AlertCircle, XCircle, Send
+    CheckCircle2, AlertCircle, XCircle, Send, RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -64,6 +64,7 @@ export default function OrderDetailPage() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [isPushingShiprocket, setIsPushingShiprocket] = useState(false);
+    const [isResettingShiprocket, setIsResettingShiprocket] = useState(false);
     const [shiprocketPushError, setShiprocketPushError] = useState<string | null>(null);
     const [selectedPickupKey, setSelectedPickupKey] = useState<string>('WAREHOUSE');
 
@@ -125,6 +126,23 @@ export default function OrderDetailPage() {
             setShiprocketPushError(err.message);
         } finally {
             setIsPushingShiprocket(false);
+        }
+    }
+
+    async function resetShiprocketData() {
+        if (!order || !confirm('Are you sure you want to reset Shiprocket data? This will allow you to push the order again.')) return;
+        setIsResettingShiprocket(true);
+        try {
+            const res = await fetch(`/api/admin/orders/${order.id}/push-shiprocket`, {
+                method: 'DELETE',
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to reset Shiprocket data');
+            await loadOrder();
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setIsResettingShiprocket(false);
         }
     }
 
@@ -191,7 +209,7 @@ export default function OrderDetailPage() {
                             <h2 className="font-semibold text-sm">Order Items</h2>
                         </div>
                         <div className="divide-y">
-                            {order.items.map((item: any, i) => (
+                            {order.items.map((item: any, i: number) => (
                                 <div key={i} className="flex gap-4 p-6">
                                     <div className="w-16 h-16 bg-zinc-100 rounded-lg border overflow-hidden flex-shrink-0">
                                         {item.product_image && (
@@ -338,10 +356,18 @@ export default function OrderDetailPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="mt-3 pt-3 border-t border-blue-200">
+                                        <div className="mt-4 pt-3 border-t border-blue-200 flex justify-between items-center">
                                             <p className="text-xs text-blue-700">
                                                 💡 Manage courier selection and tracking in Shiprocket dashboard
                                             </p>
+                                            <button
+                                                onClick={resetShiprocketData}
+                                                disabled={isResettingShiprocket}
+                                                className="text-[10px] font-bold text-red-600 hover:text-red-700 uppercase tracking-tight flex items-center gap-1 transition-colors disabled:opacity-50"
+                                            >
+                                                {isResettingShiprocket ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                                                Reset & Repush
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
