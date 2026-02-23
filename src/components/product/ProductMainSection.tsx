@@ -13,6 +13,8 @@ import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-rea
 import { LiveViewersBadge } from '@/components/product/LiveViewersBadge';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useStore } from '@/store/useStore';
+import { RecentlyViewed } from '@/components/product/RecentlyViewed';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
     const router = useRouter();
@@ -152,6 +154,22 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
         // Fallback to a generic 4-5 day estimate if no pincode checked
         // but hide if a real check happened
     }, []);
+
+    // Track Recently Viewed
+    const addToRecentlyViewed = useStore(state => state.addToRecentlyViewed);
+    useEffect(() => {
+        if (product) {
+            addToRecentlyViewed({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                slug: product.slug,
+                category: product.category,
+                rating: product.rating
+            });
+        }
+    }, [product.id, addToRecentlyViewed]);
 
     // ... (rest of component)
 
@@ -385,6 +403,11 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                     reviewCount={product.reviews || 0}
                     productName={product.name}
                 />
+            </div>
+
+            {/* RECENTLY VIEWED SECTION */}
+            <div className="lg:col-span-12 px-4 lg:px-0">
+                <RecentlyViewed currentProductId={product.id} />
             </div>
 
         </div>

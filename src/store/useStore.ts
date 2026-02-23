@@ -13,8 +13,21 @@ interface CartItem {
     attributes?: Record<string, string>; // e.g. { Color: "Red" }
 }
 
+interface RecentlyViewedItem {
+    id: string;
+    name: string;
+    price: number;
+    image: string;
+    slug: string;
+    category?: string;
+    rating?: number;
+}
+
 interface AppState {
     cart: CartItem[];
+    recentlyViewed: RecentlyViewedItem[];
+    addToRecentlyViewed: (product: RecentlyViewedItem) => void;
+    clearRecentlyViewed: () => void;
     isCartOpen: boolean;
     addToCart: (item: CartItem) => void;
     removeFromCart: (id: string) => void;
@@ -27,7 +40,18 @@ export const useStore = create<AppState>()(
     persist(
         (set) => ({
             cart: [],
+            recentlyViewed: [],
             isCartOpen: false,
+            addToRecentlyViewed: (product) =>
+                set((state) => {
+                    // Filter out any existing instance of this product
+                    const filtered = state.recentlyViewed.filter(p => p.id !== product.id);
+                    // Add to front of array, limit to 10
+                    return {
+                        recentlyViewed: [product, ...filtered].slice(0, 10)
+                    };
+                }),
+            clearRecentlyViewed: () => set({ recentlyViewed: [] }),
             addToCart: (item) =>
                 set((state) => {
                     const existing = state.cart.find((i) =>
