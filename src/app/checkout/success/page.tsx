@@ -119,7 +119,7 @@ function SuccessContent() {
                     </div>
 
                     <h1 className="text-3xl font-black font-heading mb-2">Order Confirmed!</h1>
-                    <p className="text-muted-foreground mb-8 max-w-xs mx-auto">
+                    <p className="text-muted-foreground mb-4 max-w-xs mx-auto">
                         {loading ? (
                             <span className="flex items-center justify-center gap-2">
                                 <Loader2 className="w-4 h-4 animate-spin" /> Retrieving order details...
@@ -130,6 +130,20 @@ function SuccessContent() {
                             </>
                         )}
                     </p>
+
+                    {/* COD Special Verification Message */}
+                    {!loading && order?.payment_method === 'COD' && (
+                        <div className="mb-8 p-4 bg-zinc-900 text-white rounded-2xl max-w-sm mx-auto animate-in slide-in-from-bottom-2 duration-500">
+                            <div className="flex items-center gap-2.5 mb-2 justify-center">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Next Steps</span>
+                            </div>
+                            <p className="text-sm font-black italic tracking-tight mb-1">Manual Verification Required</p>
+                            <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
+                                Since this is a COD order, our agent will <span className="text-primary italic">WhatsApp or Call</span> you within 24 hours to verify your details before we dispatch.
+                            </p>
+                        </div>
+                    )}
 
                     <div className="flex flex-col gap-3 w-full max-w-sm">
                         <Link

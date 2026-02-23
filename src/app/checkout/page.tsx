@@ -5,12 +5,13 @@ import { useStore } from '@/store/useStore';
 import { ProfileService, Address } from '@/lib/services/profile';
 import { OrderService } from '@/lib/services/orders';
 import { createClient } from '@/lib/supabase/client';
+import { BISCertificateModal } from '@/components/product/BISCertificateModal';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
     ArrowLeft, MapPin, Plus, Check, Truck, CreditCard,
     Banknote, Loader2, ShieldCheck, Package, ChevronRight,
-    Ticket, X
+    Ticket, X, CheckCircle2
 } from 'lucide-react';
 import { CheckoutAuth } from '@/components/checkout/CheckoutAuth';
 
@@ -34,6 +35,7 @@ export default function CheckoutPage() {
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
     const [showAddrForm, setShowAddrForm] = useState(false);
+    const [isBISModalOpen, setIsBISModalOpen] = useState(false);
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
@@ -572,6 +574,54 @@ export default function CheckoutPage() {
                                     )}
                                 </div>
 
+                                {/* Trust Highlights for COD */}
+                                {paymentMethod === 'COD' && (
+                                    <div className="mx-2 p-3 bg-white border border-gray-100 rounded-xl shadow-sm space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="flex items-center justify-between border-b border-gray-50 pb-2">
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                                <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Safe COD Verification</span>
+                                            </div>
+                                            <button
+                                                onClick={() => setIsBISModalOpen(true)}
+                                                className="text-[9px] font-black text-primary hover:underline uppercase tracking-tighter"
+                                            >
+                                                View Safety Cert →
+                                            </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <div className="flex flex-col items-center text-center gap-1">
+                                                <div className="p-1.5 bg-zinc-50 rounded-lg">
+                                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                                                </div>
+                                                <span className="text-[8px] font-bold text-gray-500 leading-tight">GST Verified<br />Sellers</span>
+                                            </div>
+                                            <div className="flex flex-col items-center text-center gap-1">
+                                                <div className="p-1.5 bg-zinc-50 rounded-lg">
+                                                    <Package className="w-3.5 h-3.5 text-blue-600" />
+                                                </div>
+                                                <span className="text-[8px] font-bold text-gray-500 leading-tight">Physical Stock<br />Guarantee</span>
+                                            </div>
+                                            <div className="flex flex-col items-center text-center gap-1">
+                                                <div className="p-1.5 bg-zinc-50 rounded-lg">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                                                </div>
+                                                <span className="text-[8px] font-bold text-gray-500 leading-tight">ISI Marc<br />Quality</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-zinc-900 rounded-lg p-2.5 flex items-start gap-2.5">
+                                            <div className="mt-0.5 p-1 bg-white/10 rounded-md">
+                                                <Loader2 className="w-3 h-3 text-white animate-spin-slow" />
+                                            </div>
+                                            <p className="text-[10px] text-zinc-300 font-medium leading-normal">
+                                                <span className="text-white font-black">Manual Order Verification:</span> To prevent fake orders, our agent will <span className="text-primary italic">WhatsApp/Call</span> you to confirm this order before shipping.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* COD Partial Payment Notice — shown only when COD + partial mode */}
                                 {paymentMethod === 'COD' && codSettings?.cod_mode === 'partial' && (() => {
                                     const prepaidSaving = Math.round(total * 0.05);
@@ -682,6 +732,12 @@ export default function CheckoutPage() {
                     </div>
                 </div>
             </main>
+
+            {/* BIS Modal Integration */}
+            <BISCertificateModal
+                isOpen={isBISModalOpen}
+                onClose={() => setIsBISModalOpen(false)}
+            />
         </div>
     );
 }
@@ -1099,7 +1155,44 @@ function OrderSummaryCard({
                     <ShieldCheck className="w-4 h-4 text-green-600" />
                     100% Secure Checkout • Encrypted
                 </p>
-                <p className="text-[10px] text-center text-gray-400 mt-2 px-4 leading-relaxed">
+
+                {/* Trust Highlights Sidebar */}
+                <div className="mt-6 border-t border-gray-100 pt-6 space-y-4">
+                    <div className="bg-white rounded-2xl p-4 border border-gray-50 shadow-sm group">
+                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Verified Experience</p>
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black text-gray-900">Official GST Invoice</p>
+                                    <p className="text-[10px] text-gray-500">100% Tax Compliant Indian Entity</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <div className="text-[10px] font-black text-blue-600 italic">ISI</div>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black text-gray-900">BIS Safety Marks</p>
+                                    <p className="text-[10px] text-gray-500">Child-safe materials & build</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Truck className="w-4 h-4 text-orange-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black text-gray-900">Quality Checked</p>
+                                    <p className="text-[10px] text-gray-500">Rigorous inspection before packing</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p className="text-[10px] text-center text-gray-400 mt-4 px-4 leading-relaxed">
                     By placing your order, you agree to ABC Toyz Terms of Service and Privacy Policy. All transactions are securely processed.
                 </p>
             </div>
