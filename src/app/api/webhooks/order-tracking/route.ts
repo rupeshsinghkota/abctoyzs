@@ -31,15 +31,38 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: true, message: 'Test ping received' });
         }
 
-        // Find order by shiprocket_order_id
-        const { data: order, error: orderError } = await supabaseAdmin
-            .from('orders')
-            .select('id, status, shipping_address_id')
-            .eq('shiprocket_order_id', order_id)
-            .single();
+        // Find order - prefer sr_order_id (Shiprocket's numeric ID, stored as shiprocket_order_id)
+        // Fallback: try matching our channel order_id prefix (e.g. AT-XXXXXXXX)
+        const sr_order_id = payload.sr_order_id;
 
-        if (orderError || !order) {
-            console.warn('[Shiprocket Webhook] Order not found for ID:', order_id);
+        let order: any = null;
+        let orderError: any = null;
+
+        if (sr_order_id) {
+            // Primary: match by Shiprocket's own numeric order ID
+            const res = await supabaseAdmin
+                .from('orders')
+                .select('id, status, shipping_address_id')
+                .eq('shiprocket_order_id', String(sr_order_id))
+                .maybeSingle();
+            order = res.data;
+            orderError = res.error;
+        }
+
+        if (!order && order_id) {
+            // Fallback: match by our channel_order_id if we ever store it
+            const res = await supabaseAdmin
+                .from('orders')
+                .select('id, status, shipping_address_id')
+                .eq('channel_order_id', order_id)
+                .maybeSingle();
+            order = res.data;
+            orderError = res.error;
+        }
+
+        if (!order) {
+            console.warn('[Shiprocket Webhook] Order not found for sr_order_id:', sr_order_id, 'order_id:', order_id);
+
             // Return 200 even if order not found to satisfy Shiprocket validation
             return NextResponse.json({
                 success: true,

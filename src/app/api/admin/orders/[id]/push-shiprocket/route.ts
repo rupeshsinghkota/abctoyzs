@@ -27,7 +27,7 @@ export async function POST(
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
-        if (order.shiprocket_order_id) {
+        if (order.shiprocket_order_id && order.status !== 'cancelled') {
             return NextResponse.json(
                 { error: 'Order already pushed to Shiprocket', shiprocket_order_id: order.shiprocket_order_id },
                 { status: 409 }
@@ -54,9 +54,12 @@ export async function POST(
         const amountToCollect = isPartialCod ? totalAmount - advanceAmount : totalAmount;
 
         // Shiprocket rejects UUID-format order IDs — use order_number or short suffix
-        const srOrderId = order.order_number
+        // On repush (cancelled), append timestamp to avoid duplicate order_id conflict in Shiprocket
+        const isRepush = !!order.shiprocket_order_id && order.status === 'cancelled';
+        const baseId = order.order_number
             ? String(order.order_number)
             : `AT-${order.id.replace(/-/g, '').slice(-8).toUpperCase()}`;
+        const srOrderId = isRepush ? `${baseId}-R${Date.now().toString(36).toUpperCase()}` : baseId;
 
         const shiprocketPayload = {
             order_id: srOrderId,
@@ -99,10 +102,12 @@ export async function POST(
         await supabase
             .from('orders')
             .update({
-                shiprocket_order_id: shiprocketOrderId,
+                shiprocket_order_id: String(shiprocketOrderId),
+                channel_order_id: srOrderId,        // our short ID e.g. AT-4A2A9D36
                 shipment_id: shipmentId,
                 shipping_carrier: 'Shiprocket',
                 status: 'processing',
+
             })
             .eq('id', orderId);
 
