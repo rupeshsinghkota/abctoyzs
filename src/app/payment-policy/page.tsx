@@ -47,7 +47,7 @@ export default async function PaymentPolicy() {
 
     return (
         <div className="min-h-screen bg-zinc-50 pt-24 pb-16">
-            <div className="container max-w-4xl mx-auto px-6">
+            <div className="container max-w-5xl mx-auto px-4 md:px-8">
                 <div className="bg-white rounded-[32px] overflow-hidden shadow-xl border border-zinc-100">
                     {/* Header Banner */}
                     <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 p-10 md:p-14 text-white relative overflow-hidden">
@@ -136,34 +136,40 @@ export default async function PaymentPolicy() {
                         </section>
 
                         {/* VIP Genuine Section */}
-                        <section className="bg-zinc-900 rounded-3xl p-8 text-white relative overflow-hidden">
+                        <section className="bg-zinc-900 rounded-[32px] p-8 md:p-12 text-white relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
-                            <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
-                                <div className="flex-1">
-                                    <h2 className="text-2xl font-black mb-4 flex items-center gap-3">
-                                        <Star className="w-6 h-6 text-primary fill-primary" /> Genuine Order VIP Service
+                            <div className="relative z-10 flex flex-col lg:flex-row gap-12 items-center">
+                                <div className="flex-[1.5]">
+                                    <h2 className="text-2xl md:text-3xl font-black mb-6 flex items-center gap-4">
+                                        <Star className="w-8 h-8 text-primary fill-primary" /> Genuine Order VIP Service
                                     </h2>
-                                    <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+                                    <p className="text-zinc-400 text-base md:text-lg leading-relaxed mb-10 max-w-2xl">
                                         We treat our confirmed buyers as VIPs. Once your order is placed and the advance is paid, you gain exclusive access to our **Premium Verification Protocol**.
                                     </p>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div className="flex gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                                                <PhoneCall className="w-4 h-4 text-primary" />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                                        <div className="flex items-center gap-5 group">
+                                            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                                                <PhoneCall className="w-6 h-6 text-primary" />
                                             </div>
-                                            <p className="text-xs font-bold leading-tight">Post-order Verification Call within 1-2 hours</p>
+                                            <p className="text-sm md:text-base font-bold leading-tight">Post-order Verification Call<br /><span className="text-zinc-500 font-medium text-xs">Within 1-2 hours</span></p>
                                         </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                                                <Video className="w-4 h-4 text-primary" />
+                                        <div className="flex items-center gap-5 group">
+                                            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                                                <Video className="w-6 h-6 text-primary" />
                                             </div>
-                                            <p className="text-xs font-bold leading-tight">Request Live Unit Videos/Photos on WhatsApp</p>
+                                            <p className="text-sm md:text-base font-bold leading-tight">Request Live Unit Videos<br /><span className="text-zinc-500 font-medium text-xs">Directly on WhatsApp</span></p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="bg-primary/20 p-6 rounded-2xl border border-primary/30 text-center">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">Exclusive Access</p>
-                                    <p className="text-sm font-bold">Only paid bookings will be entertained for unit-specific details.</p>
+                                <div className="w-full lg:w-auto lg:min-w-[320px]">
+                                    <div className="bg-primary/10 p-8 rounded-[32px] border border-primary/20 text-center relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12" />
+                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-4">Exclusive Access</p>
+                                        <p className="text-lg font-black leading-tight mb-2">Confirmed Orders Only</p>
+                                        <p className="text-xs text-zinc-400 font-medium leading-relaxed">
+                                            Unit-specific videos and live previews are reserved for paid bookings to ensure quality service.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </section>
