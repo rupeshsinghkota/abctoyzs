@@ -574,120 +574,144 @@ export default function CheckoutPage() {
                                     )}
                                 </div>
 
-                                {/* Trust Highlights for COD */}
+                                {/* COD Dynamic Trust Module — Shown for both COD modes */}
                                 {paymentMethod === 'COD' && (
-                                    <div className="mx-2 p-3 bg-white border border-gray-100 rounded-xl shadow-sm space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <div className="flex items-center justify-between border-b border-gray-50 pb-2">
-                                            <div className="flex items-center gap-1.5">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                                <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Safe COD Verification</span>
+                                    <div className="mx-2 space-y-4 animate-in fade-in slide-in-from-top-2 duration-400">
+                                        {/* Security & Verification Box (Indigo) */}
+                                        <div className="rounded-2xl border-2 border-indigo-100 bg-indigo-50/40 p-5 shadow-sm overflow-hidden relative group">
+                                            {/* Decorative Security Seal Background */}
+                                            <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                                                <ShieldCheck className="w-32 h-32 text-indigo-900" />
                                             </div>
-                                            <button
-                                                onClick={() => setIsBISModalOpen(true)}
-                                                className="text-[9px] font-black text-primary hover:underline uppercase tracking-tighter"
-                                            >
-                                                View Safety Cert →
-                                            </button>
-                                        </div>
 
-                                        <div className="grid grid-cols-3 gap-2">
-                                            <div className="flex flex-col items-center text-center gap-1">
-                                                <div className="p-1.5 bg-zinc-50 rounded-lg">
-                                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                                                </div>
-                                                <span className="text-[8px] font-bold text-gray-500 leading-tight">GST Verified<br />Sellers</span>
-                                            </div>
-                                            <div className="flex flex-col items-center text-center gap-1">
-                                                <div className="p-1.5 bg-zinc-50 rounded-lg">
-                                                    <Package className="w-3.5 h-3.5 text-blue-600" />
-                                                </div>
-                                                <span className="text-[8px] font-bold text-gray-500 leading-tight">Physical Stock<br />Guarantee</span>
-                                            </div>
-                                            <div className="flex flex-col items-center text-center gap-1">
-                                                <div className="p-1.5 bg-zinc-50 rounded-lg">
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                                                </div>
-                                                <span className="text-[8px] font-bold text-gray-500 leading-tight">ISI Mark<br />Quality</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-zinc-900 rounded-lg p-2.5 flex items-start gap-2.5">
-                                            <div className="mt-0.5 p-1 bg-white/10 rounded-md">
-                                                <Loader2 className="w-3 h-3 text-white animate-spin-slow" />
-                                            </div>
-                                            <p className="text-[10px] text-zinc-300 font-medium leading-normal">
-                                                <span className="text-white font-black">Manual Order Verification:</span> To prevent fake orders, our agent will <span className="text-primary italic">WhatsApp/Call</span> you to confirm this order before shipping.
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* COD Partial Payment Notice — shown only when COD + partial mode */}
-                                {paymentMethod === 'COD' && codSettings?.cod_mode === 'partial' && (() => {
-                                    const prepaidSaving = Math.round(total * 0.05);
-                                    const advanceAmount = calculateCodAdvance(total, codSettings).advance;
-                                    const balanceAmount = calculateCodAdvance(total, codSettings).balance;
-
-                                    return (
-                                        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/30 px-5 py-4 space-y-3.5 animate-in fade-in slide-in-from-top-1 duration-300">
-                                            <div className="flex items-start gap-3">
-                                                <div className="mt-0.5 p-1.5 bg-indigo-600 rounded-lg shadow-md shadow-indigo-200">
+                                            <div className="flex items-start gap-3 relative z-10">
+                                                <div className="mt-0.5 p-2 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200 ring-4 ring-white">
                                                     <ShieldCheck className="w-4 h-4 text-white" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <div className="flex items-center justify-between mb-1">
-                                                        <p className="text-xs font-black text-indigo-900 uppercase tracking-tight">Verified Booking Advance</p>
-                                                        <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-full border border-indigo-100 shadow-sm">
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <p className="text-xs font-black text-indigo-950 uppercase tracking-tight">Verified Secure Booking</p>
+                                                        <div className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-full border border-indigo-100 shadow-sm">
                                                             <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-                                                            <span className="text-[8px] font-black text-indigo-600 uppercase">100% Refundable</span>
+                                                            <span className="text-[8px] font-black text-indigo-600 uppercase">100% Refund Guarantee</span>
                                                         </div>
                                                     </div>
-                                                    <p className="text-[11px] text-indigo-800 font-medium leading-relaxed">
-                                                        To confirm your slot and protect against failed deliveries, a secure booking advance of{' '}
-                                                        <span className="font-black text-indigo-900 underline decoration-indigo-300 decoration-2 underline-offset-2">₹{advanceAmount.toLocaleString()}</span>{' '}
-                                                        is collected via **Razorpay Secure**.
-                                                    </p>
+
+                                                    {codSettings?.cod_mode === 'partial' ? (
+                                                        <p className="text-[11px] text-indigo-800 font-medium leading-relaxed">
+                                                            To protect against RTO/fake orders, a booking advance of <span className="font-black text-indigo-950 underline decoration-indigo-300 underline-offset-2">₹{calculateCodAdvance(total, codSettings).advance.toLocaleString()}</span> is collected via Razorpay. It is <span className="text-indigo-950 font-black">100% refundable</span> if you cancel before dispatch.
+                                                        </p>
+                                                    ) : (
+                                                        <p className="text-[11px] text-indigo-800 font-medium leading-relaxed">
+                                                            Your order will be <span className="text-indigo-950 font-black italic">Manually Verified</span> by our team before dispatch to ensure 100% accuracy and safety.
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-3 pb-1">
-                                                <div className="bg-white/80 p-2.5 rounded-xl border border-indigo-50 flex flex-col items-center text-center">
-                                                    <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Pay Now</span>
-                                                    <span className="text-sm font-black text-indigo-900">₹{advanceAmount.toLocaleString()}</span>
+                                            {/* Trust Points Integrated */}
+                                            <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-indigo-100/60 relative z-10">
+                                                <div className="flex flex-col items-center text-center gap-1.5 grayscale-[0.3] hover:grayscale-0 transition-all cursor-default">
+                                                    <div className="p-2 bg-white rounded-xl border border-indigo-50 shadow-sm">
+                                                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                                                    </div>
+                                                    <span className="text-[9px] font-black text-indigo-950 leading-none">GST Verified</span>
                                                 </div>
-                                                <div className="bg-white/80 p-2.5 rounded-xl border border-indigo-50 flex flex-col items-center text-center">
-                                                    <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">On Delivery</span>
-                                                    <span className="text-sm font-black text-indigo-900">₹{balanceAmount.toLocaleString()}</span>
+                                                <div className="flex flex-col items-center text-center gap-1.5 grayscale-[0.3] hover:grayscale-0 transition-all cursor-default" onClick={() => setIsBISModalOpen(true)}>
+                                                    <div className="p-2 bg-white rounded-xl border border-indigo-50 shadow-sm">
+                                                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                                                    </div>
+                                                    <span className="text-[9px] font-black text-indigo-950 leading-none">ISI Mark</span>
+                                                </div>
+                                                <div className="flex flex-col items-center text-center gap-1.5 grayscale-[0.3] hover:grayscale-0 transition-all cursor-default">
+                                                    <div className="p-2 bg-white rounded-xl border border-indigo-50 shadow-sm">
+                                                        <Package className="w-4 h-4 text-blue-600" />
+                                                    </div>
+                                                    <span className="text-[9px] font-black text-indigo-950 leading-none">Stock Verified</span>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-2">
-                                                <div className="flex items-center gap-2.5">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
-                                                    <p className="text-[10px] text-indigo-700 font-bold">100% Refund Guarantee: <span className="font-medium">Refunded if order is cancelled before dispatch.</span></p>
+                                            {/* Advanced Payment Split (Only for Partial) */}
+                                            {codSettings?.cod_mode === 'partial' && (
+                                                <div className="mt-5 grid grid-cols-2 gap-3 relative z-10">
+                                                    <div className="bg-white p-3 rounded-2xl border border-indigo-100 shadow-sm flex flex-col items-center justify-center">
+                                                        <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">Confirm Now</span>
+                                                        <span className="text-sm font-black text-indigo-950">₹{calculateCodAdvance(total, codSettings).advance.toLocaleString()}</span>
+                                                    </div>
+                                                    <div className="bg-indigo-600/5 p-3 rounded-2xl border border-indigo-100/50 flex flex-col items-center justify-center">
+                                                        <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">Pay on Delivery</span>
+                                                        <span className="text-sm font-black text-indigo-950">₹{calculateCodAdvance(total, codSettings).balance.toLocaleString()}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2.5">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
-                                                    <p className="text-[10px] text-indigo-700 font-bold tracking-tight">Razorpay Protection: <span className="font-medium">Your partial payment is secure & PCI-compliant.</span></p>
-                                                </div>
+                                            )}
+
+                                            {/* Razorpay Protection Line */}
+                                            <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-indigo-400 font-bold tracking-tight bg-indigo-50/50 py-1.5 rounded-lg border border-indigo-100/30">
+                                                <CreditCard className="w-3 h-3" />
+                                                Payment Secured by Razorpay & PCI-DSS
+                                            </div>
+                                        </div>
+
+                                        {/* Step-by-Step Verification Journey */}
+                                        <div className="rounded-2xl bg-zinc-900 p-4 relative overflow-hidden">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Priority Processing</p>
                                             </div>
 
-                                            {/* Switch to Prepaid CTA */}
+                                            <div className="space-y-4">
+                                                <div className="flex gap-3">
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <div className="w-5 h-5 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[10px] font-black text-primary">1</div>
+                                                        <div className="w-0.5 h-full bg-zinc-800" />
+                                                    </div>
+                                                    <div className="pb-4">
+                                                        <p className="text-[11px] font-black text-white">Confirmation Call/WhatsApp</p>
+                                                        <p className="text-[10px] text-zinc-500 font-medium leading-relaxed">Our agent will contact you within 24h to verify your details.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <div className="w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-black text-zinc-500">2</div>
+                                                        <div className="w-0.5 h-full bg-zinc-800" />
+                                                    </div>
+                                                    <div className="pb-4">
+                                                        <p className="text-[11px] font-black text-zinc-400">Quality Check & Dispatch</p>
+                                                        <p className="text-[10px] text-zinc-600 font-medium">Order is inspected and packed with ISI safety mark.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="flex flex-col items-center">
+                                                        <div className="w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-black text-zinc-500">3</div>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[11px] font-black text-zinc-400">Tracked Delivery</p>
+                                                        <p className="text-[10px] text-zinc-600 font-medium">Live tracking shared via WhatsApp & Email.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Final Incentive to Switch */}
+                                        {codSettings?.cod_mode === 'partial' && (
                                             <button
                                                 onClick={handleSwitchToPrepaid}
-                                                className="w-full flex items-center justify-between bg-zinc-900 hover:bg-black text-white rounded-xl px-4 py-2.5 transition-all shadow-lg shadow-zinc-200 active:scale-[0.98] group"
+                                                className="w-full relative overflow-hidden group rounded-2xl p-4 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-xl shadow-emerald-100 transition-all hover:scale-[1.01] active:scale-[0.99]"
                                             >
-                                                <div className="flex flex-col items-start leading-none">
-                                                    <span className="text-[11px] font-black">Switch to Full Prepaid</span>
-                                                    <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1">Extra ₹{prepaidSaving.toLocaleString()} Instant Savings</span>
+                                                <div className="flex items-center justify-between relative z-10">
+                                                    <div className="text-left">
+                                                        <p className="text-xs font-black uppercase tracking-tight">Avoid the Wait ⚡</p>
+                                                        <p className="text-[10px] text-white/90 font-bold">Skip verification & Save Extra ₹{Math.round(total * 0.05).toLocaleString()}</p>
+                                                    </div>
+                                                    <div className="bg-white text-emerald-600 text-[10px] font-black px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap">
+                                                        PAY FULL NOW →
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-md group-hover:bg-white/20 transition-colors">
-                                                    <span className="text-[9px] font-black uppercase tracking-widest text-primary italic">Apply PREPAID5 →</span>
-                                                </div>
+                                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
                                             </button>
-                                        </div>
-                                    );
-                                })()}
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
