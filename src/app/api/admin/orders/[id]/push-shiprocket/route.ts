@@ -34,11 +34,11 @@ export async function POST(
             );
         }
 
-        // Check for override address from admin (e.g. B2B delivery to warehouse)
+        // Check for pickup location override from admin
         const body = await req.json().catch(() => ({}));
-        const overrideAddress = body.override_address || null;
+        const pickupLocationName: string = body.pickup_location_name || 'Warehouse';
 
-        const address = overrideAddress || order.shipping_address;
+        const address = order.shipping_address;
         if (!address) {
             return NextResponse.json({ error: 'No shipping address found' }, { status: 400 });
         }
@@ -61,7 +61,7 @@ export async function POST(
         const shiprocketPayload = {
             order_id: srOrderId,
             order_date: new Date(order.created_at).toISOString(),
-            pickup_location: 'Warehouse',
+            pickup_location: pickupLocationName,
             billing_customer_name: address.name,
             billing_last_name: '',
             billing_address: address.address_line1,

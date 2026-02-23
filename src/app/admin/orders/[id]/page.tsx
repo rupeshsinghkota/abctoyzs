@@ -12,20 +12,17 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 // ShippingModal removed - orders auto-sync to Shiprocket on payment
 
-// Preset B2B / Warehouse delivery addresses (add more as needed)
-const PRESET_ADDRESSES: Record<string, {
-    name: string; phone: string;
-    address_line1: string; address_line2?: string;
-    city: string; state: string; pincode: string;
-}> = {
+// Preset Shiprocket pickup locations — must match exact name in Shiprocket account
+const PICKUP_LOCATIONS: Record<string, { label: string; shiprocketName: string; address: string }> = {
+    WAREHOUSE: {
+        label: 'Warehouse (Default)',
+        shiprocketName: 'Warehouse',
+        address: 'Your main warehouse',
+    },
     POLYGRAN_INDIA: {
-        name: 'POLYGRAN INDIA',
-        phone: '9038540911',
-        address_line1: 'WAREHOUSE NO 14, MARSON COMPOUND, BUDGE BUDGE TRUNK ROAD',
-        address_line2: 'CHAKMIR, MAHESHTALA',
-        city: 'South 24 Parganas',
-        state: 'West Bengal',
-        pincode: '700142',
+        label: 'POLYGRAN INDIA — South 24 Parganas',
+        shiprocketName: 'Polygran India', // must match exact name in Shiprocket
+        address: 'Warehouse No 14, Marson Compound, Budge Budge Trunk Road, Chakmir, Maheshtala, 700142 · 9038540911',
     },
 };
 
@@ -68,7 +65,7 @@ export default function OrderDetailPage() {
     const [updating, setUpdating] = useState(false);
     const [isPushingShiprocket, setIsPushingShiprocket] = useState(false);
     const [shiprocketPushError, setShiprocketPushError] = useState<string | null>(null);
-    const [selectedDeliveryAddressKey, setSelectedDeliveryAddressKey] = useState<string>('CUSTOMER');
+    const [selectedPickupKey, setSelectedPickupKey] = useState<string>('WAREHOUSE');
 
     useEffect(() => {
         loadOrder();
@@ -114,18 +111,15 @@ export default function OrderDetailPage() {
         setIsPushingShiprocket(true);
         setShiprocketPushError(null);
         try {
-            const overrideAddress = selectedDeliveryAddressKey !== 'CUSTOMER'
-                ? PRESET_ADDRESSES[selectedDeliveryAddressKey]
-                : null;
+            const pickupLocationName = PICKUP_LOCATIONS[selectedPickupKey]?.shiprocketName || 'Warehouse';
 
             const res = await fetch(`/api/admin/orders/${order.id}/push-shiprocket`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ override_address: overrideAddress }),
+                body: JSON.stringify({ pickup_location_name: pickupLocationName }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to push to Shiprocket');
-            // Refresh order to show new Shiprocket data
             await loadOrder();
         } catch (err: any) {
             setShiprocketPushError(err.message);
@@ -360,28 +354,25 @@ export default function OrderDetailPage() {
                                         </div>
                                     )}
 
-                                    {/* Delivery Address Selector */}
+                                    {/* Pickup Location Selector */}
                                     <div>
                                         <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
-                                            Ship To
+                                            Pickup From (Sender Warehouse)
                                         </label>
                                         <select
                                             className="w-full px-3 py-2 rounded-lg border text-sm outline-none focus:ring-2 focus:ring-primary/20 bg-white"
-                                            value={selectedDeliveryAddressKey}
-                                            onChange={(e) => setSelectedDeliveryAddressKey(e.target.value)}
+                                            value={selectedPickupKey}
+                                            onChange={(e) => setSelectedPickupKey(e.target.value)}
                                         >
-                                            <option value="CUSTOMER">📦 Customer&apos;s Address (from order)</option>
-                                            {Object.entries(PRESET_ADDRESSES).map(([key, addr]) => (
+                                            {Object.entries(PICKUP_LOCATIONS).map(([key, loc]) => (
                                                 <option key={key} value={key}>
-                                                    🏭 {addr.name} — {addr.city}, {addr.pincode}
+                                                    🏭 {loc.label}
                                                 </option>
                                             ))}
                                         </select>
-                                        {selectedDeliveryAddressKey !== 'CUSTOMER' && (
-                                            <p className="text-[11px] text-muted-foreground mt-1.5 ml-1">
-                                                {PRESET_ADDRESSES[selectedDeliveryAddressKey].address_line1}, {PRESET_ADDRESSES[selectedDeliveryAddressKey].address_line2}, {PRESET_ADDRESSES[selectedDeliveryAddressKey].pincode} · {PRESET_ADDRESSES[selectedDeliveryAddressKey].phone}
-                                            </p>
-                                        )}
+                                        <p className="text-[11px] text-muted-foreground mt-1.5 ml-1">
+                                            {PICKUP_LOCATIONS[selectedPickupKey]?.address}
+                                        </p>
                                     </div>
 
                                     <button
