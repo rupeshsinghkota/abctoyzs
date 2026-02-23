@@ -5,6 +5,7 @@ import { useStore } from '@/store/useStore';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { CartUpsells } from '@/components/cart/CartUpsells';
 
 export default function CartPage() {
     const { cart, removeFromCart, updateQuantity } = useStore();
@@ -115,6 +116,9 @@ export default function CartPage() {
                             </div>
                         </div>
                     ))}
+
+                    {/* UPSELLS SECTION */}
+                    <CartUpsells />
                 </div>
 
                 {/* Order Summary */}

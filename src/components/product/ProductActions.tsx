@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 import { trackFbEvent } from '@/components/tracking/FacebookPixel';
 import { StockUrgency } from './StockUrgency';
+import { BISCertificateModal } from './BISCertificateModal';
 
 interface ProductActionsProps {
     product: Product;
@@ -20,6 +21,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
     const { addToCart } = useStore();
     const [quantity, setQuantity] = useState(1);
     const [added, setAdded] = useState(false);
+    const [isBISModalOpen, setIsBISModalOpen] = useState(false);
 
     // Initial Price / Image / Stock comes from Product, but overrides if Variant selected
     const displayPrice = currentVariant ? currentVariant.price : product.price;
@@ -398,10 +400,13 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                         <Truck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
                         <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">Free<br />Delivery</span>
                     </a>
-                    <div className="flex flex-col items-center gap-1 group">
+                    <button
+                        onClick={() => setIsBISModalOpen(true)}
+                        className="flex flex-col items-center gap-1 group"
+                    >
                         <CheckCircle2 className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
                         <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">BIS<br />Certified</span>
-                    </div>
+                    </button>
                     <a href="/warranty-policy" className="flex flex-col items-center gap-1 group">
                         <ShieldCheck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
                         <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">1 Year<br />Warranty</span>
@@ -413,6 +418,10 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 </div>
             </div>
 
+            <BISCertificateModal
+                isOpen={isBISModalOpen}
+                onClose={() => setIsBISModalOpen(false)}
+            />
         </div>
     );
 }

@@ -94,6 +94,7 @@ export function DesktopHeader() {
                                         <Link
                                             key={power.value}
                                             href={`/category/power/${power.value}`}
+                                            prefetch={true}
                                             className="px-4 py-2 hover:bg-secondary/50 rounded-lg text-sm text-foreground/80 hover:text-primary transition-colors text-left"
                                         >
                                             <span className="font-bold block">{power.label}</span>
@@ -115,6 +116,7 @@ export function DesktopHeader() {
                                         <Link
                                             key={age.value}
                                             href={`/category/age/${age.value}`}
+                                            prefetch={true}
                                             className="px-4 py-2.5 hover:bg-primary/5 rounded-xl text-xs text-foreground/70 hover:text-primary transition-colors text-left font-bold"
                                         >
                                             {age.label}
@@ -134,6 +136,7 @@ function NavLink({ href, children, isPrimary = false }: { href: string; children
     return (
         <Link
             href={href}
+            prefetch={true}
             className={cn(
                 "text-[11px] font-black uppercase tracking-[0.15em] transition-all duration-300 py-3 px-2 relative group whitespace-nowrap",
                 isPrimary ? "text-primary hover:text-primary" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
