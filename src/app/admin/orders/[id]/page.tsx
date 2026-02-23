@@ -12,6 +12,23 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 // ShippingModal removed - orders auto-sync to Shiprocket on payment
 
+// Preset B2B / Warehouse delivery addresses (add more as needed)
+const PRESET_ADDRESSES: Record<string, {
+    name: string; phone: string;
+    address_line1: string; address_line2?: string;
+    city: string; state: string; pincode: string;
+}> = {
+    POLYGRAN_INDIA: {
+        name: 'POLYGRAN INDIA',
+        phone: '9038540911',
+        address_line1: 'WAREHOUSE NO 14, MARSON COMPOUND, BUDGE BUDGE TRUNK ROAD',
+        address_line2: 'CHAKMIR, MAHESHTALA',
+        city: 'South 24 Parganas',
+        state: 'West Bengal',
+        pincode: '700142',
+    },
+};
+
 type Order = {
     id: string;
     total_amount: number;
@@ -51,6 +68,7 @@ export default function OrderDetailPage() {
     const [updating, setUpdating] = useState(false);
     const [isPushingShiprocket, setIsPushingShiprocket] = useState(false);
     const [shiprocketPushError, setShiprocketPushError] = useState<string | null>(null);
+    const [selectedDeliveryAddressKey, setSelectedDeliveryAddressKey] = useState<string>('CUSTOMER');
 
     useEffect(() => {
         loadOrder();
@@ -96,8 +114,14 @@ export default function OrderDetailPage() {
         setIsPushingShiprocket(true);
         setShiprocketPushError(null);
         try {
+            const overrideAddress = selectedDeliveryAddressKey !== 'CUSTOMER'
+                ? PRESET_ADDRESSES[selectedDeliveryAddressKey]
+                : null;
+
             const res = await fetch(`/api/admin/orders/${order.id}/push-shiprocket`, {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ override_address: overrideAddress }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to push to Shiprocket');
@@ -328,13 +352,38 @@ export default function OrderDetailPage() {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="pt-4 border-t">
+                                <div className="pt-4 border-t space-y-3">
                                     {shiprocketPushError && (
-                                        <div className="mb-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                                        <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
                                             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                                             <span>{shiprocketPushError}</span>
                                         </div>
                                     )}
+
+                                    {/* Delivery Address Selector */}
+                                    <div>
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
+                                            Ship To
+                                        </label>
+                                        <select
+                                            className="w-full px-3 py-2 rounded-lg border text-sm outline-none focus:ring-2 focus:ring-primary/20 bg-white"
+                                            value={selectedDeliveryAddressKey}
+                                            onChange={(e) => setSelectedDeliveryAddressKey(e.target.value)}
+                                        >
+                                            <option value="CUSTOMER">📦 Customer&apos;s Address (from order)</option>
+                                            {Object.entries(PRESET_ADDRESSES).map(([key, addr]) => (
+                                                <option key={key} value={key}>
+                                                    🏭 {addr.name} — {addr.city}, {addr.pincode}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {selectedDeliveryAddressKey !== 'CUSTOMER' && (
+                                            <p className="text-[11px] text-muted-foreground mt-1.5 ml-1">
+                                                {PRESET_ADDRESSES[selectedDeliveryAddressKey].address_line1}, {PRESET_ADDRESSES[selectedDeliveryAddressKey].address_line2}, {PRESET_ADDRESSES[selectedDeliveryAddressKey].pincode} · {PRESET_ADDRESSES[selectedDeliveryAddressKey].phone}
+                                            </p>
+                                        )}
+                                    </div>
+
                                     <button
                                         onClick={pushToShiprocket}
                                         disabled={isPushingShiprocket}
@@ -346,78 +395,78 @@ export default function OrderDetailPage() {
                                             <><Send className="w-4 h-4" /> Push to Shiprocket</>
                                         )}
                                     </button>
-                                    <p className="text-[11px] text-center text-zinc-400 mt-2">Creates a new shipment order in your Shiprocket account</p>
+                                    <p className="text-[11px] text-center text-zinc-400">Creates a new shipment order in your Shiprocket account</p>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Right Column (Sidebar) */}
-                <div className="space-y-6">
-                    {/* Notes */}
-                    <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-                        <div className="border-b px-6 py-4 bg-zinc-50/50">
-                            <h2 className="font-semibold text-sm">Notes</h2>
-                        </div>
-                        <div className="p-4">
-                            <textarea
-                                className="w-full min-h-[100px] p-3 text-sm border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none resize-none"
-                                placeholder="Add note..."
-                                defaultValue={order.admin_notes || ''}
-                                onBlur={(e) => updateOrder({ admin_notes: e.target.value })}
-                            />
-                        </div>
+            {/* Right Column (Sidebar) */}
+            <div className="space-y-6">
+                {/* Notes */}
+                <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+                    <div className="border-b px-6 py-4 bg-zinc-50/50">
+                        <h2 className="font-semibold text-sm">Notes</h2>
                     </div>
+                    <div className="p-4">
+                        <textarea
+                            className="w-full min-h-[100px] p-3 text-sm border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none resize-none"
+                            placeholder="Add note..."
+                            defaultValue={order.admin_notes || ''}
+                            onBlur={(e) => updateOrder({ admin_notes: e.target.value })}
+                        />
+                    </div>
+                </div>
 
-                    {/* Customer */}
-                    <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-                        <div className="border-b px-6 py-4 bg-zinc-50/50">
-                            <h2 className="font-semibold text-sm">Customer</h2>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            {order.shipping_address ? (
-                                <>
-                                    <div className="flex items-center gap-3 text-sm">
-                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                                            {order.shipping_address.name[0]}
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-zinc-900">{order.shipping_address.name}</p>
-                                            <p className="text-zinc-500">No prior orders</p>
+                {/* Customer */}
+                <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+                    <div className="border-b px-6 py-4 bg-zinc-50/50">
+                        <h2 className="font-semibold text-sm">Customer</h2>
+                    </div>
+                    <div className="p-6 space-y-4">
+                        {order.shipping_address ? (
+                            <>
+                                <div className="flex items-center gap-3 text-sm">
+                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                                        {order.shipping_address.name[0]}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-zinc-900">{order.shipping_address.name}</p>
+                                        <p className="text-zinc-500">No prior orders</p>
+                                    </div>
+                                </div>
+                                <div className="space-y-3 pt-4 border-t">
+                                    <div className="flex items-center gap-3 text-sm text-zinc-600">
+                                        <Mail className="w-4 h-4 text-zinc-400" />
+                                        <a href={`mailto:${email}`} className="hover:text-primary transition-colors truncate">
+                                            {email}
+                                        </a>
+                                    </div>
+                                    <div className="flex items-center gap-3 text-sm text-zinc-600">
+                                        <Phone className="w-4 h-4 text-zinc-400" />
+                                        <a href={`tel:${order.shipping_address.phone}`} className="hover:text-primary transition-colors">
+                                            {order.shipping_address.phone}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className="pt-4 border-t">
+                                    <div className="flex items-start gap-3 text-sm text-zinc-600">
+                                        <MapPin className="w-4 h-4 text-zinc-400 mt-0.5" />
+                                        <div className="leading-relaxed">
+                                            <p>{order.shipping_address.address_line1}</p>
+                                            {order.shipping_address.address_line2 && <p>{order.shipping_address.address_line2}</p>}
+                                            <p>{order.shipping_address.city}, {order.shipping_address.state}</p>
+                                            <p>{order.shipping_address.pincode}</p>
+                                            <p className="mt-1 font-medium">India</p>
                                         </div>
                                     </div>
-                                    <div className="space-y-3 pt-4 border-t">
-                                        <div className="flex items-center gap-3 text-sm text-zinc-600">
-                                            <Mail className="w-4 h-4 text-zinc-400" />
-                                            <a href={`mailto:${email}`} className="hover:text-primary transition-colors truncate">
-                                                {email}
-                                            </a>
-                                        </div>
-                                        <div className="flex items-center gap-3 text-sm text-zinc-600">
-                                            <Phone className="w-4 h-4 text-zinc-400" />
-                                            <a href={`tel:${order.shipping_address.phone}`} className="hover:text-primary transition-colors">
-                                                {order.shipping_address.phone}
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div className="pt-4 border-t">
-                                        <div className="flex items-start gap-3 text-sm text-zinc-600">
-                                            <MapPin className="w-4 h-4 text-zinc-400 mt-0.5" />
-                                            <div className="leading-relaxed">
-                                                <p>{order.shipping_address.address_line1}</p>
-                                                {order.shipping_address.address_line2 && <p>{order.shipping_address.address_line2}</p>}
-                                                <p>{order.shipping_address.city}, {order.shipping_address.state}</p>
-                                                <p>{order.shipping_address.pincode}</p>
-                                                <p className="mt-1 font-medium">India</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </>
-                            ) : (
-                                <p className="text-sm text-muted-foreground">No address details</p>
-                            )}
-                        </div>
+                                </div>
+                            </>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No address details</p>
+                        )}
                     </div>
                 </div>
             </div>

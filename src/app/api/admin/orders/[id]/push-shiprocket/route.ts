@@ -34,7 +34,11 @@ export async function POST(
             );
         }
 
-        const address = order.shipping_address;
+        // Check for override address from admin (e.g. B2B delivery to warehouse)
+        const body = await req.json().catch(() => ({}));
+        const overrideAddress = body.override_address || null;
+
+        const address = overrideAddress || order.shipping_address;
         if (!address) {
             return NextResponse.json({ error: 'No shipping address found' }, { status: 400 });
         }
