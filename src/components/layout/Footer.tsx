@@ -141,6 +141,7 @@ export function Footer() {
                             <li><FooterLink href="/refund-policy">Returns & Refunds</FooterLink></li>
                             <li><FooterLink href="/warranty-policy">Warranty Policy</FooterLink></li>
                             <li><FooterLink href="/billing-terms-and-conditions">Billing Terms & Conditions</FooterLink></li>
+                            <li><FooterLink href="/payment-policy">Payment Policy</FooterLink></li>
                             <li><FooterLink href="/about-us">About Us</FooterLink></li>
                             <li><FooterLink href="/contact-us">Contact Us</FooterLink></li>
                         </ul>
@@ -246,6 +247,7 @@ export function Footer() {
                         <Link href="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link>
                         <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
                         <Link href="/billing-terms-and-conditions" className="hover:text-white transition-colors">Billing Terms</Link>
+                        <Link href="/payment-policy" className="hover:text-white transition-colors font-bold text-zinc-300">Payment Policy</Link>
                         <Link href="/site-map" className="hover:text-white transition-colors">Sitemap</Link>
                     </div>
                 </div>

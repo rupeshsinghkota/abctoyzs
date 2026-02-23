@@ -631,6 +631,12 @@ export default function CheckoutPage() {
                                                 </div>
                                             </div>
 
+                                            <div className="mt-4 pt-4 border-t border-indigo-100/40 flex justify-center">
+                                                <Link href="/payment-policy" target="_blank" className="text-[9px] font-black text-indigo-500 uppercase tracking-widest hover:text-indigo-700 underline decoration-indigo-200 underline-offset-4">
+                                                    Why Advanced Payment? Learn More →
+                                                </Link>
+                                            </div>
+
                                             {/* Advanced Payment Split (Only for Partial) */}
                                             {codSettings?.cod_mode === 'partial' && (
                                                 <div className="mt-5 grid grid-cols-2 gap-3 relative z-10">
