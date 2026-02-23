@@ -226,7 +226,7 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                                     alt={`${productName} - Main View`}
                                     loading="eager"
                                     fetchPriority="high"
-                                    className="w-full h-auto max-h-[1000px] object-contain transition-all duration-700 ease-out group-hover:scale-[1.02] relative z-10 drop-shadow-[0_10px_40px_rgba(0,0,0,0.12)]"
+                                    className="w-full h-auto max-h-[750px] object-contain p-6 md:p-8 transition-all duration-700 ease-out group-hover:scale-[1.02] relative z-10 drop-shadow-[0_12px_50px_rgba(0,0,0,0.15)]"
                                 />
 
 

@@ -187,8 +187,8 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
     return (
         <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-start max-w-[1600px] mx-auto">
-            {/* LEFT: Gallery (66%) */}
-            <div className="lg:col-span-8 bg-transparent" ref={galleryRef}>
+            {/* LEFT: Gallery (Approx 58%) */}
+            <div className="lg:col-span-7 bg-transparent" ref={galleryRef}>
                 {/* Key prop ensures gallery resets/updates when images change deeply */}
                 <ImageGallery
                     key={displayImages[0]}
@@ -198,8 +198,8 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                 />
             </div>
 
-            {/* RIGHT: Info & Actions (33%) */}
-            <div className="lg:col-span-4 relative -mt-20 lg:mt-0 z-10 w-full">
+            {/* RIGHT: Info & Actions (Approx 41%) */}
+            <div className="lg:col-span-5 relative -mt-20 lg:mt-0 z-10 w-full">
                 <div className="bg-white rounded-t-[32px] lg:rounded-none px-4 pt-5 pb-6 lg:px-6 lg:pt-8 lg:pb-0 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] lg:shadow-none min-h-[50vh]">
                     <div className="lg:sticky lg:top-28 space-y-3 lg:space-y-5">
 
