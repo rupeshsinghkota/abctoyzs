@@ -215,10 +215,10 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                     ) : (
                         <>
                             <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                                {/* Subtle Background Blur for Depth */}
+                                {/* Subtle Background Blur for Depth - Enhanced for full-frame feel */}
                                 <div
-                                    className="absolute inset-0 opacity-10 blur-3xl scale-150 transition-all duration-1000"
-                                    style={{ backgroundImage: `url(${mediaItems[desktopIndex].url})`, backgroundSize: 'cover' }}
+                                    className="absolute inset-0 opacity-20 blur-[80px] scale-125 transition-all duration-1000"
+                                    style={{ backgroundImage: `url(${mediaItems[desktopIndex].url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                                 />
 
                                 <img
@@ -226,7 +226,7 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                                     alt={`${productName} - Main View`}
                                     loading="eager"
                                     fetchPriority="high"
-                                    className="w-full h-full object-contain p-8 transition-all duration-1000 ease-out group-hover:scale-105 relative z-10"
+                                    className="w-full h-full object-contain p-2 md:p-4 transition-all duration-700 ease-out group-hover:scale-[1.03] relative z-10 drop-shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
                                 />
 
 
