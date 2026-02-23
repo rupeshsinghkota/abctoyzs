@@ -168,7 +168,7 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
             )}
 
             {/* Desktop Standard Layout (>= 768px) */}
-            <div className="hidden md:flex gap-6 h-[calc(100vh-180px)] min-h-[600px] max-h-[850px] w-full">
+            <div className="hidden md:flex gap-6 h-auto min-h-[600px] w-full">
 
                 {/* Thumbnails Strip - Floating Style */}
                 <div className="flex flex-col gap-4 w-[100px] flex-shrink-0 overflow-y-auto no-scrollbar py-2 h-full pr-2">
@@ -226,7 +226,7 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                                     alt={`${productName} - Main View`}
                                     loading="eager"
                                     fetchPriority="high"
-                                    className="w-full h-full object-contain p-2 md:p-4 transition-all duration-700 ease-out group-hover:scale-[1.03] relative z-10 drop-shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
+                                    className="w-full h-auto max-h-[1000px] object-contain transition-all duration-700 ease-out group-hover:scale-[1.02] relative z-10 drop-shadow-[0_10px_40px_rgba(0,0,0,0.12)]"
                                 />
 
 
