@@ -57,7 +57,7 @@ export async function POST(
         const shiprocketPayload = {
             order_id: srOrderId,
             order_date: new Date(order.created_at).toISOString(),
-            pickup_location: 'Jhandewalan',
+            pickup_location: 'Warehouse',
             billing_customer_name: address.name,
             billing_last_name: '',
             billing_address: address.address_line1,
