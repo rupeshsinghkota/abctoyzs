@@ -296,6 +296,19 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             {/* Desktop Wishlist & Share — Moved inside sticky container to prevent overlap */}
                             <div className="hidden lg:flex items-center gap-6 pt-4 border-t border-gray-50 mt-4">
                                 <WishlistButton productId={product.id} size="lg" className="h-10 px-0 hover:bg-transparent text-muted-foreground hover:text-red-500 transition-all flex items-center gap-2" />
+                                <span className="text-sm text-gray-300">|</span>
+                                <a
+                                    href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I have a question about ${product.name}.\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 group"
+                                >
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                    </span>
+                                    Ask a Question
+                                </a>
                             </div>
 
                         </div>
