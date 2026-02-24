@@ -86,19 +86,23 @@ function SuccessContent() {
                     }
 
                     // --- LEAD CONVERSION ---
-                    // Mark the lead as 'converted' so the automated nurture sequence stops
-                    try {
-                        const leadPhone = orderData.shipping_address?.phone?.replace(/\D/g, "").slice(-10);
-                        if (leadPhone) {
-                            const supabase = createClient();
-                            await supabase
-                                .from('leads')
-                                .update({ status: 'converted', updated_at: new Date().toISOString() })
-                                .eq('phone', leadPhone);
-                            console.log(`[Success] Lead ${leadPhone} marked as converted`);
+                    // Only mark as converted if they've actually PAID (Prepaid or Partial Advance)
+                    if (orderData.payment_status === 'paid' || orderData.payment_status === 'partially_paid') {
+                        try {
+                            const leadPhone = orderData.shipping_address?.phone?.replace(/\D/g, "").slice(-10);
+                            if (leadPhone) {
+                                const supabase = createClient();
+                                await supabase
+                                    .from('leads')
+                                    .update({ status: 'converted', updated_at: new Date().toISOString() })
+                                    .eq('phone', leadPhone);
+                                console.log(`[Success] Lead ${leadPhone} marked as converted (Paid)`);
+                            }
+                        } catch (leadError) {
+                            console.error('[Success] Lead conversion error:', leadError);
                         }
-                    } catch (leadError) {
-                        console.error('[Success] Lead conversion error:', leadError);
+                    } else {
+                        console.log(`[Success] Lead not converted: payment_status is ${orderData.payment_status}`);
                     }
                 }
             } catch (error) {

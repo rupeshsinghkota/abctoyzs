@@ -241,7 +241,8 @@ export async function POST(req: Request) {
                         console.error('[CreateOrder] WhatsApp Error:', waError);
                     }
 
-                    // 6. Mark Lead as Converted
+                    /* 
+                    // 6. Mark Lead as Converted (REMOVED: User wants only PAID to be converted)
                     try {
                         const leadPhone = address.phone.replace(/\D/g, "").slice(-10);
                         const { supabaseAdmin } = await import('@/lib/supabase/admin');
@@ -253,6 +254,7 @@ export async function POST(req: Request) {
                     } catch (leadError) {
                         console.error('[CreateOrder] Lead conversion error:', leadError);
                     }
+                    */
                 }
             } catch (srError) {
                 console.error('[CreateOrder] Shiprocket Error:', srError);
