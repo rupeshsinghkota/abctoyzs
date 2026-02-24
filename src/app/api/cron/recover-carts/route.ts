@@ -10,74 +10,116 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // 2. Define Time Window (Carts abandoned 60-120 mins ago)
-        const now = new Date();
-        const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
-        const twoHoursAgo = new Date(now.getTime() - 120 * 60 * 1000).toISOString();
-
-        // 3. Fetch Leads in window
+        // 2. Fetch Leads that are NOT converted and haven't finished the sequence (Step 4 is 'end')
         const { data: leads, error: leadsError } = await supabaseAdmin
             .from('leads')
             .select('*')
             .neq('status', 'converted')
-            .gte('created_at', twoHoursAgo)
-            .lte('created_at', oneHourAgo);
+            .lt('last_followup_step', 4); // Steps 0, 1, 2, 3
 
         if (leadsError) throw leadsError;
         if (!leads || leads.length === 0) {
-            return NextResponse.json({ message: 'No abandoned carts found in this window' });
+            return NextResponse.json({ message: 'No active leads' });
         }
 
-        // 4. Fetch successful orders in same window to exclude
-        // We look for any order by these phone numbers created after the lead
-        const phoneNumbers = leads.map(l => l.phone);
-        const { data: recentOrders, error: ordersError } = await supabaseAdmin
-            .from('orders')
-            .select('customer_phone')
-            .in('customer_phone', phoneNumbers)
-            .gte('created_at', twoHoursAgo);
+        const now = new Date();
+        const results: any[] = [];
 
-        if (ordersError) throw ordersError;
-
-        const orderedPhones = new Set(recentOrders?.map(o => o.customer_phone));
-
-        // 5. Filter for true abandonments (Lead exists, but no Order)
-        const abandonments = leads.filter(l => !orderedPhones.has(l.phone));
-
-        if (abandonments.length === 0) {
-            return NextResponse.json({ message: 'All leads in window converted to orders' });
-        }
-
-        // 6. Trigger Recovery Messages
-        const results = await Promise.all(abandonments.map(async (lead) => {
+        // 3. Process each lead based on its current step and age
+        for (const lead of leads) {
             try {
-                const cart = lead.cart_summary || [];
-                if (cart.length === 0) return { phone: lead.phone, status: 'skipped', reason: 'empty_cart' };
+                const createdAt = new Date(lead.created_at);
+                const lastFollowupAt = lead.last_followup_at ? new Date(lead.last_followup_at) : null;
+                const hoursSinceCreated = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+                const hoursSinceLastFollowup = lastFollowupAt ? (now.getTime() - lastFollowupAt.getTime()) / (1000 * 60 * 60) : hoursSinceCreated;
 
-                const primaryItem = cart[0];
-                const displayName = lead.name || 'Parent';
-                const whatsappPhone = lead.phone.length === 10 ? `91${lead.phone}` : lead.phone;
+                let nextStep = -1;
+                let templateId = '';
+                let variables: any = {};
+                let mediaUrl = '';
 
-                // Use the media template: cart_recovery_media
-                // Variables: {{1}} = Name, {{2}} = Product Name
-                const sent = await WhatsAppService.sendMediaTemplateMessage(
-                    whatsappPhone,
-                    'cart_recovery_media',
-                    primaryItem.image || 'https://abctoyz.in/logo.png', // Fallback to logo
-                    {
-                        "1": displayName,
-                        "2": primaryItem.name
+                // DETERMINE NEXT STEP
+                const currentStep = lead.last_followup_step || 0;
+
+                if (currentStep === 0 && hoursSinceCreated >= 1 && hoursSinceCreated <= 4) {
+                    // STEP 0: 1-2 Hour Quick Reminder (Existing Logic)
+                    nextStep = 1;
+                    templateId = 'cart_recovery_media';
+                    const cart = lead.cart_summary || [];
+                    const item = cart[0] || { name: 'Jeep', image: 'https://abctoyz.in/logo.png' };
+                    mediaUrl = item.image;
+                    variables = { "1": lead.name || 'Parent', "2": item.name };
+                }
+                else if (currentStep === 1 && hoursSinceLastFollowup >= 24) {
+                    // STEP 1: 24 Hour Feature Nudge
+                    nextStep = 2;
+                    templateId = 'cart_recovery_media'; // Reusing for consistency, or use specific ones if available
+                    const cart = lead.cart_summary || [];
+                    const item = cart[0] || { name: 'Jeep', image: 'https://abctoyz.in/logo.png' };
+                    mediaUrl = item.image;
+                    variables = {
+                        "1": lead.name || 'Parent',
+                        "2": `Still thinking about the ${item.name}? It features powerful 4x4 motors and long-range battery!`
+                    };
+                }
+                else if (currentStep === 2 && hoursSinceLastFollowup >= 24) {
+                    // STEP 2: 48 Hour Discount Nudge
+                    nextStep = 3;
+                    templateId = 'cart_recovery_media';
+                    const cart = lead.cart_summary || [];
+                    const item = cart[0] || { name: 'Jeep', image: 'https://abctoyz.in/logo.png' };
+                    mediaUrl = item.image;
+                    variables = {
+                        "1": lead.name || 'Parent',
+                        "2": `Special Offer! Use code PREPAID5 for extra 5% off on your ${item.name}. Secure your ride-on today!`
+                    };
+                }
+                else if (currentStep === 3 && hoursSinceLastFollowup >= 24) {
+                    // STEP 3: 72 Hour Final Nudge (Scarcity)
+                    nextStep = 4; // Mark as sequence complete
+                    templateId = 'cart_recovery_media';
+                    const cart = lead.cart_summary || [];
+                    const item = cart[0] || { name: 'Jeep', image: 'https://abctoyz.in/logo.png' };
+                    mediaUrl = item.image;
+                    variables = {
+                        "1": lead.name || 'Parent',
+                        "2": `Last chance! Stock for the ${item.name} is running low. Grab yours before it's gone!`
+                    };
+                }
+
+                // SEND MESSAGE IF STEP DETERMINED
+                if (nextStep !== -1) {
+                    const whatsappPhone = lead.phone.length === 10 ? `91${lead.phone}` : lead.phone;
+                    const sent = await WhatsAppService.sendMediaTemplateMessage(
+                        whatsappPhone,
+                        templateId,
+                        mediaUrl || 'https://abctoyz.in/logo.png',
+                        variables
+                    );
+
+                    if (sent) {
+                        // Update lead tracking
+                        await supabaseAdmin
+                            .from('leads')
+                            .update({
+                                last_followup_step: nextStep,
+                                last_followup_at: now.toISOString(),
+                                updated_at: now.toISOString()
+                            })
+                            .eq('id', lead.id);
+
+                        results.push({ phone: lead.phone, step: nextStep, status: 'sent' });
+                    } else {
+                        results.push({ phone: lead.phone, step: nextStep, status: 'failed' });
                     }
-                );
-
-                return { phone: lead.phone, status: sent ? 'sent' : 'failed' };
+                }
             } catch (err: any) {
-                return { phone: lead.phone, status: 'error', error: err.message };
+                results.push({ phone: lead.phone, error: err.message });
             }
-        }));
+        }
 
         return NextResponse.json({
-            processed: abandonments.length,
+            processed: leads.length,
             results: results
         });
 
