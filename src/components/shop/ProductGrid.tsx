@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import { Product } from '@/lib/data';
 import { ProductCard } from '@/components/shop/ProductCard';
