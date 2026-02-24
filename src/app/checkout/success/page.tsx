@@ -27,20 +27,24 @@ function SuccessContent() {
             // If we have oid and amount in URL, track immediately without waiting for DB
             if (amountParam && oid) {
                 const immediateAmount = parseFloat(amountParam);
-                console.log(`[Tracking] Firing Immediate Fallback: ${immediateAmount} | ${oid}`);
+                console.log(`[Tracking] Queuing Immediate Fallback (100ms): ${immediateAmount} | ${oid}`);
 
-                // Google
-                trackConversion(immediateAmount, oid);
+                setTimeout(() => {
+                    console.log(`[Tracking] Firing Immediate Fallback: ${immediateAmount} | ${oid}`);
+                    // Google
+                    trackConversion(immediateAmount, oid);
 
-                // Facebook
-                if (typeof window !== "undefined" && (window as any).fbq) {
-                    (window as any).fbq('track', 'Purchase', {
-                        currency: "INR",
-                        value: immediateAmount,
-                        content_type: 'product',
-                        order_id: oid
-                    });
-                }
+                    // Facebook
+                    if (typeof window !== "undefined" && (window as any).fbq) {
+                        (window as any).fbq('track', 'Purchase', {
+                            currency: "INR",
+                            value: immediateAmount,
+                            content_type: 'product',
+                            order_id: oid
+                        });
+                        console.log(`[Tracking] Facebook Fallback Fired: ${immediateAmount} INR`);
+                    }
+                }, 100);
             }
 
             let orderData = null;

@@ -76,26 +76,36 @@ export const trackEvent = (action: string, params: Record<string, any>) => {
 
 // Specifically for Google Ads Conversion
 export const trackConversion = (value: number, transaction_id: string, items?: any[]) => {
-    const label = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
-    const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+    const label = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL || "d9rkCK_qwvYbEJbKl-1C";
+    const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "AW-17945715990";
 
-    if (typeof window !== "undefined" && window.gtag && adsId && label) {
-        // Track GA4 Purchase
-        window.gtag("event", "purchase", {
-            transaction_id: transaction_id,
-            value: value,
-            currency: "INR",
-            items: items?.map(mapToGA4Item) || []
-        });
+    const fireEvents = (attempts = 0) => {
+        if (typeof window !== "undefined" && window.gtag) {
+            // Track GA4 Purchase
+            window.gtag("event", "purchase", {
+                transaction_id: transaction_id,
+                value: value,
+                currency: "INR",
+                items: items?.map(mapToGA4Item) || []
+            });
 
-        // Track Ads Conversion
-        window.gtag("event", "conversion", {
-            send_to: `${adsId}/${label}`,
-            value: value,
-            currency: "INR",
-            transaction_id: transaction_id,
-        });
-        console.log(`[Tracking] Purchase & Conversion: ${value} INR | ${transaction_id}`);
-    }
+            // Track Ads Conversion
+            window.gtag("event", "conversion", {
+                send_to: `${adsId}/${label}`,
+                value: value,
+                currency: "INR",
+                transaction_id: transaction_id,
+            });
+            console.log(`[Tracking] Google Ads & GA4 Success: ${value} INR | ${transaction_id} | ${adsId}/${label}`);
+        } else if (attempts < 5) {
+            // Retry after 500ms if gtag not ready
+            console.warn(`[Tracking] gtag not ready, retry attempt ${attempts + 1}/5...`);
+            setTimeout(() => fireEvents(attempts + 1), 500);
+        } else {
+            console.error("[Tracking] Google Ads failed after 5 retries. gtag script missing?");
+        }
+    };
+
+    fireEvents();
 };
 
