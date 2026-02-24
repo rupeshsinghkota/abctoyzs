@@ -267,6 +267,14 @@ export const PaymentProcessor = {
                     }
                 }
 
+                // Calculate refined amount display for WhatsApp variable {{3}}
+                // Template is fixed as "Amount Paid: ₹{{3}}"
+                let amountDisplay = String(order.total_amount);
+                if (order.payment_method === 'COD' && order.advance_amount > 0) {
+                    const balance = order.total_amount - order.advance_amount;
+                    amountDisplay = `${order.advance_amount} (Balance ₹${balance} COD)`;
+                }
+
                 await WhatsAppService.sendMediaTemplateMessage(
                     order.shipping_address.phone,
                     templateId,
@@ -274,7 +282,7 @@ export const PaymentProcessor = {
                     {
                         "1": order.shipping_address.name || "Customer",
                         "2": order.id,
-                        "3": String(order.total_amount)
+                        "3": amountDisplay
                     }
                 );
                 console.log('[PaymentProcessor] WhatsApp Order Received notification sent to:', order.shipping_address.phone);

@@ -214,6 +214,32 @@ export async function POST(req: Request) {
                     } catch (capiError) {
                         console.error('[CreateOrder] CAPI Error:', capiError);
                     }
+                    // 5. Send WhatsApp Notification for Full COD
+                    try {
+                        const { WhatsAppService } = await import('@/lib/services/whatsapp');
+                        const templateId = process.env.MSG91_ORDER_RECEIVED_TEMPLATE_ID || 'order_received';
+
+                        // Fetch first item's image
+                        let imageUrl = 'https://abctoyz.in/logo.png';
+                        if (items.length > 0) {
+                            const { data: p } = await supabase.from('products').select('image').eq('id', items[0].id).single();
+                            if (p?.image) imageUrl = p.image;
+                        }
+
+                        await WhatsAppService.sendMediaTemplateMessage(
+                            address.phone,
+                            templateId,
+                            imageUrl,
+                            {
+                                "1": address.name || "Customer",
+                                "2": order.id,
+                                "3": `0 (Pay ₹${total_amount} at Delivery)`
+                            }
+                        );
+                        console.log('[CreateOrder] Full COD WhatsApp notification sent');
+                    } catch (waError) {
+                        console.error('[CreateOrder] WhatsApp Error:', waError);
+                    }
                 }
             } catch (srError) {
                 console.error('[CreateOrder] Shiprocket Error:', srError);
