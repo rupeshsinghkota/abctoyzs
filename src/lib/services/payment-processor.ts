@@ -124,7 +124,7 @@ export const PaymentProcessor = {
             }
         }
 
-        // 4. Upsert Profile
+        // 4. Upsert Profile & Mark Lead as Converted
         if (userId) {
             try {
                 await supabaseAdmin
@@ -137,7 +137,7 @@ export const PaymentProcessor = {
                         is_guest: false
                     }, { onConflict: 'id' });
             } catch (profileError: any) {
-                console.error('[PaymentProcessor] Profile update failed (likely missing email column), retrying without email:', profileError.message);
+                console.error('[PaymentProcessor] Profile update failed:', profileError.message);
                 // Fallback: Try without email
                 await supabaseAdmin
                     .from('profiles')
@@ -148,6 +148,19 @@ export const PaymentProcessor = {
                         is_guest: false
                     }, { onConflict: 'id' });
             }
+        }
+
+        // --- NEW: Mark Lead as Converted ---
+        try {
+            const cleanPhone = order.shipping_address.phone.replace(/\D/g, "");
+            const leadPhone = cleanPhone.slice(-10);
+            await supabaseAdmin
+                .from('leads')
+                .update({ status: 'converted', updated_at: new Date().toISOString() })
+                .eq('phone', leadPhone);
+            console.log(`[PaymentProcessor] Lead ${leadPhone} marked as converted`);
+        } catch (leadError) {
+            console.error('[PaymentProcessor] Lead conversion update failed:', leadError);
         }
 
         // 5. Sync to Shiprocket - Auto-create order after payment success

@@ -240,6 +240,19 @@ export async function POST(req: Request) {
                     } catch (waError) {
                         console.error('[CreateOrder] WhatsApp Error:', waError);
                     }
+
+                    // 6. Mark Lead as Converted
+                    try {
+                        const leadPhone = address.phone.replace(/\D/g, "").slice(-10);
+                        const { supabaseAdmin } = await import('@/lib/supabase/admin');
+                        await supabaseAdmin
+                            .from('leads')
+                            .update({ status: 'converted', updated_at: new Date().toISOString() })
+                            .eq('phone', leadPhone);
+                        console.log(`[CreateOrder] Lead ${leadPhone} marked as converted (Full COD)`);
+                    } catch (leadError) {
+                        console.error('[CreateOrder] Lead conversion error:', leadError);
+                    }
                 }
             } catch (srError) {
                 console.error('[CreateOrder] Shiprocket Error:', srError);

@@ -19,6 +19,7 @@ export async function GET(req: Request) {
         const { data: leads, error: leadsError } = await supabaseAdmin
             .from('leads')
             .select('*')
+            .neq('status', 'converted')
             .gte('created_at', twoHoursAgo)
             .lte('created_at', oneHourAgo);
 
