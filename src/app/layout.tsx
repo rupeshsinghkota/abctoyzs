@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { WhatsAppNudge } from "@/components/ui/WhatsAppNudge";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { SettingsService } from "@/lib/services/settings";
 import { createClient } from "@/lib/supabase/server";
@@ -127,6 +128,7 @@ export default function RootLayout({
         <Footer />
         <BottomNav />
         <WhatsAppButton />
+        <WhatsAppNudge />
         <BackToTop />
         <RecentActivityToast />
       </body>
