@@ -139,6 +139,21 @@ export async function POST(request: Request) {
         // 9. Check if we need more details (Onboarding)
         const requireOnboarding = loginEmail.endsWith('@abctoyz.in');
 
+        // --- NEW: Capture as Lead ---
+        try {
+            await supabaseAdmin.from('leads').upsert({
+                phone: phone10,
+                source: 'otp_verification',
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'phone',
+                ignoreDuplicates: false
+            });
+            console.log(`[OTP Verify] Lead captured/updated for ${phone10}`);
+        } catch (leadError) {
+            console.error("[OTP Verify] Lead capture error:", leadError);
+        }
+
         return NextResponse.json({
             success: true,
             session_link: callbackUrl,

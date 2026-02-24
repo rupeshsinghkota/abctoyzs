@@ -10,10 +10,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
         }
 
-        // Clean phone number
+        // Clean and normalize to 10 digits
         const cleanPhone = phone.replace(/\D/g, "");
+        const leadPhone = cleanPhone.length > 10 ? cleanPhone.slice(-10) : cleanPhone;
 
-        if (cleanPhone.length < 10) {
+        if (leadPhone.length < 10) {
             return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
         }
 
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
         const { data, error } = await supabaseAdmin
             .from('leads')
             .upsert({
-                phone: cleanPhone,
+                phone: leadPhone,
                 email: email || null,
                 name: name || null,
                 source: source || 'checkout',
