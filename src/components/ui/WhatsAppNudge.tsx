@@ -181,6 +181,27 @@ export function WhatsAppNudge() {
                     href={`https://wa.me/918239269217?text=${encodeURIComponent(config.waMessage + `\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => {
+                        // Capture "Chat Lead" intent if we already know who this is
+                        const phone = localStorage.getItem("verified_phone") ||
+                            localStorage.getItem("lead_phone") ||
+                            localStorage.getItem("captured_phone");
+
+                        if (phone && phone.length >= 10) {
+                            fetch('/api/leads', {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    phone: phone,
+                                    source: 'whatsapp_nudge_click',
+                                    cart_summary: recentlyViewed.slice(0, 1).map(p => ({
+                                        name: p.name,
+                                        image: p.image,
+                                        price: p.price
+                                    }))
+                                })
+                            }).catch(() => { }); // Silent fail for lead tracking
+                        }
+                    }}
                     className="mt-3 block w-full bg-[#25D366] text-white text-[11px] font-black text-center py-2.5 rounded-xl hover:bg-[#128C7E] transition-colors uppercase tracking-widest"
                 >
                     Chat Now

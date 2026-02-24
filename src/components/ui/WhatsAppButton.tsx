@@ -32,6 +32,22 @@ export function WhatsAppButton() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                    // Capture "Chat Lead" intent if we already know who this is
+                    const phone = localStorage.getItem("verified_phone") ||
+                        localStorage.getItem("lead_phone") ||
+                        localStorage.getItem("captured_phone");
+
+                    if (phone && phone.length >= 10) {
+                        fetch('/api/leads', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                phone: phone,
+                                source: 'floating_whatsapp_click'
+                            })
+                        }).catch(() => { });
+                    }
+                }}
                 className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-[#25D366] text-white rounded-full shadow-[0_4px_14px_0_rgb(0,0,0,0.39)] hover:scale-110 hover:shadow-[0_6px_20px_rgba(37,211,102,0.23)] transition-all duration-300 active:scale-95 relative"
                 aria-label="Chat on WhatsApp"
             >
