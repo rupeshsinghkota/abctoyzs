@@ -111,6 +111,23 @@ export async function POST(req: Request) {
             created_at: new Date().toISOString()
         });
 
+        // --- NEW: Capture as Lead ---
+        try {
+            // Take only last 10 digits for the lead table
+            const leadPhone = cleanPhone.slice(-10);
+            await supabase.from('leads').upsert({
+                phone: leadPhone,
+                source: 'whatsapp_incoming_chat',
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'phone',
+                ignoreDuplicates: false
+            });
+            console.log(`[WhatsApp] Lead captured/updated for ${leadPhone}`);
+        } catch (leadError) {
+            console.error("[WhatsApp] Lead capture error:", leadError);
+        }
+
         // 5. RATE LIMITING (Max 6 messages in last 1 hour)
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         const { count: recentMsgCount } = await supabase
