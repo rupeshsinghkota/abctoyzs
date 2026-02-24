@@ -40,18 +40,51 @@ export function WhatsAppNudge() {
             showNudge("Need a real unboxing video of this toy? Ask us on WhatsApp! 🎥");
         }, 45000);
 
-        // 2. Exit Intent Nudge
+        // 2. Desktop Exit Intent (Mouse Leave)
         const handleMouseLeave = (e: MouseEvent) => {
             if (e.clientY <= 0) {
                 showNudge("Wait! Have a question before you go? Chat with our experts! 🤝");
             }
         };
 
+        // 3. Mobile Exit Intent (Fast Scroll Up)
+        let lastScrollY = window.scrollY;
+        let lastScrollTime = Date.now();
+
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            const currentTime = Date.now();
+            const scrollDelta = lastScrollY - currentScrollY;
+            const timeDelta = currentTime - lastScrollTime;
+
+            // If user scrolls up faster than 1500px/s (aggressive pull to top/URL bar)
+            if (scrollDelta > 100 && timeDelta < 100 && currentScrollY < 1000) {
+                showNudge("Wait! Found what you were looking for? We're here to help! 🔍");
+            }
+
+            lastScrollY = currentScrollY;
+            lastScrollTime = currentTime;
+        };
+
+        // 4. Tab Visibility (Welcome Back)
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                // Short delay to not be jarring immediately on return
+                setTimeout(() => {
+                    showNudge("Welcome back! Have any questions about this model? 🧸");
+                }, 1500);
+            }
+        };
+
         document.addEventListener("mouseleave", handleMouseLeave);
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
             clearTimeout(timer);
             document.removeEventListener("mouseleave", handleMouseLeave);
+            window.removeEventListener("scroll", handleScroll);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
     }, [pathname, showNudge]);
 
