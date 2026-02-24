@@ -4,17 +4,19 @@ import React, { useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { X, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/store/useStore";
 
 const NUDGE_KEY = "aura_nudge_seen";
 const COOLDOWN_DAYS = 1; // Show once per day
 
 export function WhatsAppNudge() {
     const pathname = usePathname();
+    const { recentlyViewed } = useStore();
     const [isVisible, setIsVisible] = useState(false);
-    const [message, setMessage] = useState("");
+    const [config, setConfig] = useState({ message: "", header: "Expert Guide", waMessage: "" });
     const [isDismissed, setIsDismissed] = useState(false);
 
-    const showNudge = useCallback((msg: string) => {
+    const showNudge = useCallback((msg: string, header = "Personal Expert Guide", waMsg = "") => {
         if (isDismissed) return;
 
         // Check localStorage for cooldown
@@ -26,24 +28,69 @@ export function WhatsAppNudge() {
             if (diffDays < COOLDOWN_DAYS) return;
         }
 
-        setMessage(msg);
+        setConfig({
+            message: msg,
+            header,
+            waMessage: waMsg || `Hi! I was browsing your site and wanted to ask something.`
+        });
         setIsVisible(true);
         localStorage.setItem(NUDGE_KEY, Date.now().toString());
     }, [isDismissed]);
 
     useEffect(() => {
-        // Only nudge on product pages or high-intent areas
-        if (!pathname?.startsWith("/product/")) return;
+        // Determine Page Context
+        const isProduct = pathname?.startsWith("/product/");
+        const isCategory = pathname?.startsWith("/category/");
+        const isCart = pathname === "/cart";
+        const isHome = pathname === "/";
 
-        // 1. Inactivity Nudge (45 seconds)
+        // 1. Inactivity Nudge (20 seconds - USER REQUEST)
         const timer = setTimeout(() => {
-            showNudge("Need a real unboxing video of this toy? Ask us on WhatsApp! 🎥");
-        }, 45000);
+            if (isProduct) {
+                const productName = recentlyViewed[0]?.name || "this model";
+                showNudge(
+                    `Need a real unboxing video of the ${productName}? Ask us! 🎥`,
+                    "Product Specialist",
+                    `Hi! I'm interested in the ${productName}. Can I see a real video?`
+                );
+            } else if (isCategory) {
+                showNudge(
+                    "Confused between 12V vs 24V? Let us help you choose the right power! ⚡",
+                    "Selection Expert",
+                    "Hi! Help me choose the right toy for my kid's age and weight."
+                );
+            } else if (isCart) {
+                showNudge(
+                    "Checking shipping? We offer FREE delivery India-wide! Need help? 🚚",
+                    "Order Support",
+                    "Hi! I'm at the cart and have a quick question before I order."
+                );
+            } else if (isHome) {
+                showNudge(
+                    "Looking for the perfect gift? Ask our experts for recommendations! 🎁",
+                    "Gift Guide",
+                    "Hi! I need help picking a gift for my kid."
+                );
+            }
+        }, 20000); // Trigger after 20 seconds as requested
 
         // 2. Desktop Exit Intent (Mouse Leave)
         const handleMouseLeave = (e: MouseEvent) => {
             if (e.clientY <= 0) {
-                showNudge("Wait! Have a question before you go? Chat with our experts! 🤝");
+                if (isProduct) {
+                    const productName = recentlyViewed[0]?.name || "this toy";
+                    showNudge(
+                        `Wait! Have a question about the ${productName} before you go? 🧸`,
+                        "Quick Help",
+                        `Hi! I have a question about the ${productName} before I leave.`
+                    );
+                } else {
+                    showNudge(
+                        "Wait! Didn't find what you were looking for? Ask us! 🔍",
+                        "Store Guide",
+                        "Hi! I'm looking for something specific but couldn't find it."
+                    );
+                }
             }
         };
 
@@ -57,9 +104,13 @@ export function WhatsAppNudge() {
             const scrollDelta = lastScrollY - currentScrollY;
             const timeDelta = currentTime - lastScrollTime;
 
-            // If user scrolls up faster than 1500px/s (aggressive pull to top/URL bar)
-            if (scrollDelta > 100 && timeDelta < 100 && currentScrollY < 1000) {
-                showNudge("Wait! Found what you were looking for? We're here to help! 🔍");
+            // If user scrolls up faster than 1200px/s (aggressive pull to top/URL bar)
+            if (scrollDelta > 120 && timeDelta < 100 && currentScrollY < 1200) {
+                showNudge(
+                    "Found what you need? We can help you pick the perfect ride-on! 🎁",
+                    "Gift Expert",
+                    "Hi! I need help picking a gift. Can you suggest something?"
+                );
             }
 
             lastScrollY = currentScrollY;
@@ -71,8 +122,12 @@ export function WhatsAppNudge() {
             if (document.visibilityState === "visible") {
                 // Short delay to not be jarring immediately on return
                 setTimeout(() => {
-                    showNudge("Welcome back! Have any questions about this model? 🧸");
-                }, 1500);
+                    showNudge(
+                        "Welcome back! Ready to see some real action videos for our toys? 🍿",
+                        "Quality Assurance",
+                        "Hi! I'm back. Can you show me some more videos of your top models?"
+                    );
+                }, 2000);
             }
         };
 
@@ -86,7 +141,7 @@ export function WhatsAppNudge() {
             window.removeEventListener("scroll", handleScroll);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
-    }, [pathname, showNudge]);
+    }, [pathname, showNudge, recentlyViewed]);
 
     const handleDismiss = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -114,16 +169,16 @@ export function WhatsAppNudge() {
                     </div>
                     <div className="space-y-1">
                         <p className="text-[13px] font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
-                            Personal Expert Guide
+                            {config.header}
                         </p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-                            {message}
+                            {config.message}
                         </p>
                     </div>
                 </div>
 
                 <a
-                    href={`https://wa.me/918239269217?text=${encodeURIComponent("Hi! I was looking at a product and wanted to see a real video or have some questions.")}`}
+                    href={`https://wa.me/918239269217?text=${encodeURIComponent(config.waMessage + `\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-3 block w-full bg-[#25D366] text-white text-[11px] font-black text-center py-2.5 rounded-xl hover:bg-[#128C7E] transition-colors uppercase tracking-widest"
