@@ -7,7 +7,9 @@ import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 import { trackFbEvent } from '@/components/tracking/FacebookPixel';
+import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 import { StockUrgency } from './StockUrgency';
+
 import { BISCertificateModal } from './BISCertificateModal';
 
 interface ProductActionsProps {
@@ -124,18 +126,20 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
         });
 
         // Track Google AddToCart
-        if (typeof window !== "undefined" && (window as any).gtag) {
-            (window as any).gtag('event', 'add_to_cart', {
-                currency: 'INR',
-                value: finalPrice * quantity,
-                items: [{
-                    item_id: String(currentVariant?.id || product.id),
-                    item_name: finalName,
-                    price: finalPrice,
-                    quantity: quantity
-                }]
-            });
-        }
+        trackEvent('add_to_cart', {
+            currency: 'INR',
+            value: finalPrice * quantity,
+            items: [mapToGA4Item({
+                id: product.id,
+                variantId: currentVariant?.id,
+                name: finalName,
+                price: finalPrice,
+                quantity: quantity,
+                category: product.category,
+                attributes: selectedAttributes
+            })]
+        });
+
 
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);

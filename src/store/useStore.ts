@@ -11,6 +11,10 @@ interface CartItem {
     image: string;
     quantity: number;
     attributes?: Record<string, string>; // e.g. { Color: "Red" }
+    box_dimensions?: string;
+    product_dimensions?: string;
+    gross_weight?: string;
+    net_weight?: string;
 }
 
 interface RecentlyViewedItem {

@@ -6,6 +6,7 @@ import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck } from
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CartUpsells } from '@/components/cart/CartUpsells';
+import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 export default function CartPage() {
     const { cart, removeFromCart, updateQuantity } = useStore();
@@ -17,9 +18,18 @@ export default function CartPage() {
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
         setMounted(true);
+        // Track GA4 view_cart
+        if (cart.length > 0) {
+            trackEvent("view_cart", {
+                currency: "INR",
+                value: subtotal,
+                items: cart.map(mapToGA4Item)
+            });
+        }
     }, []);
 
     const handleCheckout = () => {
+
         router.push('/checkout');
     };
 

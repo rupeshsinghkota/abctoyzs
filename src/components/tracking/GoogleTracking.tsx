@@ -51,29 +51,46 @@ export default function GoogleTracking() {
     );
 }
 
+// Map internal product to GA4 standard item
+export const mapToGA4Item = (item: any) => ({
+    item_id: String(item.id || item.product_id),
+    item_name: item.name || item.product_name,
+    price: item.price,
+    quantity: item.quantity || 1,
+    item_category: item.category,
+    variant: item.attributes ? Object.values(item.attributes).join(' / ') : undefined
+});
+
 // Global helper for event tracking
-export const trackEvent = (action: string, category: string, label: string, value?: number) => {
+export const trackEvent = (action: string, params: Record<string, any>) => {
     if (typeof window !== "undefined" && window.gtag) {
-        window.gtag("event", action, {
-            event_category: category,
-            event_label: label,
-            value: value,
-        });
+        window.gtag("event", action, params);
+        console.log(`[GA4] Event Tracked: ${action}`, params);
     }
 };
 
 // Specifically for Google Ads Conversion
-export const trackConversion = (value: number, transaction_id: string) => {
+export const trackConversion = (value: number, transaction_id: string, items?: any[]) => {
     const label = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
     const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
     if (typeof window !== "undefined" && window.gtag && adsId && label) {
+        // Track GA4 Purchase
+        window.gtag("event", "purchase", {
+            transaction_id: transaction_id,
+            value: value,
+            currency: "INR",
+            items: items?.map(mapToGA4Item) || []
+        });
+
+        // Track Ads Conversion
         window.gtag("event", "conversion", {
             send_to: `${adsId}/${label}`,
             value: value,
             currency: "INR",
             transaction_id: transaction_id,
         });
-        console.log(`[Google Ads] Tracking conversion: ${value} INR | ${transaction_id}`);
+        console.log(`[Tracking] Purchase & Conversion: ${value} INR | ${transaction_id}`);
     }
 };
+

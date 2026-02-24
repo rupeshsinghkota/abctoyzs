@@ -14,6 +14,7 @@ import {
     Ticket, X, CheckCircle2
 } from 'lucide-react';
 import { CheckoutAuth } from '@/components/checkout/CheckoutAuth';
+import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 declare global {
     interface Window {
@@ -39,6 +40,12 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
     const [showAddrForm, setShowAddrForm] = useState(false);
     const [isBISModalOpen, setIsBISModalOpen] = useState(false);
+    const [deliveryEstimate, setDeliveryEstimate] = useState<{
+        formattedDate?: string;
+        loading: boolean;
+        serviceable: boolean;
+        message?: string;
+    }>({ loading: false, serviceable: false });
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
@@ -117,22 +124,86 @@ export default function CheckoutPage() {
                     num_items: cart.length
                 });
             }
-            // Track InitiateCheckout - Google Ads
-            if ((window as any).gtag) {
-                (window as any).gtag('event', 'begin_checkout', {
-                    value: total,
-                    currency: 'INR',
-                    items: cart.map(item => ({
-                        item_id: item.id,
-                        item_name: item.name,
-                        price: item.price,
-                        quantity: item.quantity
-                    }))
-                });
-            }
-            console.log('[Tracking] InitiateCheckout event fired');
+            // Track begin_checkout - GA4
+            trackEvent('begin_checkout', {
+                value: total,
+                currency: 'INR',
+                items: cart.map(mapToGA4Item)
+            });
+            console.log('[Tracking] Checkout events fired');
         }
     }, [total]); // Fire when total is calculated
+
+
+    // Delivery Estimate Effect
+    useEffect(() => {
+        const fetchDeliveryEstimate = async () => {
+            if (!selectedAddressId || !addresses.length) return;
+
+            const selectedAddress = addresses.find(a => a.id === selectedAddressId);
+            if (!selectedAddress?.pincode) return;
+
+            setDeliveryEstimate(prev => ({ ...prev, loading: true }));
+            try {
+                // Calculate aggregate weight and dimensions
+                // For simplified logic, we'll use the first item's dims or defaults, and sum weights
+                let totalWeight = 0;
+                let maxL = 100, maxB = 60, maxH = 50;
+
+                cart.forEach(item => {
+                    const parseDim = (str?: string) => {
+                        if (!str) return null;
+                        const matches = str.match(/(\d+(\.\d+)?)/g);
+                        return matches ? matches.map(Number) : null;
+                    };
+
+                    const dims = parseDim(item.box_dimensions || item.product_dimensions);
+                    const w = parseDim(item.gross_weight || item.net_weight);
+
+                    totalWeight += (w ? w[0] : 10) * item.quantity;
+                    if (dims) {
+                        maxL = Math.max(maxL, dims[0]);
+                        maxB = Math.max(maxB, dims[1] || 60);
+                        maxH = Math.max(maxH, dims[2] || 50);
+                    }
+                });
+
+                const queryParams = new URLSearchParams({
+                    pincode: selectedAddress.pincode,
+                    weight: totalWeight.toString(),
+                    length: maxL.toString(),
+                    breadth: maxB.toString(),
+                    height: maxH.toString()
+                });
+
+                const res = await fetch(`/api/shipping/estimate?${queryParams.toString()}`);
+                const data = await res.json();
+
+                if (data.serviceable) {
+                    setDeliveryEstimate({
+                        serviceable: true,
+                        formattedDate: data.formattedDate,
+                        loading: false
+                    });
+                } else {
+                    setDeliveryEstimate({
+                        serviceable: false,
+                        message: data.message || 'Location not serviceable',
+                        loading: false
+                    });
+                }
+            } catch (error) {
+                console.error("Delivery estimate error:", error);
+                setDeliveryEstimate({
+                    serviceable: false,
+                    loading: false,
+                    message: "Failed to load estimate"
+                });
+            }
+        };
+
+        fetchDeliveryEstimate();
+    }, [selectedAddressId, addresses, cart]);
 
     // Re-validate coupon when payment method changes
     useEffect(() => {
@@ -747,6 +818,7 @@ export default function CheckoutPage() {
                             onPayment={handlePayment}
                             isPaymentLoading={loading}
                             selectedAddressId={selectedAddressId}
+                            deliveryEstimate={deliveryEstimate}
                         />
 
                         {/* Mobile Sticky Checkout Bar */}
@@ -1018,7 +1090,8 @@ function OrderSummaryCard({
     codSettings,
     onPayment,
     isPaymentLoading,
-    selectedAddressId
+    selectedAddressId,
+    deliveryEstimate
 }: {
     cart: any[];
     subtotal: number;
@@ -1037,6 +1110,12 @@ function OrderSummaryCard({
     onPayment: () => void;
     isPaymentLoading: boolean;
     selectedAddressId: string | null;
+    deliveryEstimate?: {
+        formattedDate?: string;
+        loading: boolean;
+        serviceable: boolean;
+        message?: string;
+    };
 }) {
     return (
         <div className="bg-white border border-gray-100 rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)] md:sticky md:top-20 lg:top-24">
@@ -1144,9 +1223,19 @@ function OrderSummaryCard({
                     </div>
                     <div className="flex justify-between items-center text-gray-500 font-medium">
                         <span>Shipping</span>
-                        <span className={shipping === 0 ? "text-green-600 font-black tracking-widest uppercase text-xs" : "text-gray-900 font-bold"}>
-                            {shipping === 0 ? "Free" : `₹${shipping}`}
-                        </span>
+                        <div className="text-right">
+                            <span className={shipping === 0 ? "text-green-600 font-black tracking-widest uppercase text-xs" : "text-gray-900 font-bold"}>
+                                {shipping === 0 ? "Free" : `₹${shipping}`}
+                            </span>
+                            {deliveryEstimate?.formattedDate && (
+                                <p className="text-[10px] text-zinc-500 font-bold mt-0.5 animate-in fade-in slide-in-from-right-1">
+                                    Delivery by <span className="text-black">{deliveryEstimate.formattedDate}</span>
+                                </p>
+                            )}
+                            {deliveryEstimate?.loading && (
+                                <p className="text-[9px] text-zinc-400 font-bold animate-pulse mt-0.5">Calculating delivery...</p>
+                            )}
+                        </div>
                     </div>
                     {discount > 0 && (
                         <div className="flex justify-between items-center text-green-600 font-black bg-green-50 p-2 rounded-xl border border-green-100 animate-in fade-in duration-300">

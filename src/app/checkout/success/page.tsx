@@ -28,10 +28,11 @@ function SuccessContent() {
                 orderData = await OrderService.getOrderById(oid);
                 if (orderData) {
                     setOrder(orderData);
-                    // TRACK CONVERSION - GOOGLE
-                    trackConversion(orderData.total_amount, orderData.id);
+                    // TRACK CONVERSION - GOOGLE (GA4 Purchase + Ads Conversion)
+                    trackConversion(orderData.total_amount, orderData.id, orderData.items);
 
                     // TRACK CONVERSION - FACEBOOK PIXEL (Full Data)
+
                     if (typeof window !== "undefined" && (window as any).fbq) {
                         // Attempt to enhance match quality by re-initializing with user data
                         // standard fbq('init', id, userData)
