@@ -1,6 +1,10 @@
+"use client";
+
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
+import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 interface ProductStripProps {
     title: string;
@@ -9,8 +13,19 @@ interface ProductStripProps {
 }
 
 export function ProductStrip({ title, products, viewAllLink = '/shop' }: ProductStripProps) {
+    useEffect(() => {
+        if (products.length > 0) {
+            trackEvent("view_item_list", {
+                item_list_id: title.toLowerCase().replace(/\s+/g, '_'),
+                item_list_name: title,
+                items: products.map(mapToGA4Item)
+            });
+        }
+    }, [products, title]);
+
     return (
         <section className="py-6 bg-background space-y-4">
+
             <div className="flex items-center justify-between px-4">
                 <h3 className="text-lg font-bold font-heading tracking-tight">{title}</h3>
                 <Link href={viewAllLink} className="text-sm font-medium text-primary hover:underline">

@@ -82,12 +82,20 @@ export default function CartPage() {
                                     <div className="flex justify-between items-start gap-3 md:gap-4">
                                         <h3 className="font-bold text-xs md:text-sm line-clamp-2 text-gray-900 leading-snug">{item.name}</h3>
                                         <button
-                                            onClick={() => removeFromCart(item.id)}
+                                            onClick={() => {
+                                                trackEvent('remove_from_cart', {
+                                                    currency: 'INR',
+                                                    value: item.price * item.quantity,
+                                                    items: [mapToGA4Item(item)]
+                                                });
+                                                removeFromCart(item.id);
+                                            }}
                                             className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 -mr-2 -mt-2 rounded-full transition-all shrink-0"
                                             aria-label="Remove item"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
+
                                     </div>
                                     <div className="flex flex-col mt-1">
                                         <div className="flex items-center gap-2">

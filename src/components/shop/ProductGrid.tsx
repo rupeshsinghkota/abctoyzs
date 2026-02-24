@@ -1,9 +1,8 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Product } from '@/lib/data';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { ChevronDown } from 'lucide-react';
+import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 interface ProductGridProps {
     products: Product[];
@@ -16,6 +15,17 @@ export function ProductGrid({ products, initialCount = 8, loadMoreCount = 4 }: P
     const hasMore = visibleCount < products.length;
     const visibleProducts = products.slice(0, visibleCount);
     const remaining = products.length - visibleCount;
+
+    useEffect(() => {
+        if (products.length > 0) {
+            trackEvent("view_item_list", {
+                item_list_id: "category_grid",
+                item_list_name: "Category Grid",
+                items: products.map(mapToGA4Item)
+            });
+        }
+    }, [products]);
+
 
     return (
         <div>

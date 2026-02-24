@@ -14,8 +14,18 @@ interface ProductCardProps {
     priority?: boolean;
 }
 
+import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
+
 export function ProductCard({ product, className, priority = false }: ProductCardProps) {
     const addToCart = useStore((state) => state.addToCart);
+
+    const handleSelect = () => {
+        trackEvent("select_item", {
+            item_list_id: "category_grid",
+            item_list_name: "Category Grid",
+            items: [mapToGA4Item(product)]
+        });
+    };
 
     const discount = product.mrp && product.mrp > product.price
         ? Math.round(((product.mrp - product.price) / product.mrp) * 100)
@@ -51,7 +61,11 @@ export function ProductCard({ product, className, priority = false }: ProductCar
             className
         )}>
             {/* ──── Image ──── */}
-            <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-zinc-100">
+            <Link
+                href={`/product/${product.slug}`}
+                className="relative block aspect-square overflow-hidden bg-zinc-100"
+                onClick={handleSelect}
+            >
                 <img
                     src={product.image}
                     alt={product.name}
@@ -116,7 +130,10 @@ export function ProductCard({ product, className, priority = false }: ProductCar
                     <Link
                         href={`/category/${product.category}`}
                         className="text-[9px] text-primary/70 font-semibold uppercase tracking-widest hover:text-primary transition-colors"
-                        onClick={e => e.stopPropagation()}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelect();
+                        }}
                     >
                         {product.category}
                     </Link>
@@ -129,7 +146,11 @@ export function ProductCard({ product, className, priority = false }: ProductCar
                 </div>
 
                 {/* Product Name */}
-                <Link href={`/product/${product.slug}`} className="block flex-1 mb-2">
+                <Link
+                    href={`/product/${product.slug}`}
+                    className="block flex-1 mb-2"
+                    onClick={handleSelect}
+                >
                     <h3 className="text-[13px] md:text-sm font-semibold text-zinc-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
                         {product.name}
                     </h3>
@@ -156,6 +177,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
                     {product.variants && product.variants.length > 0 ? (
                         <Link
                             href={`/product/${product.slug}`}
+                            onClick={handleSelect}
                             className="w-8 h-8 bg-zinc-900 rounded-full flex items-center justify-center text-white hover:bg-primary active:scale-90 transition-all flex-shrink-0"
                             title="View Options"
                         >
@@ -165,6 +187,11 @@ export function ProductCard({ product, className, priority = false }: ProductCar
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
+                                trackEvent('add_to_cart', {
+                                    currency: 'INR',
+                                    value: product.price,
+                                    items: [mapToGA4Item(product)]
+                                });
                                 addToCart({
                                     id: product.id,
                                     name: product.name,
@@ -185,4 +212,5 @@ export function ProductCard({ product, className, priority = false }: ProductCar
         </div>
     );
 }
+
 
