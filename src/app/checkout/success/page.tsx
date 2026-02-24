@@ -84,6 +84,22 @@ function SuccessContent() {
                         });
                         console.log('[Facebook Pixel] Purchase event tracked with full metadata');
                     }
+
+                    // --- LEAD CONVERSION ---
+                    // Mark the lead as 'converted' so the automated nurture sequence stops
+                    try {
+                        const leadPhone = orderData.shipping_address?.phone?.replace(/\D/g, "").slice(-10);
+                        if (leadPhone) {
+                            const supabase = createClient();
+                            await supabase
+                                .from('leads')
+                                .update({ status: 'converted', updated_at: new Date().toISOString() })
+                                .eq('phone', leadPhone);
+                            console.log(`[Success] Lead ${leadPhone} marked as converted`);
+                        }
+                    } catch (leadError) {
+                        console.error('[Success] Lead conversion error:', leadError);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to load order for detailed tracking:", error);

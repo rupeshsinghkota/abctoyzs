@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS leads (
 );
 
 -- Index for fast lookup by phone
-CREATE INDEX IF NOT EXISTS leads_phone_idx ON leads (phone);
+CREATE UNIQUE INDEX IF NOT EXISTS leads_phone_unique_idx ON leads (phone);
 
 -- Enable RLS
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
