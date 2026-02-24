@@ -14,7 +14,7 @@ export function QuantitySelector({ quantity, setQuantity, min = 1, max = 10, cla
     const decrement = () => setQuantity(Math.max(quantity - 1, min));
 
     return (
-        <div className={`flex items-center bg-gray-100 dark:bg-zinc-800 rounded-xl ${className}`}>
+        <div className={`flex items-center bg-gray-100 dark:bg-zinc-800 rounded-2xl ${className}`}>
             <button
                 onClick={decrement}
                 disabled={quantity <= min}
