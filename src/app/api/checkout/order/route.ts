@@ -264,6 +264,7 @@ export async function POST(req: Request) {
             order_id: order.id,
             razorpay_order_id: razorpayOrderId,
             amount: razorpayAmountPaise,
+            total_amount: total_amount, // Full value for tracking
             currency: razorpayCurrency,
             prepayment: payment_method === 'COD' && razorpayAmount > 0
         });

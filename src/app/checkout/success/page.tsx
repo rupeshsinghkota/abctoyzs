@@ -23,19 +23,39 @@ function SuccessContent() {
                 return;
             }
 
+            // --- IMMEDIATE FALLBACK TRACKING ---
+            // If we have oid and amount in URL, track immediately without waiting for DB
+            if (amountParam && oid) {
+                const immediateAmount = parseFloat(amountParam);
+                console.log(`[Tracking] Firing Immediate Fallback: ${immediateAmount} | ${oid}`);
+
+                // Google
+                trackConversion(immediateAmount, oid);
+
+                // Facebook
+                if (typeof window !== "undefined" && (window as any).fbq) {
+                    (window as any).fbq('track', 'Purchase', {
+                        currency: "INR",
+                        value: immediateAmount,
+                        content_type: 'product',
+                        order_id: oid
+                    });
+                }
+            }
+
             let orderData = null;
             try {
                 orderData = await OrderService.getOrderById(oid);
                 if (orderData) {
                     setOrder(orderData);
-                    // TRACK CONVERSION - GOOGLE (GA4 Purchase + Ads Conversion)
+
+                    // TRACK CONVERSION - GOOGLE (GA4 Purchase + Ads Conversion with full items)
+                    // Note: trackConversion handles deduplication via transaction_id usually, 
+                    // but we will fire again to ensure GA4 gets the items list.
                     trackConversion(orderData.total_amount, orderData.id, orderData.items);
 
-                    // TRACK CONVERSION - FACEBOOK PIXEL (Full Data)
-
+                    // TRACK CONVERSION - FACEBOOK PIXEL (Full Data with User Matching)
                     if (typeof window !== "undefined" && (window as any).fbq) {
-                        // Attempt to enhance match quality by re-initializing with user data
-                        // standard fbq('init', id, userData)
                         const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
                         if (pixelId) {
                             const userData = {
@@ -48,7 +68,6 @@ function SuccessContent() {
                                 zp: orderData.shipping_address?.pincode || undefined,
                                 country: 'in'
                             };
-                            console.log('[Facebook Pixel] Updating user data for matching:', userData);
                             (window as any).fbq('init', pixelId, userData);
                         }
 
@@ -59,27 +78,12 @@ function SuccessContent() {
                             content_type: 'product',
                             order_id: orderData.id
                         });
-                        console.log('[Facebook Pixel] Purchase event fired (Full Data) for:', orderData.id);
+                        console.log('[Facebook Pixel] Purchase event tracked with full metadata');
                     }
                 }
             } catch (error) {
-                console.error("Failed to load order for tracking:", error);
-
-                // FALLBACK TRACKING (If DB Fetch Fails)
-                if (amountParam) {
-                    const fallbackAmount = parseFloat(amountParam);
-                    trackConversion(fallbackAmount, oid);
-
-                    if (typeof window !== "undefined" && (window as any).fbq) {
-                        (window as any).fbq('track', 'Purchase', {
-                            currency: "INR",
-                            value: fallbackAmount,
-                            content_type: 'product',
-                            order_id: oid
-                        });
-                        console.log('[Facebook Pixel] Purchase event fired (Fallback Data) for:', oid);
-                    }
-                }
+                console.error("Failed to load order for detailed tracking:", error);
+                // Fallback already fired, so we just log the failure.
             } finally {
                 setLoading(false);
             }

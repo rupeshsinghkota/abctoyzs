@@ -343,8 +343,9 @@ export default function CheckoutPage() {
                                 }
 
                                 clearCart();
-                                const amountInr = orderData.amount / 100;
-                                const successUrl = `/checkout/success?oid=${orderData.order_id}&amount=${amountInr}${result.isNewUser ? '&new_account=true' : ''}`;
+                                // We pass the TOTAL amount for tracking, even if only advance was paid
+                                const totalVal = orderData.total_amount;
+                                const successUrl = `/checkout/success?oid=${orderData.order_id}&amount=${totalVal}${result.isNewUser ? '&new_account=true' : ''}`;
                                 router.push(successUrl);
                             } else {
                                 const errorData = await verifyRes.json();
