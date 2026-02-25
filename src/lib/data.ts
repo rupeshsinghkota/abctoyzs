@@ -153,6 +153,36 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
         return [];
     }
 }
+// Fetch Multiple by IDs
+export async function getProductsByIds(ids: string[]): Promise<Product[]> {
+    if (!ids || ids.length === 0) return [];
+
+    try {
+        const supabase = createClient();
+
+        // Fetch global discount
+        let discount = 0;
+        const { data: settingsData } = await supabase.from('settings').select('global_daily_discount').single();
+        if (settingsData && settingsData.global_daily_discount) {
+            discount = settingsData.global_daily_discount;
+        }
+
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .in('id', ids);
+
+        if (error || !data) {
+            console.error("fetchProductsByIds failed:", error);
+            return [];
+        }
+
+        return processProducts(data, discount);
+    } catch (e) {
+        console.error("getProductsByIds error:", e);
+        return [];
+    }
+}
 
 // Search Helper
 export async function searchProducts(query: string): Promise<Product[]> {

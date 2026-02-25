@@ -4,9 +4,10 @@ import { useState, useEffect, useMemo, useRef, Fragment } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { ImageGallery } from '@/components/product/ImageGallery';
 import { ProductActions } from '@/components/product/ProductActions';
-import { Star, Truck, ShieldCheck, CheckCircle2, RotateCcw, MapPin, Wallet } from 'lucide-react';
+import { Star, Truck, ShieldCheck, CheckCircle2, RotateCcw, MapPin, Wallet, ArrowRightLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
+import { toast } from 'sonner';
 import { ProductSpecs } from '@/components/product/ProductSpecs';
 import { StickyCartBar } from '@/components/product/StickyCartBar';
 import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-react';
@@ -19,6 +20,30 @@ import { GenuineOrderGuarantee } from '@/components/trust/GenuineOrderGuarantee'
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
     const router = useRouter();
     const searchParams = useSearchParams();
+
+    const { compareItems, addToCompare, removeFromCompare } = useStore();
+    const isComparing = compareItems.some(p => p.id === product.id);
+
+    const toggleCompare = () => {
+        if (isComparing) {
+            removeFromCompare(product.id);
+        } else {
+            if (compareItems.length >= 4) {
+                toast.error("You can only compare up to 4 products at a time.");
+                return;
+            }
+            addToCompare({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                slug: product.slug,
+                category: product.category,
+                rating: product.rating
+            });
+            toast.success("Added to comparison");
+        }
+    };
 
     // State for attribute selection
     const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(() => {
@@ -297,6 +322,17 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                             <div className="hidden lg:flex items-center gap-6 pt-4 border-t border-gray-50 mt-4">
                                 <WishlistButton productId={product.id} size="lg" className="h-10 px-0 hover:bg-transparent text-muted-foreground hover:text-red-500 transition-all flex items-center gap-2" />
                                 <span className="text-sm text-gray-300">|</span>
+                                <button
+                                    onClick={toggleCompare}
+                                    className={cn(
+                                        "h-10 text-sm font-bold transition-all flex items-center gap-2 group",
+                                        isComparing ? "text-primary" : "text-muted-foreground hover:text-primary"
+                                    )}
+                                >
+                                    <ArrowRightLeft className={cn("w-4 h-4 transition-transform", isComparing ? "scale-110" : "group-hover:scale-110")} />
+                                    {isComparing ? "Comparing" : "Add to Compare"}
+                                </button>
+                                <span className="text-sm text-gray-300">|</span>
                                 <a
                                     href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I have a question about ${product.name}.\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                                     target="_blank"
@@ -402,6 +438,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
             {/* REVIEWS SECTION */}
             <div className="lg:col-span-12 px-4 lg:px-0">
                 <ProductReviews
+                    productId={product.id}
                     rating={product.rating || 5.0}
                     reviewCount={product.reviews || 0}
                     productName={product.name}

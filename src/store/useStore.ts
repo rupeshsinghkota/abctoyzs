@@ -38,6 +38,11 @@ interface AppState {
     updateQuantity: (id: string, quantity: number) => void;
     clearCart: () => void;
     toggleCart: () => void;
+    // Comparison
+    compareItems: RecentlyViewedItem[];
+    addToCompare: (product: RecentlyViewedItem) => void;
+    removeFromCompare: (id: string) => void;
+    clearCompare: () => void;
 }
 
 export const useStore = create<AppState>()(
@@ -83,6 +88,19 @@ export const useStore = create<AppState>()(
                 })),
             clearCart: () => set({ cart: [] }),
             toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen })),
+            // Comparison
+            compareItems: [],
+            addToCompare: (product) =>
+                set((state) => {
+                    if (state.compareItems.some(p => p.id === product.id)) return state;
+                    if (state.compareItems.length >= 4) return state; // Limit to 4
+                    return { compareItems: [...state.compareItems, product] };
+                }),
+            removeFromCompare: (id) =>
+                set((state) => ({
+                    compareItems: state.compareItems.filter(p => p.id !== id)
+                })),
+            clearCompare: () => set({ compareItems: [] }),
         }),
         {
             name: 'abctoyz-storage',

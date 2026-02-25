@@ -33,6 +33,16 @@ const AGE_OPTIONS: FilterOption[] = AGE_CATEGORIES.map(cat => ({
     value: cat.value
 }));
 
+const REMOTE_CONTROL_OPTIONS: FilterOption[] = [
+    { label: 'Yes', value: 'yes' },
+    { label: 'No', value: 'no' },
+];
+
+const MOTOR_OPTIONS: FilterOption[] = [
+    { label: '2 Motors', value: '2' },
+    { label: '4 Motors', value: '4' },
+];
+
 const SEATS_OPTIONS: FilterOption[] = [
     { label: '1 Seat', value: '1' },
     { label: '2 Seats', value: '2' },
@@ -58,6 +68,8 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
     const [selectedVoltages, setSelectedVoltages] = useState<string[]>([]);
     const [selectedAges, setSelectedAges] = useState<string[]>([]);
     const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+    const [selectedRemote, setSelectedRemote] = useState<string[]>([]);
+    const [selectedMotors, setSelectedMotors] = useState<string[]>([]);
 
     // Initialize from URL
     useEffect(() => {
@@ -73,6 +85,12 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
 
         const seats = searchParams.get('seats')?.split(',') || [];
         setSelectedSeats(seats);
+
+        const remote = searchParams.get('remote')?.split(',') || [];
+        setSelectedRemote(remote);
+
+        const motors = searchParams.get('motors')?.split(',') || [];
+        setSelectedMotors(motors);
     }, [searchParams]);
 
     const updateFilters = () => {
@@ -97,6 +115,14 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
         if (selectedSeats.length > 0) params.set('seats', selectedSeats.join(','));
         else params.delete('seats');
 
+        // Remote
+        if (selectedRemote.length > 0) params.set('remote', selectedRemote.join(','));
+        else params.delete('remote');
+
+        // Motors
+        if (selectedMotors.length > 0) params.set('motors', selectedMotors.join(','));
+        else params.delete('motors');
+
         // Reset page to 1 if pagination exists (optional but good practice)
         params.delete('page');
 
@@ -109,6 +135,8 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
         setSelectedVoltages([]);
         setSelectedAges([]);
         setSelectedSeats([]);
+        setSelectedRemote([]);
+        setSelectedMotors([]);
         router.push(pathname, { scroll: false });
         setIsOpen(false);
     };
@@ -125,6 +153,8 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
         selectedVoltages.length > 0,
         selectedAges.length > 0,
         selectedSeats.length > 0,
+        selectedRemote.length > 0,
+        selectedMotors.length > 0,
         priceRange[0] > 0 || priceRange[1] < 100000
     ].filter(Boolean).length;
 
@@ -250,6 +280,48 @@ export function ProductFilters({ className, hiddenFilters = [] }: ProductFilters
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* Remote Control */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Remote Control</h3>
+                                        <div className="flex gap-2">
+                                            {REMOTE_CONTROL_OPTIONS.map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    onClick={() => toggleSelection(opt.value, selectedRemote, setSelectedRemote)}
+                                                    className={cn(
+                                                        "px-4 py-2 rounded-xl text-[11px] font-bold border transition-all flex-1",
+                                                        selectedRemote.includes(opt.value)
+                                                            ? "bg-primary text-white border-primary"
+                                                            : "bg-white text-gray-600 border-gray-100 hover:border-primary/30"
+                                                    )}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Motors */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Motor Power</h3>
+                                        <div className="flex gap-2">
+                                            {MOTOR_OPTIONS.map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    onClick={() => toggleSelection(opt.value, selectedMotors, setSelectedMotors)}
+                                                    className={cn(
+                                                        "px-4 py-2 rounded-xl text-[11px] font-bold border transition-all flex-1",
+                                                        selectedMotors.includes(opt.value)
+                                                            ? "bg-primary text-white border-primary"
+                                                            : "bg-white text-gray-600 border-gray-100 hover:border-primary/30"
+                                                    )}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
 
                                     {/* Seats */}
                                     {!hiddenFilters.includes('seats') && (

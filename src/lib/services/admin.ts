@@ -347,25 +347,63 @@ export const AdminService = {
             .from('products')
             .select('*', { count: 'exact', head: true });
 
+        const { data: lowStockProducts } = await supabase
+            .from('products')
+            .select('id, name, stock')
+            .lt('stock', 5)
+            .limit(5);
+
         const { count: orderCount } = await supabase
             .from('orders')
             .select('*', { count: 'exact', head: true });
 
         const { data: orders } = await supabase
             .from('orders')
-            .select('total_amount');
+            .select('total_amount, status, created_at')
+            .order('created_at', { ascending: true });
 
         const { count: subscriberCount } = await supabase
             .from('newsletter_subscriptions')
             .select('*', { count: 'exact', head: true });
 
+        const { count: leadCount } = await supabase
+            .from('leads')
+            .select('*', { count: 'exact', head: true });
+
+        const { count: pendingRecoveryCount } = await supabase
+            .from('leads')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'new')
+            .lt('last_followup_step', 3);
+
         const totalRevenue = orders?.reduce((sum, o) => sum + Number(o.total_amount), 0) || 0;
+
+        // Process Revenue by Month
+        const revenueByMonthMap = new Map();
+        orders?.forEach(o => {
+            const date = new Date(o.created_at);
+            const month = date.toLocaleString('default', { month: 'short' });
+            revenueByMonthMap.set(month, (revenueByMonthMap.get(month) || 0) + Number(o.total_amount));
+        });
+        const revenueByMonth = Array.from(revenueByMonthMap.entries()).map(([name, revenue]) => ({ name, revenue }));
+
+        // Process Orders by Status
+        const statusMap = new Map();
+        orders?.forEach(o => {
+            statusMap.set(o.status, (statusMap.get(o.status) || 0) + 1);
+        });
+        const ordersByStatus = Array.from(statusMap.entries()).map(([name, value]) => ({ name, value }));
 
         return {
             totalProducts: productCount || 0,
             totalOrders: orderCount || 0,
             totalRevenue,
-            totalSubscribers: subscriberCount || 0
+            totalSubscribers: subscriberCount || 0,
+            totalLeads: leadCount || 0,
+            pendingRecoveries: pendingRecoveryCount || 0,
+            revenueByMonth,
+            ordersByStatus,
+            lowStockProducts: lowStockProducts || []
         };
     },
 

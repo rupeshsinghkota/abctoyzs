@@ -2,11 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Star, ShoppingCart, Zap, Gauge, Baby, Weight, Flame } from 'lucide-react';
+import { Star, ShoppingCart, Zap, Gauge, Baby, Weight, Flame, ArrowRightLeft } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { Product } from '@/lib/data';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
     product: Product;
@@ -18,6 +19,8 @@ import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 export function ProductCard({ product, className, priority = false }: ProductCardProps) {
     const addToCart = useStore((state) => state.addToCart);
+    const { compareItems, addToCompare, removeFromCompare } = useStore();
+    const isComparing = compareItems.some(p => p.id === product.id);
 
     const handleSelect = () => {
         trackEvent("select_item", {
@@ -25,6 +28,29 @@ export function ProductCard({ product, className, priority = false }: ProductCar
             item_list_name: "Category Grid",
             items: [mapToGA4Item(product)]
         });
+    };
+
+    const toggleCompare = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isComparing) {
+            removeFromCompare(product.id);
+        } else {
+            if (compareItems.length >= 4) {
+                toast.error("You can only compare up to 4 products at a time.");
+                return;
+            }
+            addToCompare({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                slug: product.slug,
+                category: product.category,
+                rating: product.rating
+            });
+            toast.success("Added to comparison");
+        }
     };
 
     const discount = product.mrp && product.mrp > product.price
@@ -74,13 +100,24 @@ export function ProductCard({ product, className, priority = false }: ProductCar
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
-                {/* Wishlist — top right */}
                 <div className="absolute top-2 right-2 z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" onClick={e => e.preventDefault()}>
-                    <WishlistButton
-                        productId={product.id}
-                        size="sm"
-                        className="bg-white/90 backdrop-blur-sm shadow-sm border-none hover:bg-white text-zinc-400 hover:text-rose-500 transition-all"
-                    />
+                    <div className="flex flex-col gap-2">
+                        <WishlistButton
+                            productId={product.id}
+                            size="sm"
+                            className="bg-white/90 backdrop-blur-sm shadow-sm border-none hover:bg-white text-zinc-400 hover:text-rose-500 transition-all"
+                        />
+                        <button
+                            onClick={toggleCompare}
+                            className={cn(
+                                "p-2 rounded-full transition-all bg-white/90 backdrop-blur-sm shadow-sm text-zinc-400 hover:text-primary",
+                                isComparing && "bg-primary text-white scale-110 shadow-primary/20"
+                            )}
+                            title={isComparing ? "Remove from Comparison" : "Add to Comparison"}
+                        >
+                            <ArrowRightLeft className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Badges — top left stack */}

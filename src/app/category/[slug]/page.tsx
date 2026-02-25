@@ -64,6 +64,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     const age = resolvedSearchParams.age ? (resolvedSearchParams.age as string).split(',') : [];
     const seats = resolvedSearchParams.seats ? (resolvedSearchParams.seats as string).split(',') : [];
 
+    const remote = resolvedSearchParams.remote ? (resolvedSearchParams.remote as string).split(',') : [];
+    const motors = resolvedSearchParams.motors ? (resolvedSearchParams.motors as string).split(',') : [];
+
     categoryProducts = categoryProducts.filter(p => {
         // Price
         if (p.price < minPrice || p.price > maxPrice) return false;
@@ -78,6 +81,21 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         if (seats.length > 0) {
             const productSeats = p.specs?.seats?.toString();
             if (!productSeats || !seats.includes(productSeats)) return false;
+        }
+
+        // Remote
+        if (remote.length > 0) {
+            const hasRemote = p.specs?.remote_control;
+            if (remote.includes('yes') && !hasRemote) return false;
+            if (remote.includes('no') && hasRemote) return false;
+        }
+
+        // Motors (checking specs.motor for '2' or '4')
+        if (motors.length > 0) {
+            const motorCount = p.specs?.motor?.toLowerCase();
+            if (!motorCount) return false;
+            const matches = motors.some(m => motorCount.includes(m));
+            if (!matches) return false;
         }
 
         return true;

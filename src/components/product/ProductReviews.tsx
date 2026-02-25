@@ -1,21 +1,14 @@
 "use client";
 
-import { Star, CheckCircle2, ThumbsUp, User } from 'lucide-react';
+import { Star, CheckCircle2, ThumbsUp, User, PenSquare, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useMemo } from 'react';
-
-interface Review {
-    id: string;
-    author: string;
-    rating: number;
-    date: string;
-    text: string;
-    isVerified: boolean;
-    helpful?: number;
-    location?: string;
-}
+import { useState, useEffect, useMemo } from 'react';
+import { ReviewService, Review } from '@/lib/services/reviews';
+import { ReviewForm } from '@/components/product/ReviewForm';
+import { createPortal } from 'react-dom';
 
 interface ProductReviewsProps {
+    productId: string;
     rating: number;
     reviewCount: number;
     productName: string;
@@ -35,25 +28,53 @@ const MOCK_REVIEW_POOL = [
 const AUTHORS = ["Sushant P.", "Anjali M.", "Rohan S.", "Kavita R.", "Rahul D.", "Priyanka K.", "Amit G.", "Neha V."];
 const LOCATIONS = ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Pune", "Chennai", "Kolkata", "Ahmedabad"];
 
-export function ProductReviews({ rating, reviewCount, productName }: ProductReviewsProps) {
-    const reviews = useMemo(() => {
-        // Generate a few stable mock reviews based on the product
-        const count = Math.min(3, reviewCount);
-        if (count === 0) return [];
+export function ProductReviews({ productId, rating, reviewCount, productName }: ProductReviewsProps) {
+    const [realReviews, setRealReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
+    useEffect(() => {
+        setMounted(true);
+        const fetchReviews = async () => {
+            try {
+                const data = await ReviewService.getProductReviews(productId);
+                setRealReviews(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchReviews();
+    }, [productId]);
+
+    const displayReviews = useMemo(() => {
+        // If we have real reviews, show them
+        if (realReviews.length > 0) return realReviews.map(r => ({
+            id: r.id,
+            author: r.customer_name,
+            rating: r.rating,
+            date: new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),
+            text: r.comment,
+            isVerified: r.is_verified,
+            helpful: r.helpful_count,
+            location: r.location || 'India'
+        }));
+
+        // Fallback to mock reviews if none exist yet (only if reviewCount > 0)
+        const count = Math.min(3, reviewCount || 3);
         return Array.from({ length: count }).map((_, i) => ({
             id: `rev-${i}`,
             author: AUTHORS[i % AUTHORS.length],
-            rating: Math.floor(rating) + (i === 0 ? 0 : -1), // Slight variation
+            rating: Math.floor(rating) + (i === 0 ? 0 : -1),
             date: `${i + 2} weeks ago`,
             text: MOCK_REVIEW_POOL[i % MOCK_REVIEW_POOL.length],
             isVerified: true,
             helpful: Math.floor(Math.random() * 12) + 2,
             location: LOCATIONS[i % LOCATIONS.length]
         }));
-    }, [rating, reviewCount]);
-
-    if (reviewCount === 0) return null;
+    }, [realReviews, rating, reviewCount]);
 
     return (
         <section className="mt-12 lg:mt-16 border-t border-gray-100 pt-12">
@@ -63,58 +84,79 @@ export function ProductReviews({ rating, reviewCount, productName }: ProductRevi
                     <p className="text-gray-500 text-sm mt-1">Real feedback from families who bought {productName}.</p>
                 </div>
 
-                <div className="flex items-center gap-6 bg-zinc-50 px-6 py-4 rounded-2xl border border-zinc-100/50">
-                    <div className="text-center">
-                        <div className="text-3xl font-black text-zinc-900">{rating}</div>
-                        <div className="flex items-center gap-0.5 mt-1">
-                            {[1, 2, 3, 4, 5].map((s) => (
-                                <Star key={s} className={cn("w-3 h-3", s <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "fill-zinc-200 text-zinc-200")} />
-                            ))}
+                <div className="flex flex-wrap items-center gap-4">
+                    <button
+                        onClick={() => setIsFormOpen(true)}
+                        className="flex items-center gap-2 px-5 py-3 bg-zinc-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-zinc-200"
+                    >
+                        <PenSquare className="w-4 h-4" />
+                        Write a Review
+                    </button>
+
+                    <div className="flex items-center gap-6 bg-zinc-50 px-6 py-4 rounded-2xl border border-zinc-100/50">
+                        <div className="text-center">
+                            <div className="text-3xl font-black text-zinc-900">{rating}</div>
+                            <div className="flex items-center gap-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                    <Star key={s} className={cn("w-3 h-3", s <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "fill-zinc-200 text-zinc-200")} />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                    <div className="w-px h-10 bg-zinc-200" />
-                    <div>
-                        <div className="text-lg font-bold text-zinc-900">{reviewCount}</div>
-                        <div className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Total Reviews</div>
+                        <div className="w-px h-10 bg-zinc-200" />
+                        <div>
+                            <div className="text-lg font-bold text-zinc-900">{reviewCount || realReviews.length}</div>
+                            <div className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Total Reviews</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {reviews.map((r) => (
-                    <div key={r.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-0.5">
-                                {[1, 2, 3, 4, 5].map((s) => (
-                                    <Star key={s} className={cn("w-3.5 h-3.5", s <= r.rating ? "fill-yellow-400 text-yellow-400" : "fill-zinc-200 text-zinc-200")} />
-                                ))}
-                            </div>
-                            <span className="text-[10px] font-medium text-gray-400">{r.date}</span>
-                        </div>
-
-                        <p className="text-gray-600 text-sm leading-relaxed italic flex-1">"{r.text}"</p>
-
-                        <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center">
-                                    <User className="w-4 h-4 text-zinc-400" />
+            {loading ? (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-pulse">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="bg-gray-50 h-48 rounded-2xl border border-gray-100" />
+                    ))}
+                </div>
+            ) : (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {displayReviews.map((r) => (
+                        <div key={r.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-0.5">
+                                    {[1, 2, 3, 4, 5].map((s) => (
+                                        <Star key={s} className={cn("w-3.5 h-3.5", s <= r.rating ? "fill-yellow-400 text-yellow-400" : "fill-zinc-200 text-zinc-200")} />
+                                    ))}
                                 </div>
-                                <div>
-                                    <p className="text-xs font-bold text-gray-900">{r.author}</p>
-                                    <div className="flex items-center gap-1">
-                                        <CheckCircle2 className="w-3 h-3 text-green-500" />
-                                        <span className="text-[9px] font-black uppercase tracking-wider text-green-600">Verified • {r.location}</span>
+                                <span className="text-[10px] font-medium text-gray-400">{r.date}</span>
+                            </div>
+
+                            <p className="text-gray-600 text-sm leading-relaxed italic flex-1">"{r.text}"</p>
+
+                            <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center">
+                                        <User className="w-4 h-4 text-zinc-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-900">{r.author}</p>
+                                        <div className="flex items-center gap-1">
+                                            <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                            <span className="text-[9px] font-black uppercase tracking-wider text-green-600">Verified • {r.location}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
-                                <ThumbsUp className="w-3 h-3" />
-                                <span>{r.helpful}</span>
+                                <button
+                                    onClick={() => r.id.startsWith('rev-') ? null : ReviewService.toggleHelpful(r.id, r.helpful || 0)}
+                                    className="flex items-center gap-1 text-[10px] text-gray-400 font-medium hover:text-primary transition-colors cursor-pointer"
+                                >
+                                    <ThumbsUp className="w-3 h-3" />
+                                    <span>{r.helpful}</span>
+                                </button>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
 
             {reviewCount > 3 && (
                 <div className="mt-8 text-center">
@@ -122,6 +164,24 @@ export function ProductReviews({ rating, reviewCount, productName }: ProductRevi
                         View All {reviewCount} Reviews
                     </button>
                 </div>
+            )}
+
+            {/* Review Form Modal */}
+            {mounted && isFormOpen && createPortal(
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsFormOpen(false)} />
+                    <div className="relative w-full max-w-lg">
+                        <ReviewForm
+                            productId={productId}
+                            productName={productName}
+                            onClose={() => setIsFormOpen(false)}
+                            onSuccess={() => {
+                                // Refresh reviews? Or just let moderation handle it
+                            }}
+                        />
+                    </div>
+                </div>,
+                document.body
             )}
         </section>
     );
