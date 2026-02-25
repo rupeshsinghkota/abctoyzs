@@ -70,7 +70,12 @@ export default function FacebookPixel() {
 
 // Helper to track custom events
 export const trackFbEvent = (event: string, data?: any) => {
-    if (typeof window !== "undefined" && window.fbq) {
-        window.fbq('track', event, data);
+    if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq('track', event, data);
+        console.log(`[Facebook Pixel] Event Tracked: ${event}`, data);
+    } else {
+        // Queue if window.fbq not ready? Standard fbq handles this but logging for clarity
+        console.warn(`[Facebook Pixel] fbq not ready for: ${event}`);
     }
 };
+

@@ -7,8 +7,10 @@ import { ProductFilters } from '@/components/shop/ProductFilters';
 import { SettingsService } from '@/lib/services/settings';
 import { createClient } from '@/lib/supabase/server';
 import { CategorySchema } from '@/components/shop/CategorySchema';
+import TrackCategoryView from '@/components/tracking/TrackCategoryView';
 
 export const revalidate = 300; // Revalidate every 5 minutes
+
 
 interface CategoryPageProps {
     params: Promise<{
@@ -85,7 +87,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
     return (
         <div className="min-h-screen pb-20">
+            <TrackCategoryView categoryName={title} />
             <CategorySchema categoryName={title} products={categoryProducts} />
+
             {/* Breadcrumb */}
             <div className="container mx-auto px-4 pt-2">
                 <Breadcrumb

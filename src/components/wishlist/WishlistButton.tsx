@@ -48,7 +48,16 @@ export function WishlistButton({ productId, size = 'md', className }: WishlistBu
         try {
             const newStatus = await WishlistService.toggleWishlist(productId);
             setIsWishlisted(newStatus);
+
+            if (newStatus) {
+                const { trackFbEvent } = await import('@/components/tracking/FacebookPixel');
+                trackFbEvent('AddToWishlist', {
+                    content_ids: [productId],
+                    content_type: 'product'
+                });
+            }
         } catch (error) {
+
             console.error('Wishlist toggle failed:', error);
         } finally {
             setLoading(false);

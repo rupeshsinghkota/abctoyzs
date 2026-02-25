@@ -38,52 +38,49 @@ export async function GET(req: Request) {
                 let variables: any = {};
                 let mediaUrl = '';
 
+                // --- ITEM SELECTION ---
+                const cart = lead.cart_summary || [];
+                const hasItems = cart.length > 0;
+                const item = hasItems ? cart[0] : {
+                    name: 'your favorite ride-on',
+                    image: 'https://abctoyz.in/logo.png'
+                };
+                mediaUrl = item.image;
+
                 // DETERMINE NEXT STEP
                 const currentStep = lead.last_followup_step || 0;
 
                 if (currentStep === 0 && hoursSinceCreated >= 1 && hoursSinceCreated <= 4) {
-                    // STEP 0: 1-2 Hour Quick Reminder (Existing Logic)
+                    // STEP 0: 1-2 Hour Quick Reminder
                     nextStep = 1;
                     templateId = 'cart_recovery_media';
-                    const cart = lead.cart_summary || [];
-                    const item = cart[0] || { name: 'Jeep', image: 'https://abctoyz.in/logo.png' };
-                    mediaUrl = item.image;
                     variables = { "1": lead.name || 'Parent', "2": item.name };
                 }
                 else if (currentStep === 1 && hoursSinceLastFollowup >= 24) {
                     // STEP 1: 24 Hour Feature Nudge
                     nextStep = 2;
-                    templateId = 'cart_recovery_media'; // Reusing for consistency, or use specific ones if available
-                    const cart = lead.cart_summary || [];
-                    const item = cart[0] || { name: 'Jeep', image: 'https://abctoyz.in/logo.png' };
-                    mediaUrl = item.image;
+                    templateId = 'cart_recovery_media';
                     variables = {
                         "1": lead.name || 'Parent',
-                        "2": `Still thinking about the ${item.name}? It features powerful 4x4 motors and long-range battery!`
+                        "2": `Still thinking about ${item.name}? It features powerful 4x4 motors and a long-range battery!`
                     };
                 }
                 else if (currentStep === 2 && hoursSinceLastFollowup >= 24) {
                     // STEP 2: 48 Hour Discount Nudge
                     nextStep = 3;
                     templateId = 'cart_recovery_media';
-                    const cart = lead.cart_summary || [];
-                    const item = cart[0] || { name: 'Jeep', image: 'https://abctoyz.in/logo.png' };
-                    mediaUrl = item.image;
                     variables = {
                         "1": lead.name || 'Parent',
-                        "2": `Special Offer! Use code PREPAID5 for extra 5% off on your ${item.name}. Secure your ride-on today!`
+                        "2": `Special Offer! Use code PREPAID5 for an extra 5% off on ${item.name}. Secure it today!`
                     };
                 }
                 else if (currentStep === 3 && hoursSinceLastFollowup >= 24) {
                     // STEP 3: 72 Hour Final Nudge (Scarcity)
                     nextStep = 4; // Mark as sequence complete
                     templateId = 'cart_recovery_media';
-                    const cart = lead.cart_summary || [];
-                    const item = cart[0] || { name: 'Jeep', image: 'https://abctoyz.in/logo.png' };
-                    mediaUrl = item.image;
                     variables = {
                         "1": lead.name || 'Parent',
-                        "2": `Last chance! Stock for the ${item.name} is running low. Grab yours before it's gone!`
+                        "2": `Last chance! Stock for ${item.name} is running low. Grab yours before it's gone!`
                     };
                 }
 
