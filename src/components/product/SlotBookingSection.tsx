@@ -9,9 +9,10 @@ import { ProfileService } from '@/lib/services/profile';
 interface SlotBookingSectionProps {
     productId: string;
     productName: string;
+    productPrice: number;
 }
 
-export function SlotBookingSection({ productId, productName }: SlotBookingSectionProps) {
+export function SlotBookingSection({ productId, productName, productPrice }: SlotBookingSectionProps) {
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [customerName, setCustomerName] = useState('');
@@ -20,6 +21,7 @@ export function SlotBookingSection({ productId, productName }: SlotBookingSectio
     const [step, setStep] = useState<1 | 2>(1);
     const [isBooking, setIsBooking] = useState(false);
     const [meetLink, setMeetLink] = useState<string | null>(null);
+    const [supabaseOrderId, setSupabaseOrderId] = useState<string | null>(null);
 
     // Auto-fill logged in user details
     useEffect(() => {
@@ -81,15 +83,23 @@ export function SlotBookingSection({ productId, productName }: SlotBookingSectio
         setIsBooking(true);
 
         try {
-            // 1. Create Razorpay Order
+            // 1. Initialize Booking and Create Pending Order in Supabase
             const orderRes = await fetch('/api/bookings/payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, productName })
+                body: JSON.stringify({
+                    productId,
+                    productName,
+                    customerName,
+                    customerEmail,
+                    customerPhone,
+                    productPrice
+                })
             });
 
-            if (!orderRes.ok) throw new Error('Failed to initialize payment');
+            if (!orderRes.ok) throw new Error('Failed to initialize booking');
             const orderData = await orderRes.json();
+            setSupabaseOrderId(orderData.supabaseOrderId);
 
             // 2. Open Razorpay Checkout
             const options = {
@@ -112,7 +122,6 @@ export function SlotBookingSection({ productId, productName }: SlotBookingSectio
                                 productName,
                                 date: selectedDate,
                                 time: selectedTime,
-                                // Pass the actual user state form details
                                 customerName: customerName,
                                 customerEmail: customerEmail,
                                 customerPhone: customerPhone,
@@ -124,32 +133,20 @@ export function SlotBookingSection({ productId, productName }: SlotBookingSectio
 
                         const bookingData = await bookingRes.json();
 
-                        // Handle success or simulated success
                         if (bookingRes.ok || bookingData.simulated) {
                             setMeetLink(bookingData.meetLink || null);
                             toast.success(`Slot reserved! ${bookingData.simulated ? '(Simulated/Missing GCP Setup)' : ''}`);
                             setStep(2);
+
+                            // Success redirect
+                            setTimeout(() => {
+                                window.location.href = `/checkout/success?booking=true&oid=${orderData.supabaseOrderId}&amount=99`;
+                            }, 3000);
                         } else {
                             throw new Error(bookingData.message || 'Failed to generate meeting link');
                         }
-
                     } catch (error: any) {
                         toast.error(error.message || "Failed to finalize booking");
-                    } finally {
-                        setIsBooking(false);
-                    }
-                },
-                prefill: {
-                    name: customerName,
-                    email: customerEmail,
-                    contact: customerPhone
-                },
-                theme: {
-                    color: "#000000"
-                },
-                modal: {
-                    ondismiss: function () {
-                        setIsBooking(false);
                     }
                 }
             };

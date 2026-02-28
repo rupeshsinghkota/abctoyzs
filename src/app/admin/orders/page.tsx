@@ -13,7 +13,7 @@ type Order = {
     id: string;
     total_amount: number;
     status: 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned' | 'refunded';
-    payment_status: 'paid' | 'pending' | 'refunded' | 'failed';
+    payment_status: 'paid' | 'pending' | 'refunded' | 'failed' | 'paid_advance' | 'partially_paid';
     payment_method?: string;
     created_at: string;
     items: any[];
@@ -69,7 +69,9 @@ export default function OrdersPage() {
 
     const getPaymentStatusColor = (status: string) => {
         switch (status) {
-            case 'paid': return 'bg-zinc-900 text-zinc-100';
+            case 'paid':
+            case 'paid_advance':
+            case 'partially_paid': return 'bg-zinc-900 text-zinc-100';
             case 'pending': return 'bg-zinc-100 text-zinc-600';
             case 'refunded': return 'bg-zinc-200 text-zinc-600 line-through';
             default: return 'bg-zinc-100 text-zinc-600';
@@ -182,11 +184,14 @@ export default function OrdersPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getPaymentStatusColor(order.payment_status)}`}>
-                                                {order.payment_status === 'paid' ? 'Paid' :
+                                                {order.payment_status === 'paid' || order.payment_status === 'paid_advance' || order.payment_status === 'partially_paid' ? 'Paid' :
                                                     order.payment_status === 'refunded' ? 'Refunded' : 'Pending'}
                                             </span>
                                             {order.payment_method === 'COD' && (
                                                 <span className="ml-2 text-[10px] font-bold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200">COD</span>
+                                            )}
+                                            {order.payment_method === 'BOOKING' && (
+                                                <span className="ml-2 text-[10px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase tracking-tighter">Video Call</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4">

@@ -95,6 +95,7 @@ export function ProductBookingDrawer({ isOpen, onClose, productName, productId, 
                                 <SlotBookingSection
                                     productId={productId}
                                     productName={productName}
+                                    productPrice={productPrice}
                                 />
                             </div>
                         </div>

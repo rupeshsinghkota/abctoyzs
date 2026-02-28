@@ -5,7 +5,7 @@ import { AdminService } from '@/lib/services/admin';
 import { InvoiceService } from '@/lib/services/invoice';
 import {
     Loader2, ArrowLeft, MoreHorizontal, Printer, MapPin,
-    Mail, Phone, Package, Truck, CreditCard, Calendar, Clock,
+    Mail, Phone, Package, Truck, CreditCard, Calendar, Clock, Video,
     CheckCircle2, AlertCircle, XCircle, Send, RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
@@ -281,9 +281,45 @@ export default function OrderDetailPage() {
                                     // @ts-ignore
                                     <span className="text-amber-600 font-medium ml-2">Prepaid ₹{((order as any).advance_amount || 0).toLocaleString()} received</span>
                                 )}
+                                {order.payment_method === 'BOOKING' && (
+                                    <span className="text-blue-600 font-medium ml-2">Video Call Fee (₹99) Paid</span>
+                                )}
                             </div>
                         </div>
                     </div>
+
+                    {/* Booking Specific Info Card */}
+                    {order.payment_method === 'BOOKING' && (
+                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <Video className="w-16 h-16 text-blue-900" />
+                            </div>
+                            <div className="relative z-10 space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-200">
+                                        <Video className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-blue-900">Live Video Call Request</h3>
+                                        <p className="text-xs text-blue-700 font-medium">Customer paid ₹99 to see the product live on camera.</p>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 pt-2">
+                                    <div className="bg-white/60 p-3 rounded-lg border border-blue-100/50">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">Status</p>
+                                        <p className="text-sm font-bold text-blue-900">Paid Advance</p>
+                                    </div>
+                                    <div className="bg-white/60 p-3 rounded-lg border border-blue-100/50">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">Fee</p>
+                                        <p className="text-sm font-bold text-blue-900">₹99.00 (Adjustable)</p>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-blue-600 italic">
+                                    💡 Action: Check WhatsApp/Email for the Google Calendar invite or contact the customer to schedule the call.
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Fulfillment Card */}
                     <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
