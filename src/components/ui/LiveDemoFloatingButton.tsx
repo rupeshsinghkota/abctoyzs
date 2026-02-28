@@ -14,18 +14,13 @@ export function LiveDemoFloatingButton() {
     useEffect(() => {
         if (isDismissed) return;
 
-        const timer = setTimeout(() => {
-            const isTargetPage = pathname === '/' || pathname?.startsWith('/product/');
-            const isForbiddenPage = pathname?.startsWith('/admin') || pathname?.startsWith('/checkout') || pathname?.startsWith('/cart');
+        const isForbiddenPage = pathname?.startsWith('/admin') || pathname?.startsWith('/checkout') || pathname?.startsWith('/cart');
 
-            if (isTargetPage && !isForbiddenPage) {
-                setIsVisible(true);
-            } else {
-                setIsVisible(false);
-            }
-        }, 5000);
-
-        return () => clearTimeout(timer);
+        if (!isForbiddenPage) {
+            setIsVisible(true);
+        } else {
+            setIsVisible(false);
+        }
     }, [pathname, isDismissed]);
 
     if (isDismissed || !isVisible) return null;
