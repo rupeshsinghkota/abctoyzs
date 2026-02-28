@@ -182,57 +182,97 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
             <div className="md:grid md:grid-cols-12 h-full relative z-10">
 
                 {/* Left: Value Proposition */}
-                <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-10 border-b md:border-b-0 md:border-r border-white/5 bg-zinc-900/40 backdrop-blur-md text-white">
+                <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-12 border-b md:border-b-0 md:border-r border-white/5 bg-zinc-900/40 backdrop-blur-md text-white overflow-hidden relative">
+                    {/* Background Decor */}
+                    <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
+                        <div className="absolute top-10 left-10 w-32 h-32 bg-primary blur-[80px] rounded-full animate-pulse" />
+                        <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500 blur-[100px] rounded-full animate-pulse [animation-delay:2s]" />
+                    </div>
+
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="space-y-4"
+                        className="space-y-6 relative z-10"
                     >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full shadow-inner">
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                             </span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/80">Experience Excellence</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/90">Showroom Live</span>
                         </div>
-                        <h2 className="text-3xl md:text-5xl font-black leading-tight">
-                            Personal <span className="text-primary italic">Live</span> <br />Showcase.
-                        </h2>
+
+                        <div className="space-y-1">
+                            <h2 className="text-4xl md:text-6xl font-black leading-[0.9] tracking-tighter">
+                                Experience <span className="text-primary italic">Detail.</span>
+                            </h2>
+                            <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-2">1-on-1 Virtual Gallery Tour</p>
+                        </div>
+
                         <p className="text-zinc-400 text-sm font-medium leading-relaxed max-w-sm">
-                            Get an exclusive 1-on-1 virtual walkthrough of <span className="text-white font-bold">{productName}</span>.
-                            Our experts will demonstrate every feature, light, and sound just for you.
+                            Step into our premium showroom from your phone. Our product specialists will give you a detailed walkthrough of <span className="text-white font-bold">{productName}</span> with high-definition clarity.
                         </p>
                     </motion.div>
 
-                    <div className="space-y-6">
-                        {[
-                            { icon: Video, title: 'HD Interactive Demo', desc: 'See the exact product from every angle and ask questions in real-time.' },
-                            { icon: Sparkles, title: 'Personalized Expert Guidance', desc: 'Expert tips on how to get the most out of your ride-on toy.' },
-                            { icon: ShieldCheck, title: 'Trusted Reservation', desc: 'Secure your preference before it goes out of stock.' }
-                        ].map((feature, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 10 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                className="flex items-start gap-4 group"
-                            >
-                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 transition-colors shrink-0">
-                                    <feature.icon className="w-6 h-6 text-white" />
-                                </div>
-                                <div className="space-y-1">
-                                    <h4 className="text-white text-sm font-black">{feature.title}</h4>
-                                    <p className="text-zinc-500 text-xs leading-normal">{feature.desc}</p>
-                                </div>
-                            </motion.div>
-                        ))}
+                    <div className="space-y-8 relative z-10">
+                        <div className="space-y-6">
+                            {[
+                                { icon: Video, title: 'HD Cinematic Feed', desc: 'See every curve, chrome finish, and LED detail in stunning high definition.' },
+                                { icon: Sparkles, title: 'Expert Consultation', desc: 'Our specialists will guide you on features, battery life, and assembly live.' },
+                                { icon: ShieldCheck, title: 'Bill-Adjustable Credit', desc: 'The small commitment fee is instantly applied to your purchase credit.' }
+                            ].map((feature, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="flex items-start gap-4 group"
+                                >
+                                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 transition-all duration-500 shrink-0 shadow-lg group-hover:shadow-primary/10">
+                                        <feature.icon className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="text-white text-sm font-black group-hover:text-primary transition-colors">{feature.title}</h4>
+                                        <p className="text-zinc-500 text-xs leading-normal font-medium">{feature.desc}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {/* Showroom Specialists */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            className="pt-6 border-t border-white/5 space-y-4"
+                        >
+                            <p className="text-[10px] filter grayscale opacity-50 font-black uppercase tracking-widest">Today's Specialists</p>
+                            <div className="flex items-center gap-6">
+                                {[
+                                    { name: 'Rahul S.', role: 'Senior Tech' },
+                                    { name: 'Arjun K.', role: 'Ride-on Expert' }
+                                ].map((expert, i) => (
+                                    <div key={i} className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/10 flex items-center justify-center text-[10px] font-black">
+                                            {expert.name[0]}
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black">{expert.name}</p>
+                                            <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-tighter">{expert.role}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
                     </div>
 
                     <div className="pt-8 mt-auto hidden md:block">
-                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                            <div className="w-8 h-px bg-zinc-800" /> Authorized Showroom Partner
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                <div className="w-8 h-px bg-zinc-800" /> Showroom Verified
+                            </div>
+                            <div className="px-2 py-0.5 rounded border border-zinc-700 text-[8px] font-black text-zinc-400">BIS IN-5529</div>
                         </div>
                     </div>
                 </div>
@@ -251,16 +291,26 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
                                 exit={{ opacity: 0, scale: 1.05 }}
                                 className="space-y-10 max-w-lg mx-auto w-full bg-white/5 p-8 rounded-[2.5rem] border border-white/10 backdrop-blur-xl relative"
                             >
+                                {/* Progress Indicator */}
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", formStep === 1 ? "bg-primary" : "bg-primary/20")} />
+                                    <div className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", formStep === 2 ? "bg-primary" : "bg-white/10")} />
+                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-2">Step {formStep}/2</span>
+                                </div>
+
                                 {formStep === 1 ? (
                                     <motion.div
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        className="space-y-8"
+                                        className="space-y-10"
                                     >
-                                        <div className="space-y-4">
-                                            <label className="text-sm font-black text-white/90 flex items-center gap-2 uppercase tracking-widest">
-                                                <Calendar className="w-4 h-4 text-primary" /> Choose a Date
-                                            </label>
+                                        <div className="space-y-5">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-[11px] font-black text-zinc-400 flex items-center gap-2 uppercase tracking-[0.2em]">
+                                                    <Calendar className="w-3.5 h-3.5 text-primary" /> Select Date
+                                                </label>
+                                                <span className="text-[9px] font-bold text-orange-500/80 animate-pulse bg-orange-500/10 px-2 py-0.5 rounded-full">Selling Fast 🔥</span>
+                                            </div>
                                             <div className="grid grid-cols-3 gap-4">
                                                 {dates.map((d, i) => (
                                                     <motion.button
@@ -270,25 +320,25 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
                                                         transition={{ delay: i * 0.05 }}
                                                         onClick={() => setSelectedDate(d.full)}
                                                         className={cn(
-                                                            "group flex flex-col items-center p-4 rounded-2xl border-2 transition-all relative overflow-hidden",
+                                                            "group flex flex-col items-center p-5 rounded-3xl border-2 transition-all relative overflow-hidden",
                                                             selectedDate === d.full
-                                                                ? "border-primary bg-primary text-white shadow-[0_0_30px_-10px_rgba(249,115,22,0.5)]"
-                                                                : "border-white/5 text-zinc-400 bg-white/5 hover:border-white/20"
+                                                                ? "border-primary bg-primary text-white shadow-[0_20px_40px_-15px_rgba(249,115,22,0.4)]"
+                                                                : "border-white/5 text-zinc-400 bg-white/5 hover:border-white/20 active:scale-95"
                                                         )}
                                                     >
                                                         <span className={cn("text-[9px] font-black uppercase tracking-tighter mb-1", selectedDate === d.full ? "text-white/80" : "text-zinc-500")}>{d.day}</span>
                                                         <span className="text-3xl font-black">{d.date}</span>
-                                                        <span className={cn("text-[9px] font-black uppercase tracking-tighter mt-1", selectedDate === d.full ? "text-white/80" : "text-zinc-500")}>{d.month}</span>
+                                                        <span className={cn("text-[10px] font-black uppercase tracking-tighter mt-1", selectedDate === d.full ? "text-white/80" : "text-zinc-500")}>{d.month}</span>
                                                     </motion.button>
                                                 ))}
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <label className="text-sm font-black text-white/90 flex items-center gap-2 uppercase tracking-widest">
-                                                <Clock className="w-4 h-4 text-primary" /> Available Slots
+                                        <div className="space-y-5">
+                                            <label className="text-[11px] font-black text-zinc-400 flex items-center gap-2 uppercase tracking-[0.2em]">
+                                                <Clock className="w-3.5 h-3.5 text-primary" /> Preferred Time
                                             </label>
-                                            <div className="flex flex-wrap gap-2">
+                                            <div className="grid grid-cols-2 gap-3">
                                                 {timeSlots.map((t, i) => (
                                                     <motion.button
                                                         key={t}
@@ -297,10 +347,10 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
                                                         transition={{ delay: 0.15 + (i * 0.05) }}
                                                         onClick={() => setSelectedTime(t)}
                                                         className={cn(
-                                                            "px-6 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
+                                                            "px-6 py-4 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all",
                                                             selectedTime === t
-                                                                ? "bg-white text-zinc-900 border-white shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-                                                                : "bg-white/5 text-zinc-300 border-white/10 hover:border-white/25"
+                                                                ? "bg-white text-zinc-900 border-white shadow-[0_10px_30px_rgba(255,255,255,0.2)]"
+                                                                : "bg-white/5 text-zinc-300 border-white/10 hover:border-white/25 active:scale-95"
                                                         )}
                                                     >
                                                         {t}
@@ -312,78 +362,79 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
                                         <button
                                             disabled={!selectedDate || !selectedTime}
                                             onClick={() => setFormStep(2)}
-                                            className="w-full py-5 bg-primary text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30 disabled:grayscale flex items-center justify-center gap-3"
+                                            className="w-full py-6 bg-primary text-white font-black text-xs uppercase tracking-[0.2em] rounded-3xl shadow-2xl shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30 disabled:grayscale flex items-center justify-center gap-3 group"
                                         >
-                                            Next Step <ArrowRight className="w-4 h-4" />
+                                            Next Step <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                         </button>
                                     </motion.div>
                                 ) : (
                                     <motion.div
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        className="space-y-8"
+                                        className="space-y-10"
                                     >
-                                        <div className="space-y-4">
-                                            <label className="text-sm font-black text-white/90 flex items-center gap-2 uppercase tracking-widest">
-                                                Identify Yourself
+                                        <div className="space-y-6">
+                                            <label className="text-[11px] font-black text-zinc-400 flex items-center gap-2 uppercase tracking-[0.2em]">
+                                                Contact Information
                                             </label>
-                                            <div className="space-y-3">
+                                            <div className="space-y-4">
                                                 <div className="relative group">
-                                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
+                                                    <User className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
                                                     <input
                                                         type="text"
-                                                        placeholder="Your Name"
+                                                        placeholder="Full Name"
                                                         value={customerName}
                                                         onChange={(e) => setCustomerName(e.target.value)}
-                                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/5 focus:border-primary/50 outline-none text-white text-sm font-bold transition-all"
+                                                        className="w-full pl-14 pr-6 py-5 rounded-3xl bg-white/5 border border-white/5 focus:border-primary/50 focus:bg-white/10 outline-none text-white text-sm font-bold transition-all placeholder:text-zinc-600 shadow-inner"
                                                     />
                                                 </div>
                                                 <div className="relative group">
-                                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
+                                                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
                                                     <input
                                                         type="email"
                                                         placeholder="Email Address"
                                                         value={customerEmail}
                                                         onChange={(e) => setCustomerEmail(e.target.value)}
-                                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/5 focus:border-primary/50 outline-none text-white text-sm font-bold transition-all"
+                                                        className="w-full pl-14 pr-6 py-5 rounded-3xl bg-white/5 border border-white/5 focus:border-primary/50 focus:bg-white/10 outline-none text-white text-sm font-bold transition-all placeholder:text-zinc-600 shadow-inner"
                                                     />
                                                 </div>
                                                 <div className="relative group">
-                                                    <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
+                                                    <Smartphone className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
                                                     <input
                                                         type="tel"
                                                         placeholder="WhatsApp Number"
                                                         value={customerPhone}
                                                         onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/5 focus:border-primary/50 outline-none text-white text-sm font-bold transition-all"
+                                                        className="w-full pl-14 pr-6 py-5 rounded-3xl bg-white/5 border border-white/5 focus:border-primary/50 focus:bg-white/10 outline-none text-white text-sm font-bold transition-all placeholder:text-zinc-600 shadow-inner"
                                                     />
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-3 p-4 rounded-2xl bg-primary/5 border border-primary/20">
-                                                <ShieldCheck className="w-5 h-5 text-primary shrink-0" />
-                                                <div className="flex-1">
-                                                    <p className="text-[10px] text-zinc-300 font-black uppercase leading-tight">100% Adjustable Deposit</p>
-                                                    <p className="text-[9px] text-zinc-500 font-bold mt-1">A small ₹99 deposit is required to prevent spam. This is fully credited back to you on your order.</p>
+                                        <div className="space-y-6">
+                                            <div className="flex items-start gap-4 p-5 rounded-3xl bg-primary/5 border border-primary/20 relative overflow-hidden group">
+                                                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                <ShieldCheck className="w-6 h-6 text-primary shrink-0 relative z-10" />
+                                                <div className="flex-1 relative z-10">
+                                                    <p className="text-[11px] text-white font-black uppercase tracking-wider">Showroom Quality Guarantee</p>
+                                                    <p className="text-[10px] text-zinc-500 font-bold mt-1.5 leading-relaxed">The ₹99 commitment fee is 100% refundable as credit on your first order. It helps us ensure serious consultations for our high-end models.</p>
                                                 </div>
                                             </div>
 
-                                            <div className="flex gap-3">
+                                            <div className="flex gap-4">
                                                 <button
                                                     onClick={() => setFormStep(1)}
-                                                    className="px-6 py-4 rounded-2xl border border-white/10 text-white/40 hover:text-white transition-colors text-xs font-black uppercase"
+                                                    className="px-8 py-5 rounded-3xl border border-white/10 text-white/40 hover:text-white hover:bg-white/5 transition-all text-xs font-black uppercase tracking-widest active:scale-95"
                                                 >
                                                     Back
                                                 </button>
                                                 <button
                                                     onClick={handleBooking}
                                                     disabled={!customerName || !customerEmail || customerPhone.length < 10 || isBooking}
-                                                    className="flex-1 py-5 bg-white text-zinc-900 font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-2xl hover:bg-zinc-100 transition-all disabled:opacity-30 disabled:grayscale flex items-center justify-center gap-3"
+                                                    className="flex-1 py-6 bg-white text-zinc-900 font-black text-xs uppercase tracking-[0.2em] rounded-3xl shadow-2xl hover:bg-zinc-100 transition-all disabled:opacity-30 disabled:grayscale flex items-center justify-center gap-3 active:scale-[0.98]"
                                                 >
                                                     {isBooking ? (
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <Loader2 className="w-5 h-5 animate-spin" />
                                                     ) : (
                                                         <>Reserve Experience <ArrowRight className="w-4 h-4" /></>
                                                     )}
@@ -398,44 +449,74 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
                                 key="success"
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="h-full flex flex-col items-center justify-center text-center space-y-10 py-10 max-w-lg mx-auto"
+                                className="h-full flex flex-col items-center justify-center text-center space-y-12 py-10 max-w-lg mx-auto"
                             >
                                 <div className="relative">
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        transition={{ type: 'spring', damping: 12 }}
-                                        className="w-24 h-24 rounded-full bg-primary flex items-center justify-center border-8 border-white/5 shadow-[0_0_50px_rgba(249,115,22,0.5)]"
+                                        transition={{ type: 'spring', damping: 15 }}
+                                        className="w-32 h-32 rounded-full bg-primary flex items-center justify-center border-[12px] border-white/5 shadow-[0_0_80px_rgba(249,115,22,0.6)]"
                                     >
-                                        <CheckCircle2 className="w-10 h-10 text-white" />
+                                        <CheckCircle2 className="w-14 h-14 text-white" />
+                                    </motion.div>
+                                    <motion.div
+                                        animate={{ scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }}
+                                        transition={{ repeat: Infinity, duration: 4 }}
+                                        className="absolute -top-4 -right-4 w-12 h-12 rounded-2xl bg-white shadow-2xl flex items-center justify-center text-xs font-black text-primary border-4 border-zinc-900"
+                                    >
+                                        VIP
                                     </motion.div>
                                 </div>
-                                <div className="space-y-3">
-                                    <h3 className="text-4xl font-black text-white tracking-tight">Access Granted!</h3>
-                                    <p className="text-zinc-400 text-sm max-w-[300px] mx-auto leading-relaxed">
-                                        Your private demo of {productName} is locked in. Check your email for the magic link.
+                                <div className="space-y-4">
+                                    <h3 className="text-5xl font-black text-white tracking-tighter">Spot Secured!</h3>
+                                    <p className="text-zinc-400 text-sm max-w-[320px] mx-auto leading-relaxed font-medium">
+                                        You are scheduled for a private consultation. A calendar invite has been sent to <span className="text-white font-bold">{customerEmail}</span>.
                                     </p>
                                 </div>
 
-                                <div className="p-1 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-white/5 to-transparent w-full">
-                                    <div className="bg-zinc-900/80 rounded-[2.4rem] p-8 text-left space-y-6 backdrop-blur-xl border border-white/5">
-                                        <div className="grid grid-cols-2 gap-8">
-                                            <div className="space-y-1">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Scheduled For</p>
-                                                <p className="text-lg font-black text-white">{new Date(selectedDate!).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</p>
+                                <div className="p-[2px] rounded-[3rem] bg-gradient-to-br from-primary via-white/20 to-transparent w-full shadow-2xl">
+                                    <div className="bg-zinc-950 rounded-[2.9rem] p-10 text-left space-y-8 backdrop-blur-3xl relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-8 opacity-5">
+                                            <Video className="w-32 h-32 text-white" />
+                                        </div>
+                                        <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-primary border border-white/10">
+                                                <Calendar className="w-6 h-6" />
                                             </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live At</p>
-                                                <p className="text-lg font-black text-white">{selectedTime}</p>
+                                            <div>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Scheduled Date</p>
+                                                <p className="text-xl font-black text-white">{new Date(selectedDate!).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                                             </div>
                                         </div>
+
+                                        <div className="grid grid-cols-2 gap-8">
+                                            <div className="space-y-1.5">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live At</p>
+                                                <p className="text-xl font-black text-white">{selectedTime}</p>
+                                            </div>
+                                            <div className="space-y-1.5 text-right">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Expert</p>
+                                                <p className="text-xl font-black text-white">Assigned</p>
+                                            </div>
+                                        </div>
+
                                         {meetLink && (
-                                            <a href={meetLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-white/10">
-                                                <Video className="w-5 h-5" /> Launch Google Meet
-                                            </a>
+                                            <motion.a
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                href={meetLink}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-center gap-3 w-full py-5 bg-white text-zinc-950 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all border border-white/10 shadow-[0_15px_30px_rgba(255,255,255,0.1)]"
+                                            >
+                                                <Video className="w-5 h-5" /> Enter Showroom Room
+                                            </motion.a>
                                         )}
                                     </div>
                                 </div>
+
+                                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest uppercase">Check WhatsApp for confirmation</p>
                             </motion.div>
                         )}
                     </AnimatePresence>
