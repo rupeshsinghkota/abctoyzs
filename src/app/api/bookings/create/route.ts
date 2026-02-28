@@ -153,24 +153,39 @@ export async function POST(req: Request) {
 
         // 10. Send WhatsApp Notifications
         const adminPhone = process.env.ADMIN_PHONE_NUMBER || '919155149597';
-        const formattedDate = new Date(date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
+        const formattedDate = new Date(date).toLocaleDateString('en-IN', {
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata'
+        });
         const customerPhoneWithCode = customerPhone.length === 10 ? `91${customerPhone}` : customerPhone;
         const isMeetLinkReal = meetLink && !meetLink.startsWith('Admin will');
+        const meetLinkText = isMeetLinkReal
+            ? `🎥 Join here: ${meetLink}`
+            : `🎥 Our team will share the Google Meet link on WhatsApp 5 mins before your slot.`;
 
-        // Message to Customer
-        const customerMessage =
-            `✅ *Booking Confirmed — ABC Toyz*\n\n` +
-            `Hi ${customerName}! Your live video call has been booked successfully.\n\n` +
-            `*📦 Product:* ${productName}\n` +
-            `*📅 Date:* ${formattedDate}\n` +
-            `*⏰ Time:* ${time}\n` +
-            `*💳 Amount Paid:* ₹99 (adjustable on purchase)\n\n` +
-            (isMeetLinkReal
-                ? `*🎥 Join Link:* ${meetLink}\n\n`
-                : `*🎥 Meeting Link:* Our team will share the Google Meet link on this WhatsApp number 5 mins before your slot.\n\n`) +
-            `If you have questions, just reply here. See you soon! 🚀`;
+        // — Customer: use approved template —
+        const bookingTemplateId = process.env.MSG91_BOOKING_CONFIRMED_TEMPLATE_ID;
 
-        // Alert to Admin
+        const customerNotification = bookingTemplateId
+            ? WhatsAppService.sendTemplateMessage(customerPhoneWithCode, bookingTemplateId, {
+                '1': customerName,
+                '2': productName,
+                '3': formattedDate,
+                '4': time,
+                '5': meetLinkText,
+            })
+            : WhatsAppService.sendMessage(customerPhoneWithCode,
+                // Plain text fallback (only works within 24h of customer messaging you)
+                `✅ *Booking Confirmed — ABC Toyz*\n\n` +
+                `Hi ${customerName}! Your live video call is confirmed.\n\n` +
+                `📦 *Product:* ${productName}\n` +
+                `📅 *Date:* ${formattedDate}\n` +
+                `⏰ *Time:* ${time}\n` +
+                `💳 *Amount Paid:* ₹99\n\n` +
+                `${meetLinkText}\n\n` +
+                `Reply here for any questions. See you soon! 🚀`
+            );
+
+        // — Admin: plain text (your number, always active session) —
         const adminMessage =
             `🔔 *New Video Call Booking!*\n\n` +
             `*Customer:* ${customerName}\n` +
@@ -183,11 +198,11 @@ export async function POST(req: Request) {
             `*Razorpay ID:* ${razorpayPaymentId || 'N/A'}\n\n` +
             (isMeetLinkReal
                 ? `*Meet Link:* ${meetLink}`
-                : `⚠️ Google Meet link not auto-generated. Please share a link manually 5 mins before the slot.`);
+                : `⚠️ Meet link not auto-generated. Share one manually 5 mins before the slot.`);
 
-        // Fire both in parallel, don't block the response on them
+        // Fire both in parallel — don't block the response
         await Promise.allSettled([
-            WhatsAppService.sendMessage(customerPhoneWithCode, customerMessage),
+            customerNotification,
             WhatsAppService.sendMessage(adminPhone, adminMessage),
         ]);
 
