@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket, Timer, Flame, Truck, ShieldCheck, RotateCcw } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket, Timer, Flame, Truck, ShieldCheck, RotateCcw, Video, Calendar, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 import { trackFbEvent } from '@/components/tracking/FacebookPixel';
@@ -395,6 +395,67 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                 <path d="M21 5.5a13 13 0 0 1 0 15 13 13 0 0 1 0-15z" fill="#FF5F00" />
                             </svg>
                         </span>
+                    </div>
+                </div>
+
+                {/* HYBRID TRUST ENGINE: 3 Options to Buy & Verify */}
+                <div className="rounded-[20px] bg-zinc-50 border border-zinc-200 p-1">
+                    <div className="bg-white rounded-[16px] p-4 space-y-4">
+                        <div className="flex items-center gap-2 mb-1">
+                            <ShieldCheck className="w-4 h-4 text-green-600" />
+                            <h4 className="text-[11px] font-black uppercase tracking-widest text-zinc-900">Verified & Secure Purchase</h4>
+                        </div>
+
+                        {/* Option 1: Prepaid */}
+                        <div className="flex items-start gap-3 p-3 rounded-xl border border-green-100 bg-green-50/50 hover:bg-green-50 transition-colors group cursor-pointer" onClick={() => document.querySelector('.checkout-button')?.dispatchEvent(new MouseEvent('click'))}>
+                            <div className="mt-0.5"><Ticket className="w-5 h-5 text-green-600 group-hover:scale-110 transition-transform" /></div>
+                            <div>
+                                <p className="text-sm font-black text-green-800">Buy Prepaid (Extra 5% OFF)</p>
+                                <p className="text-xs text-green-600 mt-0.5 font-medium">Use code PREPAID5 at checkout. Full buyer protection.</p>
+                            </div>
+                        </div>
+
+                        {/* Option 2: COD Advance */}
+                        <div className="flex items-start gap-3 p-3 rounded-xl border border-zinc-100 bg-white hover:bg-zinc-50 transition-colors">
+                            <div className="mt-0.5"><Truck className="w-5 h-5 text-zinc-700" /></div>
+                            <div>
+                                <p className="text-sm font-black text-zinc-900">Cash on Delivery Available</p>
+                                <p className="text-xs text-zinc-500 mt-0.5">Pay just ₹500 advance now to confirm order, rest on delivery.</p>
+                            </div>
+                        </div>
+
+                        <div className="relative pt-3 pb-1">
+                            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                                <div className="w-full border-t border-zinc-100" />
+                            </div>
+                            <div className="relative flex justify-center">
+                                <span className="bg-white px-2 text-[9px] font-black uppercase tracking-widest text-zinc-400">Still not sure?</span>
+                            </div>
+                        </div>
+
+                        {/* Option 3 & 4: Live Verification */}
+                        <div className="grid grid-cols-2 gap-2">
+                            <a
+                                href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I'm interested in the ${product.name}. Can you send me a quick live video and some real photos from your warehouse?`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex flex-col items-center justify-center p-3 rounded-xl border border-zinc-100 bg-white hover:bg-zinc-50 hover:border-zinc-300 transition-all text-center group"
+                            >
+                                <Smartphone className="w-5 h-5 text-zinc-400 group-hover:text-zinc-900 mb-2 transition-colors" />
+                                <span className="text-[10px] font-black text-zinc-900 uppercase tracking-wider">Free Video</span>
+                                <span className="text-[9px] text-zinc-500 font-medium mt-0.5">Via WhatsApp</span>
+                            </a>
+                            <button
+                                onClick={() => {
+                                    document.getElementById('slot-booking')?.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-zinc-900 bg-zinc-900 hover:bg-zinc-800 transition-all text-center group"
+                            >
+                                <Video className="w-5 h-5 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px] font-black text-white uppercase tracking-wider">Book 1-on-1 Tour</span>
+                                <span className="text-[9px] text-zinc-400 font-medium mt-0.5">₹99 Refundable</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

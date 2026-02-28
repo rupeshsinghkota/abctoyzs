@@ -16,6 +16,7 @@ import { ProductReviews } from '@/components/product/ProductReviews';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/store/useStore';
 import { GenuineOrderGuarantee } from '@/components/trust/GenuineOrderGuarantee';
+import { SlotBookingSection } from '@/components/product/SlotBookingSection';
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
     const router = useRouter();
@@ -433,6 +434,14 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* SLOT BOOKING SECTION */}
+            <div className="lg:col-span-12 px-4 lg:px-0">
+                <SlotBookingSection
+                    productId={product.id}
+                    productName={product.name}
+                />
             </div>
 
             {/* REVIEWS SECTION */}

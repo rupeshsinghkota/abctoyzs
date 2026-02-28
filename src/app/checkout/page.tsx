@@ -37,7 +37,9 @@ export default function CheckoutPage() {
     const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
     const [couponError, setCouponError] = useState<string | null>(null);
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
+    const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD' | 'BOOKING'>('PREPAID');
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [showAddrForm, setShowAddrForm] = useState(false);
     const [isBISModalOpen, setIsBISModalOpen] = useState(false);
     const [deliveryEstimate, setDeliveryEstimate] = useState<{
@@ -55,6 +57,28 @@ export default function CheckoutPage() {
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [session, setSession] = useState<any>(null);
     const [codSettings, setCodSettings] = useState<any>(null);
+
+    // Generate dates (next 3 working days) for Booking
+    const getNextDays = (days: number) => {
+        let count = 0;
+        let d = new Date();
+        const dates = [];
+        while (count < days) {
+            d.setDate(d.getDate() + 1);
+            if (d.getDay() !== 0) { // Skip Sundays
+                dates.push({
+                    full: d.toISOString().split('T')[0],
+                    day: d.toLocaleDateString('en-US', { weekday: 'short' }),
+                    date: d.getDate(),
+                    month: d.toLocaleDateString('en-US', { month: 'short' })
+                });
+                count++;
+            }
+        }
+        return dates;
+    };
+    const dates = getNextDays(3);
+    const timeSlots = ["11:00 AM", "12:30 PM", "02:00 PM", "04:30 PM", "06:00 PM"];
 
     useEffect(() => {
         const fetchCodSettings = async () => {
@@ -270,6 +294,101 @@ export default function CheckoutPage() {
 
         setLoading(true);
         try {
+            // Priority: 1. Profile Email (LoggedIn), 2. Guest Email (from state), 3. Address Email (if somehow there), 4. Fallback
+            const checkoutEmail = profile?.email || guestEmail || addresses.find(a => a.id === selectedAddressId)?.email || "guest@example.com";
+            const checkoutName = addresses.find(a => a.id === selectedAddressId)?.name || profile?.name || "";
+            const checkoutPhone = addresses.find(a => a.id === selectedAddressId)?.phone || profile?.phone || "";
+
+            // --- BOOKING FLOW ---
+            if (paymentMethod === 'BOOKING') {
+                if (!selectedDate || !selectedTime) {
+                    alert("Please select a date and time for your booking.");
+                    setLoading(false);
+                    return;
+                }
+
+                // Create a consolidated product name from the cart items
+                const combinedProductNames = cart.map(item => item.name).join(', ');
+
+                // 1. Create Razorpay Order for ₹99 Booking Fee
+                const orderRes = await fetch('/api/bookings/payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: "cart_booking", productName: combinedProductNames })
+                });
+
+                if (!orderRes.ok) throw new Error('Failed to initialize booking payment');
+                const orderData = await orderRes.json();
+
+                // 2. Open Razorpay Checkout for booking
+                const options = {
+                    key: orderData.key,
+                    amount: orderData.amount,
+                    currency: "INR",
+                    name: "ABC Toyz",
+                    description: `Live Video Tour: Multiple Items`,
+                    order_id: orderData.orderId,
+                    handler: async function (response: any) {
+                        try {
+                            setLoading(true); // Re-flag loading during meeting link gen
+
+                            // 3. Call booking API to verify payment and create Google Meet link
+                            const bookingRes = await fetch('/api/bookings/create', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    productId: "cart_booking",
+                                    productName: combinedProductNames,
+                                    date: selectedDate,
+                                    time: selectedTime,
+                                    customerName: checkoutName,
+                                    customerEmail: checkoutEmail,
+                                    customerPhone: checkoutPhone,
+                                    razorpayPaymentId: response.razorpay_payment_id,
+                                    razorpayOrderId: response.razorpay_order_id,
+                                    razorpaySignature: response.razorpay_signature
+                                })
+                            });
+
+                            const bookingData = await bookingRes.json();
+
+                            if (bookingRes.ok || bookingData.simulated) {
+                                clearCart();
+                                // Send to success page with booking flag
+                                router.push(`/checkout/success?booking=true`);
+                            } else {
+                                throw new Error(bookingData.message || 'Failed to generate meeting link');
+                            }
+                        } catch (error: any) {
+                            console.error("Booking verification failed:", error);
+                            alert(`Booking finalization failed: ${error.message || 'Unknown Error'}`);
+                            setLoading(false);
+                        }
+                    },
+                    prefill: {
+                        name: checkoutName,
+                        email: checkoutEmail,
+                        contact: checkoutPhone
+                    },
+                    theme: { color: "#000000" },
+                    modal: {
+                        ondismiss: function () {
+                            setLoading(false);
+                        }
+                    }
+                };
+
+                const rzp = new (window as any).Razorpay(options);
+                rzp.on('payment.failed', function (response: any) {
+                    alert(`Payment failed: ${response.error.description}`);
+                    setLoading(false);
+                });
+                rzp.open();
+
+                return; // Stop standard checkout flow here
+            }
+
+            // --- STANDARD CHECKOUT FLOW ---
             // 1. Create Order on Backend
             const orderRes = await fetch('/api/checkout/order', {
                 method: 'POST',
@@ -281,18 +400,7 @@ export default function CheckoutPage() {
                     coupon_code: appliedCoupon?.code,
                     shipping_address_id: selectedAddressId,
                     payment_method: paymentMethod,
-                    // Priority: 1. Profile Email (LoggedIn), 2. Address Email (if saved), 3. Guest Form Email (if just typed)
-                    // Since we don't have the form state here easily (it's in subcomponent or cleared), we need to rely on what we have.
-                    // For now, let's assume if it's a guest, the address might have the email if we updated the API.
-                    // BUT, actually, we should store the email in the address table too if we added it there.
-                    // OR, since the form is "ShippingAddressForm", we only save address.
-                    // LET'S SIMPLIFY: We need the email in the order.
-                    // If user is logged in, use profile.email.
-                    // If user is guest, they MUST have just entered an address.
-                    // Wait, if they select an existing address (cookie based guest?), they might not have email.
-                    // Let's rely on finding the email in the address object (if we update addAddress to save it) OR profile.
-                    // Priority: 1. Profile Email (LoggedIn), 2. Guest Email (from state), 3. Address Email (if somehow there), 4. Fallback
-                    guest_email: profile?.email || guestEmail || addresses.find(a => a.id === selectedAddressId)?.email || "guest@example.com"
+                    guest_email: checkoutEmail
                 })
             });
 
@@ -360,9 +468,9 @@ export default function CheckoutPage() {
                         }
                     },
                     prefill: {
-                        name: addresses.find(a => a.id === selectedAddressId)?.name || profile?.name || "",
-                        contact: addresses.find(a => a.id === selectedAddressId)?.phone || profile?.phone || "",
-                        email: profile?.email || ""
+                        name: checkoutName,
+                        contact: checkoutPhone,
+                        email: checkoutEmail
                     },
                     theme: {
                         color: "#F97316" // Orange primary color
@@ -649,6 +757,87 @@ export default function CheckoutPage() {
                                     )}
                                 </div>
 
+                                {/* BOOKING Option */}
+                                <div
+                                    onClick={() => setPaymentMethod('BOOKING')}
+                                    className={`flex items-center gap-3 p-2.5 rounded-xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'BOOKING'
+                                        ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
+                                        : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
+                                        }`}
+                                >
+                                    {paymentMethod !== 'BOOKING' && (
+                                        <div className="absolute top-0 right-0 bg-zinc-900 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                                            Refundable
+                                        </div>
+                                    )}
+
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${paymentMethod === 'BOOKING' ? 'bg-black text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /><rect x="2" y="6" width="14" height="12" rx="2" /></svg>
+                                    </div>
+                                    <div className="flex-1 min-w-0 pr-4 mt-2 sm:mt-0">
+                                        <p className="font-black text-gray-900 text-sm md:text-[15px]">Book Live Video Tour</p>
+                                        <p className="text-[11px] text-gray-500 font-medium">Pay ₹99 to see products live (100% refundable).</p>
+                                    </div>
+                                    {paymentMethod === 'BOOKING' && (
+                                        <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center shadow-md">
+                                            <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Booking Dynamic Slot Selection Module */}
+                                {paymentMethod === 'BOOKING' && (
+                                    <div className="mx-2 space-y-4 animate-in fade-in slide-in-from-top-2 duration-400 pt-2">
+                                        <div className="rounded-2xl border-2 border-zinc-200 bg-white p-5 shadow-sm overflow-hidden relative group">
+                                            <h3 className="text-sm font-black text-zinc-900 mb-4 flex items-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500"><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
+                                                Select Your Slot
+                                            </h3>
+
+                                            <div className="space-y-4">
+                                                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+                                                    {dates.map((d) => (
+                                                        <button
+                                                            key={d.full}
+                                                            onClick={() => setSelectedDate(d.full)}
+                                                            className={`shrink-0 flex flex-col items-center justify-center w-20 py-3 rounded-xl border-2 transition-all snap-start ${selectedDate === d.full
+                                                                ? 'border-zinc-900 bg-zinc-900 text-white shadow-md scale-[1.02]'
+                                                                : 'border-zinc-100 bg-zinc-50 hover:bg-zinc-100 text-zinc-500 hover:border-zinc-300'
+                                                                }`}
+                                                        >
+                                                            <span className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${selectedDate === d.full ? 'text-zinc-300' : 'text-zinc-400'}`}>{d.day}</span>
+                                                            <span className={`text-2xl font-black leading-none mb-1 ${selectedDate === d.full ? 'text-white' : 'text-zinc-900'}`}>{d.date}</span>
+                                                            <span className={`text-[10px] font-bold uppercase tracking-wider ${selectedDate === d.full ? 'text-zinc-300' : 'text-zinc-400'}`}>{d.month}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+
+                                                <div className="pt-2 border-t border-zinc-100">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {timeSlots.map((time) => (
+                                                            <button
+                                                                key={time}
+                                                                disabled={!selectedDate}
+                                                                onClick={() => setSelectedTime(time)}
+                                                                className={`px-4 py-2 text-xs font-bold rounded-lg border-2 transition-all ${selectedTime === time
+                                                                    ? 'border-primary bg-primary text-white shadow-lg shadow-primary/25 scale-[1.02]'
+                                                                    : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed'
+                                                                    }`}
+                                                            >
+                                                                {time}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-zinc-50 border border-zinc-100 rounded-xl p-3 mt-4 text-[10px] font-medium text-zinc-500 leading-relaxed">
+                                                    <strong>Note:</strong> You will be charged ₹99 today for the tour slot. This fee prevents spam and <span className="text-zinc-900 font-black">will be fully adjusted</span> against your final order value if you decide to purchase.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* COD Dynamic Trust Module — Shown for both COD modes */}
                                 {paymentMethod === 'COD' && (
                                     <div className="mx-2 space-y-4 animate-in fade-in slide-in-from-top-2 duration-400">
@@ -841,7 +1030,7 @@ export default function CheckoutPage() {
                                         </>
                                     ) : (
                                         <>
-                                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'COD' ? (
+                                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'BOOKING' ? "Pay ₹99 & Book" : paymentMethod === 'COD' ? (
                                                 codSettings?.cod_mode === 'partial'
                                                     ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
                                                     : "Confirm COD"
@@ -1106,7 +1295,7 @@ function OrderSummaryCard({
     setAppliedCoupon: (v: any) => void;
     loading: boolean;
     error: string | null;
-    paymentMethod: 'PREPAID' | 'COD';
+    paymentMethod: 'PREPAID' | 'COD' | 'BOOKING';
     codSettings?: any;
     onPayment: () => void;
     isPaymentLoading: boolean;
@@ -1284,7 +1473,7 @@ function OrderSummaryCard({
                         </>
                     ) : (
                         <>
-                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'COD' ? (
+                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'BOOKING' ? "Pay ₹99 & Book" : paymentMethod === 'COD' ? (
                                 codSettings?.cod_mode === 'partial'
                                     ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
                                     : "Complete Cash on Delivery"

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle, Home, ShoppingBag, Loader2 } from 'lucide-react';
+import { CheckCircle, Home, ShoppingBag, Loader2, Calendar } from 'lucide-react';
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -12,6 +12,7 @@ import confetti from 'canvas-confetti';
 function SuccessContent() {
     const searchParams = useSearchParams();
     const oid = searchParams.get('oid');
+    const isBooking = searchParams.get('booking') === 'true';
     const amountParam = searchParams.get('amount');
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
@@ -139,7 +140,43 @@ function SuccessContent() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 pb-20 text-center">
-            {searchParams.get('new_account') === 'true' ? (
+            {isBooking ? (
+                <>
+                    <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6 animate-bounce">
+                        <Calendar className="w-12 h-12 text-primary" />
+                    </div>
+
+                    <h1 className="text-3xl font-black font-heading mb-2">Slot Reserved!</h1>
+                    <p className="text-muted-foreground mb-4 max-w-sm mx-auto">
+                        Your live video tour is booked successfully. We will share the Google Meet link via WhatsApp and Email shortly.
+                    </p>
+
+                    <div className="mb-8 p-5 bg-zinc-900 text-white rounded-[2rem] max-w-sm mx-auto animate-in slide-in-from-bottom-2 duration-500 shadow-xl shadow-zinc-200">
+                        <div className="flex items-center gap-2.5 mb-3 justify-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                Tour Confirmed
+                            </span>
+                        </div>
+                        <p className="text-base font-black italic tracking-tight mb-1">
+                            ₹99 Received securely
+                        </p>
+                        <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
+                            This amount will be 100% adjusted against your final purchase. Our team is excited to show you the products live!
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-3 w-full max-w-sm">
+                        <Link
+                            href="/"
+                            className="w-full py-3 px-6 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Home className="w-4 h-4" />
+                            Back to Store
+                        </Link>
+                    </div>
+                </>
+            ) : searchParams.get('new_account') === 'true' ? (
                 <SetPasswordForm />
             ) : (
                 <>
