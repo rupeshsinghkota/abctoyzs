@@ -11,6 +11,7 @@ import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 import { StockUrgency } from './StockUrgency';
 
 import { BISCertificateModal } from './BISCertificateModal';
+import { ProductBookingDrawer } from './ProductBookingDrawer';
 
 interface ProductActionsProps {
     product: Product;
@@ -24,6 +25,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
     const [quantity, setQuantity] = useState(1);
     const [added, setAdded] = useState(false);
     const [isBISModalOpen, setIsBISModalOpen] = useState(false);
+    const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
 
     // Initial Price / Image / Stock comes from Product, but overrides if Variant selected
     const displayPrice = currentVariant ? currentVariant.price : product.price;
@@ -170,183 +172,210 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
     ].filter(h => h.value);
 
     return (
-        <div className="space-y-3 lg:space-y-5">
-            {/* Price — FIRST, no card border */}
-            <div>
-                {/* Today's Special — small inline badge above price */}
-                {isGlobalSaleActive && timeLeft && (
-                    <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-[10px] font-black uppercase text-red-600 tracking-wider flex items-center gap-1">
-                            <Flame className="w-3 h-3" /> Today's Special
-                        </span>
-                        <span className="text-[10px] font-mono font-black text-gray-500 tabular-nums">{timeLeft}</span>
-                    </div>
-                )}
+        <>
+            <div className="space-y-3 lg:space-y-5">
+                {/* Price — FIRST, no card border */}
+                <div>
+                    {/* Today's Special — small inline badge above price */}
+                    {isGlobalSaleActive && timeLeft && (
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <span className="text-[10px] font-black uppercase text-red-600 tracking-wider flex items-center gap-1">
+                                <Flame className="w-3 h-3" /> Today's Special
+                            </span>
+                            <span className="text-[10px] font-mono font-black text-gray-500 tabular-nums">{timeLeft}</span>
+                        </div>
+                    )}
 
-                {displayRegularPrice ? (() => {
-                    const totalSaved = displayMRP - displayPrice;
-                    const totalOffPercent = Math.round((totalSaved / displayMRP) * 100);
-                    const extraSaved = displayRegularPrice - displayPrice;
-                    return (
-                        <div className="space-y-1">
-                            {/* Main price + total % off MRP */}
-                            <div className="flex items-baseline gap-2">
+                    {displayRegularPrice ? (() => {
+                        const totalSaved = displayMRP - displayPrice;
+                        const totalOffPercent = Math.round((totalSaved / displayMRP) * 100);
+                        const extraSaved = displayRegularPrice - displayPrice;
+                        return (
+                            <div className="space-y-1">
+                                {/* Main price + total % off MRP */}
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
+                                        ₹{displayPrice.toLocaleString()}
+                                    </span>
+                                    <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                        {totalOffPercent}% OFF
+                                    </span>
+                                    <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
+                                </div>
+                                {/* MRP + Our Price labels */}
+                                <div className="flex items-center gap-3 text-[11px]">
+                                    <span className="text-gray-400">
+                                        MRP <span className="line-through font-bold">₹{displayMRP.toLocaleString()}</span>
+                                    </span>
+                                    <span className="text-gray-400">
+                                        Our Price <span className="line-through font-bold">₹{displayRegularPrice.toLocaleString()}</span>
+                                    </span>
+                                </div>
+                                {/* Total savings callout */}
+                                <div className="text-[11px] font-bold text-green-700">
+                                    🎉 You save ₹{totalSaved.toLocaleString()} (₹{extraSaved.toLocaleString()} extra today!)
+                                </div>
+                            </div>
+                        );
+                    })() : (
+                        <div className="space-y-0.5">
+                            <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
                                 <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
                                     ₹{displayPrice.toLocaleString()}
                                 </span>
-                                <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
-                                    {totalOffPercent}% OFF
-                                </span>
+                                {displayMRP > displayPrice && (
+                                    <>
+                                        <span className="text-xs text-gray-400 line-through">MRP ₹{displayMRP.toLocaleString()}</span>
+                                        <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                            {Math.round(((displayMRP - displayPrice) / displayMRP) * 100)}% OFF
+                                        </span>
+                                    </>
+                                )}
                                 <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
                             </div>
-                            {/* MRP + Our Price labels */}
-                            <div className="flex items-center gap-3 text-[11px]">
-                                <span className="text-gray-400">
-                                    MRP <span className="line-through font-bold">₹{displayMRP.toLocaleString()}</span>
-                                </span>
-                                <span className="text-gray-400">
-                                    Our Price <span className="line-through font-bold">₹{displayRegularPrice.toLocaleString()}</span>
-                                </span>
-                            </div>
-                            {/* Total savings callout */}
-                            <div className="text-[11px] font-bold text-green-700">
-                                🎉 You save ₹{totalSaved.toLocaleString()} (₹{extraSaved.toLocaleString()} extra today!)
-                            </div>
-                        </div>
-                    );
-                })() : (
-                    <div className="space-y-0.5">
-                        <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
-                            <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter">
-                                ₹{displayPrice.toLocaleString()}
-                            </span>
                             {displayMRP > displayPrice && (
-                                <>
-                                    <span className="text-xs text-gray-400 line-through">MRP ₹{displayMRP.toLocaleString()}</span>
-                                    <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
-                                        {Math.round(((displayMRP - displayPrice) / displayMRP) * 100)}% OFF
-                                    </span>
-                                </>
+                                <div className="text-[11px] font-bold text-green-700">
+                                    You save ₹{(displayMRP - displayPrice).toLocaleString()}
+                                </div>
                             )}
-                            <span className="text-[9px] font-medium text-green-600">incl. taxes</span>
                         </div>
-                        {displayMRP > displayPrice && (
-                            <div className="text-[11px] font-bold text-green-700">
-                                You save ₹{(displayMRP - displayPrice).toLocaleString()}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
 
 
-            {/* Attributes Selection */}
-            {product.attributes?.map((attr) => (
-                <div key={attr.name} className="space-y-2">
-                    <div className="flex justify-between items-baseline">
-                        <span className="text-xs font-bold uppercase tracking-wider text-foreground">{attr.name}</span>
-                        {selectedAttributes[attr.name] && (
-                            <span className="text-[10px] font-medium text-muted-foreground animate-in fade-in">
-                                {selectedAttributes[attr.name]}
-                            </span>
-                        )}
-                    </div>
+                {/* Attributes Selection */}
+                {product.attributes?.map((attr) => (
+                    <div key={attr.name} className="space-y-2">
+                        <div className="flex justify-between items-baseline">
+                            <span className="text-xs font-bold uppercase tracking-wider text-foreground">{attr.name}</span>
+                            {selectedAttributes[attr.name] && (
+                                <span className="text-[10px] font-medium text-muted-foreground animate-in fade-in">
+                                    {selectedAttributes[attr.name]}
+                                </span>
+                            )}
+                        </div>
 
-                    <div className="flex flex-wrap gap-2">
-                        {attr.options.map((option) => {
-                            const isSelected = selectedAttributes[attr.name] === option;
-                            const optionImage = getOptionImage(attr.name, option);
+                        <div className="flex flex-wrap gap-2">
+                            {attr.options.map((option) => {
+                                const isSelected = selectedAttributes[attr.name] === option;
+                                const optionImage = getOptionImage(attr.name, option);
 
-                            if (optionImage) {
+                                if (optionImage) {
+                                    return (
+                                        <button
+                                            key={option}
+                                            onClick={() => handleAttributeSelect(attr.name, option)}
+                                            className={cn(
+                                                "group relative flex flex-col items-center gap-1 transition-all",
+                                                isSelected ? "scale-100" : "scale-95 opacity-80 hover:scale-100 hover:opacity-100"
+                                            )}
+                                            title={option}
+                                        >
+                                            <div className={cn(
+                                                "w-14 h-14 lg:w-16 lg:h-16 rounded-xl overflow-hidden border-2 transition-all shadow-sm relative",
+                                                isSelected
+                                                    ? "border-primary ring-2 ring-primary/20 ring-offset-1"
+                                                    : "border-gray-200 hover:border-gray-300"
+                                            )}>
+                                                <img src={optionImage} alt={option} className="w-full h-full object-cover" />
+                                                {isSelected && (
+                                                    <div className="absolute inset-0 bg-black/10 flex items-center justify-center backdrop-blur-[1px]">
+                                                        <div className="bg-white rounded-full p-0.5 shadow-md animate-in zoom-in">
+                                                            <Check className="w-3 h-3 text-primary" strokeWidth={3} />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span className={cn(
+                                                "text-[9px] font-bold uppercase tracking-wide max-w-[56px] truncate",
+                                                isSelected ? "text-primary" : "text-muted-foreground"
+                                            )}>
+                                                {option}
+                                            </span>
+                                        </button>
+                                    )
+                                }
+
                                 return (
                                     <button
                                         key={option}
                                         onClick={() => handleAttributeSelect(attr.name, option)}
                                         className={cn(
-                                            "group relative flex flex-col items-center gap-1 transition-all",
-                                            isSelected ? "scale-100" : "scale-95 opacity-80 hover:scale-100 hover:opacity-100"
-                                        )}
-                                        title={option}
-                                    >
-                                        <div className={cn(
-                                            "w-14 h-14 lg:w-16 lg:h-16 rounded-xl overflow-hidden border-2 transition-all shadow-sm relative",
+                                            "px-4 py-2 text-xs font-bold rounded-lg border-2 transition-all",
                                             isSelected
-                                                ? "border-primary ring-2 ring-primary/20 ring-offset-1"
-                                                : "border-gray-200 hover:border-gray-300"
-                                        )}>
-                                            <img src={optionImage} alt={option} className="w-full h-full object-cover" />
-                                            {isSelected && (
-                                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center backdrop-blur-[1px]">
-                                                    <div className="bg-white rounded-full p-0.5 shadow-md animate-in zoom-in">
-                                                        <Check className="w-3 h-3 text-primary" strokeWidth={3} />
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <span className={cn(
-                                            "text-[9px] font-bold uppercase tracking-wide max-w-[56px] truncate",
-                                            isSelected ? "text-primary" : "text-muted-foreground"
-                                        )}>
-                                            {option}
-                                        </span>
+                                                ? "border-primary bg-primary text-white shadow-lg shadow-primary/25"
+                                                : "border-gray-200 hover:border-gray-300 text-gray-600 bg-white"
+                                        )}
+                                    >
+                                        {option}
                                     </button>
-                                )
-                            }
-
-                            return (
-                                <button
-                                    key={option}
-                                    onClick={() => handleAttributeSelect(attr.name, option)}
-                                    className={cn(
-                                        "px-4 py-2 text-xs font-bold rounded-lg border-2 transition-all",
-                                        isSelected
-                                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/25"
-                                            : "border-gray-200 hover:border-gray-300 text-gray-600 bg-white"
-                                    )}
-                                >
-                                    {option}
-                                </button>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
 
-            {/* Stock — slim inline text */}
-            {displayStock <= 10 && (
-                <p className="text-[10px] font-bold text-orange-600 flex items-center gap-1">
-                    <Flame className="w-3 h-3" /> Only {displayStock} left — selling fast!
-                </p>
-            )}
-
+                {/* Stock — slim inline text */}
+                {displayStock <= 10 && (
+                    <p className="text-[10px] font-bold text-orange-600 flex items-center gap-1">
+                        <Flame className="w-3 h-3" /> Only {displayStock} left — selling fast!
+                    </p>
+                )}
 
 
-            {/* Actions Row */}
-            <div className="space-y-2 pt-1">
-                <div className="flex gap-2 h-10 lg:h-12">
-                    <div className="shrink-0 h-full w-16 lg:w-20">
-                        <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200/60 rounded-lg lg:rounded-xl bg-gray-50/30" />
+
+                {/* Actions Row */}
+                <div className="space-y-2 pt-1">
+                    <div className="flex gap-2 h-10 lg:h-12">
+                        <div className="shrink-0 h-full w-16 lg:w-20">
+                            <QuantitySelector quantity={quantity} setQuantity={setQuantity} className="h-full border border-gray-200/60 rounded-lg lg:rounded-xl bg-gray-50/30" />
+                        </div>
+                        <button
+                            onClick={handleAddToCart}
+                            disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
+                            className={cn(
+                                "aspect-square h-full bg-white border border-primary/10 text-primary rounded-lg lg:rounded-xl flex items-center justify-center shadow-sm hover:bg-primary hover:text-white transition-all disabled:opacity-50 group",
+                                added && "bg-green-600 border-green-600 text-white"
+                            )}
+                            title="Add To Cart"
+                        >
+                            {added ? <Check className="w-4 h-4" strokeWidth={3} /> : <ShoppingCart className="w-4 h-4" strokeWidth={2.5} />}
+                        </button>
+                        <button
+                            onClick={handleBuyNow}
+                            disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
+                            className="flex-1 h-full bg-primary text-white text-xs lg:text-sm font-black rounded-lg lg:rounded-xl flex items-center justify-center gap-1.5 hover:bg-orange-600 transition-all shadow-md active:scale-[0.98] tracking-wider"
+                        >
+                            <ShoppingBag className="w-3.5 h-3.5" strokeWidth={2.5} />
+                            BUY NOW
+                        </button>
                     </div>
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className={cn(
-                            "aspect-square h-full bg-white border border-primary/10 text-primary rounded-lg lg:rounded-xl flex items-center justify-center shadow-sm hover:bg-primary hover:text-white transition-all disabled:opacity-50 group",
-                            added && "bg-green-600 border-green-600 text-white"
-                        )}
-                        title="Add To Cart"
-                    >
-                        {added ? <Check className="w-4 h-4" strokeWidth={3} /> : <ShoppingCart className="w-4 h-4" strokeWidth={2.5} />}
-                    </button>
-                    <button
-                        onClick={handleBuyNow}
-                        disabled={!allAttributesSelected && product.attributes && product.attributes.length > 0}
-                        className="flex-1 h-full bg-primary text-white text-xs lg:text-sm font-black rounded-lg lg:rounded-xl flex items-center justify-center gap-1.5 hover:bg-orange-600 transition-all shadow-md active:scale-[0.98] tracking-wider"
-                    >
-                        <ShoppingBag className="w-3.5 h-3.5" strokeWidth={2.5} />
-                        BUY NOW
-                    </button>
+
+                    {/* Secondary Discovery / Trust CTA For High-Ticket Items */}
+                    {displayPrice > 5000 && (
+                        <button
+                            onClick={() => setIsBookingDrawerOpen(true)}
+                            className="w-full mt-2 h-10 lg:h-12 bg-zinc-900 border border-zinc-900 text-white hover:bg-white hover:text-zinc-900 text-xs font-black rounded-lg flex items-center justify-between px-4 transition-colors group"
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className="w-5 h-5 rounded-full bg-white text-zinc-900 flex items-center justify-center group-hover:bg-zinc-900 group-hover:text-white transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /><rect x="2" y="6" width="14" height="12" rx="2" /></svg>
+                                </div>
+                                <span className="uppercase tracking-widest leading-none">Book 1-on-1 Video Tour</span>
+                            </div>
+                            <span className="text-[10px] bg-white text-zinc-900 px-2 py-0.5 rounded-full ring-2 ring-zinc-900 group-hover:bg-zinc-900 group-hover:text-white group-hover:ring-white transition-colors font-bold">+ ₹99/slot</span>
+                        </button>
+                    )}
                 </div>
+
+                {/* Slide-Out Booking Drawer */}
+                <ProductBookingDrawer
+                    isOpen={isBookingDrawerOpen}
+                    onClose={() => setIsBookingDrawerOpen(false)}
+                    productId={currentVariant?.id || product.id}
+                    productName={currentVariant ? `${product.name} - ${currentVariant.name}` : product.name}
+                    productPrice={displayPrice}
+                />
 
                 {/* PREPAID5 */}
                 <div className="flex items-center gap-2 bg-green-50/80 border border-dashed border-green-300 rounded-lg px-2.5 py-1.5 animate-pulse [animation-duration:3s]">
@@ -421,11 +450,10 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     </a>
                 </div>
             </div>
-
             <BISCertificateModal
                 isOpen={isBISModalOpen}
                 onClose={() => setIsBISModalOpen(false)}
             />
-        </div>
+        </>
     );
 }
