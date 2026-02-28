@@ -13,13 +13,14 @@ export function LiveDemoFloatingButton() {
     const [isDismissed, setIsDismissed] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
 
-    // Only show on product pages or home, and wait a bit
+    // Only show on product pages
     useEffect(() => {
         if (isDismissed) return;
 
-        const isForbiddenPage = pathname?.startsWith('/admin') || pathname?.startsWith('/checkout') || pathname?.startsWith('/cart');
+        // Show only on individual product pages
+        const isProductPage = pathname?.startsWith('/product/');
 
-        if (!isForbiddenPage) {
+        if (isProductPage) {
             setIsVisible(true);
             // Auto-show tooltip for mobile users after a delay, since they can't hover
             const timer = setTimeout(() => setShowTooltip(true), 3000);

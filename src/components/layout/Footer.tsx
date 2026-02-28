@@ -142,6 +142,7 @@ export function Footer() {
                             <li><FooterLink href="/warranty-policy">Warranty Policy</FooterLink></li>
                             <li><FooterLink href="/billing-terms-and-conditions">Billing Terms & Conditions</FooterLink></li>
                             <li><FooterLink href="/payment-policy">Payment Policy</FooterLink></li>
+                            <li><FooterLink href="/live-tour">🎥 Live Video Tour Experience</FooterLink></li>
                             <li><FooterLink href="/booking-policy">📹 Video Call Booking Policy</FooterLink></li>
                             <li><FooterLink href="/about-us">About Us</FooterLink></li>
                             <li><FooterLink href="/contact-us">Contact Us</FooterLink></li>

@@ -1,9 +1,16 @@
 'use client';
 
-import { CheckCircle2, XCircle, ShieldCheck, Truck, MessageCircle, Banknote, Award, Sparkles } from 'lucide-react';
+import { CheckCircle2, XCircle, ShieldCheck, Truck, MessageCircle, Banknote, Award, Sparkles, Video } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
 
 const features = [
+    {
+        icon: Video,
+        label: 'Live Showroom Tour',
+        us: '1-on-1 private video tour to see product live',
+        them: 'Stock photos only, no real visibility',
+        usShort: 'See it live on video',
+    },
     {
         icon: MessageCircle,
         label: 'Customer Support',
