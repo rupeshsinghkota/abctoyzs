@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Calendar } from "lucide-react";
+import { X, Calendar, Video } from "lucide-react";
 import { SlotBookingSection } from "./SlotBookingSection";
 import { AnimatePresence, motion } from "framer-motion";
 
