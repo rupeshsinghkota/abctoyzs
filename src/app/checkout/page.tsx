@@ -123,6 +123,7 @@ export default function CheckoutPage() {
                     ProfileService.getProfile()
                 ]);
                 setAddresses(addrList);
+                setProfile(userProfile);
                 if (addrList.length === 0) setShowAddrForm(true);
 
                 // Auto-select default address

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Video, CheckCircle2, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { ProfileService } from '@/lib/services/profile';
 
 interface SlotBookingSectionProps {
     productId: string;
@@ -19,6 +20,23 @@ export function SlotBookingSection({ productId, productName }: SlotBookingSectio
     const [step, setStep] = useState<1 | 2>(1);
     const [isBooking, setIsBooking] = useState(false);
     const [meetLink, setMeetLink] = useState<string | null>(null);
+
+    // Auto-fill logged in user details
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const profile = await ProfileService.getProfile();
+                if (profile) {
+                    if (profile.full_name) setCustomerName(profile.full_name);
+                    if (profile.email) setCustomerEmail(profile.email);
+                    if (profile.phone) setCustomerPhone(profile.phone);
+                }
+            } catch (err) {
+                console.error("Error fetching profile for booking:", err);
+            }
+        };
+        fetchProfile();
+    }, []);
 
     // Generate dates (next 3 working days)
     const getNextDays = (days: number) => {
