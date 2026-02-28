@@ -45,7 +45,9 @@ interface AppState {
     clearCompare: () => void;
     // Global Booking
     isBookingOpen: boolean;
+    currentProductContext: { productId: string; productName: string; productPrice: number } | null;
     bookingContext: { productId: string; productName: string; productPrice: number } | null;
+    setCurrentProductContext: (context: { productId: string; productName: string; productPrice: number } | null) => void;
     openBooking: (context?: { productId: string; productName: string; productPrice: number }) => void;
     closeBooking: () => void;
 }
@@ -108,15 +110,17 @@ export const useStore = create<AppState>()(
             clearCompare: () => set({ compareItems: [] }),
             // Global Booking
             isBookingOpen: false,
+            currentProductContext: null,
             bookingContext: null,
-            openBooking: (context) => set({
+            setCurrentProductContext: (context) => set({ currentProductContext: context }),
+            openBooking: (context) => set((state) => ({
                 isBookingOpen: true,
-                bookingContext: context || {
+                bookingContext: context || state.currentProductContext || {
                     productId: 'general',
                     productName: 'Showroom General Tour',
                     productPrice: 0
                 }
-            }),
+            })),
             closeBooking: () => set({ isBookingOpen: false, bookingContext: null }),
         }),
         {

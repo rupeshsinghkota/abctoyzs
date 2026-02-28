@@ -8,9 +8,10 @@ import { useStore } from "@/store/useStore";
 
 export function LiveDemoFloatingButton() {
     const pathname = usePathname();
-    const { openBooking } = useStore();
+    const { openBooking, currentProductContext } = useStore();
     const [isVisible, setIsVisible] = useState(false);
     const [isDismissed, setIsDismissed] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
 
     // Only show on product pages or home, and wait a bit
     useEffect(() => {
@@ -20,6 +21,13 @@ export function LiveDemoFloatingButton() {
 
         if (!isForbiddenPage) {
             setIsVisible(true);
+            // Auto-show tooltip for mobile users after a delay, since they can't hover
+            const timer = setTimeout(() => setShowTooltip(true), 3000);
+            const hideTimer = setTimeout(() => setShowTooltip(false), 7000);
+            return () => {
+                clearTimeout(timer);
+                clearTimeout(hideTimer);
+            };
         } else {
             setIsVisible(false);
         }
@@ -28,17 +36,24 @@ export function LiveDemoFloatingButton() {
     if (isDismissed || !isVisible) return null;
 
     return (
-        <div className="fixed bottom-[164px] right-5 z-[100] group md:bottom-[164px] md:right-10">
+        <div className="fixed bottom-48 right-5 z-[100] group md:bottom-[164px] md:right-10">
             <div className="relative">
                 {/* Amazing Tooltip */}
-                <div className="absolute right-full mr-4 bottom-1/2 translate-y-1/2 bg-zinc-950 text-white px-5 py-3 rounded-2xl border border-white/10 shadow-2xl opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 pointer-events-none whitespace-nowrap overflow-hidden">
+                <div className={cn(
+                    "absolute right-full mr-4 bottom-1/2 translate-y-1/2 bg-zinc-950 text-white px-5 py-3 rounded-2xl border border-white/10 shadow-2xl transition-all pointer-events-none whitespace-nowrap overflow-hidden",
+                    showTooltip ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0"
+                )}>
                     <div className="flex items-center gap-3">
                         <div className="flex flex-col">
                             <div className="flex items-center gap-1.5 mb-0.5">
                                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Live Showroom</span>
+                                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+                                    {currentProductContext ? 'Product Preview' : 'Live Showroom'}
+                                </span>
                             </div>
-                            <p className="text-xs font-black tracking-tight">Tap to See it Live! 🎥</p>
+                            <p className="text-xs font-black tracking-tight">
+                                {currentProductContext ? `See ${currentProductContext.productName.split(' ')[0]} Live! 🎥` : 'Tap to See it Live! 🎥'}
+                            </p>
                         </div>
                     </div>
                     {/* Inner highlight */}
