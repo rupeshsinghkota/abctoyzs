@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { ShoppingBag, X, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -16,9 +17,13 @@ const ACTIVITIES = [
 ];
 
 export function RecentActivityToast() {
+    const pathname = usePathname();
     const [index, setIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
     const [hasBeenShown, setHasBeenShown] = useState(false);
+
+    // Hide on cart, checkout, and admin pages
+    const isHiddenPage = pathname?.startsWith('/cart') || pathname?.startsWith('/checkout') || pathname?.startsWith('/admin');
 
     useEffect(() => {
         // Initial delay before first show
@@ -46,6 +51,7 @@ export function RecentActivityToast() {
         };
     }, []);
 
+    if (isHiddenPage) return null;
     if (!hasBeenShown) return null;
 
     const activity = ACTIVITIES[index];
