@@ -23,7 +23,7 @@ declare global {
 }
 
 import { BRAND_CONFIG } from '@/config/brand';
-import { GenuineOrderGuarantee } from '@/components/trust/GenuineOrderGuarantee';
+
 
 export default function CheckoutPage() {
     const router = useRouter();
@@ -929,8 +929,7 @@ export default function CheckoutPage() {
                                                 <CreditCard className="w-3 h-3" />
                                                 Payment Secured by Razorpay & PCI-DSS
                                             </div>
-                                            {/* Genuine Order Service Component (VIP Benefits) */}
-                                            <GenuineOrderGuarantee />
+
                                         </div>
 
                                         {/* Step-by-Step Verification Journey */}
