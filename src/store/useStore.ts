@@ -43,6 +43,11 @@ interface AppState {
     addToCompare: (product: RecentlyViewedItem) => void;
     removeFromCompare: (id: string) => void;
     clearCompare: () => void;
+    // Global Booking
+    isBookingOpen: boolean;
+    bookingContext: { productId: string; productName: string; productPrice: number } | null;
+    openBooking: (context?: { productId: string; productName: string; productPrice: number }) => void;
+    closeBooking: () => void;
 }
 
 export const useStore = create<AppState>()(
@@ -101,6 +106,18 @@ export const useStore = create<AppState>()(
                     compareItems: state.compareItems.filter(p => p.id !== id)
                 })),
             clearCompare: () => set({ compareItems: [] }),
+            // Global Booking
+            isBookingOpen: false,
+            bookingContext: null,
+            openBooking: (context) => set({
+                isBookingOpen: true,
+                bookingContext: context || {
+                    productId: 'general',
+                    productName: 'Showroom General Tour',
+                    productPrice: 0
+                }
+            }),
+            closeBooking: () => set({ isBookingOpen: false, bookingContext: null }),
         }),
         {
             name: 'abctoyz-storage',

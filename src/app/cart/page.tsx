@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 export default function CartPage() {
-    const { cart, removeFromCart, updateQuantity } = useStore();
+    const { cart, removeFromCart, updateQuantity, openBooking } = useStore();
     const router = useRouter();
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0; // Free shipping
@@ -175,16 +175,16 @@ export default function CartPage() {
                                 <p className="text-[11px] font-medium text-zinc-400 leading-relaxed italic">
                                     "See these items live on video before we ship them to your doorstep."
                                 </p>
-                                <Link
-                                    href="/category/all"
-                                    className="flex items-center justify-between w-full px-4 py-3 bg-zinc-900 border border-white/5 text-xs font-black text-white rounded-xl hover:bg-zinc-800 transition-all group/btn shadow-lg"
+                                <button
+                                    onClick={() => openBooking()}
+                                    className="flex items-center justify-between w-full px-4 py-3 bg-zinc-900 border border-white/5 text-xs font-black text-white rounded-xl hover:bg-zinc-800 transition-all group/btn shadow-lg mt-4 cursor-pointer"
                                 >
                                     <div className="flex items-center gap-2">
                                         <Video className="w-4 h-4 text-primary" strokeWidth={3} />
-                                        <span className="uppercase tracking-widest">Book Live Tour</span>
+                                        <span className="uppercase tracking-widest uppercase">Book Live Tour</span>
                                     </div>
                                     <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover/btn:translate-x-1 group-hover/btn:text-primary transition-all" />
-                                </Link>
+                                </button>
                             </div>
                         )}
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Product, ProductVariant } from '@/lib/data';
 import { useStore } from '@/store/useStore';
-import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket, Timer, Flame, Truck, ShieldCheck, RotateCcw, Video, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Check, ShoppingCart, CheckCircle2, Gauge, Weight, Gamepad2, Baby, Ticket, Timer, Flame, Truck, ShieldCheck, RotateCcw, Video, ArrowRight, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { QuantitySelector } from '@/components/ui/QuantitySelector';
 import { trackFbEvent } from '@/components/tracking/FacebookPixel';
@@ -11,7 +11,6 @@ import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 import { StockUrgency } from './StockUrgency';
 
 import { BISCertificateModal } from './BISCertificateModal';
-import { ProductBookingDrawer } from './ProductBookingDrawer';
 
 interface ProductActionsProps {
     product: Product;
@@ -21,11 +20,10 @@ interface ProductActionsProps {
 }
 
 export function ProductActions({ product, selectedAttributes, onAttributeSelect, currentVariant }: ProductActionsProps) {
-    const { addToCart } = useStore();
+    const { addToCart, openBooking } = useStore();
     const [quantity, setQuantity] = useState(1);
     const [added, setAdded] = useState(false);
     const [isBISModalOpen, setIsBISModalOpen] = useState(false);
-    const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
 
     // Initial Price / Image / Stock comes from Product, but overrides if Variant selected
     const displayPrice = currentVariant ? currentVariant.price : product.price;
@@ -162,14 +160,6 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
         const variant = product.variants.find(v => v.attributes[attrName] === optionValue && v.image);
         return variant?.image;
     };
-
-    // Feature highlights derived from product specs
-    const highlights = [
-        { icon: Baby, label: 'Age', value: product.specs?.suitable_age || (product.ageGroup ? `${product.ageGroup} Yrs` : null) },
-        { icon: Gauge, label: 'Speed', value: product.specs?.speed },
-        { icon: Weight, label: 'Load', value: product.specs?.max_load },
-        { icon: Gamepad2, label: 'Control', value: product.specs?.mobile_app ? 'App & Remote' : (product.specs?.remote_control ? 'Remote' : 'Manual') },
-    ].filter(h => h.value);
 
     return (
         <>
@@ -354,13 +344,14 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     {/* Secondary Discovery / Trust CTA For High-Ticket Items */}
                     {displayPrice >= 4500 && (
                         <button
-                            onClick={() => setIsBookingDrawerOpen(true)}
+                            onClick={() => openBooking({
+                                productId: currentVariant?.id || product.id,
+                                productName: currentVariant ? `${product.name} - ${currentVariant.name}` : product.name,
+                                productPrice: displayPrice
+                            })}
                             className="w-full mt-3 h-14 bg-zinc-950 border border-white/10 text-white hover:bg-zinc-900 text-xs font-black rounded-xl flex items-center justify-between px-5 transition-all group relative overflow-hidden shadow-2xl active:scale-[0.98] z-20"
                         >
                             <div className="flex items-center gap-3 relative z-10">
-                                <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(249,115,22,0.4)]">
-                                    <Video className="w-3 h-3" strokeWidth={3} />
-                                </div>
                                 <div className="flex flex-col items-start">
                                     <div className="flex items-center gap-1.5 mb-1">
                                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -387,15 +378,6 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                         </button>
                     )}
                 </div>
-
-                {/* Slide-Out Booking Drawer */}
-                <ProductBookingDrawer
-                    isOpen={isBookingDrawerOpen}
-                    onClose={() => setIsBookingDrawerOpen(false)}
-                    productId={currentVariant?.id || product.id}
-                    productName={currentVariant ? `${product.name} - ${currentVariant.name}` : product.name}
-                    productPrice={displayPrice}
-                />
 
                 {/* PREPAID5 */}
                 <div className="flex items-center gap-2 bg-green-50/80 border border-dashed border-green-300 rounded-lg px-2.5 py-1.5 animate-pulse [animation-duration:3s]">

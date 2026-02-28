@@ -4,9 +4,11 @@ import { Video, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/store/useStore";
 
 export function LiveDemoFloatingButton() {
     const pathname = usePathname();
+    const { openBooking } = useStore();
     const [isVisible, setIsVisible] = useState(false);
     const [isDismissed, setIsDismissed] = useState(false);
 
@@ -46,14 +48,10 @@ export function LiveDemoFloatingButton() {
                 {/* Main Pulsating Button */}
                 <button
                     onClick={() => {
-                        const bookingSection = document.getElementById('booking-section');
-                        if (bookingSection) {
-                            bookingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        } else {
-                            // On mobile or if section not found, go to some high-intent page or open generic drawer
-                            const anyProduct = document.querySelector('[href*="/product/"]');
-                            if (anyProduct) anyProduct.scrollIntoView({ behavior: 'smooth' });
-                        }
+                        // If we are on a product page, we can try to extract product info
+                        // But it's safer to just call a "Show global booking" and if the site 
+                        // is using any product context (like recently viewed), we use that.
+                        openBooking();
                     }}
                     className="w-14 h-14 md:w-16 md:h-16 bg-zinc-950 rounded-full flex items-center justify-center text-white shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_40px_rgba(249,115,22,0.3)] transition-all relative z-10 active:scale-95 border border-white/10 group-hover:border-primary/50"
                 >

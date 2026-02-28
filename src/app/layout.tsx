@@ -19,6 +19,7 @@ import WhatsAppTracker from "@/components/tracking/WhatsAppTracker";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { RecentActivityToast } from "@/components/common/RecentActivityToast";
 import { CompareDrawer } from "@/components/shop/CompareDrawer";
+import { GlobalBookingDrawerWrap } from "@/components/GlobalBookingDrawerWrap";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -135,6 +136,7 @@ export default function RootLayout({
         <LiveDemoFloatingButton />
         <RecentActivityToast />
         <CompareDrawer />
+        <GlobalBookingDrawerWrap />
       </body>
     </html>
   );
