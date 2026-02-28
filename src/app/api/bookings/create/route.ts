@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import crypto from 'crypto';
+import { WhatsAppService } from '@/lib/services/whatsapp';
 
 // ==========================================
 // ⚠️ ADMIN SETUP REQUIRED
@@ -150,7 +151,47 @@ export async function POST(req: Request) {
                 .eq('razorpay_order_id', razorpayOrderId);
         }
 
-        // 10. Return the generated Meet Link to the frontend
+        // 10. Send WhatsApp Notifications
+        const adminPhone = process.env.ADMIN_PHONE_NUMBER || '919155149597';
+        const formattedDate = new Date(date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
+        const customerPhoneWithCode = customerPhone.length === 10 ? `91${customerPhone}` : customerPhone;
+        const isMeetLinkReal = meetLink && !meetLink.startsWith('Admin will');
+
+        // Message to Customer
+        const customerMessage =
+            `✅ *Booking Confirmed — ABC Toyz*\n\n` +
+            `Hi ${customerName}! Your live video call has been booked successfully.\n\n` +
+            `*📦 Product:* ${productName}\n` +
+            `*📅 Date:* ${formattedDate}\n` +
+            `*⏰ Time:* ${time}\n` +
+            `*💳 Amount Paid:* ₹99 (adjustable on purchase)\n\n` +
+            (isMeetLinkReal
+                ? `*🎥 Join Link:* ${meetLink}\n\n`
+                : `*🎥 Meeting Link:* Our team will share the Google Meet link on this WhatsApp number 5 mins before your slot.\n\n`) +
+            `If you have questions, just reply here. See you soon! 🚀`;
+
+        // Alert to Admin
+        const adminMessage =
+            `🔔 *New Video Call Booking!*\n\n` +
+            `*Customer:* ${customerName}\n` +
+            `*Phone:* ${customerPhone}\n` +
+            `*Email:* ${customerEmail}\n` +
+            `*Product:* ${productName}\n` +
+            `*Date:* ${formattedDate}\n` +
+            `*Time:* ${time}\n` +
+            `*Payment:* ₹99 paid ✅\n` +
+            `*Razorpay ID:* ${razorpayPaymentId || 'N/A'}\n\n` +
+            (isMeetLinkReal
+                ? `*Meet Link:* ${meetLink}`
+                : `⚠️ Google Meet link not auto-generated. Please share a link manually 5 mins before the slot.`);
+
+        // Fire both in parallel, don't block the response on them
+        await Promise.allSettled([
+            WhatsAppService.sendMessage(customerPhoneWithCode, customerMessage),
+            WhatsAppService.sendMessage(adminPhone, adminMessage),
+        ]);
+
+        // 11. Return the generated Meet Link to the frontend
         return NextResponse.json({
             success: true,
             message: 'Slot booked successfully',

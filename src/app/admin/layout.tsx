@@ -11,6 +11,7 @@ import {
     Globe,
     Mail,
     Ticket,
+    Video,
     Settings
 } from 'lucide-react';
 import { AdminBottomNav } from '@/components/admin/AdminBottomNav';
@@ -45,6 +46,7 @@ export default async function AdminLayout({
         { icon: Package, label: 'Products', href: '/admin/products' },
         { icon: Ticket, label: 'Coupons', href: '/admin/coupons' },
         { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
+        { icon: Video, label: 'Video Bookings', href: '/admin/bookings' },
         { icon: Users, label: 'Customers', href: '/admin/customers' },
         { icon: Mail, label: 'Subscribers', href: '/admin/subscribers' },
         { icon: Globe, label: 'SEO', href: '/admin/seo' },
