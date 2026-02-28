@@ -6,7 +6,7 @@ import {
     Loader2, Search, Download, Filter, ChevronRight,
     ArrowUpDown, Eye, MoreHorizontal
 } from 'lucide-react';
-import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
 type Order = {
@@ -87,52 +87,51 @@ export default function OrdersPage() {
     }
 
     return (
-        <div className="max-w-[1600px] mx-auto p-6 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
-                    <p className="text-muted-foreground text-sm">Manage and fulfill your customer orders.</p>
+                    <h1 className="text-3xl font-black tracking-tight text-zinc-900">Orders</h1>
+                    <p className="text-zinc-500 text-sm font-medium">Manage and fulfill your customer orders.</p>
                 </div>
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                    <button className="px-4 py-2 bg-white border rounded-lg text-sm font-medium hover:bg-zinc-50 transition-colors shadow-sm flex items-center gap-2">
+                    <button className="flex-1 sm:flex-none px-4 py-2.5 bg-white border rounded-xl text-xs font-black uppercase tracking-widest hover:bg-zinc-50 transition-all shadow-sm flex items-center justify-center gap-2">
                         <Download className="w-4 h-4" />
                         Export
                     </button>
-                    <button className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+                    <button className="flex-1 sm:flex-none px-4 py-2.5 bg-zinc-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-zinc-800 transition-all shadow-sm shadow-zinc-200">
                         Create Order
                     </button>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-xl border shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div className="relative w-full sm:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="bg-white p-6 rounded-3xl border shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between">
+                <div className="relative w-full lg:max-w-md">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                     <input
                         type="text"
                         placeholder="Search by order ID, customer, phone..."
-                        className="w-full pl-9 pr-4 py-2 rounded-lg border text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                        className="w-full pl-11 pr-4 py-3 rounded-2xl bg-zinc-50 border-transparent focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all text-sm font-medium"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <div className="relative group w-full sm:w-auto">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                        <select
-                            className="w-full sm:w-48 pl-9 pr-4 py-2 rounded-lg border text-sm appearance-none bg-white cursor-pointer hover:border-zinc-300 transition-all outline-none focus:ring-2 focus:ring-primary/20"
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
+                <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+                    {['all', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+                        <button
+                            key={status}
+                            onClick={() => setFilterStatus(status)}
+                            className={cn(
+                                "px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap border",
+                                filterStatus === status
+                                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                                    : "bg-white text-zinc-500 border-zinc-100 hover:border-zinc-300"
+                            )}
                         >
-                            <option value="all">All Statuses</option>
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none" />
-                    </div>
+                            {status}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -143,12 +142,12 @@ export default function OrdersPage() {
                         <thead className="bg-zinc-50 border-b text-xs uppercase font-medium text-muted-foreground">
                             <tr>
                                 <th className="px-6 py-3 tracking-wider">Order</th>
-                                <th className="px-6 py-3 tracking-wider">Date</th>
+                                <th className="px-6 py-3 tracking-wider hidden sm:table-cell">Date</th>
                                 <th className="px-6 py-3 tracking-wider">Customer</th>
                                 <th className="px-6 py-3 tracking-wider">Total</th>
-                                <th className="px-6 py-3 tracking-wider">Payment</th>
-                                <th className="px-6 py-3 tracking-wider">Fulfillment</th>
-                                <th className="px-6 py-3 tracking-wider">Items</th>
+                                <th className="px-6 py-3 tracking-wider hidden lg:table-cell">Payment</th>
+                                <th className="px-6 py-3 tracking-wider hidden md:table-cell">Fulfillment</th>
+                                <th className="px-6 py-3 tracking-wider hidden xl:table-cell">Items</th>
                                 <th className="px-6 py-3 text-right">Action</th>
                             </tr>
                         </thead>
@@ -166,24 +165,21 @@ export default function OrdersPage() {
                                         className="hover:bg-zinc-50/50 transition-colors cursor-pointer group"
                                         onClick={() => router.push(`/admin/orders/${order.id}`)}
                                     >
-                                        <td className="px-6 py-4 font-medium text-zinc-900">
+                                        <td className="px-6 py-4 font-medium text-zinc-900 whitespace-nowrap">
                                             #{order.id.slice(0, 8).toUpperCase()}
                                         </td>
-                                        <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
+                                        <td className="px-6 py-4 text-muted-foreground whitespace-nowrap hidden sm:table-cell text-xs">
                                             {new Date(order.created_at).toLocaleDateString()}
-                                            <span className="text-xs ml-1 text-zinc-400">
-                                                {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="font-medium text-zinc-900">{order.shipping_address?.name || 'Guest'}</div>
-                                            <div className="text-xs text-muted-foreground">{order.shipping_address?.phone}</div>
+                                            <div className="font-medium text-zinc-900 truncate max-w-[120px] sm:max-w-none">{order.shipping_address?.name || 'Guest'}</div>
+                                            <div className="text-xs text-muted-foreground hidden sm:block">{order.shipping_address?.phone}</div>
                                         </td>
                                         <td className="px-6 py-4 font-semibold text-zinc-900">
                                             ₹{order.total_amount.toLocaleString()}
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getPaymentStatusColor(order.payment_status)}`}>
+                                        <td className="px-6 py-4 hidden lg:table-cell">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getPaymentStatusColor(order.payment_status)}`}>
                                                 {order.payment_status === 'paid' || order.payment_status === 'paid_advance' || order.payment_status === 'partially_paid' ? 'Paid' :
                                                     order.payment_status === 'refunded' ? 'Refunded' : 'Pending'}
                                             </span>
@@ -194,12 +190,12 @@ export default function OrdersPage() {
                                                 <span className="ml-2 text-[10px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase tracking-tighter">Video Call</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${getStatusColor(order.status)}`}>
+                                        <td className="px-6 py-4 hidden md:table-cell">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border capitalize ${getStatusColor(order.status)}`}>
                                                 {order.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-muted-foreground">
+                                        <td className="px-6 py-4 text-muted-foreground hidden xl:table-cell">
                                             {order.items?.length || 0} items
                                         </td>
                                         <td className="px-6 py-4 text-right">

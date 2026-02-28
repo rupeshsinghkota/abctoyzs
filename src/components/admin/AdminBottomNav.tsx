@@ -10,16 +10,15 @@ export function AdminBottomNav() {
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dash', href: '/admin' },
-        { icon: Package, label: 'Products', href: '/admin/products' },
+        { icon: Package, label: 'Items', href: '/admin/products' },
         { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
-        { icon: Users, label: 'Users', href: '/admin/customers' },
-        { icon: Settings, label: 'Settings', href: '/admin/settings' },
-        { icon: Home, label: 'Store', href: '/' },
+        { icon: Users, label: 'Peeps', href: '/admin/customers' },
+        { icon: Settings, label: 'Config', href: '/admin/settings' },
     ];
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t z-50 pb-[env(safe-area-inset-bottom)]">
-            <div className="flex justify-around items-center h-16">
+        <nav className="md:hidden fixed bottom-6 left-6 right-6 bg-zinc-900/90 backdrop-blur-xl border border-white/10 z-50 rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
+            <div className="flex justify-around items-center h-16 px-2">
                 {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = pathname === item.href;
@@ -29,12 +28,12 @@ export function AdminBottomNav() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-                                isActive ? "text-primary bg-primary/5" : "text-muted-foreground hover:text-foreground"
+                                "flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-all duration-300",
+                                isActive ? "text-primary scale-110" : "text-white/40 hover:text-white"
                             )}
                         >
-                            <Icon className="w-5 h-5" />
-                            <span className="text-[10px] font-bold uppercase tracking-tighter">{item.label}</span>
+                            <Icon className={cn("w-5 h-5", isActive ? "stroke-[3px]" : "stroke-[2px]")} />
+                            <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
                         </Link>
                     );
                 })}

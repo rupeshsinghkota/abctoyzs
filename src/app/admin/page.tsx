@@ -153,17 +153,17 @@ export default function AdminDashboard() {
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Sales Chart */}
-                <div className="lg:col-span-2 bg-white border rounded-[2rem] p-8 shadow-sm">
-                    <div className="flex items-center justify-between mb-8">
+                <div className="lg:col-span-2 bg-white border rounded-[2rem] p-5 md:p-8 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                         <div>
                             <h2 className="text-xl font-black">Revenue <span className="text-primary">Growth</span></h2>
                             <p className="text-sm text-muted-foreground font-medium">Monthly performance overview</p>
                         </div>
-                        <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-xl text-xs font-bold text-zinc-500">
+                        <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 border border-zinc-100 w-fit">
                             Last 6 Months
                         </div>
                     </div>
-                    <div className="h-[350px]">
+                    <div className="h-[300px] md:h-[350px]">
                         {mounted && (
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={stats.revenueByMonth}>
@@ -178,13 +178,13 @@ export default function AdminDashboard() {
                                         dataKey="name"
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fontSize: 12, fontWeight: 600, fill: '#71717a' }}
+                                        tick={{ fontSize: 10, fontWeight: 700, fill: '#a1a1aa' }}
                                         dy={10}
                                     />
                                     <YAxis
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fontSize: 12, fontWeight: 600, fill: '#71717a' }}
+                                        tick={{ fontSize: 10, fontWeight: 700, fill: '#a1a1aa' }}
                                         tickFormatter={(v) => `₹${v / 1000}k`}
                                     />
                                     <Tooltip
@@ -199,10 +199,10 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Status Distribution */}
-                <div className="bg-white border rounded-[2rem] p-8 shadow-sm">
+                <div className="bg-white border rounded-[2rem] p-5 md:p-8 shadow-sm">
                     <h2 className="text-xl font-black mb-1">Order <span className="text-primary">Status</span></h2>
                     <p className="text-sm text-muted-foreground font-medium mb-8">Current fulfillment state</p>
-                    <div className="h-[300px]">
+                    <div className="h-[250px] md:h-[300px]">
                         {mounted && (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
                                         cx="50%"
                                         cy="50%"
                                         innerRadius={60}
-                                        outerRadius={100}
+                                        outerRadius={80}
                                         paddingAngle={5}
                                         dataKey="value"
                                     >
@@ -228,10 +228,10 @@ export default function AdminDashboard() {
                         {stats.ordersByStatus.map((status, idx) => (
                             <div key={status.name} className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
-                                    <span className="text-xs font-bold text-zinc-600 uppercase tracking-wider">{status.name}</span>
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
+                                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{status.name}</span>
                                 </div>
-                                <span className="text-sm font-black">{status.value}</span>
+                                <span className="text-sm font-black text-zinc-900">{status.value}</span>
                             </div>
                         ))}
                     </div>
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
             {/* Bottom Section: Quick Actions & Inventory */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Quick Actions */}
-                <div className="bg-zinc-900 text-white rounded-[2rem] p-8 shadow-sm">
+                <div className="bg-zinc-900 text-white rounded-[2rem] p-6 md:p-8 shadow-sm">
                     <h2 className="text-xl font-black mb-6">Quick <span className="text-primary">Actions</span></h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <a

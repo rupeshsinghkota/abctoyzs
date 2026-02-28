@@ -14,6 +14,7 @@ import {
     Settings
 } from 'lucide-react';
 import { AdminBottomNav } from '@/components/admin/AdminBottomNav';
+import { AdminMobileMenu } from '@/components/admin/AdminMobileMenu';
 
 export default async function AdminLayout({
     children,
@@ -51,65 +52,63 @@ export default async function AdminLayout({
     ];
 
     return (
-        <div className="min-h-screen flex bg-background">
-            {/* Sidebar */}
-            <aside className="hidden md:flex w-64 border-r bg-card flex-col">
-                <div className="p-6 border-b">
+        <div className="min-h-screen flex bg-zinc-50/50">
+            {/* Sidebar (Desktop) */}
+            <aside className="hidden md:flex w-72 border-r bg-white flex-col sticky top-0 h-screen">
+                <div className="p-8 border-b">
                     <Link href="/" className="flex items-center gap-2">
                         <img src="/logo_wide.png" alt="ABC Toyz" className="h-8" />
                     </Link>
-                    <p className="text-xs text-muted-foreground mt-2">Admin Dashboard</p>
+                    <div className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] px-2 py-1 rounded w-fit mt-3">Admin Panel</div>
                 </div>
 
-                <nav className="flex-1 p-4 space-y-1">
+                <nav className="flex-1 p-6 space-y-1.5 overflow-y-auto">
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 transition-colors group"
+                                className="flex items-center gap-3 px-4 py-3.5 rounded-2xl hover:bg-zinc-100 transition-all group font-bold text-sm text-zinc-600 hover:text-zinc-900"
                             >
-                                <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                                <span className="font-medium text-foreground/80 group-hover:text-primary">
-                                    {item.label}
-                                </span>
+                                <Icon className="w-5 h-5 text-zinc-400 group-hover:text-primary transition-colors" />
+                                <span>{item.label}</span>
                             </Link>
                         );
                     })}
                 </nav>
 
-                <div className="p-4 border-t">
+                <div className="p-6 border-t space-y-2">
                     <Link
                         href="/"
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted transition-colors"
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-2xl hover:bg-zinc-100 transition-all font-bold text-sm text-zinc-600"
                     >
-                        <Home className="w-5 h-5" />
-                        <span className="font-medium">View Store</span>
+                        <Home className="w-5 h-5 text-zinc-400" />
+                        <span>View Store</span>
                     </Link>
                     <form action="/auth/signout" method="post">
                         <button
                             type="submit"
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors mt-1"
+                            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl hover:bg-rose-50 text-rose-600 transition-all font-bold text-sm mt-1"
                         >
-                            <LogOut className="w-5 h-5" />
-                            <span className="font-medium">Logout</span>
+                            <LogOut className="w-5 h-5 text-red-300" />
+                            <span>Sign Out</span>
                         </button>
                     </form>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto">
+            <main className="flex-1 min-w-0">
                 {/* Mobile Top Bar */}
-                <div className="md:hidden flex items-center justify-between p-4 border-b bg-card sticky top-0 z-20">
+                <div className="md:hidden flex items-center justify-between px-6 py-4 border-b bg-white/80 backdrop-blur-xl sticky top-0 z-40">
                     <Link href="/admin">
                         <img src="/logo_wide.png" alt="ABC Toyz" className="h-6" />
                     </Link>
-                    <div className="text-xs font-bold text-primary uppercase tracking-widest">Admin</div>
+                    <AdminMobileMenu navItems={navItems} />
                 </div>
 
-                <div className="p-4 md:p-8 pb-24 md:pb-8">
+                <div className="p-4 md:p-10 lg:p-12 pb-32 md:pb-10">
                     {children}
                 </div>
             </main>
