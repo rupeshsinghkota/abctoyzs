@@ -1,5 +1,5 @@
 "use client";
-import { X, Copy, Check, Ticket } from "lucide-react";
+import { X, Copy, Check, Ticket, Video } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,10 @@ export function HeaderBanner() {
             text: "Get 5% OFF on Prepaid Orders!",
             code: "PREPAID5",
             icon: <Ticket className="w-3.5 h-3.5" />
+        },
+        {
+            text: "See it Live: Book a Private Video Tour for ₹99 🎥",
+            icon: <Video className="w-3.5 h-3.5 animate-pulse text-orange-400" />
         }
     ];
 

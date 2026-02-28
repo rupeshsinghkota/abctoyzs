@@ -362,6 +362,10 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                     <Video className="w-3 h-3" strokeWidth={3} />
                                 </div>
                                 <div className="flex flex-col items-start">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                        <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">Live Now</span>
+                                    </div>
                                     <span className="uppercase tracking-[0.1em] leading-none font-black text-[11px] group-hover:text-primary transition-colors">Personal Video Showcase</span>
                                     <span className="text-[9px] text-zinc-500 font-bold tracking-tight uppercase mt-1">Chat live with our showroom experts</span>
                                 </div>

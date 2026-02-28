@@ -9,6 +9,7 @@ import { FeatureSpotlight } from "@/components/home/FeatureSpotlight";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ProductHighlightGrid } from "@/components/home/ProductHighlightGrid";
 import { Testimonials } from "@/components/home/Testimonials";
+import { VideoShowcaseSection } from "@/components/home/VideoShowcaseSection";
 import { WhyBuyFromUs } from "@/components/home/WhyBuyFromUs";
 import { ShopByAge } from "@/components/home/ShopByAge";
 import { ShopByPower } from "@/components/home/ShopByPower";
@@ -137,6 +138,7 @@ export default async function Home() {
 
 
 
+      <VideoShowcaseSection />
       <Testimonials />
       <WhyBuyFromUs />
       <Newsletter />

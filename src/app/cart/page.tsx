@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -157,18 +157,42 @@ export default function CartPage() {
                                 <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 leading-none">Total</span>
                                 <span className="text-[9px] md:text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Incl. of all taxes</span>
                             </div>
-                            <span className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-none">₹{total.toLocaleString()}</span>
+                            <div className="flex justify-between items-center text-lg lg:text-xl font-black text-gray-900 border-t border-gray-100 pt-5 mt-4">
+                                <span className="tracking-tight">Grand Total</span>
+                                <span className="text-primary tracking-tighter">₹{subtotal.toLocaleString()}</span>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Desktop Button Location */}
-                    <div className="hidden lg:block">
+                        {/* LIVE VIDEO CTA NUDGE */}
+                        {subtotal >= 4999 && (
+                            <div className="my-6 p-5 bg-zinc-950 rounded-[28px] border border-white/5 space-y-3 shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 -mr-4 -mt-4 w-20 h-20 bg-primary/10 blur-2xl rounded-full" />
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                    <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Showroom Assist</span>
+                                </div>
+                                <h4 className="text-xs font-black text-white tracking-tight uppercase">Unsure about the size or quality?</h4>
+                                <p className="text-[11px] font-medium text-zinc-400 leading-relaxed italic">
+                                    "See these items live on video before we ship them to your doorstep."
+                                </p>
+                                <Link
+                                    href="/category/all"
+                                    className="flex items-center justify-between w-full px-4 py-3 bg-zinc-900 border border-white/5 text-xs font-black text-white rounded-xl hover:bg-zinc-800 transition-all group/btn shadow-lg"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <Video className="w-4 h-4 text-primary" strokeWidth={3} />
+                                        <span className="uppercase tracking-widest">Book Live Tour</span>
+                                    </div>
+                                    <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover/btn:translate-x-1 group-hover/btn:text-primary transition-all" />
+                                </Link>
+                            </div>
+                        )}
+
                         <button
-                            onClick={handleCheckout}
-                            className="w-full mt-6 bg-black text-white h-16 rounded-[20px] font-black text-base lg:text-lg shadow-xl shadow-black/20 hover:shadow-black/30 hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                            onClick={() => router.push('/checkout')}
+                            className="w-full bg-primary hover:bg-orange-600 text-white py-4 rounded-xl lg:rounded-2xl font-black text-xs md:text-sm tracking-widest uppercase shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-2 mt-2"
                         >
-                            Proceed to Checkout
-                            <ArrowRight className="w-5 h-5" />
+                            Secure Checkout <ArrowRight className="w-4 h-4" />
                         </button>
                         <div className="mt-4 space-y-3">
                             <div className="flex items-center justify-center gap-1.5 px-3 py-2 bg-green-50 rounded-xl border border-green-100">

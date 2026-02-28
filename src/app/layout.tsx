@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { WhatsAppNudge } from "@/components/ui/WhatsAppNudge";
 import { BackToTop } from "@/components/ui/BackToTop";
+import { LiveDemoFloatingButton } from "@/components/ui/LiveDemoFloatingButton";
 import { SettingsService } from "@/lib/services/settings";
 import { createClient } from "@/lib/supabase/server";
 import Script from "next/script";
@@ -131,6 +132,7 @@ export default function RootLayout({
         <WhatsAppButton />
         <WhatsAppNudge />
         <BackToTop />
+        <LiveDemoFloatingButton />
         <RecentActivityToast />
         <CompareDrawer />
       </body>
