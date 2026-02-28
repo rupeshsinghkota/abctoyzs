@@ -37,6 +37,9 @@ export async function POST(req: Request) {
                 // Normal COD - no online payment required
                 razorpayAmount = 0;
             }
+        } else if (payment_method === 'BOOKING') {
+            // Bookings always charge a flat ₹99 fee
+            razorpayAmount = 99;
         }
 
         // 1. Create a "pending" order in database
@@ -54,7 +57,7 @@ export async function POST(req: Request) {
                     status: 'processing',
                     payment_method: payment_method || 'PREPAID',
                     guest_email: guest_email,
-                    advance_amount: payment_method === 'COD' ? razorpayAmount : 0
+                    advance_amount: (payment_method === 'COD' || payment_method === 'BOOKING') ? razorpayAmount : 0
                 })
                 .select()
                 .single();
@@ -73,7 +76,7 @@ export async function POST(req: Request) {
                     payment_status: 'pending',
                     status: 'processing',
                     payment_method: payment_method || 'PREPAID',
-                    advance_amount: payment_method === 'COD' ? razorpayAmount : 0
+                    advance_amount: (payment_method === 'COD' || payment_method === 'BOOKING') ? razorpayAmount : 0
                 })
                 .select()
                 .single();
@@ -266,7 +269,7 @@ export async function POST(req: Request) {
             amount: razorpayAmountPaise,
             total_amount: total_amount, // Full value for tracking
             currency: razorpayCurrency,
-            prepayment: payment_method === 'COD' && razorpayAmount > 0
+            prepayment: (payment_method === 'COD' || payment_method === 'BOOKING') && razorpayAmount > 0
         });
 
     } catch (error: any) {

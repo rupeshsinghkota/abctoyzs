@@ -310,24 +310,32 @@ export default function CheckoutPage() {
                 // Create a consolidated product name from the cart items
                 const combinedProductNames = cart.map(item => item.name).join(', ');
 
-                // 1. Create Razorpay Order for ₹99 Booking Fee
-                const orderRes = await fetch('/api/bookings/payment', {
+                // 1. Create a Standard Pending Order + Razorpay Order for ₹99 Booking Fee
+                const orderRes = await fetch('/api/checkout/order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId: "cart_booking", productName: combinedProductNames })
+                    body: JSON.stringify({
+                        items: cart,
+                        total_amount: total,
+                        discount_amount: appliedCoupon ? (total * appliedCoupon.discount / 100) : 0,
+                        coupon_code: appliedCoupon?.code || null,
+                        shipping_address_id: selectedAddressId,
+                        payment_method: 'BOOKING',
+                        guest_email: checkoutEmail
+                    }),
                 });
 
-                if (!orderRes.ok) throw new Error('Failed to initialize booking payment');
+                if (!orderRes.ok) throw new Error('Failed to initialize booking order');
                 const orderData = await orderRes.json();
 
                 // 2. Open Razorpay Checkout for booking
                 const options = {
-                    key: orderData.key,
-                    amount: orderData.amount,
-                    currency: "INR",
+                    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                    amount: orderData.amount, // Will be 9900 (₹99 in paise)
+                    currency: orderData.currency,
                     name: "ABC Toyz",
-                    description: `Live Video Tour: Multiple Items`,
-                    order_id: orderData.orderId,
+                    description: `Live Video Tour Booking`,
+                    order_id: orderData.razorpay_order_id,
                     handler: async function (response: any) {
                         try {
                             setLoading(true); // Re-flag loading during meeting link gen

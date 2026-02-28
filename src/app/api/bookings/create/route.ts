@@ -134,12 +134,28 @@ export async function POST(req: Request) {
             meetLink = "Admin will share meeting link via WhatsApp 5 mins before.";
         }
 
-        // 9. Return the generated Meet Link to the frontend
+        // 9. Update the Supabase Order to reflect the Booking Advance Payment
+        const { createClient } = await import('@/lib/supabase/server');
+        const supabase = await createClient();
+
+        // Use the razorpayOrderId that was just paid to find and update the pending order
+        if (razorpayOrderId) {
+            await supabase
+                .from('orders')
+                .update({
+                    payment_status: 'paid_advance',
+                    razorpay_payment_id: razorpayPaymentId,
+                    status: 'processing' // Ensure it's marked as processing now
+                })
+                .eq('razorpay_order_id', razorpayOrderId);
+        }
+
+        // 10. Return the generated Meet Link to the frontend
         return NextResponse.json({
             success: true,
             message: 'Slot booked successfully',
             meetLink: meetLink,
-            eventId: response.data.id
+            eventId: response.data?.id
         });
 
     } catch (error: any) {
