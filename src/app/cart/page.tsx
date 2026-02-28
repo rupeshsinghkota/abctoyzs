@@ -163,31 +163,6 @@ export default function CartPage() {
                             </div>
                         </div>
 
-                        {/* LIVE VIDEO CTA NUDGE */}
-                        {subtotal >= 4999 && (
-                            <div className="my-6 p-5 bg-zinc-950 rounded-[28px] border border-white/5 space-y-3 shadow-2xl relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 -mr-4 -mt-4 w-20 h-20 bg-primary/10 blur-2xl rounded-full" />
-                                <div className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                    <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Showroom Assist</span>
-                                </div>
-                                <h4 className="text-xs font-black text-white tracking-tight uppercase">Unsure about the size or quality?</h4>
-                                <p className="text-[11px] font-medium text-zinc-400 leading-relaxed italic">
-                                    "See these items live on video before we ship them to your doorstep."
-                                </p>
-                                <button
-                                    onClick={() => openBooking()}
-                                    className="flex items-center justify-between w-full px-4 py-3 bg-zinc-900 border border-white/5 text-xs font-black text-white rounded-xl hover:bg-zinc-800 transition-all group/btn shadow-lg mt-4 cursor-pointer"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <Video className="w-4 h-4 text-primary" strokeWidth={3} />
-                                        <span className="uppercase tracking-widest uppercase">Book Live Tour</span>
-                                    </div>
-                                    <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover/btn:translate-x-1 group-hover/btn:text-primary transition-all" />
-                                </button>
-                            </div>
-                        )}
-
                         <button
                             onClick={() => router.push('/checkout')}
                             className="w-full bg-primary hover:bg-orange-600 text-white py-4 rounded-xl lg:rounded-2xl font-black text-xs md:text-sm tracking-widest uppercase shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-2 mt-2"
