@@ -77,14 +77,22 @@ export function SlotBookingSection({ productId, productName, productPrice, isDra
         }
 
         const phoneRegex = /^[0-9]{10}$/;
-        if (!phoneRegex.test(customerPhone)) {
+        const cleanPhone = customerPhone.replace(/\D/g, '').slice(-10);
+        if (!phoneRegex.test(cleanPhone)) {
             toast.error("Please enter a valid 10-digit phone number");
+            return;
+        }
+
+        // Check if Razorpay is loaded
+        if (!(window as any).Razorpay) {
+            toast.error("Payment system is still loading. Please wait 2 seconds.");
             return;
         }
 
         setIsBooking(true);
 
         try {
+            console.log('[Booking] Initializing payment for:', productName);
             const orderRes = await fetch('/api/bookings/payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -93,12 +101,16 @@ export function SlotBookingSection({ productId, productName, productPrice, isDra
                     productName,
                     customerName,
                     customerEmail,
-                    customerPhone,
+                    customerPhone: cleanPhone,
                     productPrice
                 })
             });
 
-            if (!orderRes.ok) throw new Error('Failed to initialize booking');
+            if (!orderRes.ok) {
+                const errorData = await orderRes.json();
+                throw new Error(errorData.message || 'Failed to initialize booking');
+            }
+
             const orderData = await orderRes.json();
             setSupabaseOrderId(orderData.supabaseOrderId);
 
@@ -123,7 +135,7 @@ export function SlotBookingSection({ productId, productName, productPrice, isDra
                                 time: selectedTime,
                                 customerName,
                                 customerEmail,
-                                customerPhone,
+                                customerPhone: cleanPhone,
                                 razorpayPaymentId: response.razorpay_payment_id,
                                 razorpayOrderId: response.razorpay_order_id,
                                 razorpaySignature: response.razorpay_signature
@@ -144,13 +156,15 @@ export function SlotBookingSection({ productId, productName, productPrice, isDra
                             throw new Error(bookingData.message || 'Failed to generate meeting link');
                         }
                     } catch (error: any) {
+                        console.error('[Booking Finalize Error]:', error);
                         toast.error(error.message || "Failed to finalize booking");
+                        setIsBooking(false); // Must reset since success state wasn't reached
                     }
                 },
                 prefill: {
                     name: customerName,
                     email: customerEmail,
-                    contact: customerPhone
+                    contact: cleanPhone
                 },
                 theme: {
                     color: "#F97316"
