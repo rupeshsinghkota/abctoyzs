@@ -11,9 +11,10 @@ interface SlotBookingSectionProps {
     productId: string;
     productName: string;
     productPrice: number;
+    isDrawer?: boolean;
 }
 
-export function SlotBookingSection({ productId, productName, productPrice }: SlotBookingSectionProps) {
+export function SlotBookingSection({ productId, productName, productPrice, isDrawer = false }: SlotBookingSectionProps) {
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [customerName, setCustomerName] = useState('');
@@ -176,111 +177,126 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
     };
 
     return (
-        <section id="slot-booking" className="mt-12 mb-20 bg-zinc-950 rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5 pointer-events-none" />
+        <section
+            id="slot-booking"
+            className={cn(
+                isDrawer ? "mt-4" : "mt-12 mb-20 bg-zinc-950 rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden",
+                "relative"
+            )}
+        >
+            {!isDrawer && <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5 pointer-events-none" />}
 
-            <div className="md:grid md:grid-cols-12 h-full relative z-10">
+            <div className={cn(isDrawer ? "block" : "md:grid md:grid-cols-12", "h-full relative z-10")}>
 
                 {/* Left: Value Proposition */}
-                <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-12 border-b md:border-b-0 md:border-r border-white/5 bg-zinc-900/40 backdrop-blur-md text-white overflow-hidden relative">
-                    {/* Background Decor */}
-                    <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
-                        <div className="absolute top-10 left-10 w-32 h-32 bg-primary blur-[80px] rounded-full animate-pulse" />
-                        <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500 blur-[100px] rounded-full animate-pulse [animation-delay:2s]" />
-                    </div>
-
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="space-y-6 relative z-10"
-                    >
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full shadow-inner">
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                            </span>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/90">Showroom Live</span>
+                {!isDrawer && (
+                    <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-center space-y-12 border-b md:border-b-0 md:border-r border-white/5 bg-zinc-900/40 backdrop-blur-md text-white overflow-hidden relative">
+                        {/* Background Decor */}
+                        <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
+                            <div className="absolute top-10 left-10 w-32 h-32 bg-primary blur-[80px] rounded-full animate-pulse" />
+                            <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500 blur-[100px] rounded-full animate-pulse [animation-delay:2s]" />
                         </div>
 
-                        <div className="space-y-1">
-                            <h2 className="text-4xl md:text-6xl font-black leading-[0.9] tracking-tighter">
-                                Experience <span className="text-primary italic">Detail.</span>
-                            </h2>
-                            <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-2">1-on-1 Virtual Gallery Tour</p>
-                        </div>
-
-                        <p className="text-zinc-400 text-sm font-medium leading-relaxed max-w-sm">
-                            Step into our premium showroom from your phone. Our product specialists will give you a detailed walkthrough of <span className="text-white font-bold">{productName}</span> with high-definition clarity.
-                        </p>
-                    </motion.div>
-
-                    <div className="space-y-8 relative z-10">
-                        <div className="space-y-6">
-                            {[
-                                { icon: Video, title: 'HD Cinematic Feed', desc: 'See every curve, chrome finish, and LED detail in stunning high definition.' },
-                                { icon: Sparkles, title: 'Expert Consultation', desc: 'Our specialists will guide you on features, battery life, and assembly live.' },
-                                { icon: ShieldCheck, title: 'Bill-Adjustable Credit', desc: 'The small commitment fee is instantly applied to your purchase credit.' }
-                            ].map((feature, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.1 }}
-                                    className="flex items-start gap-4 group"
-                                >
-                                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 transition-all duration-500 shrink-0 shadow-lg group-hover:shadow-primary/10">
-                                        <feature.icon className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <h4 className="text-white text-sm font-black group-hover:text-primary transition-colors">{feature.title}</h4>
-                                        <p className="text-zinc-500 text-xs leading-normal font-medium">{feature.desc}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* Showroom Specialists */}
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            className="pt-6 border-t border-white/5 space-y-4"
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="space-y-6 relative z-10"
                         >
-                            <p className="text-[10px] filter grayscale opacity-50 font-black uppercase tracking-widest">Today's Specialists</p>
-                            <div className="flex items-center gap-6">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full shadow-inner">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                </span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/90">Showroom Live</span>
+                            </div>
+
+                            <div className="space-y-1">
+                                <h2 className="text-4xl md:text-6xl font-black leading-[0.9] tracking-tighter">
+                                    Experience <span className="text-primary italic">Detail.</span>
+                                </h2>
+                                <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-2">1-on-1 Virtual Gallery Tour</p>
+                            </div>
+
+                            <p className="text-zinc-400 text-sm font-medium leading-relaxed max-w-sm">
+                                Step into our premium showroom from your phone. Our product specialists will give you a detailed walkthrough of <span className="text-white font-bold">{productName}</span> with high-definition clarity.
+                            </p>
+                        </motion.div>
+
+                        <div className="space-y-8 relative z-10">
+                            <div className="space-y-6">
                                 {[
-                                    { name: 'Rahul S.', role: 'Senior Tech' },
-                                    { name: 'Arjun K.', role: 'Ride-on Expert' }
-                                ].map((expert, i) => (
-                                    <div key={i} className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/10 flex items-center justify-center text-[10px] font-black">
-                                            {expert.name[0]}
+                                    { icon: Video, title: 'HD Cinematic Feed', desc: 'See every curve, chrome finish, and LED detail in stunning high definition.' },
+                                    { icon: Sparkles, title: 'Expert Consultation', desc: 'Our specialists will guide you on features, battery life, and assembly live.' },
+                                    { icon: ShieldCheck, title: 'Bill-Adjustable Credit', desc: 'The small commitment fee is instantly applied to your purchase credit.' }
+                                ].map((feature, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: i * 0.1 }}
+                                        className="flex items-start gap-4 group"
+                                    >
+                                        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 transition-all duration-500 shrink-0 shadow-lg group-hover:shadow-primary/10">
+                                            <feature.icon className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
                                         </div>
-                                        <div>
-                                            <p className="text-[10px] font-black">{expert.name}</p>
-                                            <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-tighter">{expert.role}</p>
+                                        <div className="space-y-1">
+                                            <h4 className="text-white text-sm font-black group-hover:text-primary transition-colors">{feature.title}</h4>
+                                            <p className="text-zinc-500 text-xs leading-normal font-medium">{feature.desc}</p>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
-                        </motion.div>
-                    </div>
 
-                    <div className="pt-8 mt-auto hidden md:block">
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
-                                <div className="w-8 h-px bg-zinc-800" /> Showroom Verified
+                            {/* Showroom Specialists */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                className="pt-6 border-t border-white/5 space-y-4"
+                            >
+                                <p className="text-[10px] filter grayscale opacity-50 font-black uppercase tracking-widest">Today's Specialists</p>
+                                <div className="flex items-center gap-6">
+                                    {[
+                                        { name: 'Rahul S.', role: 'Senior Tech' },
+                                        { name: 'Arjun K.', role: 'Ride-on Expert' }
+                                    ].map((expert, i) => (
+                                        <div key={i} className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/10 flex items-center justify-center text-[10px] font-black">
+                                                {expert.name[0]}
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-black">{expert.name}</p>
+                                                <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-tighter">{expert.role}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        <div className="pt-8 mt-auto hidden md:block">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                    <div className="w-8 h-px bg-zinc-800" /> Showroom Verified
+                                </div>
+                                <div className="px-2 py-0.5 rounded border border-zinc-700 text-[8px] font-black text-zinc-400">BIS IN-5529</div>
                             </div>
-                            <div className="px-2 py-0.5 rounded border border-zinc-700 text-[8px] font-black text-zinc-400">BIS IN-5529</div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Right: Booking Form */}
-                <div className="md:col-span-7 p-6 md:p-12 flex flex-col justify-center min-h-[600px] relative overflow-hidden bg-zinc-900/10">
-                    <div className="absolute top-0 right-0 -mr-32 -mt-32 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-64 h-64 bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
+                <div className={cn(
+                    "flex flex-col justify-center relative overflow-hidden",
+                    isDrawer ? "col-span-12 p-4" : "md:col-span-7 p-6 md:p-12 min-h-[600px] bg-zinc-900/10"
+                )}>
+                    {!isDrawer && (
+                        <>
+                            <div className="absolute top-0 right-0 -mr-32 -mt-32 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
+                            <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-64 h-64 bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
+                        </>
+                    )}
 
                     <AnimatePresence mode="wait">
                         {bookingStatus === 'idle' ? (
@@ -289,13 +305,16 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 1.05 }}
-                                className="space-y-10 max-w-lg mx-auto w-full bg-white/5 p-8 rounded-[2.5rem] border border-white/10 backdrop-blur-xl relative"
+                                className={cn(
+                                    "max-w-lg mx-auto w-full relative",
+                                    isDrawer ? "space-y-6" : "space-y-10 bg-white/5 p-8 rounded-[2.5rem] border border-white/10 backdrop-blur-xl"
+                                )}
                             >
                                 {/* Progress Indicator */}
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", formStep === 1 ? "bg-primary" : "bg-primary/20")} />
-                                    <div className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", formStep === 2 ? "bg-primary" : "bg-white/10")} />
-                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-2">Step {formStep}/2</span>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className={cn("h-1 flex-1 rounded-full transition-all duration-500", formStep === 1 ? "bg-primary" : "bg-primary/20")} />
+                                    <div className={cn("h-1 flex-1 rounded-full transition-all duration-500", formStep === 2 ? "bg-primary" : "bg-white/10")} />
+                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest ml-2">Step {formStep}/2</span>
                                 </div>
 
                                 {formStep === 1 ? (
@@ -449,55 +468,65 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
                                 key="success"
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="h-full flex flex-col items-center justify-center text-center space-y-12 py-10 max-w-lg mx-auto"
+                                className={cn(
+                                    "flex flex-col items-center justify-center text-center mx-auto w-full",
+                                    isDrawer ? "space-y-8 py-6" : "space-y-12 py-10 max-w-lg"
+                                )}
                             >
                                 <div className="relative">
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
                                         transition={{ type: 'spring', damping: 15 }}
-                                        className="w-32 h-32 rounded-full bg-primary flex items-center justify-center border-[12px] border-white/5 shadow-[0_0_80px_rgba(249,115,22,0.6)]"
+                                        className={cn(
+                                            "rounded-full bg-primary flex items-center justify-center border-white/5",
+                                            isDrawer ? "w-24 h-24 border-8" : "w-32 h-32 border-[12px] shadow-[0_0_80px_rgba(249,115,22,0.6)]"
+                                        )}
                                     >
-                                        <CheckCircle2 className="w-14 h-14 text-white" />
+                                        <CheckCircle2 className={cn("text-white", isDrawer ? "w-10 h-10" : "w-14 h-14")} />
                                     </motion.div>
                                     <motion.div
                                         animate={{ scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }}
                                         transition={{ repeat: Infinity, duration: 4 }}
-                                        className="absolute -top-4 -right-4 w-12 h-12 rounded-2xl bg-white shadow-2xl flex items-center justify-center text-xs font-black text-primary border-4 border-zinc-900"
+                                        className="absolute -top-2 -right-2 w-10 h-10 rounded-xl bg-white shadow-2xl flex items-center justify-center text-[10px] font-black text-primary border-4 border-zinc-950"
                                     >
                                         VIP
                                     </motion.div>
                                 </div>
-                                <div className="space-y-4">
-                                    <h3 className="text-5xl font-black text-white tracking-tighter">Spot Secured!</h3>
-                                    <p className="text-zinc-400 text-sm max-w-[320px] mx-auto leading-relaxed font-medium">
-                                        You are scheduled for a private consultation. A calendar invite has been sent to <span className="text-white font-bold">{customerEmail}</span>.
+
+                                <div className="space-y-2">
+                                    <h3 className={cn("font-black text-white tracking-tighter", isDrawer ? "text-3xl" : "text-5xl")}>Spot Secured!</h3>
+                                    <p className="text-zinc-500 text-[11px] max-w-[280px] mx-auto leading-relaxed font-bold uppercase tracking-widest">
+                                        Private consultation confirmed.
                                     </p>
                                 </div>
 
-                                <div className="p-[2px] rounded-[3rem] bg-gradient-to-br from-primary via-white/20 to-transparent w-full shadow-2xl">
-                                    <div className="bg-zinc-950 rounded-[2.9rem] p-10 text-left space-y-8 backdrop-blur-3xl relative overflow-hidden">
-                                        <div className="absolute top-0 right-0 p-8 opacity-5">
-                                            <Video className="w-32 h-32 text-white" />
-                                        </div>
-                                        <div className="flex items-center gap-4 border-b border-white/5 pb-6">
-                                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-primary border border-white/10">
-                                                <Calendar className="w-6 h-6" />
+                                <div className={cn(
+                                    "p-[1px] rounded-[2rem] bg-gradient-to-br from-primary/50 via-white/10 to-transparent w-full shadow-2xl",
+                                    isDrawer ? "max-w-xs" : ""
+                                )}>
+                                    <div className={cn(
+                                        "bg-zinc-950/50 rounded-[1.9rem] text-left backdrop-blur-3xl relative overflow-hidden",
+                                        isDrawer ? "p-6 space-y-4" : "p-10 space-y-8"
+                                    )}>
+                                        <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+                                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary border border-white/10">
+                                                <Calendar className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Scheduled Date</p>
-                                                <p className="text-xl font-black text-white">{new Date(selectedDate!).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                                <p className="text-[8px] font-black uppercase tracking-widest text-zinc-600">Scheduled Date</p>
+                                                <p className="text-sm font-black text-white">{new Date(selectedDate!).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</p>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-8">
-                                            <div className="space-y-1.5">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live At</p>
-                                                <p className="text-xl font-black text-white">{selectedTime}</p>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1">
+                                                <p className="text-[8px] font-black uppercase tracking-widest text-zinc-600">Live At</p>
+                                                <p className="text-sm font-black text-white">{selectedTime}</p>
                                             </div>
-                                            <div className="space-y-1.5 text-right">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Expert</p>
-                                                <p className="text-xl font-black text-white">Assigned</p>
+                                            <div className="space-y-1 text-right">
+                                                <p className="text-[8px] font-black uppercase tracking-widest text-zinc-600">Status</p>
+                                                <p className="text-[10px] font-black text-primary uppercase italic">Ready</p>
                                             </div>
                                         </div>
 
@@ -508,15 +537,15 @@ export function SlotBookingSection({ productId, productName, productPrice }: Slo
                                                 href={meetLink}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center justify-center gap-3 w-full py-5 bg-white text-zinc-950 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all border border-white/10 shadow-[0_15px_30px_rgba(255,255,255,0.1)]"
+                                                className="flex items-center justify-center gap-3 w-full py-4 bg-white text-zinc-950 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
                                             >
-                                                <Video className="w-5 h-5" /> Enter Showroom Room
+                                                <Video className="w-4 h-4" /> Enter Showroom
                                             </motion.a>
                                         )}
                                     </div>
                                 </div>
 
-                                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest uppercase">Check WhatsApp for confirmation</p>
+                                <p className="text-[9px] font-black text-zinc-700 uppercase tracking-[0.3em]">Check your WhatsApp</p>
                             </motion.div>
                         )}
                     </AnimatePresence>
