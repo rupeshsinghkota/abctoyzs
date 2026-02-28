@@ -59,7 +59,7 @@ export function ProductBookingDrawer({ isOpen, onClose, productName, productId, 
                                     <Calendar className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <h2 className="font-black text-foreground tracking-tight leading-none text-base md:text-lg">Book Video Tour</h2>
+                                    <h2 className="font-black text-foreground tracking-tight leading-none text-base md:text-lg">Book Live Video Call</h2>
                                 </div>
                             </div>
                             <button
@@ -76,7 +76,7 @@ export function ProductBookingDrawer({ isOpen, onClose, productName, productId, 
                             <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 text-white p-5 shadow-inner">
                                 <div className="flex items-start gap-4">
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Requesting Demo For</p>
+                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Requesting Live Video Demo For</p>
                                         <h3 className="font-black text-lg md:text-xl truncate tracking-tight">{productName}</h3>
                                         <div className="mt-3 inline-flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-full border border-white/20">
                                             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />

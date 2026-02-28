@@ -79,7 +79,7 @@ export function SlotBookingSection({ productId, productName }: SlotBookingSectio
                 amount: orderData.amount,
                 currency: "INR",
                 name: "ABC Toyz",
-                description: `Live Video Tour: ${productName}`,
+                description: `Live Video Call: ${productName}`,
                 order_id: orderData.orderId,
                 handler: async function (response: any) {
                     try {
@@ -304,7 +304,7 @@ export function SlotBookingSection({ productId, productName }: SlotBookingSectio
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-black text-zinc-900 tracking-tight">Slot Reserved!</h3>
                                 <p className="text-zinc-500 text-sm max-w-[280px] mx-auto leading-relaxed">
-                                    Your 1-on-1 video tour is confirmed. We've sent the calendar invite to your email.
+                                    Your 1-on-1 video call is confirmed. We've sent the calendar invite to your email.
                                 </p>
                             </div>
                             <div className="bg-zinc-50 rounded-xl p-5 w-full border border-zinc-200 text-left space-y-3">

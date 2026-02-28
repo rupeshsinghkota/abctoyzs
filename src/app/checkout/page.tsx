@@ -783,8 +783,8 @@ export default function CheckoutPage() {
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /><rect x="2" y="6" width="14" height="12" rx="2" /></svg>
                                     </div>
                                     <div className="flex-1 min-w-0 pr-4 mt-2 sm:mt-0">
-                                        <p className="font-black text-gray-900 text-sm md:text-[15px]">Book Live Video Tour</p>
-                                        <p className="text-[11px] text-gray-500 font-medium">Pay ₹99 to see products live (100% refundable).</p>
+                                        <p className="font-black text-gray-900 text-sm md:text-[15px]">Book Live Video Call</p>
+                                        <p className="text-[11px] text-gray-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis">Pay ₹99 for a 1-on-1 video call to see it live.</p>
                                     </div>
                                     {paymentMethod === 'BOOKING' && (
                                         <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center shadow-md">
@@ -1484,7 +1484,7 @@ function OrderSummaryCard({
                         </>
                     ) : (
                         <>
-                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'BOOKING' ? "Pay ₹99 & Book" : paymentMethod === 'COD' ? (
+                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'BOOKING' ? "Pay ₹99 & Book Video Call" : paymentMethod === 'COD' ? (
                                 codSettings?.cod_mode === 'partial'
                                     ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
                                     : "Complete Cash on Delivery"

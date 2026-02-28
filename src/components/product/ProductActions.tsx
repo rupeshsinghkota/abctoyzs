@@ -364,7 +364,10 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                                 <div className="w-5 h-5 rounded-full bg-white text-zinc-900 flex items-center justify-center group-hover:bg-zinc-900 group-hover:text-white transition-colors shadow-[0_0_10px_rgba(255,255,255,0.3)] animate-[pulse_2s_infinite]">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /><rect x="2" y="6" width="14" height="12" rx="2" /></svg>
                                 </div>
-                                <span className="uppercase tracking-widest leading-none">Book 1-on-1 Video Tour</span>
+                                <div className="flex flex-col items-start pr-1">
+                                    <span className="uppercase tracking-widest leading-none font-black text-[11px]">Book Live Video Call</span>
+                                    <span className="text-[8px] text-zinc-400 font-bold tracking-tight uppercase mt-0.5">See the toy live on camera</span>
+                                </div>
                             </div>
                             <span className="text-[10px] bg-white text-zinc-900 px-2 py-0.5 rounded-full ring-2 ring-zinc-900 group-hover:bg-zinc-900 group-hover:text-white group-hover:ring-white transition-colors font-bold relative z-10 shadow-sm">+ ₹99/slot</span>
                         </button>
