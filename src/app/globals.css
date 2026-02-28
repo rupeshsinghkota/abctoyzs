@@ -34,7 +34,14 @@
     }
   }
 
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
   --animate-gradient-x: gradient-x 3s ease infinite;
+  --animate-shimmer: shimmer 2.5s infinite;
 }
 
 :root {
