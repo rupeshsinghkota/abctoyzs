@@ -355,18 +355,31 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     {displayPrice >= 4500 && (
                         <button
                             onClick={() => setIsBookingDrawerOpen(true)}
-                            className="w-full mt-3 h-12 lg:h-12 bg-zinc-900 border border-zinc-900 text-white hover:bg-white hover:text-zinc-900 text-xs font-black rounded-xl flex items-center justify-between px-4 transition-all group relative overflow-hidden shadow-lg active:scale-[0.98] z-20"
+                            className="w-full mt-3 h-14 bg-zinc-950 border border-white/10 text-white hover:bg-zinc-900 text-xs font-black rounded-xl flex items-center justify-between px-5 transition-all group relative overflow-hidden shadow-2xl active:scale-[0.98] z-20"
                         >
-                            <div className="flex items-center gap-2 relative z-10">
-                                <div className="w-5 h-5 rounded-full bg-white text-zinc-900 flex items-center justify-center group-hover:bg-zinc-900 group-hover:text-white transition-colors shadow-[0_0_10px_rgba(255,255,255,0.3)] animate-pulse">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /><rect x="2" y="6" width="14" height="12" rx="2" /></svg>
+                            <div className="flex items-center gap-3 relative z-10">
+                                <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+                                    <Video className="w-3 h-3" strokeWidth={3} />
                                 </div>
-                                <div className="flex flex-col items-start pr-1">
-                                    <span className="uppercase tracking-widest leading-none font-black text-[11px]">Book Live Video Call</span>
-                                    <span className="text-[8px] text-zinc-400 font-bold tracking-tight uppercase mt-0.5">See it live on camera</span>
+                                <div className="flex flex-col items-start">
+                                    <span className="uppercase tracking-[0.1em] leading-none font-black text-[11px] group-hover:text-primary transition-colors">Personal Video Showcase</span>
+                                    <span className="text-[9px] text-zinc-500 font-bold tracking-tight uppercase mt-1">Chat live with our showroom experts</span>
                                 </div>
                             </div>
-                            <span className="text-[10px] bg-white text-zinc-900 px-2 py-1 rounded-full ring-2 ring-zinc-900 group-hover:bg-zinc-900 group-hover:text-white group-hover:ring-white transition-colors font-bold relative z-10 shadow-sm">+ ₹99/slot</span>
+
+                            <div className="flex items-center gap-2 relative z-10">
+                                <div className="flex -space-x-2">
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="w-5 h-5 rounded-full border-2 border-zinc-950 bg-zinc-800 flex items-center justify-center overflow-hidden">
+                                            <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900" />
+                                        </div>
+                                    ))}
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:translate-x-1 transition-transform" />
+                            </div>
+
+                            {/* Decorative background light */}
+                            <div className="absolute top-0 right-0 -mr-8 -mt-8 w-24 h-24 bg-primary/5 blur-2xl rounded-full group-hover:bg-primary/10 transition-colors" />
                         </button>
                     )}
                 </div>
