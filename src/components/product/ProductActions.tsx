@@ -352,24 +352,21 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                     </div>
 
                     {/* Secondary Discovery / Trust CTA For High-Ticket Items */}
-                    {displayPrice > 5000 && (
+                    {displayPrice >= 4500 && (
                         <button
                             onClick={() => setIsBookingDrawerOpen(true)}
-                            className="w-full mt-2 h-10 lg:h-12 bg-zinc-900 border border-zinc-900 text-white hover:bg-white hover:text-zinc-900 text-xs font-black rounded-lg flex items-center justify-between px-4 transition-colors group relative overflow-hidden"
+                            className="w-full mt-3 h-12 lg:h-12 bg-zinc-900 border border-zinc-900 text-white hover:bg-white hover:text-zinc-900 text-xs font-black rounded-xl flex items-center justify-between px-4 transition-all group relative overflow-hidden shadow-lg active:scale-[0.98] z-20"
                         >
-                            {/* Shimmer Effect */}
-                            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:hidden [animation:shimmer_2.5s_infinite]" />
-
                             <div className="flex items-center gap-2 relative z-10">
-                                <div className="w-5 h-5 rounded-full bg-white text-zinc-900 flex items-center justify-center group-hover:bg-zinc-900 group-hover:text-white transition-colors shadow-[0_0_10px_rgba(255,255,255,0.3)] animate-[pulse_2s_infinite]">
+                                <div className="w-5 h-5 rounded-full bg-white text-zinc-900 flex items-center justify-center group-hover:bg-zinc-900 group-hover:text-white transition-colors shadow-[0_0_10px_rgba(255,255,255,0.3)] animate-pulse">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /><rect x="2" y="6" width="14" height="12" rx="2" /></svg>
                                 </div>
                                 <div className="flex flex-col items-start pr-1">
                                     <span className="uppercase tracking-widest leading-none font-black text-[11px]">Book Live Video Call</span>
-                                    <span className="text-[8px] text-zinc-400 font-bold tracking-tight uppercase mt-0.5">See the toy live on camera</span>
+                                    <span className="text-[8px] text-zinc-400 font-bold tracking-tight uppercase mt-0.5">See it live on camera</span>
                                 </div>
                             </div>
-                            <span className="text-[10px] bg-white text-zinc-900 px-2 py-0.5 rounded-full ring-2 ring-zinc-900 group-hover:bg-zinc-900 group-hover:text-white group-hover:ring-white transition-colors font-bold relative z-10 shadow-sm">+ ₹99/slot</span>
+                            <span className="text-[10px] bg-white text-zinc-900 px-2 py-1 rounded-full ring-2 ring-zinc-900 group-hover:bg-zinc-900 group-hover:text-white group-hover:ring-white transition-colors font-bold relative z-10 shadow-sm">+ ₹99/slot</span>
                         </button>
                     )}
                 </div>
