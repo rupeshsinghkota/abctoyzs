@@ -163,7 +163,7 @@ export async function POST(req: Request) {
             : `🎥 Our team will share the Google Meet link on WhatsApp 5 mins before your slot.`;
 
         // — Customer: use approved template —
-        const bookingTemplateId = process.env.MSG91_BOOKING_CONFIRMED_TEMPLATE_ID;
+        const bookingTemplateId = process.env.MSG91_BOOKING_CONFIRMED_TEMPLATE_ID || 'booking';
 
         const customerNotification = bookingTemplateId
             ? WhatsAppService.sendTemplateMessage(customerPhoneWithCode, bookingTemplateId, {
