@@ -712,9 +712,9 @@ export default function CheckoutPage() {
                                 {/* Prepaid Option */}
                                 <div
                                     onClick={() => setPaymentMethod('PREPAID')}
-                                    className={`flex items-center gap-3 p-2.5 rounded-xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'PREPAID'
-                                        ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
-                                        : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
+                                    className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'PREPAID'
+                                        ? "border-zinc-900 bg-zinc-50/50 shadow-md ring-4 ring-zinc-900/5"
+                                        : "border-gray-100 bg-white hover:border-gray-200 hover:bg-zinc-50/30 hover:shadow-sm"
                                         }`}
                                 >
                                     {/* Recommended Badge */}
@@ -739,9 +739,9 @@ export default function CheckoutPage() {
                                 {/* COD Option */}
                                 <div
                                     onClick={() => setPaymentMethod('COD')}
-                                    className={`flex items-center gap-3 p-2.5 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'COD'
-                                        ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
-                                        : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
+                                    className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${paymentMethod === 'COD'
+                                        ? "border-zinc-900 bg-zinc-50/50 shadow-md ring-4 ring-zinc-900/5"
+                                        : "border-gray-100 bg-white hover:border-gray-200 hover:bg-zinc-50/30 hover:shadow-sm"
                                         }`}
                                 >
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${paymentMethod === 'COD' ? 'bg-black text-white' : 'bg-gray-100 text-gray-400'}`}>
@@ -768,9 +768,9 @@ export default function CheckoutPage() {
                                 {/* BOOKING Option */}
                                 <div
                                     onClick={() => setPaymentMethod('BOOKING')}
-                                    className={`flex items-center gap-3 p-2.5 rounded-xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'BOOKING'
-                                        ? "border-black bg-gray-50/50 shadow-md ring-4 ring-black/5"
-                                        : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/30 hover:shadow-sm"
+                                    className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all relative overflow-hidden group ${paymentMethod === 'BOOKING'
+                                        ? "border-zinc-900 bg-zinc-50/50 shadow-md ring-4 ring-zinc-900/5"
+                                        : "border-gray-100 bg-white hover:border-gray-200 hover:bg-zinc-50/30 hover:shadow-sm"
                                         }`}
                                 >
                                     {paymentMethod !== 'BOOKING' && (
@@ -1331,7 +1331,7 @@ function OrderSummaryCard({
                 <div className="max-h-[25vh] overflow-y-auto pr-2 no-scrollbar border-b border-gray-100 pb-2 lg:pb-3">
                     {cart.map((item: any) => (
                         <div key={item.id} className="flex gap-3 mb-2 last:mb-0 items-center">
-                            <div className="w-10 h-10 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm">
+                            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm">
                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -1446,10 +1446,10 @@ function OrderSummaryCard({
 
                     <div className="flex justify-between items-center">
                         <div>
-                            <span className="font-black text-lg tracking-tight text-gray-900">Total</span>
-                            <p className="text-[9px] text-gray-400 font-bold tracking-widest uppercase">Incl. of all taxes</p>
+                            <span className="font-black text-xl lg:text-2xl tracking-tight text-gray-900">Total</span>
+                            <p className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase mt-0.5">Incl. of all taxes</p>
                         </div>
-                        <span className="text-2xl font-black text-gray-900 tracking-tighter">₹{total.toLocaleString()}</span>
+                        <span className="text-3xl lg:text-4xl font-black text-zinc-900 tracking-tighter">₹{total.toLocaleString()}</span>
                     </div>
 
                     {/* Total Savings Summary */}
@@ -1472,8 +1472,11 @@ function OrderSummaryCard({
                 <button
                     onClick={onPayment}
                     disabled={isPaymentLoading || cart.length === 0 || !selectedAddressId}
-                    className="w-full mt-4 bg-black text-white h-14 rounded-2xl font-black text-lg shadow-xl shadow-black/20 hover:shadow-black/30 hover:-translate-y-1 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="group relative w-full mt-4 bg-zinc-900 text-white h-14 md:h-[60px] rounded-2xl font-black text-lg shadow-xl shadow-zinc-900/20 hover:shadow-zinc-900/30 hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden"
                 >
+                    <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+                        <div className="relative h-full w-8 bg-white/20" />
+                    </div>
                     {isPaymentLoading ? (
                         <>
                             <Loader2 className="w-5 h-5 animate-spin" />
