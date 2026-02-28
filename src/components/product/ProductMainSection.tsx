@@ -15,7 +15,7 @@ import { LiveViewersBadge } from '@/components/product/LiveViewersBadge';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/store/useStore';
-import { GenuineOrderGuarantee } from '@/components/trust/GenuineOrderGuarantee';
+
 
 export function ProductMainSection({ product, boxContent = [] }: { product: Product, boxContent?: string[] }) {
     const router = useRouter();
@@ -315,8 +315,6 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 )}
                             </div>
 
-                            {/* Genuine Order Guarantee */}
-                            <GenuineOrderGuarantee className="mt-2" />
 
                             {/* Desktop Wishlist & Share — Moved inside sticky container to prevent overlap */}
                             <div className="hidden lg:flex items-center gap-6 pt-4 border-t border-gray-50 mt-4">
