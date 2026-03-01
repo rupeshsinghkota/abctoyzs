@@ -164,7 +164,8 @@ export async function POST(req: Request) {
                 .update({
                     payment_status: 'paid', // Standard 'paid' status
                     razorpay_payment_id: razorpayPaymentId,
-                    status: 'processing'
+                    status: 'processing',
+                    admin_notes: `JSON_BOOKING:{"date":"${date}","time":"${time}","meet":"${meetLink}"}`
                 })
                 .eq('razorpay_order_id', razorpayOrderId);
         }
