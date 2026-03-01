@@ -175,75 +175,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ status: "success", reason: "empty_message_ignored" });
         }
 
-        const { data: globalSettings } = await supabase.from('settings').select('ai_reply_enabled, global_daily_discount').single();
-        if (globalSettings?.ai_reply_enabled === false) {
-            return NextResponse.json({ status: "success", reason: "ai_disabled" });
-        }
+        // 🚨 AI CHAT PERMANENTLY DISABLED FOR WHATSAPP (Aura Removal)
+        return NextResponse.json({ status: "success", reason: "ai_chat_disabled_permanently" });
 
-        const activeDiscount = globalSettings?.global_daily_discount || 0;
-
-        // 7. PROCEED TO AI RESPONSE
-        const phoneVariations = [cleanPhone, cleanPhone.substring(2)];
-        let customerName = null;
-        let matchingAddresses = null;
-        for (const phonePattern of phoneVariations) {
-            const { data } = await supabase.from('addresses').select('id, name').ilike('phone', `%${phonePattern}%`);
-            if (data?.length) { matchingAddresses = data; customerName = data[0].name; break; }
-        }
-
-        let userContext = `# USER CONTEXT\n- Customer Name: ${customerName || 'Customer'}\n- Phone: ${cleanPhone}\n`;
-        if (activeDiscount > 0) {
-            userContext += `- Active Store-Wide Sale: ${activeDiscount}% Off (Prices dynamically updated in tools)\n`;
-        }
-
-        if (matchingAddresses?.length) {
-            const { data: orders } = await supabase.from('orders').select(`id, status, total_amount, created_at`).in('shipping_address_id', matchingAddresses.map(a => a.id)).order('created_at', { ascending: false }).limit(3);
-            if (orders?.length) userContext += `\n## RECENT ORDERS\n` + orders.map(o => `- Order #${o.id}: ${o.status}, Amount: ${o.total_amount}`).join('\n');
-        }
-
-        const rawHistory = (conversationHistory || [])
-            .filter(msg => msg.message && !msg.message.includes(`[WAMID:${wamid}]`))
-            .reverse()
-            .map(msg => ({
-                role: (msg.role === 'admin' || msg.role === 'model_handover' || (msg.role === 'model' && msg.message?.includes('(ADMIN)'))) ? 'model' : msg.role as 'user' | 'model',
-                parts: [{ text: msg.message }]
-            }));
-
-        const firstUserIdx = rawHistory.findIndex(m => m.role === 'user');
-        const history = firstUserIdx !== -1 ? rawHistory.slice(firstUserIdx) : [];
-
-        const response = await AuraService.generateResponse(messageText, history, userContext);
-        if (response.text) {
-            let finalOutputText = response.text;
-            let extractedImageUrl = null;
-
-            // Extract [IMAGE: url] tag
-            const imageRegex = /\[IMAGE:\s*(https?:\/\/[^\s\]]+)\s*\]/i;
-            const match = finalOutputText.match(imageRegex);
-
-            if (match && match[1]) {
-                extractedImageUrl = match[1];
-                // Remove the tag from the text so it doesn't show to the customer
-                finalOutputText = finalOutputText.replace(imageRegex, '').trim();
-            }
-
-            let sendResult;
-            if (extractedImageUrl) {
-                // Send as an image with the remaining text as the caption
-                sendResult = await WhatsAppService.sendMediaMessage(cleanPhone, extractedImageUrl, finalOutputText);
-            } else {
-                // Standard text message
-                sendResult = await WhatsAppService.sendMessage(cleanPhone, finalOutputText);
-            }
-
-            const sentWamid = (sendResult as any)?.data?.message_uuid || (sendResult as any)?.message_uuid || (sendResult as any)?.wamid || (sendResult as any)?.uuid;
-            await supabase.from('whatsapp_conversations').insert({
-                phone_number: cleanPhone,
-                role: response.handover ? 'model_handover' : 'model',
-                message: `[WAMID:${sentWamid || 'N/A'}] ${response.text}`, // We log the original response.text so the AI remembers it sent an image
-                created_at: new Date().toISOString()
-            });
-        }
+        // AI logic removed per request to completely disable Aura from WhatsApp
+        /* 
+           The previous logic for fetching user context, checking orders, 
+           and calling AuraService for a response has been removed.
+        */
 
         return NextResponse.json({ status: "success" });
 
