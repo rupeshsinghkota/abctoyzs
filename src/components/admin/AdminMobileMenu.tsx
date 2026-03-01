@@ -5,13 +5,27 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     Menu, X, LayoutDashboard, Package, ShoppingCart,
-    Users, Globe, Mail, Ticket, Settings, Home, LogOut
+    Users, Globe, Mail, Ticket, Settings, Home, LogOut,
+    Video, MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function AdminMobileMenu({ navItems }: { navItems: any[] }) {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
+
+    const ICON_MAP = {
+        LayoutDashboard,
+        MessageSquare,
+        Package,
+        Ticket,
+        ShoppingCart,
+        Video,
+        Users,
+        Mail,
+        Globe,
+        Settings
+    };
 
     return (
         <>
@@ -51,7 +65,7 @@ export function AdminMobileMenu({ navItems }: { navItems: any[] }) {
 
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {navItems.map((item) => {
-                        const Icon = item.icon;
+                        const Icon = ICON_MAP[item.icon as keyof typeof ICON_MAP] || LayoutDashboard;
                         const isActive = pathname === item.href;
                         return (
                             <Link

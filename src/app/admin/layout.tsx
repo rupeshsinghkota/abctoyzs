@@ -42,17 +42,30 @@ export default async function AdminLayout({
     }
 
     const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
-        { icon: MessageSquare, label: 'Inquiries', href: '/admin/inquiries' },
-        { icon: Package, label: 'Products', href: '/admin/products' },
-        { icon: Ticket, label: 'Coupons', href: '/admin/coupons' },
-        { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
-        { icon: Video, label: 'Video Bookings', href: '/admin/bookings' },
-        { icon: Users, label: 'Customers', href: '/admin/customers' },
-        { icon: Mail, label: 'Subscribers', href: '/admin/subscribers' },
-        { icon: Globe, label: 'SEO', href: '/admin/seo' },
-        { icon: Settings, label: 'Settings', href: '/admin/settings' },
+        { icon: 'LayoutDashboard' as const, label: 'Dashboard', href: '/admin' },
+        { icon: 'MessageSquare' as const, label: 'Inquiries', href: '/admin/inquiries' },
+        { icon: 'Package' as const, label: 'Products', href: '/admin/products' },
+        { icon: 'Ticket' as const, label: 'Coupons', href: '/admin/coupons' },
+        { icon: 'ShoppingCart' as const, label: 'Orders', href: '/admin/orders' },
+        { icon: 'Video' as const, label: 'Video Bookings', href: '/admin/bookings' },
+        { icon: 'Users' as const, label: 'Customers', href: '/admin/customers' },
+        { icon: 'Mail' as const, label: 'Subscribers', href: '/admin/subscribers' },
+        { icon: 'Globe' as const, label: 'SEO', href: '/admin/seo' },
+        { icon: 'Settings' as const, label: 'Settings', href: '/admin/settings' },
     ];
+
+    const ICON_MAP = {
+        LayoutDashboard,
+        MessageSquare,
+        Package,
+        Ticket,
+        ShoppingCart,
+        Video,
+        Users,
+        Mail,
+        Globe,
+        Settings
+    };
 
     return (
         <div className="min-h-screen flex bg-zinc-50/50">
@@ -67,7 +80,7 @@ export default async function AdminLayout({
 
                 <nav className="flex-1 p-6 space-y-1.5 overflow-y-auto">
                     {navItems.map((item) => {
-                        const Icon = item.icon;
+                        const Icon = ICON_MAP[item.icon as keyof typeof ICON_MAP] || LayoutDashboard;
                         return (
                             <Link
                                 key={item.href}
