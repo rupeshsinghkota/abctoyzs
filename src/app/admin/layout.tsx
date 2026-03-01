@@ -12,6 +12,7 @@ import {
     Mail,
     Ticket,
     Video,
+    MessageSquare,
     Settings
 } from 'lucide-react';
 import { AdminBottomNav } from '@/components/admin/AdminBottomNav';
@@ -42,7 +43,7 @@ export default async function AdminLayout({
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
-        { icon: LayoutDashboard, label: 'Inquiries', href: '/admin/inquiries' },
+        { icon: MessageSquare, label: 'Inquiries', href: '/admin/inquiries' },
         { icon: Package, label: 'Products', href: '/admin/products' },
         { icon: Ticket, label: 'Coupons', href: '/admin/coupons' },
         { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
