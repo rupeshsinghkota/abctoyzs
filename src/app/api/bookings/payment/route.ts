@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         const { data: address, error: addrError } = await supabaseAdmin
             .from('addresses')
             .insert({
-                user_id: user?.id || null,
+                user_id: null, // Don't link video call address to user profile to prevent clutter
                 name: customerName || 'Lead',
                 phone: customerPhone || '',
                 email: customerEmail || '',
