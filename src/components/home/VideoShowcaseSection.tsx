@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { Video, Calendar, Smartphone, Star, Play, CheckCircle2 } from "lucide-react";
 
 export function VideoShowcaseSection() {
@@ -60,10 +61,12 @@ export function VideoShowcaseSection() {
                     <div className="flex-1 relative w-full max-w-lg lg:max-w-none">
                         <div className="relative aspect-square md:aspect-[4/5] bg-zinc-900 rounded-[40px] border border-white/10 overflow-hidden shadow-2xl group">
                             {/* Mock video background */}
-                            <img
+                            <Image
                                 src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?q=80&w=2070&auto=format&fit=crop"
                                 alt="Toy Car Showcase"
-                                className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
+                                fill
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                                className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
                             />
 
                             {/* Overlay UI elements */}

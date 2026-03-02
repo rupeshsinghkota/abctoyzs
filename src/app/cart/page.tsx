@@ -5,7 +5,7 @@ import { useStore } from '@/store/useStore';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+import Image from 'next/image';
 import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 export default function CartPage() {
@@ -71,10 +71,12 @@ export default function CartPage() {
                     {cart.map((item) => (
                         <div key={item.id} className="flex gap-4 p-5 bg-white border border-gray-100 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden group">
                             <div className="relative w-24 h-24 bg-gray-50 rounded-[18px] overflow-hidden shrink-0 border border-gray-100">
-                                <img
-                                    src={item.image}
+                                <Image
+                                    src={item.image || '/categories/cat_supercar_1769364520277.webp'}
                                     alt={item.name}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    sizes="96px"
+                                    className="object-contain"
                                 />
                             </div>
                             <div className="flex-1 flex flex-col justify-between min-w-0">
@@ -181,8 +183,8 @@ export default function CartPage() {
                                     <span className="bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[9px] font-black text-gray-700">💵 COD</span>
                                     <span className="bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[9px] font-black text-gray-700">UPI</span>
                                     <span className="bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[9px] font-black text-[#2B85FF]">Razorpay</span>
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-2.5" />
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4" />
+                                    <span className="bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[9px] font-black text-[#1A1F71]">VISA</span>
+                                    <span className="bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[9px] font-black text-[#EB001B]">MC</span>
                                 </div>
                             </div>
 

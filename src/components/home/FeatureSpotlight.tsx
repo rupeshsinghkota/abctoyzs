@@ -1,6 +1,7 @@
 'use client';
 import { Product } from '@/lib/data';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Star } from 'lucide-react';
 
 export function FeatureSpotlight({ product, reversed = false }: { product: Product | null, reversed?: boolean }) {
@@ -25,10 +26,12 @@ export function FeatureSpotlight({ product, reversed = false }: { product: Produ
                     {/* Image Side */}
                     <div className="flex-1 w-full relative z-10 group">
                         <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-900/50">
-                            <img
+                            <Image
                                 src={product.image}
                                 alt={product.name}
-                                className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-700"
+                                fill
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                                className="object-cover transform group-hover:scale-105 transition-transform duration-700"
                             />
                         </div>
                     </div>

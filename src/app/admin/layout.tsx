@@ -73,7 +73,7 @@ export default async function AdminLayout({
             <aside className="hidden md:flex w-72 border-r bg-white flex-col sticky top-0 h-screen">
                 <div className="p-8 border-b">
                     <Link href="/" className="flex items-center gap-2">
-                        <img src="/logo_wide.png" alt="ABC Toyz" className="h-8" />
+                        <img src="/logo_wide.webp" alt="ABC Toyz" className="h-8" />
                     </Link>
                     <div className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] px-2 py-1 rounded w-fit mt-3">Admin Panel</div>
                 </div>
@@ -119,7 +119,7 @@ export default async function AdminLayout({
                 {/* Mobile Top Bar */}
                 <div className="md:hidden flex items-center justify-between px-6 py-4 border-b bg-white/80 backdrop-blur-xl sticky top-0 z-40">
                     <Link href="/admin">
-                        <img src="/logo_wide.png" alt="ABC Toyz" className="h-6" />
+                        <img src="/logo_wide.webp" alt="ABC Toyz" className="h-6" />
                     </Link>
                     <AdminMobileMenu navItems={navItems} />
                 </div>

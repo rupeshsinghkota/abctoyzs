@@ -6,6 +6,7 @@ import { useStore } from '@/store/useStore';
 import { useRouter } from 'next/navigation';
 import { Product, ProductVariant } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface StickyCartBarProps {
     product: Product;
@@ -100,11 +101,13 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
                 <div className="flex items-center justify-between p-3 gap-3">
                     {/* Left: Product Mini Info */}
                     <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
-                            <img
-                                src={currentVariant?.image || product.images?.[0] || product.image}
+                        <div className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden shrink-0 relative">
+                            <Image
+                                src={currentVariant?.image || product.images?.[0] || product.image || '/categories/cat_supercar_1769364520277.webp'}
                                 alt={product.name}
-                                className="w-full h-full object-contain"
+                                fill
+                                sizes="40px"
+                                className="object-contain"
                             />
                         </div>
                         <div className="flex flex-col min-w-0">
@@ -147,11 +150,15 @@ export function StickyCartBar({ product, selectedAttributes = {}, currentVariant
                 isVisible ? "translate-y-0 opacity-100 scale-100" : "translate-y-20 opacity-0 scale-95"
             )}>
                 <div className="flex items-center gap-4 border-r border-white/10 pr-6">
-                    <img
-                        src={currentVariant?.image || product.images?.[0] || product.image}
-                        alt={product.name}
-                        className="w-8 h-8 rounded-md bg-white p-1"
-                    />
+                    <div className="relative w-8 h-8 rounded-md bg-white p-1 overflow-hidden">
+                        <Image
+                            src={currentVariant?.image || product.images?.[0] || product.image || '/categories/cat_supercar_1769364520277.webp'}
+                            alt={product.name}
+                            fill
+                            sizes="32px"
+                            className="object-contain"
+                        />
+                    </div>
                     <div className="flex flex-col">
                         <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest leading-none mb-1">You are viewing</span>
                         <span className="text-sm font-black text-white leading-none truncate max-w-[200px]">{product.name}</span>

@@ -52,7 +52,7 @@ export function AdminMobileMenu({ navItems }: { navItems: any[] }) {
             )}>
                 <div className="p-6 border-b flex justify-between items-center bg-zinc-50/50">
                     <div>
-                        <img src="/logo_wide.png" alt="ABC Toyz" className="h-6" />
+                        <img src="/logo_wide.webp" alt="ABC Toyz" className="h-6" />
                         <p className="text-[10px] font-black uppercase tracking-widest text-primary mt-1">Admin Panel</p>
                     </div>
                     <button
