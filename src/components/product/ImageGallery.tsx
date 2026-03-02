@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Maximize2, Play, CirclePlay } from 'lucide-react';
+import Image from 'next/image';
 
 interface ImageGalleryProps {
     images: string[];
@@ -41,6 +42,9 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
     const scrollTo = useCallback((index: number) => emblaApi?.scrollTo(index), [emblaApi]);
 
+    // Determine if a URL is external (Supabase storage) or local
+    const isExternal = (url: string) => url.startsWith('http://') || url.startsWith('https://');
+
     return (
         <div className="w-full">
             {/* Mobile Carousel (< 768px) - Optimized 1:1 Aspect Ratio */}
@@ -58,17 +62,19 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                                         src={item.url}
                                         controls
                                         className="w-full h-full object-contain bg-black"
-                                        poster={images[0]} // Use first image as poster fallback
+                                        poster={images[0]}
                                     />
                                 ) : (
                                     <div className="relative w-full h-full">
-                                        <img
+                                        <Image
                                             src={item.url}
                                             alt={`${productName} - View ${index + 1}`}
-                                            className="w-full h-full object-contain drop-shadow-sm p-0"
-                                            loading={index === 0 ? 'eager' : 'lazy'}
-                                            fetchPriority={index === 0 ? 'high' : 'auto'}
+                                            fill
+                                            sizes="100vw"
+                                            priority={index === 0}
+                                            className="object-contain drop-shadow-sm p-0"
                                             draggable={false}
+                                            unoptimized={!isExternal(item.url)}
                                         />
                                         {/* Maximize Hint */}
                                         <div className="absolute top-4 right-4 bg-white/50 backdrop-blur-sm p-2 rounded-full active:scale-95 transition-all">
@@ -139,11 +145,14 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                         <ChevronLeft className="w-6 h-6 rotate-45" />
                     </button>
 
-                    <div className="w-full h-full flex items-center justify-center px-4" onClick={() => setIsFullScreen(false)}>
-                        <img
+                    <div className="w-full h-full flex items-center justify-center px-4 relative" onClick={() => setIsFullScreen(false)}>
+                        <Image
                             src={mediaItems[selectedIndex].url}
                             alt="Full screen view"
-                            className="max-w-full max-h-[80vh] object-contain shadow-2xl"
+                            fill
+                            sizes="100vw"
+                            className="object-contain"
+                            unoptimized={!isExternal(mediaItems[selectedIndex].url)}
                         />
                     </div>
 
@@ -190,11 +199,13 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                                     <CirclePlay className="w-8 h-8 text-primary relative z-10 fill-white/80" />
                                 </div>
                             ) : (
-                                <img
+                                <Image
                                     src={item.url}
                                     alt={`Thumbnail ${idx + 1}`}
-                                    loading="lazy"
-                                    className="w-full h-full object-contain bg-white transition-transform duration-500 group-hover:scale-110"
+                                    fill
+                                    sizes="80px"
+                                    className="object-contain bg-white transition-transform duration-500 group-hover:scale-110"
+                                    unoptimized={!isExternal(item.url)}
                                 />
                             )}
                         </button>
@@ -215,20 +226,24 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                     ) : (
                         <>
                             <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                                {/* Subtle Background Blur for Depth - Enhanced for full-frame feel */}
+                                {/* Subtle Background Blur for Depth */}
                                 <div
                                     className="absolute inset-0 opacity-20 blur-[80px] scale-125 transition-all duration-1000"
                                     style={{ backgroundImage: `url(${mediaItems[desktopIndex].url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                                 />
 
-                                <img
-                                    src={mediaItems[desktopIndex].url}
-                                    alt={`${productName} - Main View`}
-                                    loading="eager"
-                                    fetchPriority="high"
-                                    className="w-full h-auto max-h-[750px] object-contain p-6 md:p-8 transition-all duration-700 ease-out group-hover:scale-[1.02] relative z-10 drop-shadow-[0_12px_50px_rgba(0,0,0,0.15)]"
-                                />
-
+                                {/* Main Image — priority so it loads instantly (LCP element) */}
+                                <div className="relative w-full max-h-[750px] aspect-square flex items-center justify-center p-6 md:p-8 z-10">
+                                    <Image
+                                        src={mediaItems[desktopIndex].url}
+                                        alt={`${productName} - Main View`}
+                                        fill
+                                        sizes="(max-width: 1280px) 60vw, 800px"
+                                        priority={desktopIndex === 0}
+                                        className="object-contain transition-all duration-700 ease-out group-hover:scale-[1.02] drop-shadow-[0_12px_50px_rgba(0,0,0,0.15)]"
+                                        unoptimized={!isExternal(mediaItems[desktopIndex].url)}
+                                    />
+                                </div>
 
                                 {/* Fullscreen / Zoom Hint */}
                                 <div className="absolute bottom-8 left-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
@@ -255,4 +270,3 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
         </div>
     );
 }
-

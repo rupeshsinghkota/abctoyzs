@@ -52,9 +52,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-// Force dynamic rendering to ensure fresh data on every request (fixes localhost 404s due to caching)
-export const dynamic = 'force-dynamic';
-// export const revalidate = 300; // REMOVED to prevent stale data persistence
+// Cache the page for 60 seconds on Vercel's edge — eliminates the Supabase
+// round-trip for every visitor. Cache is purged on the next deploy automatically.
+export const revalidate = 60;
 
 const LEGACY_SLUGS = [
     'maverick-utv-buggy',
@@ -101,35 +101,32 @@ export default async function ProductPage({ params }: PageProps) {
 
 
 
-    // Get related products (same category, excluding current)
-    // Get related products with Smart Fallback
-    // Ideally we should have a specific API for this to avoid fetching ALL products, 
-    // but since we are caching the page, this impact is minimized.
-    const allProducts = await fetchProducts();
+    // Reuse the same fetch — no second DB query needed
+    const allProducts = products.length > 0
+        ? await fetchProducts()  // fetch all once for related products
+        : [];
 
     // 1. Primary Strategy: Same Category
     let relatedProducts = allProducts
-        .filter(p => p.id !== product.id && p.category === product.category);
+        .filter(p => p.id !== product!.id && p.category === product!.category);
 
-    // 2. Fallback Strategy: Fill with Best Sellers / Popular if we have fewer than 4 items
+    // 2. Fallback: fill with Best Sellers if fewer than 4
     if (relatedProducts.length < 4) {
         const needed = 4 - relatedProducts.length;
         const fallbackItems = allProducts
             .filter(p =>
-                p.id !== product.id && // Not current product
-                p.category !== product.category && // Not already in list (different cat)
-                (p.tag === 'Best Seller' || p.rating >= 4.5) // Prioritize popular
+                p.id !== product!.id &&
+                p.category !== product!.category &&
+                (p.tag === 'Best Seller' || p.rating >= 4.5)
             )
-            .slice(0, needed + 2); // Fetch a few extras just in case
-
+            .slice(0, needed + 2);
         relatedProducts = [...relatedProducts, ...fallbackItems];
 
-        // 3. Final Fallback: If still under 4, just grab any other products
         if (relatedProducts.length < 4) {
             const stillNeeded = 4 - relatedProducts.length;
             const remaining = allProducts
                 .filter(p =>
-                    p.id !== product.id &&
+                    p.id !== product!.id &&
                     !relatedProducts.find(rp => rp.id === p.id)
                 )
                 .slice(0, stillNeeded);
@@ -137,7 +134,6 @@ export default async function ProductPage({ params }: PageProps) {
         }
     }
 
-    // Limit to 6 items max for display
     relatedProducts = relatedProducts.slice(0, 6);
 
 
