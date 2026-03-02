@@ -80,14 +80,14 @@ export interface ProductVariant {
 
 // Structured Category Constants
 export const VEHICLE_CATEGORIES = [
-    { label: 'Cars', value: 'cars', image: '/categories/cat_supercar_1769364520277.png' },
-    { label: 'Jeeps & Trucks', value: 'jeeps', image: '/categories/cat_suv_1769364537319.png' },
-    { label: 'Bikes', value: 'bikes', image: '/categories/cat_motorcycle_1769364560643.png' },
-    { label: 'ATVs', value: 'atvs', image: '/categories/cat_atv_1769364577413.png' },
-    { label: 'UTVs & Buggies', value: 'utvs', image: '/categories/cat_utv_1769364600471.png' },
-    { label: 'Go-Karts', value: 'gokarts', image: '/categories/cat_gokart_1769364617852.png' },
-    { label: 'Dirt Bikes', value: 'dirtbikes', image: '/categories/cat_dirtbike.png' },
-    { label: 'Scooters', value: 'scooters', image: '/categories/cat_scooter_1769364639228.png' },
+    { label: 'Cars', value: 'cars', image: '/categories/cat_supercar_1769364520277.webp' },
+    { label: 'Jeeps & Trucks', value: 'jeeps', image: '/categories/cat_suv_1769364537319.webp' },
+    { label: 'Bikes', value: 'bikes', image: '/categories/cat_motorcycle_1769364560643.webp' },
+    { label: 'ATVs', value: 'atvs', image: '/categories/cat_atv_1769364577413.webp' },
+    { label: 'UTVs & Buggies', value: 'utvs', image: '/categories/cat_utv_1769364600471.webp' },
+    { label: 'Go-Karts', value: 'gokarts', image: '/categories/cat_gokart_1769364617852.webp' },
+    { label: 'Dirt Bikes', value: 'dirtbikes', image: '/categories/cat_dirtbike.webp' },
+    { label: 'Scooters', value: 'scooters', image: '/categories/cat_scooter_1769364639228.webp' },
 ];
 
 export const POWER_CATEGORIES = [
@@ -122,18 +122,18 @@ export async function fetchProducts(slug?: string): Promise<Product[]> {
             }
         }
 
-        const { data, error } = await query;
+        // Run products + settings queries in PARALLEL — saves one full round-trip
+        const [{ data, error }, { data: settingsData }] = await Promise.all([
+            query,
+            supabase.from('settings').select('global_daily_discount').single(),
+        ]);
 
         if (error) {
             console.error("[fetchProducts] Supabase error:", error);
             return [];
         }
 
-        let discount = 0;
-        const { data: settingsData } = await supabase.from('settings').select('global_daily_discount').single();
-        if (settingsData && settingsData.global_daily_discount) {
-            discount = settingsData.global_daily_discount;
-        }
+        const discount = settingsData?.global_daily_discount ?? 0;
 
         if (!data || data.length === 0) {
             if (slug) {
@@ -160,23 +160,18 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
     try {
         const supabase = createClient();
 
-        // Fetch global discount
-        let discount = 0;
-        const { data: settingsData } = await supabase.from('settings').select('global_daily_discount').single();
-        if (settingsData && settingsData.global_daily_discount) {
-            discount = settingsData.global_daily_discount;
-        }
-
-        const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .in('id', ids);
+        // Run both queries in PARALLEL
+        const [{ data, error }, { data: settingsData }] = await Promise.all([
+            supabase.from('products').select('*').in('id', ids),
+            supabase.from('settings').select('global_daily_discount').single(),
+        ]);
 
         if (error || !data) {
             console.error("fetchProductsByIds failed:", error);
             return [];
         }
 
+        const discount = settingsData?.global_daily_discount ?? 0;
         return processProducts(data, discount);
     } catch (e) {
         console.error("getProductsByIds error:", e);

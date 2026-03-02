@@ -4,32 +4,31 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Car, Bike, Truck, Zap } from 'lucide-react'; // Fallback icons
 
 // We'll simulate "Stories" with categories
 // Quick Category Nav (Story Style)
 const categories = [
-    { id: 'new', name: 'New In', image: '/hero/hero_car_1769365166894.png', color: 'from-pink-500 via-red-500 to-yellow-500', link: '/category/new' },
+    { id: 'new', name: 'New In', image: '/hero/hero_car_1769365166894.webp', color: 'from-pink-500 via-red-500 to-yellow-500', link: '/category/new' },
 
     // Age Categories
-    { id: 'toddlers', name: 'Toddlers', image: '/categories/age_toddler.png', color: 'from-pink-400 to-rose-500', link: '/category/age/1-3' },
-    { id: 'kids', name: 'Kids', image: '/categories/age_kid.png', color: 'from-blue-400 to-cyan-500', link: '/category/age/3-6' },
-    { id: 'teens', name: 'Teens', image: '/categories/age_teen.png', color: 'from-amber-400 to-orange-500', link: '/category/age/6-10' },
+    { id: 'toddlers', name: 'Toddlers', image: '/categories/age_toddler.webp', color: 'from-pink-400 to-rose-500', link: '/category/age/1-3' },
+    { id: 'kids', name: 'Kids', image: '/categories/age_kid.webp', color: 'from-blue-400 to-cyan-500', link: '/category/age/3-6' },
+    { id: 'teens', name: 'Teens', image: '/categories/age_teen.webp', color: 'from-amber-400 to-orange-500', link: '/category/age/6-10' },
 
     // Power Categories
-    { id: '12v', name: '12V Power', image: '/categories/power_12v.png', color: 'from-yellow-400 to-orange-500', link: '/category/power/12v' },
-    { id: '24v', name: '24V Power', image: '/categories/power_24v.png', color: 'from-green-400 to-emerald-500', link: '/category/power/24v' },
-    { id: '36v', name: '36V Power', image: '/categories/power_36v.png', color: 'from-indigo-400 to-purple-600', link: '/category/power/36v' },
+    { id: '12v', name: '12V Power', image: '/categories/power_12v.webp', color: 'from-yellow-400 to-orange-500', link: '/category/power/12v' },
+    { id: '24v', name: '24V Power', image: '/categories/power_24v.webp', color: 'from-green-400 to-emerald-500', link: '/category/power/24v' },
+    { id: '36v', name: '36V Power', image: '/categories/power_36v.webp', color: 'from-indigo-400 to-purple-600', link: '/category/power/36v' },
 
     // Vehicle Types
-    { id: 'supercars', name: 'Supercars', image: '/categories/cat_supercar_1769364520277.png', color: 'from-red-500 to-rose-600', link: '/category/cars' },
-    { id: 'suvs', name: 'SUVs', image: '/categories/cat_suv_1769364537319.png', color: 'from-blue-500 to-indigo-600', link: '/category/jeeps' },
-    { id: 'bikes', name: 'Bikes', image: '/categories/cat_motorcycle_1769364560643.png', color: 'from-slate-500 to-gray-600', link: '/category/bikes' },
-    { id: 'dirtbikes', name: 'Dirt Bikes', image: '/categories/cat_dirtbike.png', color: 'from-orange-500 to-red-600', link: '/category/dirtbikes' },
-    { id: 'atvs', name: 'ATVs', image: '/categories/cat_atv_1769364577413.png', color: 'from-green-500 to-emerald-600', link: '/category/atvs' },
-    { id: 'utvs', name: 'UTVs', image: '/categories/cat_utv_1769364600471.png', color: 'from-orange-500 to-red-600', link: '/category/utvs' },
-    { id: 'gokarts', name: 'Go-Karts', image: '/categories/cat_gokart_1769364617852.png', color: 'from-yellow-500 to-amber-600', link: '/category/gokarts' },
-    { id: 'scooters', name: 'Scooters', image: '/categories/cat_scooter_1769364639228.png', color: 'from-cyan-500 to-blue-600', link: '/category/scooters' },
+    { id: 'supercars', name: 'Supercars', image: '/categories/cat_supercar_1769364520277.webp', color: 'from-red-500 to-rose-600', link: '/category/cars' },
+    { id: 'suvs', name: 'SUVs', image: '/categories/cat_suv_1769364537319.webp', color: 'from-blue-500 to-indigo-600', link: '/category/jeeps' },
+    { id: 'bikes', name: 'Bikes', image: '/categories/cat_motorcycle_1769364560643.webp', color: 'from-slate-500 to-gray-600', link: '/category/bikes' },
+    { id: 'dirtbikes', name: 'Dirt Bikes', image: '/categories/cat_dirtbike.webp', color: 'from-orange-500 to-red-600', link: '/category/dirtbikes' },
+    { id: 'atvs', name: 'ATVs', image: '/categories/cat_atv_1769364577413.webp', color: 'from-green-500 to-emerald-600', link: '/category/atvs' },
+    { id: 'utvs', name: 'UTVs', image: '/categories/cat_utv_1769364600471.webp', color: 'from-orange-500 to-red-600', link: '/category/utvs' },
+    { id: 'gokarts', name: 'Go-Karts', image: '/categories/cat_gokart_1769364617852.webp', color: 'from-yellow-500 to-amber-600', link: '/category/gokarts' },
+    { id: 'scooters', name: 'Scooters', image: '/categories/cat_scooter_1769364639228.webp', color: 'from-cyan-500 to-blue-600', link: '/category/scooters' },
 
 ];
 
@@ -44,10 +43,12 @@ export function Stories() {
                             cat.color
                         )}>
                             <div className="w-full h-full rounded-full bg-background border-[3px] border-background overflow-hidden relative">
-                                <img
+                                <Image
                                     src={cat.image}
                                     alt={cat.name}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    sizes="72px"
+                                    className="object-cover"
                                 />
                             </div>
                         </div>

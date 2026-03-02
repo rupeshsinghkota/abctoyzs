@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Star, ShoppingCart, Zap, Gauge, Baby, Weight, Flame, ArrowRightLeft } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { Product } from '@/lib/data';
@@ -92,12 +93,13 @@ export function ProductCard({ product, className, priority = false }: ProductCar
                 className="relative block aspect-square overflow-hidden bg-zinc-100"
                 onClick={handleSelect}
             >
-                <img
-                    src={product.image}
+                <Image
+                    src={product.image || '/categories/cat_supercar_1769364520277.webp'}
                     alt={product.name}
-                    loading={priority ? 'eager' : 'lazy'}
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    priority={priority}
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
                 <div className="absolute top-2 right-2 z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" onClick={e => e.preventDefault()}>

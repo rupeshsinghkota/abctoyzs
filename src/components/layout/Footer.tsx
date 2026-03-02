@@ -71,7 +71,7 @@ export function Footer() {
                     <div className="space-y-6">
                         <Link href="/" className="inline-block">
                             <img
-                                src="/logo_wide.png"
+                                src="/logo_wide.webp"
                                 alt="ABC Toyz"
                                 className="h-8 md:h-10 w-auto object-contain brightness-0 invert opacity-100"
                             />

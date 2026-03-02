@@ -22,7 +22,7 @@ export function DesktopHeader() {
                     {/* Left: Logo */}
                     <Link href="/" className="flex items-center transition-all duration-300 hover:scale-105 active:scale-95 shrink-0">
                         <img
-                            src="/logo_wide.png"
+                            src="/logo_wide.webp"
                             alt="ABC Toyz"
                             className="h-9 w-auto object-contain"
                         />

@@ -3,10 +3,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const ageGroups = [
-    { label: "1-3 Years", range: "Toddlers", href: "/category/age/1-3", image: "/images/shop-by/age-toddler.png" },
-    { label: "3-6 Years", range: "Preschoolers", href: "/category/age/3-6", image: "/images/shop-by/age-preschool.png" },
-    { label: "6-10 Years", range: "Kids", href: "/category/age/6-10", image: "/images/shop-by/age-kids.png" },
-    { label: "10+ Years", range: "Teens", href: "/category/age/10-plus", image: "/images/shop-by/age-bigkids.png" }
+    { label: "1-3 Years", range: "Toddlers", href: "/category/age/1-3", image: "/images/shop-by/age-toddler.webp" },
+    { label: "3-6 Years", range: "Preschoolers", href: "/category/age/3-6", image: "/images/shop-by/age-preschool.webp" },
+    { label: "6-10 Years", range: "Kids", href: "/category/age/6-10", image: "/images/shop-by/age-kids.webp" },
+    { label: "10+ Years", range: "Teens", href: "/category/age/10-plus", image: "/images/shop-by/age-bigkids.webp" }
 ];
 
 export function ShopByAge() {

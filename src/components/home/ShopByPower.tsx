@@ -4,9 +4,9 @@ import Image from 'next/image';
 import { Zap, Gauge, Mountain } from 'lucide-react';
 
 const powerTypes = [
-    { label: "12V Standard", desc: "Safe speeds for beginners", icon: Zap, href: "/category/power/12v", color: "bg-blue-50 text-blue-600 hover:bg-blue-100", image: "/images/shop-by/power-12v.png" },
-    { label: "24V Performance", desc: "Faster drift & speed", icon: Gauge, href: "/category/power/24v", color: "bg-orange-50 text-orange-600 hover:bg-orange-100", image: "/images/shop-by/power-24v.png" },
-    { label: "36V/48V Pro", desc: "All-terrain domination", icon: Mountain, href: "/category/power/36v", color: "bg-green-50 text-green-600 hover:bg-green-100", image: "/images/shop-by/power-4x4.png" }
+    { label: "12V Standard", desc: "Safe speeds for beginners", icon: Zap, href: "/category/power/12v", color: "bg-blue-50 text-blue-600 hover:bg-blue-100", image: "/images/shop-by/power-12v.webp" },
+    { label: "24V Performance", desc: "Faster drift & speed", icon: Gauge, href: "/category/power/24v", color: "bg-orange-50 text-orange-600 hover:bg-orange-100", image: "/images/shop-by/power-24v.webp" },
+    { label: "36V/48V Pro", desc: "All-terrain domination", icon: Mountain, href: "/category/power/36v", color: "bg-green-50 text-green-600 hover:bg-green-100", image: "/images/shop-by/power-4x4.webp" }
 ];
 
 export function ShopByPower() {

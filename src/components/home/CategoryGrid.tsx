@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VEHICLE_CATEGORIES } from '@/lib/data';
@@ -27,11 +28,12 @@ export function CategoryGrid() {
                         className="group relative rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 shadow-lg md:shadow-xl hover:shadow-2xl transition-all duration-300"
                     >
                         {/* Image */}
-                        <img
+                        <Image
                             src={cat.image}
                             alt={cat.label}
-                            loading="lazy"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
+                            fill
+                            sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 25vw"
+                            className="object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
                         />
 
                         {/* Gradient Overlay */}

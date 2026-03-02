@@ -14,7 +14,7 @@ const slides = [
         id: 1,
         title: "Premium Electric Cars",
         subtitle: "Officially Licensed BMW, Audi & More",
-        image: "/hero/hero_car_1769365166894.png",
+        image: "/hero/hero_car_1769365166894.webp",
         cta: "Shop Now",
         link: "/category/cars",
         color: "bg-blue-600"
@@ -23,7 +23,7 @@ const slides = [
         id: 2,
         title: "Off-Road Jeeps",
         subtitle: "For the Little Adventurers",
-        image: "/hero/hero_jeep_1769365183790.png",
+        image: "/hero/hero_jeep_1769365183790.webp",
         cta: "Explore",
         link: "/category/jeeps",
         color: "bg-orange-600"
@@ -32,7 +32,7 @@ const slides = [
         id: 3,
         title: "Super Bikes",
         subtitle: "Speed & Style Combined",
-        image: "/hero/hero_bike_1769365200981.png",
+        image: "/hero/hero_bike_1769365200981.webp",
         cta: "Ride On",
         link: "/category/bikes",
         color: "bg-red-600"

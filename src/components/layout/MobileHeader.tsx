@@ -54,7 +54,7 @@ export function MobileHeader() {
                     <div className="flex-none flex items-center justify-between p-5 border-b border-border/10">
                         <Link href="/" onClick={() => setIsMenuOpen(false)} className="active:scale-95 transition-transform">
                             <img
-                                src="/logo_wide.png"
+                                src="/logo_wide.webp"
                                 alt="ABC Toyz"
                                 className="h-6 w-auto object-contain"
                             />
@@ -221,7 +221,7 @@ export function MobileHeader() {
 
                         <Link href="/" className="flex items-center active:scale-95 transition-transform">
                             <img
-                                src="/logo_wide.png"
+                                src="/logo_wide.webp"
                                 alt="ABC Toyz"
                                 className="h-6 w-auto object-contain"
                             />
