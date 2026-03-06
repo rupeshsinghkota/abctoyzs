@@ -31,10 +31,13 @@ export async function POST(req: Request) {
             honest_critique: "Sounds very authentic. May mention a minor point (like 'assembly took 30 mins' or 'wish it had more colors') but remains overwhelmingly positive (4-5 stars). Uses natural phrasing and occasional '...'."
         };
 
+        const today = new Date().toISOString().split('T')[0];
+
         const prompt = `
             You are an E-commerce Content Strategist specializing in building authentic social proof for "${BRAND_CONFIG.name}".
             Your task is to generate ${count} high-quality, realistic customer reviews that will WOW other parents.
 
+            TODAY'S DATE: ${today}
             PRODUCT DETAILS:
             Name: ${productName}
             Description: ${productDescription}
@@ -52,7 +55,7 @@ export async function POST(req: Request) {
                - Occasionally include a very minor, realistic typo (e.g., "beutiful" instead of "beautiful") or a Hinglish word (e.g., "Shukriya", "Beta loved it", "Ekdum premium").
             ${year
                 ? `4. **BACKDATING**: Dates must be ISO strings randomly spread across the ENTIRE year ${year} (from January to December).`
-                : `4. **BACKDATING**: Dates must be ISO strings randomly spread across the last ${daysBack} days.`
+                : `4. **BACKDATING**: Dates must be ISO strings randomly spread across the last ${daysBack} days RELATIVE TO TODAY (${today}).`
             }
             5. **RATINGS**: Must be between ${ratingRange[0]} and ${ratingRange[1]} stars.
 
