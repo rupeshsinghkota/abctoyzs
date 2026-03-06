@@ -50,6 +50,7 @@ export default async function AdminLayout({
         { icon: 'Video' as const, label: 'Video Bookings', href: '/admin/bookings' },
         { icon: 'Users' as const, label: 'Customers', href: '/admin/customers' },
         { icon: 'Mail' as const, label: 'Subscribers', href: '/admin/subscribers' },
+        { icon: 'MessageSquare' as const, label: 'Reviews', href: '/admin/reviews' },
         { icon: 'Globe' as const, label: 'SEO', href: '/admin/seo' },
         { icon: 'Settings' as const, label: 'Settings', href: '/admin/settings' },
     ];

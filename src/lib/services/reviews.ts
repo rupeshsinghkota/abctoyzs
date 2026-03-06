@@ -65,5 +65,51 @@ export const ReviewService = {
 
         if (error) throw error;
         return data as Review;
+    },
+
+    async getAllReviews() {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('product_reviews')
+            .select('*, product:products(name)')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('[ReviewService] getAllReviews error:', error);
+            return [];
+        }
+
+        return data;
+    },
+
+    async bulkInsertReviews(reviews: any[]) {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('product_reviews')
+            .insert(reviews)
+            .select();
+
+        if (error) throw error;
+        return data;
+    },
+
+    async deleteReview(id: string) {
+        const supabase = createClient();
+        const { error } = await supabase
+            .from('product_reviews')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+    },
+
+    async approveReview(id: string) {
+        const supabase = createClient();
+        const { error } = await supabase
+            .from('product_reviews')
+            .update({ is_approved: true })
+            .eq('id', id);
+
+        if (error) throw error;
     }
 };

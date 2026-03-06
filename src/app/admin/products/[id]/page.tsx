@@ -7,8 +7,8 @@ import Link from 'next/link';
 import {
     ArrowLeft, Save, Loader2, ImagePlus, X, Zap,
     Users, Gauge, Battery, Smartphone, Tag, Star,
-    Package, DollarSign, Hash, Layers, Split, Check,
-    Upload, Sparkles, Edit, ChevronLeft, ChevronRight
+    Package, DollarSign, Hash, Layers, Split,
+    Check, Upload, Sparkles, Edit, ChevronLeft, ChevronRight, MessageSquare
 } from 'lucide-react';
 import { VEHICLE_CATEGORIES, AGE_CATEGORIES, normalizeAgeGroup } from '@/lib/data';
 
@@ -42,6 +42,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [isUploading, setIsUploading] = useState(false);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const [activeTab, setActiveTab] = useState('media');
+    const [isGeneratingReviews, setIsGeneratingReviews] = useState(false);
+    const [reviewCount, setReviewCount] = useState(5);
+    const [reviewDaysBack, setReviewDaysBack] = useState(30);
+    const [reviewStyle, setReviewStyle] = useState('mixed');
+    const [productReviews, setProductReviews] = useState<any[]>([]);
     const [brandingIndex, setBrandingIndex] = useState<number | null>(null);
     const [isBrandingAll, setIsBrandingAll] = useState(false);
     const [isGeneratingPosters, setIsGeneratingPosters] = useState(false);
@@ -114,7 +119,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     // Load Data
     useEffect(() => {
         loadData();
+        loadReviews();
     }, [id]);
+
+    async function loadReviews() {
+        try {
+            const { ReviewService } = await import('@/lib/services/reviews');
+            const data = await ReviewService.getProductReviews(id);
+            setProductReviews(data);
+        } catch (error) {
+            console.error("Failed to load reviews", error);
+        }
+    }
 
     async function loadData() {
         try {
@@ -826,6 +842,39 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         setVariants(newVars);
     };
 
+    const generateAIReviews = async () => {
+        if (!confirm(`Generate ${reviewCount} AI reviews for this product?`)) return;
+
+        setIsGeneratingReviews(true);
+        try {
+            const resp = await fetch('/api/admin/reviews/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productId: id,
+                    productName: formData.name,
+                    productDescription: formData.description,
+                    count: reviewCount,
+                    daysBack: reviewDaysBack,
+                    style: reviewStyle
+                })
+            });
+
+            const data = await resp.json();
+            if (data.error) throw new Error(data.error);
+
+            const { ReviewService } = await import('@/lib/services/reviews');
+            await ReviewService.bulkInsertReviews(data.reviews);
+
+            alert(`Successfully generated ${data.reviews.length} reviews!`);
+            loadReviews(); // Refresh the list
+        } catch (error: any) {
+            alert(error.message || "Failed to generate reviews");
+        } finally {
+            setIsGeneratingReviews(false);
+        }
+    };
+
     const tabs = [
         { id: 'media', label: 'Media', icon: ImagePlus },
         { id: 'basic', label: 'Basic Info', icon: Package },
@@ -834,6 +883,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         { id: 'specs', label: 'Tech Specs', icon: Gauge },
         { id: 'logistics', label: 'Logistics', icon: Package },
         { id: 'pricing', label: 'Pricing', icon: DollarSign },
+        { id: 'reviews', label: 'Reviews', icon: MessageSquare },
     ];
 
     const validImages = formData.images.filter(img => img.trim());
@@ -1870,6 +1920,108 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                 </div>
                             </div>
                         )}
+
+                        {/* Reviews Tab */}
+                        {activeTab === 'reviews' && (
+                            <div className="bg-card border rounded-3xl p-6 space-y-8">
+                                <div className="p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl border border-blue-500/20">
+                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                        <div>
+                                            <h3 className="text-xl font-black flex items-center gap-2">
+                                                <Sparkles className="w-6 h-6 text-blue-500" />
+                                                AI Review Generator
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground mt-1">Generate realistic, backdated reviews to build social proof.</p>
+                                        </div>
+
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            <div className="flex flex-col">
+                                                <label className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Count</label>
+                                                <select
+                                                    value={reviewCount}
+                                                    onChange={(e) => setReviewCount(Number(e.target.value))}
+                                                    className="px-3 py-2 bg-background border rounded-lg font-bold"
+                                                >
+                                                    {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n} Reviews</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Timeframe</label>
+                                                <select
+                                                    value={reviewDaysBack}
+                                                    onChange={(e) => setReviewDaysBack(Number(e.target.value))}
+                                                    className="px-3 py-2 bg-background border rounded-lg font-bold"
+                                                >
+                                                    {[7, 30, 90, 180, 365].map(d => <option key={d} value={d}>Last {d} Days</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Style</label>
+                                                <select
+                                                    value={reviewStyle}
+                                                    onChange={(e) => setReviewStyle(e.target.value)}
+                                                    className="px-3 py-2 bg-background border rounded-lg font-bold"
+                                                >
+                                                    <option value="mixed">Mixed</option>
+                                                    <option value="excited_parent">Excited Parent</option>
+                                                    <option value="technical_buyer">Technical Buyer</option>
+                                                    <option value="gift_focus">Gift Focus</option>
+                                                    <option value="honest_critique">Honest & Natural</option>
+                                                </select>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={generateAIReviews}
+                                                disabled={isGeneratingReviews}
+                                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 mt-auto"
+                                            >
+                                                {isGeneratingReviews ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
+                                                Generate Reviews
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <h3 className="text-lg font-bold">Existing Reviews ({productReviews.length})</h3>
+                                    </div>
+
+                                    {productReviews.length === 0 ? (
+                                        <div className="text-center py-12 bg-muted/20 rounded-2xl border-2 border-dashed">
+                                            <p className="text-muted-foreground">No reviews yet for this product.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid gap-4">
+                                            {productReviews.map((review) => (
+                                                <div key={review.id} className="p-4 bg-background border rounded-2xl flex gap-4">
+                                                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary shrink-0 text-lg">
+                                                        {review.customer_name[0]}
+                                                    </div>
+                                                    <div className="flex-1 space-y-1">
+                                                        <div className="flex justify-between items-start">
+                                                            <div>
+                                                                <h4 className="font-bold">{review.customer_name}</h4>
+                                                                <div className="flex items-center gap-1 text-yellow-500">
+                                                                    {[...Array(5)].map((_, i) => (
+                                                                        <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-current' : 'text-muted'}`} />
+                                                                    ))}
+                                                                    <span className="text-xs text-muted-foreground ml-2">Verified Purchase</span>
+                                                                </div>
+                                                            </div>
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {new Date(review.created_at).toLocaleDateString()}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-sm leading-relaxed">{review.comment}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Sidebar */}
@@ -1901,10 +2053,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         </div>
                     </div>
                 </div>
-            </form >
+            </form>
 
             {/* Mobile Sticky Save Button */}
-            < div className="lg:hidden fixed bottom-[64px] left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-40" >
+            <div className="lg:hidden fixed bottom-[64px] left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-40">
                 <button
                     onClick={() => document.querySelector('form')?.requestSubmit()}
                     disabled={saving}
@@ -1913,58 +2065,56 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     {saving ? <Loader2 className="animate-spin" /> : <Save className="w-5 h-5" />}
                     Update Product
                 </button>
-            </div >
+            </div>
 
             {/* IMAGE PICKER MODAL */}
-            {
-                selectingImageForVariant !== null && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                        <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-                            <div className="p-6 border-b flex justify-between items-center">
-                                <h3 className="text-xl font-black">Select Image for Variation</h3>
-                                <button onClick={() => setSelectingImageForVariant(null)} className="p-2 hover:bg-muted rounded-full transition-colors"><X className="w-6 h-6" /></button>
-                            </div>
+            {selectingImageForVariant !== null && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+                        <div className="p-6 border-b flex justify-between items-center">
+                            <h3 className="text-xl font-black">Select Image for Variation</h3>
+                            <button onClick={() => setSelectingImageForVariant(null)} className="p-2 hover:bg-muted rounded-full transition-colors"><X className="w-6 h-6" /></button>
+                        </div>
 
-                            <div className="flex-1 overflow-y-auto p-6">
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                    {/* Option to Clear Image */}
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {/* Option to Clear Image */}
+                                <button
+                                    onClick={() => {
+                                        if (selectingImageForVariant !== null) {
+                                            updateVariant(selectingImageForVariant, 'image', '');
+                                            setSelectingImageForVariant(null);
+                                        }
+                                    }}
+                                    className="aspect-square rounded-2xl border-2 border-dashed border-muted flex flex-col items-center justify-center gap-2 hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-all font-bold text-muted-foreground"
+                                >
+                                    <X className="w-8 h-8" />
+                                    <span>No Image</span>
+                                </button>
+
+                                {/* Product Images */}
+                                {formData.images.filter(img => img).map((img, i) => (
                                     <button
+                                        key={i}
                                         onClick={() => {
                                             if (selectingImageForVariant !== null) {
-                                                updateVariant(selectingImageForVariant, 'image', '');
+                                                updateVariant(selectingImageForVariant, 'image', img);
                                                 setSelectingImageForVariant(null);
                                             }
                                         }}
-                                        className="aspect-square rounded-2xl border-2 border-dashed border-muted flex flex-col items-center justify-center gap-2 hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-all font-bold text-muted-foreground"
+                                        className="group relative aspect-square rounded-2xl overflow-hidden border-2 border-transparent hover:border-primary hover:shadow-xl hover:scale-105 transition-all"
                                     >
-                                        <X className="w-8 h-8" />
-                                        <span>No Image</span>
+                                        <img src={img} className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <span className="text-white font-bold bg-black/50 px-3 py-1 rounded-full backdrop-blur-md">Select</span>
+                                        </div>
                                     </button>
-
-                                    {/* Product Images */}
-                                    {formData.images.filter(img => img).map((img, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => {
-                                                if (selectingImageForVariant !== null) {
-                                                    updateVariant(selectingImageForVariant, 'image', img);
-                                                    setSelectingImageForVariant(null);
-                                                }
-                                            }}
-                                            className="group relative aspect-square rounded-2xl overflow-hidden border-2 border-transparent hover:border-primary hover:shadow-xl hover:scale-105 transition-all"
-                                        >
-                                            <img src={img} className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <span className="text-white font-bold bg-black/50 px-3 py-1 rounded-full backdrop-blur-md">Select</span>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>
-                )
-            }
-        </div >
+                </div>
+            )}
+        </div>
     );
-}
+};
