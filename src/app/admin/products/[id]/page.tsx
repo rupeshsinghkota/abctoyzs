@@ -44,7 +44,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [activeTab, setActiveTab] = useState('media');
     const [isGeneratingReviews, setIsGeneratingReviews] = useState(false);
     const [reviewCount, setReviewCount] = useState(5);
-    const [reviewDaysBack, setReviewDaysBack] = useState(30);
+    const [reviewDaysBack, setReviewDaysBack] = useState('30');
     const [reviewStyle, setReviewStyle] = useState('mixed');
     const [productReviews, setProductReviews] = useState<any[]>([]);
     const [brandingIndex, setBrandingIndex] = useState<number | null>(null);
@@ -855,7 +855,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     productName: formData.name,
                     productDescription: formData.description,
                     count: reviewCount,
-                    daysBack: reviewDaysBack,
+                    daysBack: ['2024', '2025'].includes(reviewDaysBack) ? undefined : Number(reviewDaysBack),
+                    year: ['2024', '2025'].includes(reviewDaysBack) ? reviewDaysBack : undefined,
                     style: reviewStyle
                 })
             });
@@ -1949,10 +1950,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                                 <label className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Timeframe</label>
                                                 <select
                                                     value={reviewDaysBack}
-                                                    onChange={(e) => setReviewDaysBack(Number(e.target.value))}
+                                                    onChange={(e) => setReviewDaysBack(e.target.value)}
                                                     className="px-3 py-2 bg-background border rounded-lg font-bold"
                                                 >
-                                                    {[7, 30, 90, 180, 365].map(d => <option key={d} value={d}>Last {d} Days</option>)}
+                                                    <optgroup label="Relative Time">
+                                                        {[7, 30, 90, 180, 365].map(d => <option key={d} value={d.toString()}>Last {d} Days</option>)}
+                                                    </optgroup>
+                                                    <optgroup label="Specific Year">
+                                                        <option value="2024">Year 2024</option>
+                                                        <option value="2025">Year 2025</option>
+                                                    </optgroup>
                                                 </select>
                                             </div>
                                             <div className="flex flex-col">

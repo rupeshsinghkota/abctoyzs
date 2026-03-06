@@ -13,7 +13,8 @@ export async function POST(req: Request) {
             count = 5,
             ratingRange = [4, 5],
             daysBack = 30,
-            style = "mixed"
+            style = "mixed",
+            year
         } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
@@ -49,7 +50,10 @@ export async function POST(req: Request) {
                - Use diverse Indian cities (e.g., Gurgaon, Hyderabad, Kolkata, Chandigarh, Jaipur).
                - Add emojis naturally but strategically (max 3 per review).
                - Occasionally include a very minor, realistic typo (e.g., "beutiful" instead of "beautiful") or a Hinglish word (e.g., "Shukriya", "Beta loved it", "Ekdum premium").
-            4. **BACKDATING**: Dates must be ISO strings randomly spread across the last ${daysBack} days.
+            ${year
+                ? `4. **BACKDATING**: Dates must be ISO strings randomly spread across the ENTIRE year ${year} (from January to December).`
+                : `4. **BACKDATING**: Dates must be ISO strings randomly spread across the last ${daysBack} days.`
+            }
             5. **RATINGS**: Must be between ${ratingRange[0]} and ${ratingRange[1]} stars.
 
             Output ONLY valid JSON array of objects:
