@@ -226,7 +226,7 @@ export default async function PaymentPolicy() {
                         <div className="pt-10 border-t border-zinc-100 text-center">
                             <p className="text-zinc-500 text-sm mb-4 italic">Have questions about your payment?</p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                                <Link href="https://wa.me/918239269217" className="text-emerald-600 font-black tracking-tight flex items-center gap-2 hover:scale-105 transition-transform">
+                                <Link href="https://wa.me/917557777998" className="text-emerald-600 font-black tracking-tight flex items-center gap-2 hover:scale-105 transition-transform">
                                     WhatsApp Support →
                                 </Link>
                                 <Link href="mailto:payments@abctoyz.in" className="text-indigo-600 font-black tracking-tight flex items-center gap-2 hover:scale-105 transition-transform">

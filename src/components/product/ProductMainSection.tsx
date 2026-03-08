@@ -332,7 +332,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                 </button>
                                 <span className="text-sm text-gray-300">|</span>
                                 <a
-                                    href={`https://wa.me/918239269217?text=${encodeURIComponent(`Hi ABC Toyz, I have a question about ${product.name}.\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                                    href={`https://wa.me/917557777998?text=${encodeURIComponent(`Hi ABC Toyz, I have a question about ${product.name}.\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="h-10 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 group"

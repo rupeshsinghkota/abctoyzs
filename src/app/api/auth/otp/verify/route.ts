@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         // Note: Supabase Auth users can have phone as their identity.
 
         // Let's try to get the user by phone
-        // We'll use the cleanPhone (e.g. 918239269217)
+        // We'll use the cleanPhone (e.g. 917557777998)
         // We should ensure it has leading + for Supabase Auth consistency if possible, 
         // but here we'll stick to what we have.
 

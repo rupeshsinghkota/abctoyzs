@@ -139,7 +139,7 @@ export function ProfileSidebar() {
                         {/* Support & Exit Group: Glassmorphism */}
                         <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-[2.5rem] overflow-hidden shadow-lg shadow-zinc-200/30">
                             <a
-                                href="https://wa.me/918239269217"
+                                href="https://wa.me/917557777998"
                                 target="_blank"
                                 rel="noreferrer"
                                 className="flex items-center justify-between px-6 py-4 transition-all active:bg-white/50 border-b border-white/20"

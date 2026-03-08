@@ -100,7 +100,7 @@ export default function ContactUsClient() {
                                 Our WhatsApp support is active 10 hours a day for live video calls, assembly guidance, and order tracking.
                             </p>
                             <a
-                                href="https://wa.me/918239269217"
+                                href="https://wa.me/917557777998"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white w-full py-4 rounded-xl font-bold transition-all justify-center shadow-lg shadow-green-900/20"

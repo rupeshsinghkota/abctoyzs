@@ -157,7 +157,7 @@ export function WhyBuyFromUs() {
                             Shop Now — Free Delivery
                         </a>
                         <a
-                            href={`https://wa.me/918239269217?text=${encodeURIComponent('Hi ABC Toyz! I have a question before ordering.')}`}
+                            href={`https://wa.me/917557777998?text=${encodeURIComponent('Hi ABC Toyz! I have a question before ordering.')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white font-black text-sm px-6 py-3.5 rounded-full transition-all hover:scale-105"

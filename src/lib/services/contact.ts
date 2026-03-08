@@ -29,7 +29,7 @@ export const ContactService = {
 
         // Notify Admin via WhatsApp (Optional/If configured)
         try {
-            const adminPhone = process.env.ADMIN_WHATSAPP_NUMBER || "918239269217";
+            const adminPhone = process.env.ADMIN_WHATSAPP_NUMBER || "917557777998";
             const adminText = `🆕 *New Contact Inquiry* on abcToyz\n\n*Name:* ${data.name}\n*Email:* ${data.email}${data.phone ? `\n*WhatsApp:* ${data.phone}` : ''}\n*Subject:* ${data.subject}\n*Message:* ${data.message}`;
             await WhatsAppService.sendMessage(adminPhone, adminText);
         } catch (wsError) {

@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 
 export function WhatsAppButton() {
     const pathname = usePathname();
-    const [whatsappUrl, setWhatsappUrl] = React.useState(`https://wa.me/918239269217?text=${encodeURIComponent("Hi ABC Toyz, I have a question!")}`);
+    const [whatsappUrl, setWhatsappUrl] = React.useState(`https://wa.me/917557777998?text=${encodeURIComponent("Hi ABC Toyz, I have a question!")}`);
 
     React.useEffect(() => {
-        const phoneNumber = "918239269217"; // Official business number
+        const phoneNumber = "917557777998"; // Official business number
         const currentUrl = window.location.href;
         const pageTitle = document.title;
         const message = encodeURIComponent(`Hi ABC Toyz, I'm browsing ${pageTitle} and wanted to know more!\n\nContext: ${currentUrl}`);

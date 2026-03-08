@@ -178,7 +178,7 @@ export function WhatsAppNudge() {
                 </div>
 
                 <a
-                    href={`https://wa.me/918239269217?text=${encodeURIComponent(config.waMessage + `\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                    href={`https://wa.me/917557777998?text=${encodeURIComponent(config.waMessage + `\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => {
