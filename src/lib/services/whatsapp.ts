@@ -8,7 +8,8 @@ export const WhatsAppService = {
      */
     async sendMessage(to: string, text: string) {
         const apiKey = process.env.MSG91_AUTH_KEY;
-        const sender = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "917557777998";
+        const sender = process.env.MSG91_INTEGRATED_NUMBER || process.env.MSG91_SENDER_NUMBER || "917557777998";
+        console.log(`[WhatsApp] Sending to ${to} using sender ${sender}`);
 
         if (!apiKey || !sender) {
             console.error("Missing MSG91 Configuration");
@@ -58,7 +59,8 @@ export const WhatsAppService = {
      */
     async sendTemplateMessage(to: string, templateId: string, variables: Record<string, string>) {
         const apiKey = process.env.MSG91_AUTH_KEY;
-        const sender = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "917557777998";
+        const sender = process.env.MSG91_INTEGRATED_NUMBER || process.env.MSG91_SENDER_NUMBER || "917557777998";
+        console.log(`[WhatsApp] Sending template ${templateId} to ${to} using sender ${sender}`);
 
         if (!apiKey || !sender) {
             console.error("Missing MSG91 Configuration");
