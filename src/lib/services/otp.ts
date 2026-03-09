@@ -28,7 +28,7 @@ export const OTPService = {
         }
 
         // 3. Send via WhatsApp
-        const templateId = process.env.MSG91_OTP_TEMPLATE_ID || 'auth_abctoyz';
+        const templateId = process.env.MSG91_OTP_TEMPLATE_ID || 'auth';
         // Try template first
         let sent = await WhatsAppService.sendTemplateMessage(cleanPhone, templateId, { "1": otp });
 
