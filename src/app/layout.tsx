@@ -20,6 +20,7 @@ import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { RecentActivityToast } from "@/components/common/RecentActivityToast";
 import { CompareDrawer } from "@/components/shop/CompareDrawer";
 import { GlobalBookingDrawerWrap } from "@/components/GlobalBookingDrawerWrap";
+import { ExitDiscountPopup } from "@/components/ui/ExitDiscountPopup";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -137,6 +138,7 @@ export default function RootLayout({
         <RecentActivityToast />
         <CompareDrawer />
         <GlobalBookingDrawerWrap />
+        <ExitDiscountPopup />
       </body>
     </html>
   );

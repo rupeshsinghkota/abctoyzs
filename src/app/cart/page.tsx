@@ -2,18 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck, Video } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Truck, ShieldCheck, Video, Ticket } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 export default function CartPage() {
-    const { cart, removeFromCart, updateQuantity, openBooking } = useStore();
+    const { cart, removeFromCart, updateQuantity, openBooking, appliedCoupon } = useStore();
     const router = useRouter();
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0; // Free shipping
-    const total = subtotal + shipping;
+    const discount = appliedCoupon ? appliedCoupon.discount : 0;
+    const total = subtotal + shipping - discount;
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
@@ -152,6 +153,16 @@ export default function CartPage() {
                             <span className="text-green-600 font-black tracking-widest uppercase text-xs">Free</span>
                         </div>
 
+                        {appliedCoupon && (
+                            <div className="flex justify-between items-center text-green-600 font-medium animate-in fade-in slide-in-from-top-1">
+                                <div className="flex items-center gap-1.5">
+                                    <Ticket className="w-3.5 h-3.5" />
+                                    <span>Discount ({appliedCoupon.code})</span>
+                                </div>
+                                <span className="font-bold">-₹{appliedCoupon.discount.toLocaleString()}</span>
+                            </div>
+                        )}
+
                         <div className="h-px w-full bg-gray-100 my-4" />
 
                         <div className="flex justify-between items-end">
@@ -161,7 +172,7 @@ export default function CartPage() {
                             </div>
                             <div className="flex justify-between items-center text-lg lg:text-xl font-black text-gray-900 border-t border-gray-100 pt-5 mt-4">
                                 <span className="tracking-tight">Grand Total</span>
-                                <span className="text-primary tracking-tighter">₹{subtotal.toLocaleString()}</span>
+                                <span className="text-primary tracking-tighter">₹{total.toLocaleString()}</span>
                             </div>
                         </div>
 

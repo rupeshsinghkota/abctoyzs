@@ -43,6 +43,9 @@ interface AppState {
     addToCompare: (product: RecentlyViewedItem) => void;
     removeFromCompare: (id: string) => void;
     clearCompare: () => void;
+    // Coupon System
+    appliedCoupon: { code: string; discount: number; coupon_id: string } | null;
+    setAppliedCoupon: (coupon: { code: string; discount: number; coupon_id: string } | null) => void;
     // Global Booking
     isBookingOpen: boolean;
     currentProductContext: { productId: string; productName: string; productPrice: number } | null;
@@ -108,6 +111,9 @@ export const useStore = create<AppState>()(
                     compareItems: state.compareItems.filter(p => p.id !== id)
                 })),
             clearCompare: () => set({ compareItems: [] }),
+            // Coupon System
+            appliedCoupon: null,
+            setAppliedCoupon: (coupon) => set({ appliedCoupon: coupon }),
             // Global Booking
             isBookingOpen: false,
             currentProductContext: null,

@@ -27,14 +27,14 @@ import { BRAND_CONFIG } from '@/config/brand';
 
 export default function CheckoutPage() {
     const router = useRouter();
-    const { cart, clearCart } = useStore();
+    const { cart, clearCart, appliedCoupon, setAppliedCoupon } = useStore();
     const [loading, setLoading] = useState(false);
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [profile, setProfile] = useState<any>(null);
     const [guestEmail, setGuestEmail] = useState<string>("");
     const [couponCode, setCouponCode] = useState('');
-    const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+    // const [appliedCoupon, setAppliedCoupon] = useState<any>(null); // Removed: now from store
     const [couponError, setCouponError] = useState<string | null>(null);
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD' | 'BOOKING'>('PREPAID');
