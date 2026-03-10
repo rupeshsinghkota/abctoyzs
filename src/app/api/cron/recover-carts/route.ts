@@ -53,44 +53,38 @@ export async function GET(req: Request) {
                 if (currentStep === 0 && hoursSinceCreated >= 1 && hoursSinceCreated <= 4) {
                     // STEP 0: 1-2 Hour Quick Reminder
                     nextStep = 1;
-                    templateId = 'cart_recovery_media';
                     variables = { "1": lead.name || 'Parent', "2": item.name };
                 }
                 else if (currentStep === 1 && hoursSinceLastFollowup >= 24) {
                     // STEP 1: 24 Hour Feature Nudge
                     nextStep = 2;
-                    templateId = 'cart_recovery_media';
-                    variables = {
-                        "1": lead.name || 'Parent',
-                        "2": `Still thinking about ${item.name}? It features powerful 4x4 motors and a long-range battery!`
-                    };
+                    variables = { "1": lead.name || 'Parent', "2": item.name };
                 }
                 else if (currentStep === 2 && hoursSinceLastFollowup >= 24) {
-                    // STEP 2: 48 Hour Discount Nudge
+                    // STEP 2: 48 Hour Discount Nudge (5% OFF)
                     nextStep = 3;
-                    templateId = 'cart_recovery_media';
-                    variables = {
-                        "1": lead.name || 'Parent',
-                        "2": `Special Offer! Use code PREPAID5 for an extra 5% off on ${item.name}. Secure it today!`
-                    };
+                    variables = { "1": lead.name || 'Parent', "2": item.name };
                 }
                 else if (currentStep === 3 && hoursSinceLastFollowup >= 24) {
                     // STEP 3: 72 Hour Final Nudge (Scarcity)
-                    nextStep = 4; // Mark as sequence complete
-                    templateId = 'cart_recovery_media';
-                    variables = {
-                        "1": lead.name || 'Parent',
-                        "2": `Last chance! Stock for ${item.name} is running low. Grab yours before it's gone!`
-                    };
+                    nextStep = 4;
+                    variables = { "1": lead.name || 'Parent', "2": item.name };
                 }
 
                 // SEND MESSAGE IF STEP DETERMINED
                 if (nextStep !== -1) {
+                    const templateId = 'cart_recovery_media'; // Unified template
                     const whatsappPhone = lead.phone.length === 10 ? `91${lead.phone}` : lead.phone;
+
+                    // Ensure absolute image URL for WhatsApp
+                    const absoluteMediaUrl = mediaUrl?.startsWith('http')
+                        ? mediaUrl
+                        : `https://abctoyz.in${mediaUrl?.startsWith('/') ? '' : '/'}${mediaUrl}`;
+
                     const sent = await WhatsAppService.sendMediaTemplateMessage(
                         whatsappPhone,
                         templateId,
-                        mediaUrl || 'https://abctoyz.in/logo.png',
+                        absoluteMediaUrl || 'https://abctoyz.in/logo.png',
                         variables
                     );
 

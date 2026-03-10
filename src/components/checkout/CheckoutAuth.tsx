@@ -46,7 +46,16 @@ export function CheckoutAuth({ onAuthenticated, cart }: CheckoutAuthProps) {
             const res = await fetch('/api/auth/otp/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone })
+                body: JSON.stringify({
+                    phone,
+                    cart_summary: cart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        image: item.image,
+                        quantity: item.quantity
+                    }))
+                })
             });
             const data = await res.json();
 
