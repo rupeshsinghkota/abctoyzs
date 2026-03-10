@@ -29,12 +29,10 @@ export function ExitDiscountPopup() {
             return;
         }
 
-        // Push a dummy state to history so we can intercept the first "Back" click
+        // 1. Back Button Interception
         window.history.pushState({ exitPopup: true }, "");
 
         const handlePopState = (e: PopStateEvent) => {
-            // If the user hits back, this event fires. 
-            // Since we pushed a state, the browser stays on the current page but pops our state.
             if (!hasShown) {
                 setIsOpen(true);
                 setHasShown(true);
@@ -42,12 +40,41 @@ export function ExitDiscountPopup() {
             }
         };
 
+        // 2. Link Click Interception (Any page from that)
+        const handleLinkClick = (e: MouseEvent) => {
+            const target = (e.target as HTMLElement).closest('a');
+            if (target && target instanceof HTMLAnchorElement) {
+                const href = target.getAttribute('href');
+
+                // Don't intercept if:
+                // - It's a hash link, mailto, tel
+                // - It leads to checkout from cart (funnel progression)
+                // - It's external
+                if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('http')) return;
+
+                // If moving from cart to checkout, don't block
+                if (pathname === '/cart' && href === '/checkout') return;
+
+                if (!hasShown) {
+                    e.preventDefault();
+                    setIsOpen(true);
+                    setHasShown(true);
+                    sessionStorage.setItem('exit_popup_shown', 'true');
+
+                    // Store intended destination to resume after dismissal
+                    // But for simplicity, we just show the popup and let them click again or claim
+                }
+            }
+        };
+
         window.addEventListener('popstate', handlePopState);
+        document.addEventListener('click', handleLinkClick, { capture: true });
 
         return () => {
             window.removeEventListener('popstate', handlePopState);
+            document.removeEventListener('click', handleLinkClick, { capture: true });
         };
-    }, [hasShown, isEligible, isHiddenPage, appliedCoupon]);
+    }, [hasShown, isEligible, isHiddenPage, appliedCoupon, pathname]);
 
     const handleClaim = async () => {
         try {
