@@ -226,7 +226,11 @@ export async function POST(req: Request) {
                         let imageUrl = 'https://abctoyz.in/logo.png';
                         if (items.length > 0) {
                             const { data: p } = await supabase.from('products').select('image').eq('id', items[0].id).single();
-                            if (p?.image) imageUrl = p.image;
+                            if (p?.image) {
+                                imageUrl = p.image.startsWith('http')
+                                    ? p.image
+                                    : `https://abctoyz.in${p.image.startsWith('/') ? '' : '/'}${p.image}`;
+                            }
                         }
 
                         await WhatsAppService.sendMediaTemplateMessage(

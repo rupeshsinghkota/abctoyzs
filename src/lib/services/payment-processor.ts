@@ -33,6 +33,7 @@ export const PaymentProcessor = {
             .eq('order_id', orderId);
 
         // Combine into a single object for the rest of the logic
+        const TARGET_NUMBER = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "917557777998";
         const order = {
             ...orderBase,
             shipping_address: shippingAddress || {}, // Fallback if address missing
@@ -269,14 +270,16 @@ export const PaymentProcessor = {
                 // Fetch first item's image for the media template
                 let imageUrl = 'https://abctoyz.in/logo.png'; // Fallback
                 if (order.items.length > 0) {
-                    const { data: product } = await supabaseAdmin
+                    const { data: p } = await supabaseAdmin
                         .from('products')
                         .select('image')
                         .eq('id', order.items[0].product_id)
                         .single();
 
-                    if (product?.image) {
-                        imageUrl = product.image;
+                    if (p?.image) {
+                        imageUrl = p.image.startsWith('http')
+                            ? p.image
+                            : `https://abctoyz.in${p.image.startsWith('/') ? '' : '/'}${p.image}`;
                     }
                 }
 

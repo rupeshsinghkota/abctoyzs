@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         }
         const firstMessage = Array.isArray(internalMessages) ? internalMessages[0] : null;
 
-        const TARGET_NUMBER = "917557777998";
+        const TARGET_NUMBER = process.env.MSG91_SENDER_NUMBER || process.env.MSG91_INTEGRATED_NUMBER || "917557777998";
 
         // 1. EXTRACT UNIQUE ID AND STATUS EARLY
         const statusUpdate = payload.statuses?.[0] || body.statuses?.[0] || (body.entry?.[0]?.changes?.[0]?.value?.statuses?.[0]);
