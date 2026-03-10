@@ -23,47 +23,29 @@ export function ExitDiscountPopup() {
     useEffect(() => {
         if (hasShown || !isEligible || isHiddenPage || appliedCoupon) return;
 
-        // 1. Desktop Exit Intent (Mouse Leave Top)
-        const handleMouseLeave = (e: MouseEvent) => {
-            if (e.clientY <= 0 && !hasShown) {
-                setIsOpen(true);
-                setHasShown(true);
-                sessionStorage.setItem('exit_popup_shown', 'true');
-            }
-        };
-
-        // 2. Mobile Exit Intent (Fast Scroll Up near top)
-        let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-        let lastScrollTime = Date.now();
-
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            const currentTime = Date.now();
-            const scrollDelta = lastScrollY - currentScrollY;
-            const timeDelta = currentTime - lastScrollTime;
-
-            // Fast scroll up within the top part of the page
-            if (scrollDelta > 100 && timeDelta < 100 && currentScrollY < 1000 && !hasShown) {
-                setIsOpen(true);
-                setHasShown(true);
-                sessionStorage.setItem('exit_popup_shown', 'true');
-            }
-
-            lastScrollY = currentScrollY;
-            lastScrollTime = currentTime;
-        };
-
         // Check if already shown in this session
         if (sessionStorage.getItem('exit_popup_shown')) {
             setHasShown(true);
-        } else {
-            document.addEventListener('mouseleave', handleMouseLeave);
-            window.addEventListener('scroll', handleScroll, { passive: true });
+            return;
         }
 
+        // Push a dummy state to history so we can intercept the first "Back" click
+        window.history.pushState({ exitPopup: true }, "");
+
+        const handlePopState = (e: PopStateEvent) => {
+            // If the user hits back, this event fires. 
+            // Since we pushed a state, the browser stays on the current page but pops our state.
+            if (!hasShown) {
+                setIsOpen(true);
+                setHasShown(true);
+                sessionStorage.setItem('exit_popup_shown', 'true');
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+
         return () => {
-            document.removeEventListener('mouseleave', handleMouseLeave);
-            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('popstate', handlePopState);
         };
     }, [hasShown, isEligible, isHiddenPage, appliedCoupon]);
 
