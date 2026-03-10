@@ -132,7 +132,7 @@ export default function RootLayout({
         <Footer />
         <BottomNav />
         <WhatsAppButton />
-        <WhatsAppNudge />
+        {/* <WhatsAppNudge /> - User requested icon only, no text popups */}
         <BackToTop />
         <LiveDemoFloatingButton />
         <RecentActivityToast />

@@ -21,13 +21,7 @@ export function WhatsAppButton() {
     }
 
     return (
-        <div className="fixed bottom-24 right-5 md:bottom-10 md:right-10 z-[100] group">
-            {/* Tooltip */}
-            <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-zinc-900 text-white text-xs font-bold px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-xl">
-                Chat on WhatsApp
-                <div className="absolute left-full top-1/2 -translate-y-1/2 border-8 border-transparent border-l-zinc-900"></div>
-            </div>
-
+        <div className="fixed bottom-24 right-5 md:bottom-10 md:right-10 z-[100]">
             <a
                 href={whatsappUrl}
                 target="_blank"
