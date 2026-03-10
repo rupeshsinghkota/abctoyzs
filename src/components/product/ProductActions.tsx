@@ -441,7 +441,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
                 <div className="grid grid-cols-4 items-center gap-2 bg-orange-50/50 border border-orange-100/70 rounded-xl px-2 py-3">
                     <a href="/shipping-policy" className="flex flex-col items-center gap-1 group">
                         <Truck className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">Free<br />Delivery</span>
+                        <span className="text-[9px] font-black text-gray-700 group-hover:text-primary transition-colors text-center leading-tight">Express<br />Metro Delivery</span>
                     </a>
                     <button
                         onClick={() => setIsBISModalOpen(true)}
