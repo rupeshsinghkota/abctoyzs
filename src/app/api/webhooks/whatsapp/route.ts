@@ -1,6 +1,5 @@
 
 import { NextResponse } from "next/server";
-import { AuraService } from "@/lib/services/aura";
 import { WhatsAppService } from "@/lib/services/whatsapp";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
@@ -150,7 +149,6 @@ export async function POST(req: Request) {
                     created_at: new Date().toISOString()
                 });
                 await WhatsAppService.sendMessage(cleanPhone, limitMessage);
-                await AuraService.generateResponse("SYSTEM_RATE_LIMIT_NOTICE", [], `# HANDOVER\nReason: Rate Limit Exceeded for ${cleanPhone}`);
             }
             return NextResponse.json({ status: "success", reason: "rate_limited" });
         }
