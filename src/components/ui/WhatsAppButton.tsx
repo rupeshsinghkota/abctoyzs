@@ -8,12 +8,16 @@ export function WhatsAppButton() {
     const [whatsappUrl, setWhatsappUrl] = React.useState(`https://wa.me/917557777998?text=${encodeURIComponent("Hi ABC Toyz, I have a question!")}`);
 
     React.useEffect(() => {
-        const phoneNumber = "917557777998"; // Official business number
-        const currentUrl = window.location.href;
-        const pageTitle = document.title;
-        const message = encodeURIComponent(`Hi ABC Toyz, I'm browsing ${pageTitle} and wanted to know more!\n\nContext: ${currentUrl}`);
-        setWhatsappUrl(`https://wa.me/${phoneNumber}?text=${message}`);
-    }, []);
+        // Add a small delay to ensure document.title is updated by Next.js
+        const timer = setTimeout(() => {
+            const phoneNumber = "917557777998"; // Official business number
+            const currentUrl = window.location.href;
+            const pageTitle = document.title;
+            const message = encodeURIComponent(`Hi ABC Toyz, I'm browsing ${pageTitle} and wanted to know more!\n\nContext: ${currentUrl}`);
+            setWhatsappUrl(`https://wa.me/${phoneNumber}?text=${message}`);
+        }, 100);
+        return () => clearTimeout(timer);
+    }, [pathname]);
 
     // Hide the WhatsApp button in the main conversion funnels to prevent UI overlaps and distractions.
     if (pathname?.startsWith('/cart') || pathname?.startsWith('/checkout')) {
