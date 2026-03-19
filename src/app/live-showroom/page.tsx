@@ -146,7 +146,7 @@ export default function LiveShowroomPage() {
                                     key={isCameraOff ? 'off' : 'on'}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    src="/images/live-showroom/expert-guide.png" 
+                                    src="/images/products/supersport-pink/side.jpg" 
                                     alt="Live Feed" 
                                     className={cn(
                                         "w-full h-full object-cover transition-all duration-700",
