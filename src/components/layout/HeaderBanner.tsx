@@ -19,7 +19,7 @@ export function HeaderBanner() {
             icon: <Ticket className="w-3.5 h-3.5" />
         },
         {
-            text: "See it Live: Book a Private Video Tour for ₹99 🎥",
+            text: "See it Live: Book a Private Video Tour 🎥",
             icon: <Video className="w-3.5 h-3.5 animate-pulse text-orange-400" />
         }
     ];
