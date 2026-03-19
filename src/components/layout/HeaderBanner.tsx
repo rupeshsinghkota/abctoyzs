@@ -20,7 +20,8 @@ export function HeaderBanner() {
         },
         {
             text: "See it Live: Book a Private Video Tour 🎥",
-            icon: <Video className="w-3.5 h-3.5 animate-pulse text-orange-400" />
+            icon: <Video className="w-3.5 h-3.5 animate-pulse text-orange-400" />,
+            link: "/live-showroom"
         }
     ];
 
@@ -46,7 +47,17 @@ export function HeaderBanner() {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 animate-gradient-x" />
 
             <div className="container max-w-7xl mx-auto px-4 h-10 flex items-center justify-center relative">
-                <div className="flex items-center gap-3 transition-all duration-500 transform">
+                <div 
+                    onClick={() => {
+                        if (messages[currentMessage].link) {
+                            window.location.href = messages[currentMessage].link;
+                        }
+                    }}
+                    className={cn(
+                        "flex items-center gap-3 transition-all duration-500 transform",
+                        messages[currentMessage].link && "cursor-pointer hover:opacity-80"
+                    )}
+                >
                     {messages[currentMessage].icon}
                     <p className="text-[10px] md:text-[11px] font-bold text-white tracking-widest uppercase flex items-center gap-2">
                         {messages[currentMessage].text}

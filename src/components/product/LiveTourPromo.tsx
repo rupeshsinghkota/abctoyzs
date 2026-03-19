@@ -58,8 +58,13 @@ export function LiveTourPromo({ productName }: { productName: string }) {
                             <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                         </a>
                         <div className="flex flex-col items-center sm:items-start">
-                            <span className="text-white font-black text-[10px] uppercase tracking-widest">Available Now</span>
-                            <span className="text-zinc-500 text-[10px] font-bold">Mon-Sat • 10AM - 8PM</span>
+                            <a 
+                                href="/live-showroom" 
+                                className="text-white font-black text-[10px] uppercase tracking-widest hover:text-primary transition-colors underline underline-offset-4"
+                            > 
+                                How it works?
+                            </a>
+                            <span className="text-zinc-500 text-[10px] font-bold">Google Meet Available</span>
                         </div>
                     </div>
                 </div>
