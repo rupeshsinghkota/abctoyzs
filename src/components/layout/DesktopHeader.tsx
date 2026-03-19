@@ -83,6 +83,10 @@ export function DesktopHeader() {
                             Track Order
                         </NavLink>
 
+                        <NavLink href="/live-showroom" isPrimary>
+                            Live Showroom
+                        </NavLink>
+
                         {/* Power Dropdown */}
                         <div className="relative group">
                             <button className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.15em] text-foreground/60 hover:text-primary transition-colors py-2 whitespace-nowrap">

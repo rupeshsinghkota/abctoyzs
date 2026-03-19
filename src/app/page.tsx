@@ -14,6 +14,7 @@ import { WhyBuyFromUs } from "@/components/home/WhyBuyFromUs";
 import { ShopByAge } from "@/components/home/ShopByAge";
 import { ShopByPower } from "@/components/home/ShopByPower";
 import { BudgetShowcase } from "@/components/home/BudgetShowcase";
+import { LiveShowroomCTA } from "@/components/home/LiveShowroomCTA";
 import { fetchProducts } from "@/lib/data";
 import { Metadata } from 'next';
 import { SettingsService } from '@/lib/services/settings';
@@ -138,6 +139,9 @@ export default async function Home() {
 
 
 
+      <LazySection className="mt-2" placeholderHeight="h-96">
+        <LiveShowroomCTA />
+      </LazySection>
       <VideoShowcaseSection />
       <Testimonials />
       <WhyBuyFromUs />

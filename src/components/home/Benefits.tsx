@@ -21,7 +21,7 @@ const benefits = [
         icon: Video,
         title: "Live Showroom Tour",
         description: "Interact before you buy",
-        href: "/live-tour"
+        href: "/live-showroom"
     }
 ];
 
