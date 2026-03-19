@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 
 import { Video, Calendar, ShieldCheck, Sparkles, Smartphone, ArrowRight, CheckCircle2, Star, Mic, MicOff, Camera, PhoneOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
