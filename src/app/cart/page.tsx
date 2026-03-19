@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { mapToGA4Item, trackEvent } from '@/components/tracking/GoogleTracking';
 
 export default function CartPage() {
-    const { cart, removeFromCart, updateQuantity, openBooking, appliedCoupon } = useStore();
+    const { cart, removeFromCart, updateQuantity, appliedCoupon } = useStore();
     const router = useRouter();
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = 0; // Free shipping

@@ -20,7 +20,7 @@ interface ProductActionsProps {
 }
 
 export function ProductActions({ product, selectedAttributes, onAttributeSelect, currentVariant }: ProductActionsProps) {
-    const { addToCart, openBooking, setCurrentProductContext } = useStore();
+    const { addToCart, setCurrentProductContext } = useStore();
     const [quantity, setQuantity] = useState(1);
     const [added, setAdded] = useState(false);
     const [isBISModalOpen, setIsBISModalOpen] = useState(false);
@@ -328,38 +328,7 @@ export function ProductActions({ product, selectedAttributes, onAttributeSelect,
 
                 {/* Actions Row */}
                 <div className="space-y-4 pt-1">
-                    {/* Trust CTA For High-Ticket Items — Moved ABOVE Buy Now to be extremely visible on mobile */}
-                    {displayPrice >= 4500 && (
-                        <button
-                            onClick={() => openBooking()}
-                            className="w-full h-14 bg-zinc-950 border border-white/10 text-white hover:bg-zinc-900 text-xs font-black rounded-xl flex items-center justify-between px-5 transition-all group relative overflow-hidden shadow-2xl active:scale-[0.98] z-20"
-                        >
-                            <div className="flex items-center gap-3 relative z-10">
-                                <div className="flex flex-col items-start text-left">
-                                    <div className="flex items-center gap-1.5 mb-1">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">Live Showroom</span>
-                                    </div>
-                                    <span className="uppercase tracking-[0.1em] leading-none font-black text-[11px] group-hover:text-primary transition-colors">See this toy live!</span>
-                                    <span className="text-[9px] text-zinc-500 font-bold tracking-tight uppercase mt-1">Book a quick video call tour</span>
-                                </div>
-                            </div>
 
-                            <div className="flex items-center gap-2 relative z-10">
-                                <div className="flex -space-x-2">
-                                    {[1, 2, 3].map((i) => (
-                                        <div key={i} className="w-5 h-5 rounded-full border-2 border-zinc-950 bg-zinc-800 flex items-center justify-center overflow-hidden">
-                                            <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900" />
-                                        </div>
-                                    ))}
-                                </div>
-                                <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:translate-x-1 transition-transform" />
-                            </div>
-
-                            {/* Decorative background light */}
-                            <div className="absolute top-0 right-0 -mr-8 -mt-8 w-24 h-24 bg-primary/5 blur-2xl rounded-full group-hover:bg-primary/10 transition-colors" />
-                        </button>
-                    )}
 
                     <div className="flex gap-2 h-10 lg:h-12">
                         <div className="shrink-0 h-full w-16 lg:w-20">

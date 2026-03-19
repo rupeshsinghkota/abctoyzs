@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { WhatsAppNudge } from "@/components/ui/WhatsAppNudge";
 import { BackToTop } from "@/components/ui/BackToTop";
-import { LiveDemoFloatingButton } from "@/components/ui/LiveDemoFloatingButton";
+
 import { SettingsService } from "@/lib/services/settings";
 import { createClient } from "@/lib/supabase/server";
 import Script from "next/script";
@@ -20,7 +20,7 @@ import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { RecentActivityToast } from "@/components/common/RecentActivityToast";
 import { CompareDrawer } from "@/components/shop/CompareDrawer";
 import { GlobalBookingDrawerWrap } from "@/components/GlobalBookingDrawerWrap";
-import { ExitDiscountPopup } from "@/components/ui/ExitDiscountPopup";
+
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -134,11 +134,11 @@ export default function RootLayout({
         <WhatsAppButton />
         {/* <WhatsAppNudge /> - User requested icon only, no text popups */}
         <BackToTop />
-        <LiveDemoFloatingButton />
+
         <RecentActivityToast />
         <CompareDrawer />
         <GlobalBookingDrawerWrap />
-        <ExitDiscountPopup />
+
       </body>
     </html>
   );
