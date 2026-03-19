@@ -126,7 +126,7 @@ export default function RootLayout({
         />
         <Header />
 
-        <main className="relative flex flex-col min-h-screen">
+        <main className="relative flex flex-col min-h-screen animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
           {children}
         </main>
         <Footer />

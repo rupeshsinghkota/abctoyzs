@@ -187,10 +187,10 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                             onMouseEnter={() => item.type === 'image' && setDesktopIndex(idx)}
                             onClick={() => setDesktopIndex(idx)}
                             className={cn(
-                                "relative w-20 h-20 rounded-2xl overflow-hidden transition-all duration-300 flex-shrink-0 group",
+                                "relative w-16 h-16 rounded-2xl overflow-hidden smooth-transition flex-shrink-0 group",
                                 desktopIndex === idx
-                                    ? "ring-2 ring-black dark:ring-white ring-offset-4 scale-105 shadow-lg"
-                                    : "opacity-40 hover:opacity-100 grayscale hover:grayscale-0 hover:scale-105"
+                                    ? "ring-2 ring-primary ring-offset-2 scale-110 shadow-lg z-10"
+                                    : "opacity-40 hover:opacity-100 grayscale-[50%] hover:grayscale-0 hover:scale-105"
                             )}
                         >
                             {item.type === 'video' ? (
@@ -233,14 +233,14 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                                 />
 
                                 {/* Main Image — priority so it loads instantly (LCP element) */}
-                                <div className="relative w-full max-h-[750px] aspect-square flex items-center justify-center p-6 md:p-8 z-10">
+                                <div className="relative w-full max-h-[750px] aspect-square flex items-center justify-center p-6 md:p-8 z-10 animate-in fade-in zoom-in-95 duration-700 ease-out" key={desktopIndex}>
                                     <Image
                                         src={mediaItems[desktopIndex].url}
                                         alt={`${productName} - Main View`}
                                         fill
                                         sizes="(max-width: 1280px) 60vw, 800px"
-                                        priority={desktopIndex === 0}
-                                        className="object-contain transition-all duration-700 ease-out group-hover:scale-[1.02] drop-shadow-[0_12px_50px_rgba(0,0,0,0.15)]"
+                                        priority
+                                        className="object-contain transition-all duration-1000 ease-out group-hover:scale-[1.03] drop-shadow-[0_20px_60px_rgba(0,0,0,0.12)]"
                                         unoptimized={!isExternal(mediaItems[desktopIndex].url)}
                                     />
                                 </div>

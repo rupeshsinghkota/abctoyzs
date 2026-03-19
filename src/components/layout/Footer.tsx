@@ -46,7 +46,7 @@ export function Footer() {
                 onClick={() => toggleSection(id)}
                 className="flex items-center justify-between w-full md:cursor-default md:pointer-events-none py-4 md:py-0 group"
             >
-                <h3 className="text-white font-bold text-base md:text-lg tracking-tight">{title}</h3>
+                <h3 className="text-white font-black text-[11px] uppercase tracking-[0.2em]">{title}</h3>
                 <ChevronDown
                     className={cn(
                         "w-5 h-5 text-zinc-500 transition-transform duration-300 md:hidden",
@@ -225,19 +225,19 @@ export function Footer() {
                 </div>
 
                 {/* Partner Badges */}
-                <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-500 mb-12">
+                <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 opacity-30 grayscale hover:grayscale-0 transition-all duration-700 mb-12 bg-zinc-900/30 p-8 rounded-3xl border border-white/5">
                     <div className="flex flex-col items-center gap-1">
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Our Logistics Partners</span>
-                        <div className="flex gap-6 items-center">
-                            <span className="text-white font-black text-sm tracking-tighter">BLUEDART</span>
-                            <span className="text-white font-black text-sm tracking-tighter">DELHIVERY</span>
-                            <span className="text-white font-black text-sm tracking-tighter">XPRESSBEES</span>
+                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-2">Our Logistics Partners</span>
+                        <div className="flex gap-8 items-center">
+                            <span className="text-white font-black text-xs tracking-tighter opacity-80 uppercase">Bluedart</span>
+                            <span className="text-white font-black text-xs tracking-tighter opacity-80 uppercase">Delhivery</span>
+                            <span className="text-white font-black text-xs tracking-tighter opacity-80 uppercase">Xpressbees</span>
                         </div>
                     </div>
-                    <div className="h-8 w-px bg-zinc-800 hidden md:block" />
+                    <div className="h-10 w-px bg-zinc-800 hidden md:block" />
                     <div className="flex flex-col items-center gap-1">
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Secure Payments by</span>
-                        <span className="text-[#3395FF] font-black text-sm tracking-tighter italic">Razorpay</span>
+                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-2">Secure Payments by</span>
+                        <span className="text-[#3395FF] font-black text-sm tracking-tighter italic opacity-80 uppercase">Razorpay</span>
                     </div>
                 </div>
 

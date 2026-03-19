@@ -225,7 +225,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
 
             {/* RIGHT: Info & Actions (Approx 41%) */}
             <div className="lg:col-span-5 relative -mt-20 lg:mt-0 z-10 w-full">
-                <div className="bg-white rounded-t-[32px] lg:rounded-none px-4 pt-5 pb-6 lg:px-6 lg:pt-8 lg:pb-0 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] lg:shadow-none min-h-[50vh]">
+                <div className="bg-white rounded-t-[32px] lg:rounded-2xl px-4 pt-5 pb-6 lg:px-7 lg:py-8 shadow-[0_-12px_40px_rgba(0,0,0,0.08)] lg:shadow-premium min-h-[50vh] transition-all duration-500">
                     <div className="lg:sticky lg:top-28 space-y-3 lg:space-y-5">
 
                         {/* --- SCARCITY TRIGGER: Live Viewers --- */}
@@ -250,7 +250,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     </div>
                                 </div>
 
-                                <h1 className="text-xl md:text-2xl lg:text-3xl font-extrabold font-heading leading-tight tracking-tight text-gray-900">
+                                <h1 className="text-xl md:text-2xl lg:text-3xl font-extrabold font-heading leading-tight tracking-tight text-gray-900 animate-in fade-in slide-in-from-left-4 duration-500">
                                     {product.name}
                                 </h1>
                                 <div className="flex items-center gap-2">

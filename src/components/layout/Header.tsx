@@ -52,7 +52,7 @@ export function Header() {
         >
             <HeaderBanner />
 
-            <div className="w-full relative bg-background/80 backdrop-blur-xl border-b border-border/40">
+            <div className="w-full relative bg-glass border-b border-white/10 shadow-sm">
                 {/* Mobile Header: Hidden on Desktop */}
                 <div className="md:hidden w-full">
                     <MobileHeader />

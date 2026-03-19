@@ -83,8 +83,8 @@ export function ProductCard({ product, className, priority = false }: ProductCar
     return (
         <div className={cn(
             "group relative bg-white rounded-2xl overflow-hidden flex flex-col h-full",
-            "shadow-[0_1px_4px_rgba(0,0,0,0.06)] border border-zinc-100",
-            "hover:shadow-[0_8px_24px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300",
+            "border border-zinc-100/50 shadow-sm smooth-transition",
+            "hover:shadow-premium hover:-translate-y-1.5 hover:scale-[1.01]",
             className
         )}>
             {/* ──── Image ──── */}
@@ -125,25 +125,26 @@ export function ProductCard({ product, className, priority = false }: ProductCar
                 {/* Badges — top left stack */}
                 <div className="absolute top-2 left-2 z-10 flex flex-col gap-1 pointer-events-none">
                     {isNew && (
-                        <span className="bg-emerald-500 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm w-fit">
+                        <span className="bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg shadow-emerald-500/20 w-fit">
                             New
                         </span>
                     )}
                     {isBestSeller && (
-                        <span className="inline-flex items-center gap-0.5 bg-orange-500 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm w-fit">
+                        <span className="inline-flex items-center gap-1 bg-orange-500 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg shadow-orange-500/20 w-fit">
                             <Flame className="w-2.5 h-2.5" /> Bestseller
                         </span>
                     )}
                     {!isNew && !isBestSeller && tag && (
-                        <span className="bg-zinc-700 text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm w-fit">
+                        <span className="bg-zinc-800 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg w-fit">
                             {tag}
                         </span>
                     )}
                     {discount > 5 && (
-                        <span className="bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm w-fit">
+                        <span className="bg-rose-500 text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow-lg shadow-rose-500/20 w-fit">
                             {discount}% OFF
                         </span>
                     )}
+
                 </div>
             </Link>
 
