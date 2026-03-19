@@ -212,6 +212,12 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
         }
     };
 
+    // Random social proof count (deterministic for product/session)
+    const parentCount = useMemo(() => {
+        const seed = product.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        return 35 + (seed % 25); // Range 35-60
+    }, [product.id]);
+
     return (
         <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-start max-w-[1600px] mx-auto">
             {/* LEFT: Gallery (Approx 58%) */}
@@ -358,11 +364,11 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                         </div>
                                     ))}
                                     <div className="w-8 h-8 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[10px] font-black text-white">
-                                        +42
+                                        +{parentCount}
                                     </div>
                                 </div>
                                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-tight">
-                                    <span className="text-zinc-900 font-black">42 parents</span> in Delhi-NCR <br/>booked a Live Tour today.
+                                    <span className="text-zinc-900 font-black">{parentCount} parents</span> in Delhi-NCR <br/>booked a Live Tour today.
                                 </p>
                                 <div className="h-8 w-px bg-zinc-200" />
                                 <div className="flex flex-col items-end">

@@ -146,6 +146,15 @@ export function ProductCard({ product, className, priority = false }: ProductCar
                     )}
 
                 </div>
+
+                {/* Top Right — Live Tour Indicator */}
+                <div className="absolute top-2 right-2 z-10 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-white/90 backdrop-blur rounded-full shadow-sm border border-zinc-100">
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                        <span className="text-[9px] font-black text-zinc-900 uppercase">Live Tour</span>
+                    </div>
+                </div>
+
             </Link>
 
             {/* ──── Content ──── */}

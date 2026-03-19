@@ -76,6 +76,16 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                                             draggable={false}
                                             unoptimized={!isExternal(item.url)}
                                         />
+                                        {/* Live Tour Indicator */}
+                                        <div className="absolute top-4 left-4 bg-zinc-900/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2 group/live active:scale-95 transition-all z-20">
+                                            <span className="relative flex h-2 w-2">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                            </span>
+                                            <span className="text-[10px] font-black text-white uppercase tracking-widest hidden md:inline">See on Live Call</span>
+                                            <span className="text-[10px] font-black text-white uppercase tracking-widest md:hidden">Live View</span>
+                                        </div>
+
                                         {/* Maximize Hint */}
                                         <div className="absolute top-4 right-4 bg-white/50 backdrop-blur-sm p-2 rounded-full active:scale-95 transition-all">
                                             <Maximize2 className="w-4 h-4 text-gray-700" />
@@ -246,6 +256,16 @@ export function ImageGallery({ images, videos = [], productName = "Product" }: I
                                 </div>
 
                                 {/* Fullscreen / Zoom Hint */}
+                                <div className="absolute top-8 left-8 z-20">
+                                    <div className="flex items-center gap-3 px-5 py-2.5 bg-zinc-900/60 backdrop-blur-xl rounded-full border border-white/20 shadow-2xl animate-in slide-in-from-left-4 duration-1000">
+                                        <span className="relative flex h-2.5 w-2.5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                        </span>
+                                        <p className="text-[11px] font-black text-white uppercase tracking-[0.2em]">Showroom is Live</p>
+                                    </div>
+                                </div>
+
                                 <div className="absolute bottom-8 left-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
                                     <div className="flex items-center gap-2 px-4 py-2 bg-black/5 backdrop-blur-md rounded-full border border-black/5">
                                         <Maximize2 className="w-4 h-4" />

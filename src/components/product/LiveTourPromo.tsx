@@ -46,17 +46,21 @@ export function LiveTourPromo({ productName }: { productName: string }) {
                         ))}
                     </div>
 
-                    <div className="pt-6">
+                    <div className="pt-6 flex flex-col sm:flex-row items-center gap-4">
                         <a
                             href={`https://wa.me/917557777998?text=${encodeURIComponent(`Hi ABC Toyz, I want to book a Video Tour for ${productName}.`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-3 bg-primary hover:bg-orange-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.15em] transition-all hover:shadow-xl active:scale-95 group/btn"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-primary hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all hover:shadow-2xl hover:shadow-primary/20 active:scale-95 group/btn"
                         >
                             <Video className="w-5 h-5 animate-pulse" />
                             Book Free Video Tour
                             <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                         </a>
+                        <div className="flex flex-col items-center sm:items-start">
+                            <span className="text-white font-black text-[10px] uppercase tracking-widest">Available Now</span>
+                            <span className="text-zinc-500 text-[10px] font-bold">Mon-Sat • 10AM - 8PM</span>
+                        </div>
                     </div>
                 </div>
 
@@ -68,18 +72,28 @@ export function LiveTourPromo({ productName }: { productName: string }) {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-4">
-                        <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-lg animate-bounce">
-                            <Video className="w-8 h-8 text-white fill-white" />
+                        <div className="relative">
+                            <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center animate-ping absolute inset-0" />
+                            <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-2xl relative z-10">
+                                <Video className="w-10 h-10 text-white fill-white" />
+                            </div>
                         </div>
                         <div>
-                            <p className="text-white font-black text-sm uppercase tracking-widest italic">Live from</p>
-                            <p className="text-zinc-400 text-xs font-bold">Delhi Showroom</p>
+                            <p className="text-white font-black text-sm uppercase tracking-widest italic">Live Showroom</p>
+                            <div className="flex items-center gap-1.5 justify-center mt-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-tighter">Online & Ready</p>
+                            </div>
                         </div>
                     </div>
                     {/* Floating "Recording" Badge */}
-                    <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1 rounded-full bg-red-500 text-white text-[10px] font-black uppercase tracking-widest">
-                        <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        REC
+                    <div className="absolute top-6 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-600 shadow-xl text-white text-[10px] font-black uppercase tracking-widest border border-white/20">
+                        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                        LIVE
+                    </div>
+                    {/* Viewer Count */}
+                    <div className="absolute bottom-6 right-6 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest border border-white/5">
+                         84 Viewers
                     </div>
                 </div>
             </div>
