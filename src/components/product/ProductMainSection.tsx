@@ -14,6 +14,8 @@ import { Package, Zap, Gauge, Weight, Battery, Gamepad2, Baby } from 'lucide-rea
 import { LiveViewersBadge } from '@/components/product/LiveViewersBadge';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { OrderCountdown } from '@/components/ui/OrderCountdown';
+import { LiveTourPromo } from '@/components/product/LiveTourPromo';
 import { useStore } from '@/store/useStore';
 
 
@@ -272,6 +274,9 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                         <span className="text-[10px] font-medium text-muted-foreground/60">({product.reviews})</span>
                                     )}
                                 </div>
+                                
+                                {/* --- Urgency: Order Countdown --- */}
+                                <OrderCountdown />
                             </div>
 
 
@@ -341,8 +346,29 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                     </span>
-                                    Ask a Question
                                 </a>
+                            </div>
+
+                            {/* --- Social Proof: Trust Ticker --- */}
+                            <div className="bg-zinc-50 border border-zinc-100/50 rounded-2xl p-4 flex items-center justify-between gap-4 animate-in fade-in duration-1000">
+                                <div className="flex -space-x-2">
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-zinc-200 overflow-hidden">
+                                            <img src={`https://i.pravatar.cc/100?u=parent${i}`} alt="Verified Parent" className="w-full h-full object-cover grayscale" />
+                                        </div>
+                                    ))}
+                                    <div className="w-8 h-8 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[10px] font-black text-white">
+                                        +42
+                                    </div>
+                                </div>
+                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-tight">
+                                    <span className="text-zinc-900 font-black">42 parents</span> in Delhi-NCR <br/>booked a Live Tour today.
+                                </p>
+                                <div className="h-8 w-px bg-zinc-200" />
+                                <div className="flex flex-col items-end">
+                                    <span className="text-[10px] font-black text-green-600 uppercase">Verified</span>
+                                    <span className="text-[8px] font-bold text-zinc-400">ABC Toyz™</span>
+                                </div>
                             </div>
 
                         </div>
@@ -431,6 +457,11 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                         </div>
                     </div>
                 </div>
+            </div>
+
+             {/* LIVE TOUR PROMO */}
+            <div className="lg:col-span-12 px-4 lg:px-0 py-8 lg:py-16">
+                <LiveTourPromo productName={product.name} />
             </div>
 
             {/* REVIEWS SECTION */}
