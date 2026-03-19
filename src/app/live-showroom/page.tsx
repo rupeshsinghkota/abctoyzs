@@ -1,7 +1,7 @@
 "use client";
 
-import { Video, Calendar, ShieldCheck, Sparkles, Smartphone, ArrowRight, CheckCircle2, Star } from "lucide-react";
-import { motion } from "framer-motion";
+import { Video, Calendar, ShieldCheck, Sparkles, Smartphone, ArrowRight, CheckCircle2, Star, Mic, MicOff, Camera, PhoneOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,9 @@ export default function LiveShowroomPage() {
         { label: "HD Quality", value: "4K" },
         { label: "Trust Score", value: "4.9/5" }
     ];
+
+    const [isMuted, setIsMuted] = useState(false);
+    const [isCameraOff, setIsCameraOff] = useState(false);
 
     const steps = [
         {
@@ -113,6 +116,78 @@ export default function LiveShowroomPage() {
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{stat.label}</p>
                             </div>
                         ))}
+                    </motion.div>
+
+                    {/* LIVE SIMULATION PREVIEW */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.8 }}
+                        className="mt-20 relative max-w-4xl mx-auto group"
+                    >
+                        <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-blue-500/50 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                        <div className="relative rounded-[2rem] overflow-hidden bg-zinc-900 border border-white/10 shadow-2xl">
+                            {/* Toolbar */}
+                            <div className="absolute top-0 inset-x-0 h-14 bg-gradient-to-b from-black/60 to-transparent z-20 flex items-center justify-between px-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="px-2 py-0.5 rounded bg-primary text-[8px] font-black text-white uppercase tracking-widest">Live</div>
+                                    <p className="text-white text-[10px] font-bold tracking-tight">Showroom Tour: ABC Toyz Hub</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                    <span className="text-white/40 text-[9px] font-bold">03:42</span>
+                                </div>
+                            </div>
+
+                            {/* Main Video Feed */}
+                            <div className="aspect-video relative overflow-hidden">
+                                <motion.img 
+                                    key={isCameraOff ? 'off' : 'on'}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    src="/images/live-showroom/expert-guide.png" 
+                                    alt="Live Feed" 
+                                    className={cn(
+                                        "w-full h-full object-cover transition-all duration-700",
+                                        isCameraOff && "blur-3xl scale-110 opacity-50"
+                                    )}
+                                />
+                                
+                                {/* Self View (Small Corner) */}
+                                <div className="absolute bottom-6 right-6 w-32 md:w-48 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl z-20 bg-zinc-800">
+                                    <img 
+                                        src="/images/live-showroom/happy-parent.png" 
+                                        alt="You" 
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+
+                                {/* Call Overlay Buttons */}
+                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
+                                    <button 
+                                        onClick={() => setIsMuted(!isMuted)}
+                                        className={cn(
+                                            "w-12 h-12 rounded-full flex items-center justify-center transition-all",
+                                            isMuted ? "bg-red-500 text-white" : "bg-white/10 hover:bg-white/20 text-white backdrop-blur-md"
+                                        )}
+                                    >
+                                        {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                                    </button>
+                                    <button 
+                                        onClick={() => setIsCameraOff(!isCameraOff)}
+                                        className={cn(
+                                            "w-12 h-12 rounded-full flex items-center justify-center transition-all",
+                                            isCameraOff ? "bg-red-500 text-white" : "bg-white/10 hover:bg-white/20 text-white backdrop-blur-md"
+                                        )}
+                                    >
+                                        {isCameraOff ? <Smartphone className="w-5 h-5" /> : <Camera className="w-5 h-5" />}
+                                    </button>
+                                    <button className="w-16 h-12 rounded-3xl bg-red-500/80 hover:bg-red-600 text-white flex items-center justify-center transition-all shadow-lg">
+                                        <PhoneOff className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </motion.div>
                 </div>
             </section>
