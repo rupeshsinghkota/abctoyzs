@@ -65,9 +65,9 @@ export function LiveShowroomCTA() {
                                 {/* The "Phone" Container */}
                                 <div className="relative aspect-[9/16] rounded-[3rem] overflow-hidden border-8 border-white/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] bg-zinc-900 rotate-3 group-hover:rotate-0 transition-transform duration-700">
                                     <img 
-                                        src="/logo_wide.webp" 
+                                        src="/images/live-showroom/expert-guide.png" 
                                         alt="Live Preview" 
-                                        className="w-full h-full object-cover opacity-20 grayscale brightness-50"
+                                        className="w-full h-full object-cover"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                                     

@@ -37,7 +37,7 @@ export default function LiveShowroomPage() {
             <section className="relative pt-32 pb-20 overflow-hidden bg-zinc-950">
                 <div className="absolute inset-0 z-0">
                     <img 
-                        src="/brain/15843977-c906-41df-9bda-02839106f186/delhi_showroom_premium_view_1773923347505.png" 
+                        src="/images/live-showroom/showroom-hero.png" 
                         alt="Showroom Background" 
                         className="w-full h-full object-cover opacity-40 brightness-[0.3]"
                     />
@@ -150,7 +150,7 @@ export default function LiveShowroomPage() {
                                 className="relative z-10 rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white ring-1 ring-zinc-200"
                             >
                                 <img 
-                                    src="/brain/15843977-c906-41df-9bda-02839106f186/video_call_expert_guide_1773923364585.png" 
+                                    src="/images/live-showroom/expert-guide.png" 
                                     alt="Expert Video Call" 
                                     className="w-full h-auto"
                                 />
@@ -229,7 +229,7 @@ export default function LiveShowroomPage() {
                                 className="relative z-10 rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white ring-1 ring-zinc-200"
                             >
                                 <img 
-                                    src="/brain/15843977-c906-41df-9bda-02839106f186/satisfied_parent_video_call_1773923382256.png" 
+                                    src="/images/live-showroom/happy-parent.png" 
                                     alt="Happy Parent" 
                                     className="w-full h-auto"
                                 />
