@@ -139,11 +139,6 @@ export function Footer() {
                             <li><FooterLink href="/track-order">Track My Order</FooterLink></li>
                             <li><FooterLink href="/shipping-policy">Shipping & Delivery</FooterLink></li>
                             <li><FooterLink href="/refund-policy">Returns & Refunds</FooterLink></li>
-                            <li><FooterLink href="/warranty-policy">Warranty Policy</FooterLink></li>
-                            <li><FooterLink href="/billing-terms-and-conditions">Billing Terms & Conditions</FooterLink></li>
-                            <li><FooterLink href="/payment-policy">Payment Policy</FooterLink></li>
-                            <li><FooterLink href="/live-tour">🎥 Live Video Tour Experience</FooterLink></li>
-                            <li><FooterLink href="/booking-policy">📹 Video Call Booking Policy</FooterLink></li>
                             <li><FooterLink href="/about-us">About Us</FooterLink></li>
                             <li><FooterLink href="/contact-us">Contact Us</FooterLink></li>
                         </ul>
@@ -248,7 +243,6 @@ export function Footer() {
                         <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
                         <Link href="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link>
                         <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
-                        <Link href="/booking-policy" className="hover:text-white transition-colors">Booking Policy</Link>
                         <Link href="/billing-terms-and-conditions" className="hover:text-white transition-colors">Billing Terms</Link>
                         <Link href="/payment-policy" className="hover:text-white transition-colors font-bold text-zinc-300">Payment Policy</Link>
                         <Link href="/site-map" className="hover:text-white transition-colors">Sitemap</Link>

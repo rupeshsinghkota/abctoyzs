@@ -38,8 +38,8 @@ export async function POST(req: Request) {
                 razorpayAmount = 0;
             }
         } else if (payment_method === 'BOOKING') {
-            // Bookings always charge a flat ₹99 fee
-            razorpayAmount = 99;
+            // Bookings are now free
+            razorpayAmount = 0;
         }
 
         // 1. Create a "pending" order in database

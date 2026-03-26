@@ -159,10 +159,10 @@ function SuccessContent() {
                             </span>
                         </div>
                         <p className="text-base font-black italic tracking-tight mb-1">
-                            ₹99 Received securely
+                            Free Experience Activated
                         </p>
                         <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
-                            This amount will be 100% adjusted against your final purchase. Our team is excited to show you the products live!
+                            Our team is excited to show you the products live! A specialist will connect with you at the scheduled time to help you explore every detail.
                         </p>
                     </div>
 

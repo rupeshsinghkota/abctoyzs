@@ -311,7 +311,7 @@ export default function CheckoutPage() {
                 // Create a consolidated product name from the cart items
                 const combinedProductNames = cart.map(item => item.name).join(', ');
 
-                // 1. Create a Standard Pending Order + Razorpay Order for ₹99 Booking Fee
+                // 1. Create a Standard Order (Amount 0)
                 const orderRes = await fetch('/api/checkout/order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -329,70 +329,38 @@ export default function CheckoutPage() {
                 if (!orderRes.ok) throw new Error('Failed to initialize booking order');
                 const orderData = await orderRes.json();
 
-                // 2. Open Razorpay Checkout for booking
-                const options = {
-                    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-                    amount: orderData.amount, // Will be 9900 (₹99 in paise)
-                    currency: orderData.currency,
-                    name: "ABC Toyz",
-                    description: `Live Video Tour Booking`,
-                    order_id: orderData.razorpay_order_id,
-                    handler: async function (response: any) {
-                        try {
-                            setLoading(true); // Re-flag loading during meeting link gen
+                // 2. Since it's free, call booking creation directly (skip Razorpay)
+                try {
+                    setLoading(true);
 
-                            // 3. Call booking API to verify payment and create Google Meet link
-                            const bookingRes = await fetch('/api/bookings/create', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    productId: "cart_booking",
-                                    productName: combinedProductNames,
-                                    date: selectedDate,
-                                    time: selectedTime,
-                                    customerName: checkoutName,
-                                    customerEmail: checkoutEmail,
-                                    customerPhone: checkoutPhone,
-                                    razorpayPaymentId: response.razorpay_payment_id,
-                                    razorpayOrderId: response.razorpay_order_id,
-                                    razorpaySignature: response.razorpay_signature
-                                })
-                            });
+                    const bookingRes = await fetch('/api/bookings/create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            productId: "cart_booking",
+                            productName: combinedProductNames,
+                            date: selectedDate,
+                            time: selectedTime,
+                            customerName: checkoutName,
+                            customerEmail: checkoutEmail,
+                            customerPhone: checkoutPhone,
+                            supabaseOrderId: orderData.order_id // Use the standard order ID from checkout/order
+                        })
+                    });
 
-                            const bookingData = await bookingRes.json();
+                    const bookingData = await bookingRes.json();
 
-                            if (bookingRes.ok || bookingData.simulated) {
-                                clearCart();
-                                // Send to success page with booking flag
-                                router.push(`/checkout/success?booking=true`);
-                            } else {
-                                throw new Error(bookingData.message || 'Failed to generate meeting link');
-                            }
-                        } catch (error: any) {
-                            console.error("Booking verification failed:", error);
-                            alert(`Booking finalization failed: ${error.message || 'Unknown Error'}`);
-                            setLoading(false);
-                        }
-                    },
-                    prefill: {
-                        name: checkoutName,
-                        email: checkoutEmail,
-                        contact: checkoutPhone
-                    },
-                    theme: { color: "#000000" },
-                    modal: {
-                        ondismiss: function () {
-                            setLoading(false);
-                        }
+                    if (bookingRes.ok || bookingData.simulated) {
+                        clearCart();
+                        router.push(`/checkout/success?booking=true&oid=${orderData.order_id}&amount=0`);
+                    } else {
+                        throw new Error(bookingData.message || 'Failed to finalize booking');
                     }
-                };
-
-                const rzp = new (window as any).Razorpay(options);
-                rzp.on('payment.failed', function (response: any) {
-                    alert(`Payment failed: ${response.error.description}`);
+                } catch (error: any) {
+                    console.error("Booking finalization failed:", error);
+                    alert(`Booking failed: ${error.message || 'Unknown Error'}`);
                     setLoading(false);
-                });
-                rzp.open();
+                }
 
                 return; // Stop standard checkout flow here
             }
@@ -775,8 +743,8 @@ export default function CheckoutPage() {
                                         }`}
                                 >
                                     {paymentMethod !== 'BOOKING' && (
-                                        <div className="absolute top-0 right-0 bg-zinc-900 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl shadow-sm z-10">
-                                            Refundable
+                                        <div className="absolute top-0 right-0 bg-green-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                                            Free Service
                                         </div>
                                     )}
 
@@ -785,7 +753,7 @@ export default function CheckoutPage() {
                                     </div>
                                     <div className="flex-1 min-w-0 pr-4 mt-2 sm:mt-0">
                                         <p className="font-black text-gray-900 text-sm md:text-[15px]">Book Live Video Call</p>
-                                        <p className="text-[11px] text-gray-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis">Pay ₹99 for a 1-on-1 video call to see it live.</p>
+                                        <p className="text-[11px] text-gray-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis">Free 1-on-1 video call to see it live.</p>
                                     </div>
                                     {paymentMethod === 'BOOKING' && (
                                         <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center shadow-md">

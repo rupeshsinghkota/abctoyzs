@@ -89,15 +89,6 @@ export function MobileHeader() {
                                 Shop All
                             </Link>
 
-                            <Link
-                                href="/live-showroom"
-                                className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/10 rounded-xl transition-all text-primary font-black uppercase text-[11px] tracking-widest group"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <Video className="w-5 h-5 animate-pulse" />
-                                Live Showroom Tour
-                            </Link>
-
                             <div className="h-px bg-border/20 my-2 mx-3" />
 
                             {/* The Garage (Grid UI) */}

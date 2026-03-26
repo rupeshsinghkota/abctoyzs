@@ -30,20 +30,27 @@ export async function POST(req: Request) {
         }
 
         // 2. Verify Razorpay payment signature
-        if (process.env.RAZORPAY_KEY_SECRET && razorpayPaymentId && razorpayOrderId && razorpaySignature) {
-            const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
-            hmac.update(razorpayOrderId + "|" + razorpayPaymentId);
-            const generatedSignature = hmac.digest('hex');
+        // We skip verification if it's a free booking (no payment details provided)
+        const isFreeBooking = !razorpayPaymentId && !razorpayOrderId;
 
-            if (generatedSignature !== razorpaySignature) {
-                console.error('[BookingCreate] Invalid Signature');
-                return NextResponse.json({ message: 'Invalid payment signature' }, { status: 400 });
+        if (!isFreeBooking) {
+            if (process.env.RAZORPAY_KEY_SECRET && razorpayPaymentId && razorpayOrderId && razorpaySignature) {
+                const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+                hmac.update(razorpayOrderId + "|" + razorpayPaymentId);
+                const generatedSignature = hmac.digest('hex');
+
+                if (generatedSignature !== razorpaySignature) {
+                    console.error('[BookingCreate] Invalid Signature');
+                    return NextResponse.json({ message: 'Invalid payment signature' }, { status: 400 });
+                }
+            } else if (process.env.RAZORPAY_KEY_SECRET) {
+                console.error('[BookingCreate] Missing Payment Details for verification');
+                return NextResponse.json({ message: 'Missing payment details' }, { status: 400 });
+            } else {
+                console.warn("Skipping Razorpay signature verification due to missing SECRET in env.");
             }
-        } else if (process.env.RAZORPAY_KEY_SECRET) {
-            console.error('[BookingCreate] Missing Payment Details for verification');
-            return NextResponse.json({ message: 'Missing payment details' }, { status: 400 });
         } else {
-            console.warn("Skipping Razorpay signature verification due to missing SECRET in env.");
+            console.log('[BookingCreate] Processing as FREE booking (no payment verification needed)');
         }
 
         // 3. Environment Check for Google API
@@ -158,16 +165,29 @@ export async function POST(req: Request) {
         }
 
         // 9. Update Order Record using Admin (for guests)
-        if (razorpayOrderId) {
-            await supabaseAdmin
-                .from('orders')
-                .update({
-                    payment_status: 'paid', // Standard 'paid' status
-                    razorpay_payment_id: razorpayPaymentId,
-                    status: 'processing',
-                    admin_notes: `JSON_BOOKING:{"date":"${date}","time":"${time}","meet":"${meetLink}"}`
-                })
-                .eq('razorpay_order_id', razorpayOrderId);
+        if (razorpayOrderId || isFreeBooking) {
+            const updatePayload: any = {
+                payment_status: isFreeBooking ? 'paid' : 'paid', // Mark as paid for both, as free is "complete"
+                status: 'processing',
+                admin_notes: `JSON_BOOKING:{"date":"${date}","time":"${time}","meet":"${meetLink}"}`
+            };
+
+            if (razorpayPaymentId) {
+                updatePayload.razorpay_payment_id = razorpayPaymentId;
+            }
+
+            const query = supabaseAdmin.from('orders').update(updatePayload);
+            
+            if (razorpayOrderId) {
+                await query.eq('razorpay_order_id', razorpayOrderId);
+            } else {
+                // If free booking, we might need another way to identify the order if we don't have the orderId from frontend
+                // Let's check if frontend sends supabaseOrderId
+                const { supabaseOrderId } = body;
+                if (supabaseOrderId) {
+                    await query.eq('id', supabaseOrderId);
+                }
+            }
         }
 
         // 10. Send WhatsApp Notifications
@@ -197,8 +217,7 @@ export async function POST(req: Request) {
                     `Hi ${customerName}! Your live video call is confirmed.\n\n` +
                     `📦 *Product:* ${productName}\n` +
                     `📅 *Date:* ${formattedDate}\n` +
-                    `⏰ *Time:* ${time}\n` +
-                    `💳 *Amount Paid:* ₹99\n\n` +
+                    `⏰ *Time:* ${time}\n\n` + // Removed Amount Paid
                     `${meetLinkText}\n\n` +
                     `Reply here for any questions. See you soon! 🚀`
                 );
@@ -211,7 +230,7 @@ export async function POST(req: Request) {
                 `*Product:* ${productName}\n` +
                 `*Date:* ${formattedDate}\n` +
                 `*Time:* ${time}\n` +
-                `*Payment:* ₹99 paid ✅\n` +
+                `*Payment:* ${isFreeBooking ? 'FREE (Commitment Fee Removed)' : '₹99 paid ✅'}\n` +
                 `*Razorpay ID:* ${razorpayPaymentId || 'N/A'}\n\n` +
                 (isMeetLinkReal
                     ? `*Meet Link:* ${meetLink}`

@@ -114,53 +114,87 @@ export function SlotBookingSection({ productId, productName, productPrice, isDra
             const orderData = await orderRes.json();
             setSupabaseOrderId(orderData.supabaseOrderId);
 
-            const options = {
-                key: orderData.key,
-                amount: orderData.amount,
-                currency: "INR",
-                name: "ABC Toyz",
-                description: `Live Video Call: ${productName}`,
-                order_id: orderData.orderId,
-                handler: async function (response: any) {
-                    try {
-                        toast.info("Verifying booking details...");
+            if (orderData.amount === 0 || !orderData.orderId) {
+                            // Free Booking: Call creation directly
+                            console.log('[Booking] Free booking detected, creating meeting immediately...');
+                            const bookingRes = await fetch('/api/bookings/create', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    productId,
+                                    productName,
+                                    date: selectedDate,
+                                    time: selectedTime,
+                                    customerName,
+                                    customerEmail,
+                                    customerPhone: cleanPhone,
+                                    supabaseOrderId: orderData.supabaseOrderId // Pass this for identifying the order in backend
+                                })
+                            });
 
-                        const bookingRes = await fetch('/api/bookings/create', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                productId,
-                                productName,
-                                date: selectedDate,
-                                time: selectedTime,
-                                customerName,
-                                customerEmail,
-                                customerPhone: cleanPhone,
-                                razorpayPaymentId: response.razorpay_payment_id,
-                                razorpayOrderId: response.razorpay_order_id,
-                                razorpaySignature: response.razorpay_signature
-                            })
-                        });
+                            const bookingData = await bookingRes.json();
 
-                        const bookingData = await bookingRes.json();
+                            if (bookingRes.ok || bookingData.simulated) {
+                                setMeetLink(bookingData.meetLink || null);
+                                setBookingStatus('success');
+                                toast.success("Slot Reserved! See you on the call.");
 
-                        if (bookingRes.ok || bookingData.simulated) {
-                            setMeetLink(bookingData.meetLink || null);
-                            setBookingStatus('success');
-                            toast.success("Slot Reserved! See you on the call.");
-
-                            setTimeout(() => {
-                                window.location.href = `/checkout/success?booking=true&oid=${orderData.supabaseOrderId}&amount=99`;
-                            }, 3000);
-                        } else {
-                            throw new Error(bookingData.message || 'Failed to generate meeting link');
+                                setTimeout(() => {
+                                    window.location.href = `/checkout/success?booking=true&oid=${orderData.supabaseOrderId}&amount=0`;
+                                }, 3000);
+                            } else {
+                                throw new Error(bookingData.message || 'Failed to generate meeting link');
+                            }
+                            return;
                         }
-                    } catch (error: any) {
-                        console.error('[Booking Finalize Error]:', error);
-                        toast.error(error.message || "Failed to finalize booking");
-                        setIsBooking(false); // Must reset since success state wasn't reached
-                    }
-                },
+
+                        const options = {
+                            key: orderData.key,
+                            amount: orderData.amount,
+                            currency: "INR",
+                            name: "ABC Toyz",
+                            description: `Live Video Call: ${productName}`,
+                            order_id: orderData.orderId,
+                            handler: async function (response: any) {
+                                try {
+                                    toast.info("Verifying booking details...");
+
+                                    const bookingRes = await fetch('/api/bookings/create', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            productId,
+                                            productName,
+                                            date: selectedDate,
+                                            time: selectedTime,
+                                            customerName,
+                                            customerEmail,
+                                            customerPhone: cleanPhone,
+                                            razorpayPaymentId: response.razorpay_payment_id,
+                                            razorpayOrderId: response.razorpay_order_id,
+                                            razorpaySignature: response.razorpay_signature
+                                        })
+                                    });
+
+                                    const bookingData = await bookingRes.json();
+
+                                    if (bookingRes.ok || bookingData.simulated) {
+                                        setMeetLink(bookingData.meetLink || null);
+                                        setBookingStatus('success');
+                                        toast.success("Slot Reserved! See you on the call.");
+
+                                        setTimeout(() => {
+                                            window.location.href = `/checkout/success?booking=true&oid=${orderData.supabaseOrderId}&amount=0`;
+                                        }, 3000);
+                                    } else {
+                                        throw new Error(bookingData.message || 'Failed to generate meeting link');
+                                    }
+                                } catch (error: any) {
+                                    console.error('[Booking Finalize Error]:', error);
+                                    toast.error(error.message || "Failed to finalize booking");
+                                    setIsBooking(false); // Must reset since success state wasn't reached
+                                }
+                            },
                 prefill: {
                     name: customerName,
                     email: customerEmail,
@@ -242,7 +276,7 @@ export function SlotBookingSection({ productId, productName, productPrice, isDra
                                 {[
                                     { icon: Video, title: 'HD Cinematic Feed', desc: 'See every curve, chrome finish, and LED detail in stunning high definition.' },
                                     { icon: Sparkles, title: 'Expert Consultation', desc: 'Our specialists will guide you on features, battery life, and assembly live.' },
-                                    { icon: ShieldCheck, title: 'Bill-Adjustable Credit', desc: 'The small commitment fee is instantly applied to your purchase credit.' }
+                                    { icon: ShieldCheck, title: 'Completely Free Experience', desc: 'Book your private showroom tour for free. No credit card required.' }
                                 ].map((feature, i) => (
                                     <motion.div
                                         key={i}
@@ -449,8 +483,8 @@ export function SlotBookingSection({ productId, productName, productPrice, isDra
                                                 <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                 <ShieldCheck className="w-6 h-6 text-primary shrink-0 relative z-10" />
                                                 <div className="flex-1 relative z-10">
-                                                    <p className="text-[11px] text-white font-black uppercase tracking-wider">Showroom Quality Guarantee</p>
-                                                    <p className="text-[10px] text-zinc-500 font-bold mt-1.5 leading-relaxed">The ₹99 commitment fee is 100% refundable as credit on your first order. It helps us ensure serious consultations for our high-end models.</p>
+                                                    <p className="text-[11px] text-white font-black uppercase tracking-wider">Free Video Consultation</p>
+                                                    <p className="text-[10px] text-zinc-500 font-bold mt-1.5 leading-relaxed">Experience our premium ride-on toys live. No booking fee or hidden charges. Our experts are ready to show you the details.</p>
                                                 </div>
                                             </div>
 

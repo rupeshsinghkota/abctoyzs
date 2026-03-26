@@ -52,7 +52,7 @@ export async function POST(req: Request) {
                 payment_method: 'BOOKING',
                 guest_email: customerEmail,
                 shipping_address_id: address.id,
-                advance_amount: 99
+                advance_amount: 0 // Free Video Call
             })
             .select()
             .single();
@@ -71,40 +71,13 @@ export async function POST(req: Request) {
             price: productPrice || 0
         });
 
-        // 4. Create Razorpay Order
-        const razorpay = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID,
-            key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-        });
-
-        const amountInPaise = 99 * 100; // ₹99 fee
-
-        const options = {
-            amount: amountInPaise,
-            currency: 'INR',
-            receipt: orderDB.id,
-            notes: {
-                payment_type: 'video_consultation_booking',
-                productId: String(productId) || 'unknown',
-                productName: productName || 'unknown',
-                supabase_order_id: orderDB.id
-            }
-        };
-
-        const razorpayOrder = await razorpay.orders.create(options);
-
-        // 5. Update Supabase Order with Razorpay Order ID
-        await supabaseAdmin
-            .from('orders')
-            .update({ razorpay_order_id: razorpayOrder.id })
-            .eq('id', orderDB.id);
-
-        console.log('[BookingPayment] Successfully initialized Razorpay:', razorpayOrder.id);
+        // 4. Return success for free booking (skip Razorpay)
+        console.log('[BookingPayment] Free Booking Initialized:', orderDB.id);
 
         return NextResponse.json({
-            orderId: razorpayOrder.id,
+            orderId: null, // No Razorpay order needed for free booking
             supabaseOrderId: orderDB.id,
-            amount: razorpayOrder.amount,
+            amount: 0,
             key: process.env.RAZORPAY_KEY_ID
         });
 

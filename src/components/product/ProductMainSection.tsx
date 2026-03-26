@@ -15,7 +15,6 @@ import { LiveViewersBadge } from '@/components/product/LiveViewersBadge';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { OrderCountdown } from '@/components/ui/OrderCountdown';
-import { LiveTourPromo } from '@/components/product/LiveTourPromo';
 import { useStore } from '@/store/useStore';
 
 
@@ -368,7 +367,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                                     </div>
                                 </div>
                                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-tight">
-                                    <span className="text-zinc-900 font-black">{parentCount} parents</span> in Delhi-NCR <br/>booked a Live Tour today.
+                                    <span className="text-zinc-900 font-black">{parentCount} parents</span> <br/>booked a Live Tour today.
                                 </p>
                                 <div className="h-8 w-px bg-zinc-200" />
                                 <div className="flex flex-col items-end">
@@ -465,12 +464,7 @@ export function ProductMainSection({ product, boxContent = [] }: { product: Prod
                 </div>
             </div>
 
-             {/* LIVE TOUR PROMO */}
-            <div className="lg:col-span-12 px-4 lg:px-0 py-8 lg:py-16">
-                <LiveTourPromo productName={product.name} />
-            </div>
-
-            {/* REVIEWS SECTION */}
+             {/* REVIEWS SECTION */}
             <div className="lg:col-span-12 px-4 lg:px-0">
                 <ProductReviews
                     productId={product.id}

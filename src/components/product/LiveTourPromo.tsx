@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 
 export function LiveTourPromo({ productName }: { productName: string }) {
     const benefits = [
-        "See the actual size & build quality",
-        "Test the remote control live",
-        "Check all lighting & sound effects",
-        "Get all your questions answered"
+        "See the actual size & quality live",
+        "Test the real-world scale (1:4)",
+        "Check every light & sound effect",
+        "See the magic before you buy"
     ];
 
     return (
@@ -32,7 +32,7 @@ export function LiveTourPromo({ productName }: { productName: string }) {
                     </h2>
                     
                     <p className="text-zinc-400 text-sm leading-relaxed max-w-md">
-                        Not sure about the size or features? Book a 5-minute private video tour and see the <strong>{productName}</strong> in action from our Delhi showroom.
+                        Stop trusting photos that don't tell the whole story. Book a 5-minute private video tour and see the magic of the <strong>{productName}</strong> live from our showroom floor.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
