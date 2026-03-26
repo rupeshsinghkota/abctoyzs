@@ -106,7 +106,7 @@ export function LiveShowroomCTA() {
                                 {/* Decorative Badges */}
                                 <div className="absolute -right-8 top-12 bg-white rounded-2xl p-4 shadow-2xl border border-zinc-100 hidden md:block rotate-6">
                                     <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">Fee</p>
-                                    <p className="text-lg font-black text-zinc-950 leading-none">₹99 <span className="text-[10px] text-primary">Refundable</span></p>
+                                    <p className="text-lg font-black text-zinc-950 leading-none uppercase">Free <span className="text-[10px] text-primary">No Fee</span></p>
                                 </div>
                             </div>
                         </div>

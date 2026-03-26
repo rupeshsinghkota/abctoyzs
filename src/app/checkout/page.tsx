@@ -808,7 +808,7 @@ export default function CheckoutPage() {
                                                 </div>
 
                                                 <div className="bg-zinc-50 border border-zinc-100 rounded-xl p-3 mt-4 text-[10px] font-medium text-zinc-500 leading-relaxed">
-                                                    <strong>Note:</strong> You will be charged ₹99 today for the tour slot. This fee prevents spam and <span className="text-zinc-900 font-black">will be fully adjusted</span> against your final order value if you decide to purchase.
+                                                    <strong>Note:</strong> This is a <span className="text-zinc-900 font-black">completely free service</span> to help you experience our premium ride-on toys live. No credit card or commitment fee is required.
                                                 </div>
                                             </div>
                                         </div>
@@ -1006,7 +1006,7 @@ export default function CheckoutPage() {
                                         </>
                                     ) : (
                                         <>
-                                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'BOOKING' ? "Pay ₹99 & Book" : paymentMethod === 'COD' ? (
+                                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'BOOKING' ? "Book Free Call" : paymentMethod === 'COD' ? (
                                                 codSettings?.cod_mode === 'partial'
                                                     ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
                                                     : "Confirm COD"
@@ -1452,7 +1452,7 @@ function OrderSummaryCard({
                         </>
                     ) : (
                         <>
-                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'BOOKING' ? "Pay ₹99 & Book Video Call" : paymentMethod === 'COD' ? (
+                            {!selectedAddressId ? "Select Address First" : paymentMethod === 'BOOKING' ? "Book Free Video Call" : paymentMethod === 'COD' ? (
                                 codSettings?.cod_mode === 'partial'
                                     ? `Pay ₹${calculateCodAdvance(total, codSettings).advance.toLocaleString()} Advance`
                                     : "Complete Cash on Delivery"

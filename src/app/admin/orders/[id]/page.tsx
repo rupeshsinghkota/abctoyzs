@@ -282,7 +282,7 @@ export default function OrderDetailPage() {
                                     <span className="text-amber-600 font-medium ml-2">Prepaid ₹{((order as any).advance_amount || 0).toLocaleString()} received</span>
                                 )}
                                 {order.payment_method === 'BOOKING' && (
-                                    <span className="text-blue-600 font-medium ml-2">Video Call Fee (₹99) Paid</span>
+                                    <span className="text-blue-600 font-medium ml-2">Free Video Call Booking</span>
                                 )}
                             </div>
                         </div>
@@ -301,17 +301,17 @@ export default function OrderDetailPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-blue-900">Live Video Call Request</h3>
-                                        <p className="text-xs text-blue-700 font-medium">Customer paid ₹99 to see the product live on camera.</p>
+                                        <p className="text-xs text-blue-700 font-medium">Customer requested a free live video tour of the product.</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 pt-2">
                                     <div className="bg-white/60 p-3 rounded-lg border border-blue-100/50">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">Status</p>
-                                        <p className="text-sm font-bold text-blue-900">Paid Advance</p>
+                                        <p className="text-sm font-bold text-blue-900">Slot Reserved</p>
                                     </div>
                                     <div className="bg-white/60 p-3 rounded-lg border border-blue-100/50">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">Fee</p>
-                                        <p className="text-sm font-bold text-blue-900">₹99.00 (Adjustable)</p>
+                                        <p className="text-sm font-bold text-blue-900">FREE</p>
                                     </div>
                                 </div>
                                 <p className="text-xs text-blue-600 italic">

@@ -9,19 +9,8 @@ export const metadata: Metadata = {
 
 const sections = [
     {
-        icon: IndianRupee,
-        title: '1. Booking Fee',
-        color: 'text-orange-500',
-        bg: 'bg-orange-50 border-orange-100',
-        points: [
-            'A ₹99 booking fee is charged to confirm your live video call slot.',
-            'This amount is fully adjustable against your final product purchase.',
-            'The fee ensures committed bookings and prevents no-shows.',
-        ],
-    },
-    {
         icon: Video,
-        title: '2. What You Get',
+        title: '1. What You Get',
         color: 'text-blue-600',
         bg: 'bg-blue-50 border-blue-100',
         points: [
@@ -33,19 +22,19 @@ const sections = [
     },
     {
         icon: Calendar,
-        title: '3. Cancellation Policy',
+        title: '2. Commitment & Cancellation',
         color: 'text-red-500',
         bg: 'bg-red-50 border-red-100',
         points: [
-            'Cancel 2+ hours before your slot → Full ₹99 refund.',
-            'Cancel within 2 hours of your slot → No refund (slot cannot be reassigned).',
-            'No-show without notice → No refund.',
+            'Our showroom slots are limited and in high demand.',
+            'If you cannot attend, please cancel at least 2 hours in advance.',
+            'Frequent no-shows may lead to a temporary block from booking live tours.',
             'To cancel, WhatsApp us at +91 82392 69217.',
         ],
     },
     {
         icon: RefreshCcw,
-        title: '4. Rescheduling',
+        title: '3. Rescheduling',
         color: 'text-green-600',
         bg: 'bg-green-50 border-green-100',
         points: [
@@ -56,29 +45,18 @@ const sections = [
     },
     {
         icon: ShieldCheck,
-        title: '5. Purchase Adjustment',
+        title: '4. Completely Free Service',
         color: 'text-indigo-600',
         bg: 'bg-indigo-50 border-indigo-100',
         points: [
-            'If you purchase the product after your call, the ₹99 fee is adjusted in your order.',
-            'The adjustment is valid for 7 days after your call date.',
-            'Mention your booking reference when placing the order to claim the adjustment.',
-        ],
-    },
-    {
-        icon: Clock,
-        title: '6. Refund Timeline',
-        color: 'text-amber-600',
-        bg: 'bg-amber-50 border-amber-100',
-        points: [
-            'Approved refunds are processed within 5–7 business days.',
-            'Refunds are credited to the original payment method (UPI, card, etc.).',
-            'For refund status, email support@abctoyz.in or WhatsApp us.',
+            'This is a premium service provided for free to genuine customers.',
+            'No credit card or commitment fee is required to book a slot.',
+            'Experience our products from the comfort of your home before making a decision.',
         ],
     },
     {
         icon: PhoneCall,
-        title: '7. Contact & Support',
+        title: '5. Contact & Support',
         color: 'text-zinc-700',
         bg: 'bg-zinc-50 border-zinc-200',
         points: [
@@ -105,7 +83,7 @@ export default function BookingPolicyPage() {
                         Everything you need to know about booking, cancelling, and rescheduling your private live video tour at ABC Toyz.
                     </p>
                     <p className="text-zinc-600 text-xs mt-6 font-medium">
-                        Last updated: March 2025
+                        Last updated: March 2026
                     </p>
                 </div>
             </div>
@@ -113,11 +91,11 @@ export default function BookingPolicyPage() {
             {/* Highlight Bar */}
             <div className="bg-primary text-white py-4">
                 <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm font-bold text-center">
-                    <span>✅ ₹99 Booking Fee</span>
+                    <span>✅ 100% Free Experience</span>
                     <span className="hidden sm:block text-white/40">•</span>
                     <span>🎥 15-Min Private Live Call</span>
                     <span className="hidden sm:block text-white/40">•</span>
-                    <span>💰 Fully Adjustable on Purchase</span>
+                    <span>🤝 No Commitment Required</span>
                 </div>
             </div>
 
@@ -153,7 +131,7 @@ export default function BookingPolicyPage() {
                     <Video className="w-8 h-8 text-primary mx-auto" />
                     <h3 className="text-2xl font-black text-white tracking-tight">Ready to See It Live?</h3>
                     <p className="text-zinc-400 text-sm font-medium max-w-sm mx-auto">
-                        Book your private 15-minute video tour today. Pay just ₹99, fully adjusted on purchase.
+                        Book your private 15-minute video tour today. It's completely free and available to book right at checkout.
                     </p>
                     <Link
                         href="/"

@@ -33,7 +33,7 @@ export function VideoShowcaseSection() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
                             {[
                                 "Real-time walkthrough",
-                                "Adjustable ₹99 fee",
+                                "Completely Free",
                                 "Ask safety questions",
                                 "See actual colors"
                             ].map((item) => (
